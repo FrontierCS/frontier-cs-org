@@ -38,23 +38,30 @@
 
 {%- if site.serve_og_meta %}
 
+    {%- comment -%} Resolve OG image: page.og_image > page.image > site.og_image > site.icon {%- endcomment -%}
+    {%- if page.og_image -%}{%- assign og_img = page.og_image -%}
+    {%- elsif page.image -%}{%- assign og_img = page.image -%}
+    {%- elsif site.og_image -%}{%- assign og_img = site.og_image -%}
+    {%- elsif site.icon -%}{%- capture og_img -%}assets/img/{{ site.icon }}{%- endcapture -%}{%- endif -%}
+    {%- if og_img -%}{%- assign og_img_abs = og_img | relative_url | prepend: site.url -%}{%- endif -%}
+
     <!-- OpenGraph -->
     <meta property="og:site_name" content="{{ title }}" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="{%- if page.title -%}{{ title }} | {{ page.title }}{%- else -%}{{ title }}{%- endif -%}" />
     <meta property="og:url" content="{{ page.url | prepend: site.baseurl | prepend: site.url | remove_first: 'index.html' }}" />
     <meta property="og:description" content="{%- if page.description -%}{{ page.description }}{%- else -%}{{ site.description }}{%- endif -%}" />
-    {% if page.og_image or site.og_image -%}
-    <meta property="og:image" content="{%- if page.og_image -%}{{ page.og_image }}{%- else -%}{{ site.og_image }}{%- endif -%}" />
+    {% if og_img_abs -%}
+    <meta property="og:image" content="{{ og_img_abs }}" />
     {%- endif %}
     <meta property="og:locale" content="{{ site.lang }}" />
 
     <!-- Twitter card -->
-    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="{%- if page.title -%}{{ page.title }}{%- else -%}{{ title }}{%- endif -%}" />
     <meta name="twitter:description" content="{%- if page.description -%}{{ page.description }}{%- else -%}{{ site.description }}{%- endif -%}" />
-    {% if page.og_image or site.og_image -%}
-    <meta name="twitter:image" content="{%- if page.og_image -%}{{ page.og_image }}{%- else -%}{{ site.og_image }}{%- endif -%}" />
+    {% if og_img_abs -%}
+    <meta name="twitter:image" content="{{ og_img_abs }}" />
     {%- endif %}
     {% if site.twitter_username -%}
     <meta name="twitter:site" content="@{{ site.twitter_username }}" />

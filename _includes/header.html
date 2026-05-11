@@ -5,7 +5,7 @@
       <nav id="navbar" class="navbar navbar-light navbar-expand-sm {% if site.navbar_fixed %}fixed-top{% else %}sticky-top{% endif %}">
         <div class="container">
           <a class="navbar-brand title font-weight-lighter" href="{{ '/' | relative_url }}">
-            {{ site.first_name | default: site.title }}
+            <svg class="fc-brand-mark" width="13" height="13" viewBox="0 0 13 13" aria-hidden="true"><path d="M2.5 1 L10 6.5 L2.5 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>{{ site.first_name | default: site.title }}
           </a>
           <!-- Navbar Toggle -->
           <button class="navbar-toggler collapsed ml-auto" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">

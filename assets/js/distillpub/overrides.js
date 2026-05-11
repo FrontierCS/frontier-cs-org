@@ -1,4 +1,25 @@
 $(document).ready(function() {
+    // Safety net: ensure d-byline gets populated even if the distill
+    // Controller's DOMContentLoaded callback never fires (observed when the
+    // page is loaded inside a sandboxed iframe where readyState transitions
+    // happen before the listener attaches).
+    (function ensureBylinePopulated() {
+        var byline = document.querySelector('d-byline');
+        var fmEl = document.querySelector('d-front-matter');
+        if (!byline || !fmEl) return;
+        if (byline.innerHTML && byline.innerHTML.length > 0) return;
+        var script = fmEl.querySelector('script');
+        if (!script) return;
+        try {
+            var data = JSON.parse(script.textContent);
+            byline.frontMatter = data;
+            var appendix = document.querySelector('distill-appendix');
+            if (appendix && (!appendix.innerHTML || appendix.innerHTML.length === 0)) {
+                appendix.frontMatter = data;
+            }
+        } catch (e) { /* silent fallback */ }
+    })();
+
     // Use custom date display (e.g. "周二, Feb 3, 2026") when set on body
     var dateDisplay = document.body.getAttribute('data-date-display');
     if (dateDisplay) {

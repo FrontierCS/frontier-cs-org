@@ -1,9 +1,16 @@
 ---
-layout: page
+layout: default
 permalink: /404.html
 title: "Page not found"
-description: "Looks like there has been a mistake. Nothing exists here."
-redirect: true
+description: "We can't find the page you're looking for."
 ---
 
-<p>You will be redirected to the main page within 3 seconds. If not redirected, please click <a href="{{ site.baseurl }}/">here</a>.</p>
+<section class="fc-not-found">
+  <p class="fc-not-found-eyebrow">Error 404</p>
+  <h1>We can't find that page.</h1>
+  <p>The page you're looking for may have moved, or never existed. Try the homepage or browse the latest blog posts.</p>
+  <div class="fc-not-found-actions">
+    <a class="primary" href="{{ '/' | relative_url }}">Go home <span aria-hidden="true">→</span></a>
+    <a class="secondary" href="{{ '/blog/' | relative_url }}">Read the blog</a>
+  </div>
+</section>

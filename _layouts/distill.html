@@ -71,6 +71,12 @@
 
       <d-byline></d-byline>
 
+      {% if page.image %}
+      <figure class="fc-post-hero">
+        <img src="{{ page.image | relative_url }}" alt="{{ page.title }}">
+      </figure>
+      {% endif %}
+
       <d-article>
         {% if page.toc -%}
         <d-contents>
@@ -103,6 +109,50 @@
 
     {% include scripts/bootstrap.html %}
     {% include scripts/analytics.html %}
+
+    <script>
+    // Reading progress bar (top hairline).
+    (function () {
+      var bar = document.createElement('div');
+      bar.className = 'fc-reading-progress';
+      bar.setAttribute('aria-hidden', 'true');
+      document.body.insertBefore(bar, document.body.firstChild);
+      var article = document.querySelector('d-article') || document.querySelector('.post-content');
+      if (!article) return;
+      function update() {
+        var rect = article.getBoundingClientRect();
+        var start = rect.top + window.scrollY;
+        var end = start + rect.height - window.innerHeight;
+        var p = end > start ? (window.scrollY - start) / (end - start) : 0;
+        p = Math.max(0, Math.min(1, p));
+        bar.style.width = (p * 100) + '%';
+      }
+      document.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('resize', update);
+      window.addEventListener('load', update);
+      update();
+    })();
+
+    // Section h2 / h3 anchor links (deep-linkable headings).
+    (function () {
+      var article = document.querySelector('d-article') || document.querySelector('.post-content');
+      if (!article) return;
+      article.querySelectorAll('h2, h3').forEach(function (h) {
+        if (!h.id) {
+          var slug = h.textContent.trim().toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
+          if (slug) h.id = slug;
+        }
+        if (h.id && !h.querySelector('.fc-anchor')) {
+          var a = document.createElement('a');
+          a.href = '#' + h.id;
+          a.className = 'fc-anchor';
+          a.setAttribute('aria-label', 'Direct link to section');
+          a.textContent = '#';
+          h.appendChild(a);
+        }
+      });
+    })();
+    </script>
   </body>
 
 
