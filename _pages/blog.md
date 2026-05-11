@@ -19,9 +19,8 @@ show_year: 2026
 ---
 
 <section class="blog-hero">
-  <p class="blog-eyebrow">Frontier-CS Blog</p>
-  <h1>Research notes, benchmark releases, and agent evaluation insights</h1>
-  <p>Browse every Frontier-CS post and open each paper for the full write-up.</p>
+  <h1>Blog Posts</h1>
+  <p>Research notes, benchmark releases, and agent evaluation insights.</p>
 </section>
 
 {% if page.show_year %}

@@ -42,9 +42,19 @@
     {% endif %}
   </a>
   <div class="fc-post-card-body">
-    <p class="fc-post-meta">{{ card_post.date | date: '%b %-d, %Y' }}</p>
     <h3><a href="{{ post_link }}"{% if is_external %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ card_post.title }}</a></h3>
-    <p>{{ card_post.description }}</p>
+    <div class="fc-post-card-spacer" aria-hidden="true"></div>
+    <dl class="fc-post-card-details">
+      <div>
+        <dt>Date</dt>
+        <dd>{{ card_post.date | date: '%B %-d, %Y' }}</dd>
+      </div>
+      <div>
+        <dt>Category</dt>
+        <dd>{{ primary_tag | default: "Research" }}</dd>
+      </div>
+    </dl>
+    <a class="fc-post-card-button" href="{{ post_link }}"{% if is_external %} target="_blank" rel="noopener noreferrer"{% endif %}>Read the blog <span aria-hidden="true">→</span></a>
   </div>
 </article>
 {% else %}
@@ -65,7 +75,7 @@
     <p class="blog-card-meta">{{ card_post.date | date: '%b %-d, %Y' }} &middot; {{ read_time }} min read</p>
     <h2><a href="{{ post_link }}"{% if is_external %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ card_post.title }}</a></h2>
     <p>{{ card_post.description }}</p>
-    <a class="blog-card-link" href="{{ post_link }}"{% if is_external %} target="_blank" rel="noopener noreferrer"{% endif %}>Read post &rarr;</a>
+    <a class="blog-card-link" href="{{ post_link }}"{% if is_external %} target="_blank" rel="noopener noreferrer"{% endif %}>Read more &rarr;</a>
   </div>
 </article>
 {% endif %}

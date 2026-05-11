@@ -5,8 +5,9 @@
 // Typography
 
 :root {
-  --fc-font-sans: Arial, "Helvetica Neue", Helvetica, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --fc-font-sans: "Styrene A", "Styrene B", "Inter", "Avenir Next", "Helvetica Neue", -apple-system, BlinkMacSystemFont, Arial, ui-sans-serif, system-ui, sans-serif;
   --fc-font-mono: "SF Mono", "SFMono-Regular", ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --fc-font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", "Times New Roman", serif;
 }
 
 html,
@@ -695,13 +696,14 @@ footer.sticky-bottom {
 
 .blog-card-meta {
   font-size: 0.82rem;
-  margin-bottom: 0.2rem !important;
+  margin-bottom: 0.14rem !important;
 }
 
 .blog-card-link {
   color: #111111;
   font-weight: 600;
   margin-top: 0.2rem;
+  letter-spacing: 0.005em;
 }
 
 .keep-reading {
@@ -885,6 +887,7 @@ body {
   margin: 1.2rem 0 0 !important;
   color: #5f5f5f !important;
   font-size: 1rem !important;
+  font-family: Georgia, "Times New Roman", Times, serif !important;
 }
 
 .fc-release-link a {
@@ -1808,6 +1811,8 @@ body {
   border: 1px solid rgba(0, 50, 98, 0.16);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.72);
+  letter-spacing: 0.024em;
+  font-weight: 600;
 }
 
 .fc-post-card-body,
@@ -1925,10 +1930,9 @@ body {
   grid-template-columns: minmax(260px, 360px) 1fr !important;
   gap: 1.5rem !important;
   padding: 1rem !important;
-  border: 1px solid rgba(15, 23, 42, 0.09) !important;
+  border: 0 !important;
   border-radius: 26px !important;
-  background: rgba(255, 255, 255, 0.78) !important;
-  box-shadow: 0 16px 42px rgba(15, 23, 42, 0.08) !important;
+  box-shadow: none !important;
 }
 
 .blog-card-thumb img {
@@ -1943,6 +1947,8 @@ body {
 }
 
 .blog-card-body {
+  display: flex;
+  flex-direction: column;
   justify-content: center;
   padding-right: 0.5rem;
 }
@@ -1965,14 +1971,17 @@ body {
 .blog-card h2 {
   margin: 0.3rem 0 0.7rem !important;
   color: #0b1020;
-  font-size: clamp(1.45rem, 2.4vw, 2.1rem) !important;
+  font-size: clamp(1.25rem, 1.65vw, 1.7rem) !important;
   line-height: 1.08 !important;
-  letter-spacing: -0.055em !important;
+  letter-spacing: -0.024em !important;
+
 }
 
 .blog-card-link {
+  align-self: flex-end;
+  margin-top: auto;
   color: #0b1020 !important;
-  font-weight: 800 !important;
+  font-weight: 400 !important;
   text-decoration: none !important;
 }
 
@@ -2566,6 +2575,7 @@ body {
 .fc-logo-marquee {
   position: relative;
   width: 100%;
+  margin-top: 4rem !important;
   overflow: hidden;
   mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
 }
@@ -2574,7 +2584,7 @@ body {
   display: flex;
   width: max-content;
   gap: 1.4rem;
-  animation: fc-logo-scroll 24s linear infinite;
+  animation: fc-logo-scroll 42s linear infinite;
 }
 
 .fc-logo-marquee:hover .fc-logo-track {
@@ -2701,8 +2711,8 @@ body {
 }
 
 .fc-involved-page {
-  max-width: 1040px;
-  margin: 4.5rem auto;
+  max-width: 1080px;
+  margin: clamp(3.5rem, 6vw, 5rem) auto;
   padding: 0 0 3rem;
   border: 0;
   border-radius: 0;
@@ -2712,18 +2722,20 @@ body {
 
 .fc-involved-page h1 {
   margin: 0 0 0.9rem;
-  color: #0f172a;
-  font-size: clamp(1.8rem, 3vw, 2.7rem);
+  color: #000000 !important;
+  font-size: clamp(1.6rem, 2.4vw, 2.5rem);
   line-height: 1.08;
-  letter-spacing: -0.045em;
+  font-weight: 620;
+  letter-spacing: 0.024em;
 }
 
 .fc-involved-subtitle {
   max-width: 920px;
   margin-bottom: 1.25rem;
-  color: #526174;
-  font-size: 1.05rem;
-  font-weight: 750;
+  color: #000000 !important;
+  font-family: var(--fc-font-sans) !important;
+  font-size: 1rem;
+  font-weight: 600;
   line-height: 1.55;
 }
 
@@ -2734,16 +2746,111 @@ body {
 }
 
 .fc-involved-card p {
-  color: #526174;
+  color: #000000 !important;
   max-width: 980px;
-  font-size: 1rem;
+  font-family: Georgia, "Times New Roman", Times, serif !important;
+  font-weight: 400 !important;
+  font-size: 0.96rem;
   line-height: 1.62;
   margin-bottom: 0.9rem;
 }
 
 .fc-involved-card a {
   color: #003262;
-  font-weight: 750;
+  font-family: Georgia, "Times New Roman", Times, serif !important;
+  font-weight: 620;
+}
+
+.fc-projects-page {
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: clamp(3.25rem, 6vw, 4.75rem) 0 clamp(4rem, 7vw, 5.5rem);
+}
+
+body > .container.mt-5:has(.fc-projects-page) {
+  margin-top: 0 !important;
+}
+
+.fc-projects-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: clamp(2rem, 7vw, 6rem);
+  align-items: center;
+  margin-bottom: clamp(2rem, 4vw, 3.2rem);
+}
+
+.fc-projects-hero h1 {
+  margin: 0;
+  color: #000000 !important;
+  font-size: clamp(1rem, 3vw, 3.15rem);
+  line-height: 0.96;
+  letter-spacing: 0.024rem;
+  font-weight: 600;
+}
+
+.fc-projects-hero p {
+  max-width: 620px;
+  margin: 0;
+  color: #000000 !important;
+  font-family: Georgia, "Times New Roman", Times, serif !important;
+  font-size: clamp(1rem, 1.45vw, 1.22rem);
+  line-height: 1.35;
+  letter-spacing: 0;
+}
+
+.fc-project-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.fc-project-card {
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(1.4rem, 2.4vw, 2rem);
+  border-radius: 20px;
+  background: #d4e0ef;
+  color: var(--fc-industrial-ink) !important;
+  text-decoration: none !important;
+}
+
+.fc-project-card:hover {
+  background: #cbd9ea;
+  color: var(--fc-industrial-ink) !important;
+}
+
+.fc-project-card-kicker {
+  margin: 0 0 0.9rem;
+  color: var(--fc-industrial-blue-dark) !important;
+  font-family: var(--fc-font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em !important;
+  text-transform: uppercase;
+}
+
+.fc-project-card h2 {
+  margin: 0 0 0.9rem;
+  color: #000000 !important;
+  font-size: clamp(1.55rem, 2.4vw, 2.2rem);
+  line-height: 1.02;
+  font-weight: 620;
+}
+
+.fc-project-card > p:not(.fc-project-card-kicker) {
+  margin: 0;
+  color: #1f2937 !important;
+  font-family: Georgia, "Times New Roman", Times, serif !important;
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
+.fc-project-card > span {
+  margin-top: auto;
+  color: var(--fc-industrial-blue-dark);
+  font-size: 0.9rem;
+  font-weight: 650;
 }
 
 // Leaderboard visual style: clean rank/model/score table.
@@ -2928,7 +3035,7 @@ body {
     transform: translateX(0);
   }
   to {
-    transform: translateX(calc(-50% - 1.1rem));
+    transform: translateX(-50%);
   }
 }
 
@@ -3147,4 +3254,1688 @@ body {
 .fc-bottom-nav::before {
   height: 2px;
   background: #9bbcf2 !important;
+}
+
+// Minimal industrial blue redesign.
+:root {
+  --fc-industrial-bg: #e9eff7;
+  --fc-industrial-band: #e9eff7;
+  --fc-industrial-panel: #fbfcfe;
+  --fc-industrial-panel-soft: #eef3f9;
+  --fc-industrial-ink: #111a27;
+  --fc-industrial-muted: #566273;
+  --fc-industrial-faint: #8b96a5;
+  --fc-industrial-line: rgba(42, 67, 101, 0.18);
+  --fc-industrial-line-strong: rgba(42, 67, 101, 0.30);
+  --fc-industrial-blue: #2f5f98;
+  --fc-industrial-blue-dark: #203f66;
+  --global-bg-color: var(--fc-industrial-bg);
+  --global-card-bg-color: var(--fc-industrial-panel);
+  --global-theme-color: var(--fc-industrial-blue);
+  --global-hover-color: var(--fc-industrial-blue-dark);
+  --global-divider-color: var(--fc-industrial-line);
+}
+
+html,
+body {
+  background: var(--fc-industrial-bg) !important;
+  color: var(--fc-industrial-ink);
+  max-width: 100%;
+  overflow-x: hidden !important;
+}
+
+body {
+  padding-bottom: 0 !important;
+}
+
+body > .container.mt-5 {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.navbar {
+  background: rgba(244, 247, 251, 0.9) !important;
+  border-bottom: 1px solid var(--fc-industrial-line) !important;
+  box-shadow: none !important;
+  backdrop-filter: blur(20px);
+}
+
+.navbar > .container,
+.fc-hero.fc-hero-bench,
+.fc-section,
+.fc-bottom-nav {
+  max-width: 1080px !important;
+}
+
+.navbar > .container {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+.navbar.navbar-light .navbar-brand {
+  color: var(--fc-industrial-ink) !important;
+  font-size: 0.95rem;
+  font-weight: 560 !important;
+  letter-spacing: -0.025em !important;
+}
+
+.navbar.navbar-light .navbar-nav .nav-item .nav-link {
+  color: rgba(17, 24, 39, 0.62) !important;
+  font-size: 0.86rem;
+  font-weight: 500 !important;
+  letter-spacing: -0.015em;
+  padding-left: 1.35rem;
+}
+
+.navbar.navbar-light .navbar-nav .nav-item .nav-link:hover,
+.navbar.navbar-light .navbar-nav .nav-item.active > .nav-link {
+  color: var(--fc-industrial-ink) !important;
+}
+
+.fc-hero.fc-hero-bench {
+  min-height: auto !important;
+  padding-top: clamp(3.5rem, 6vw, 5.4rem) !important;
+  padding-bottom: clamp(4.2rem, 7vw, 6.6rem) !important;
+  grid-template-columns: minmax(0, 0.88fr) minmax(0, 1fr) !important;
+  gap: clamp(3rem, 7vw, 7rem) !important;
+}
+
+.fc-hero.fc-hero-bench::before,
+.fc-latest::before,
+.fc-leaderboard::before,
+.fc-contributors::before {
+  background: var(--fc-industrial-bg) !important;
+}
+
+.fc-latest::after,
+.fc-leaderboard::after,
+.fc-contributors::after,
+.fc-bottom-nav::before {
+  height: 1px !important;
+  background: var(--fc-industrial-line) !important;
+}
+
+.fc-hero-bench h1 {
+  max-width: 620px !important;
+  margin-bottom: 1.45rem !important;
+  color: #000000 !important;
+  font-size: clamp(3.1rem, 3.4vw, 3.8rem) !important;
+  line-height: 0.93 !important;
+  letter-spacing: -0.022em !important;
+  font-weight: 640 !important;
+}
+
+.fc-hero-points {
+  max-width: 620px !important;
+}
+
+.fc-hero-points p {
+  margin-bottom: 0.44rem !important;
+  color: #000000 !important;
+  font-size: clamp(0.96rem, 1.2vw, 1.1rem) !important;
+  line-height: 1.38 !important;
+  letter-spacing: -0.022em !important;
+  font-family: Georgia, "Times New Roman", Times, serif !important;
+}
+
+.fc-hero-points em {
+  color: var(--fc-industrial-blue) !important;
+  font-style: normal !important;
+  font-weight: 620 !important;
+}
+
+.fc-release-link {
+  margin-top: 1.8rem !important;
+  color: #000000 !important;
+  font-size: 0.96rem !important;
+}
+
+.fc-release-link + .fc-release-link {
+  margin-top: 0.45rem !important;
+}
+
+.fc-release-link a,
+.fc-kicker,
+.fc-prompt,
+.fc-post-list-item:hover span,
+.fc-post-list-item:hover em,
+.fc-bottom-nav a:hover,
+.fc-involved-card a {
+  color: var(--fc-industrial-blue) !important;
+}
+
+.fc-terminal-card {
+  max-width: 520px !important;
+  border: 1px solid var(--fc-industrial-line) !important;
+  border-radius: 14px !important;
+  background: var(--fc-industrial-panel) !important;
+  box-shadow: none !important;
+}
+
+.fc-terminal-top {
+  height: 40px !important;
+  background: var(--fc-industrial-panel-soft) !important;
+  border-bottom: 1px solid var(--fc-industrial-line) !important;
+}
+
+.fc-terminal-top p {
+  color: var(--fc-industrial-faint) !important;
+  font-size: 0.72rem !important;
+  letter-spacing: 0.02em;
+}
+
+.fc-terminal-body {
+  min-height: 190px !important;
+  padding: 1.15rem 1.2rem 1.35rem !important;
+  color: var(--fc-industrial-ink) !important;
+  font-size: 0.82rem !important;
+  line-height: 1.7 !important;
+  background: linear-gradient(180deg, #fbfdff 0%, #f6faff 100%) !important;
+}
+
+.fc-terminal-comment,
+.fc-terminal-body p:first-child {
+  color: #2f5f98 !important;
+}
+
+.fc-prompt {
+  color: var(--fc-industrial-blue) !important;
+}
+
+.fc-terminal-line::after {
+  border-right-color: rgba(47, 95, 152, 0.5);
+}
+
+.fc-terminal-body p {
+  margin-bottom: 0.38rem !important;
+}
+
+.fc-terminal-muted {
+  color: #6b7280 !important;
+}
+
+.fc-terminal-rule-line {
+  width: 100%;
+  height: 1px;
+  margin: 0.9rem 0 1.1rem !important;
+  background: var(--fc-industrial-line);
+}
+
+.fc-terminal-body .fc-terminal-rule-line {
+  margin-bottom: 1.2rem !important;
+}
+
+.fc-terminal-spacer::after,
+.fc-terminal-rule-line::after {
+  display: none !important;
+}
+
+.fc-terminal-test-block {
+  display: grid;
+  gap: 0.34rem;
+  margin: 0 !important;
+}
+
+.fc-terminal-test-block::after {
+  display: none !important;
+}
+
+.fc-terminal-body .fc-terminal-run-row {
+  display: grid;
+  grid-template-columns: minmax(0, 8.8rem) auto minmax(68px, 1fr);
+  gap: 0.55rem;
+  align-items: center;
+  color: #6b7280 !important;
+  white-space: nowrap;
+  margin: 0 !important;
+  line-height: 1.18 !important;
+}
+
+.fc-terminal-test-block + .fc-terminal-rule-line {
+  margin-top: 0.9rem !important;
+}
+
+.fc-terminal-body .fc-terminal-run-row span {
+  margin-left: 0 !important;
+  color: #334155 !important;
+}
+
+.fc-terminal-bar {
+  --bar-color: #9bc77d;
+  --bar-width: 78%;
+  width: 100% !important;
+  min-width: 68px;
+  height: 5px !important;
+  margin-left: 0 !important;
+  background: linear-gradient(to right, var(--bar-color) var(--bar-width), rgba(47, 95, 152, 0.14) var(--bar-width)) !important;
+  box-shadow: 0 0 0 1px rgba(47, 95, 152, 0.06);
+}
+
+.fc-terminal-bar-warn {
+  --bar-color: #d8a22d;
+  --bar-width: 62%;
+}
+
+.fc-terminal-bar-long {
+  --bar-width: 86%;
+}
+
+.fc-terminal-bar-full {
+  --bar-width: 96%;
+}
+
+.fc-terminal-success {
+  color: #5c9b42 !important;
+  font-weight: 560;
+}
+
+.fc-section {
+  max-width: 1080px !important;
+  margin-bottom: 0 !important;
+}
+
+.fc-latest,
+.fc-leaderboard,
+.fc-contributors {
+  padding-top: clamp(3.5rem, 6vw, 5.2rem) !important;
+  padding-bottom: clamp(3.5rem, 6vw, 5.2rem) !important;
+}
+
+.fc-section-heading {
+  margin-bottom: 1.6rem;
+}
+
+.fc-section-heading-row {
+  align-items: flex-end;
+}
+
+.fc-kicker {
+  margin-bottom: 0.58rem !important;
+  font-size: 1rem !important;
+  font-weight: 650 !important;
+  letter-spacing: 0.16em !important;
+}
+
+.fc-section h2 {
+  color: var(--fc-industrial-ink) !important;
+  font-size: clamp(2rem, 3.4vw, 3.6rem) !important;
+  line-height: 0.98 !important;
+  letter-spacing: -0.065em !important;
+  font-weight: 690 !important;
+}
+
+.fc-section-heading-row > span,
+.fc-section-heading-row a {
+  color: var(--fc-industrial-muted) !important;
+  font-size: 0.78rem !important;
+  font-weight: 520 !important;
+  text-decoration: none !important;
+}
+
+.fc-section-heading-row a:hover {
+  color: var(--fc-industrial-blue) !important;
+}
+
+.fc-post-grid,
+.keep-reading-grid {
+  gap: 1rem !important;
+}
+
+.fc-post-card,
+.keep-reading-card,
+.blog-card {
+  border: 1px solid var(--fc-industrial-line) !important;
+  border-radius: 16px !important;
+  background: rgba(251, 253, 255, 0.86) !important;
+  box-shadow: none !important;
+  transition: border-color 0.18s ease, transform 0.18s ease !important;
+}
+
+.fc-post-card:hover,
+.keep-reading-card:hover,
+.blog-card:hover {
+  border-color: var(--fc-industrial-line-strong) !important;
+  box-shadow: none !important;
+  transform: translateY(-2px) !important;
+}
+
+.fc-post-thumb img,
+.fc-post-placeholder,
+.blog-card-placeholder,
+.keep-reading-card-thumb img,
+.keep-reading-card-placeholder {
+  height: 172px !important;
+  background:
+    linear-gradient(90deg, rgba(42, 67, 101, 0.07) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(42, 67, 101, 0.07) 1px, transparent 1px),
+    #edf2f8 !important;
+  background-size: 20px 20px !important;
+}
+
+.fc-post-card-body,
+.keep-reading-card-body {
+  padding: 1rem !important;
+}
+
+.fc-post-meta,
+.keep-reading-card-meta,
+.blog-card-meta {
+  color: var(--fc-industrial-faint) !important;
+  font-size: 0.66rem !important;
+  font-weight: 520 !important;
+  letter-spacing: 0.08em !important;
+}
+
+.fc-post-card h3,
+.keep-reading-card h3 {
+  margin-top: 0.3rem !important;
+  font-size: 1.02rem !important;
+  line-height: 1.22 !important;
+}
+
+.fc-post-card h3 a,
+.keep-reading-card h3 a,
+.blog-card h2 a {
+  color: var(--fc-industrial-ink) !important;
+  font-weight: 620;
+}
+
+.fc-post-card-body p,
+.keep-reading-card-body p,
+.blog-card-body > p {
+  color: var(--fc-industrial-muted) !important;
+  font-size: 0.9rem;
+  line-height: 1.52;
+}
+
+.fc-post-grid .fc-post-card {
+  min-height: 480px !important;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 22px !important;
+  border-color: transparent !important;
+  background: #d4e0ef !important;
+}
+
+.fc-post-grid .fc-post-thumb {
+  display: block;
+}
+
+.fc-post-grid .fc-post-thumb img,
+.fc-post-grid .fc-post-placeholder {
+  width: 100%;
+  height: 180px !important;
+  display: block;
+  object-fit: cover;
+  border-radius: 0 !important;
+  background:
+    linear-gradient(90deg, rgba(42, 67, 101, 0.07) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(42, 67, 101, 0.07) 1px, transparent 1px),
+    #c8d8ea !important;
+  background-size: 20px 20px !important;
+}
+
+.fc-post-grid .fc-post-placeholder {
+  display: grid;
+  place-items: center;
+}
+
+.fc-post-grid .fc-post-card-body {
+  width: 100%;
+  min-height: 290px;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(1.25rem, 2.2vw, 1.65rem) !important;
+}
+
+.fc-post-grid .fc-post-card h3 {
+  margin: 0 0 0.8rem !important;
+  font-size: clamp(1.18rem, 1.55vw, 1.42rem) !important;
+  line-height: 1.12 !important;
+  letter-spacing: 0.024em !important;
+}
+
+.fc-post-grid .fc-post-card h3 a {
+  color: #0f172a !important;
+  font-weight: 620;
+}
+
+.fc-post-card-spacer {
+  flex: 1 1 auto;
+  min-height: 2.2rem;
+}
+
+.fc-post-card-details {
+  margin: 0 0 1.05rem;
+  border-top: 1px solid rgba(17, 26, 39, 0.12);
+}
+
+.fc-post-card-details div {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: 1rem;
+  padding: 0.62rem 0;
+  border-bottom: 1px solid rgba(17, 26, 39, 0.12);
+}
+
+.fc-post-card-details dt,
+.fc-post-card-details dd {
+  margin: 0;
+}
+
+.fc-post-card-details dt {
+  color: #0f172a;
+  font-family: var(--fc-font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.fc-post-card-details dd {
+  color: #111827;
+  font-size: 0.76rem;
+  text-align: right;
+  letter-spacing: -0.04em;
+}
+
+.fc-post-card-button {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.62rem 0.95rem;
+  border-radius: 999px;
+  background: var(--fc-industrial-blue-dark);
+  color: #ffffff !important;
+  font-size: 0.84rem;
+  font-weight: 500;
+  text-decoration: none !important;
+}
+
+.fc-post-card-button:hover {
+  background: var(--fc-industrial-blue);
+  color: #ffffff !important;
+}
+
+.fc-post-card-button span {
+  color: #ffffff !important;
+}
+
+.fc-carousel-button {
+  width: 2.1rem;
+  height: 2.1rem;
+  display: inline-grid;
+  place-items: center;
+  border: 0;
+  border-radius: 999px;
+  background: var(--fc-industrial-blue-dark);
+  color: #ffffff;
+  cursor: pointer;
+  font: inherit;
+  line-height: 1;
+  z-index: 2;
+}
+
+.fc-carousel-button:hover {
+  background: var(--fc-industrial-blue);
+}
+
+.fc-post-carousel {
+  position: relative;
+}
+
+.fc-post-carousel > .fc-carousel-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.fc-carousel-button-prev {
+  left: -3rem;
+}
+
+.fc-carousel-button-next {
+  right: -3rem;
+}
+
+.fc-post-carousel-viewport {
+  overflow: hidden;
+}
+
+.fc-post-carousel .fc-post-track {
+  display: flex !important;
+  grid-template-columns: none !important;
+  gap: 1rem !important;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.fc-post-carousel .fc-post-track::-webkit-scrollbar {
+  display: none;
+}
+
+.fc-post-carousel .fc-post-card {
+  flex: 0 0 calc((100% - 2rem) / 3);
+  scroll-snap-align: start;
+}
+
+@media (max-width: 900px) {
+  .fc-post-carousel .fc-post-card {
+    flex-basis: calc((100% - 1rem) / 2);
+  }
+
+  .fc-carousel-button-prev {
+    left: -0.75rem;
+  }
+
+  .fc-carousel-button-next {
+    right: -0.75rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .fc-post-carousel .fc-post-card {
+    flex-basis: 100%;
+  }
+}
+
+.fc-post-list-strip {
+  grid-template-columns: minmax(240px, 0.76fr) minmax(0, 1.65fr) !important;
+  gap: clamp(2.2rem, 6vw, 5rem) !important;
+  margin-top: clamp(2.6rem, 5vw, 4rem) !important;
+}
+
+.fc-post-list-strip h3 {
+  max-width: 310px !important;
+  color: var(--fc-industrial-ink) !important;
+  font-size: clamp(1.2rem, 2vw, 1.7rem) !important;
+  line-height: 1.12 !important;
+  letter-spacing: -0.05em !important;
+  font-weight: 640 !important;
+}
+
+.fc-post-list {
+  border-top: 1px solid var(--fc-industrial-line) !important;
+}
+
+.fc-post-list-item {
+  padding: 0.88rem 0 !important;
+  border-bottom: 1px solid var(--fc-industrial-line) !important;
+}
+
+.fc-post-list-item span {
+  color: var(--fc-industrial-ink);
+  font-size: 0.9rem !important;
+  font-weight: 520 !important;
+}
+
+.fc-post-list-item em {
+  color: var(--fc-industrial-faint) !important;
+  font-size: 0.82rem !important;
+}
+
+.fc-leaderboard {
+  max-width: 1080px !important;
+}
+
+.fc-leaderboard-grid {
+  gap: 1rem !important;
+}
+
+.fc-leaderboard-card {
+  border: 1px solid var(--fc-industrial-line) !important;
+  border-radius: 14px !important;
+  background: rgba(251, 253, 255, 0.9) !important;
+  box-shadow: none !important;
+}
+
+.fc-leaderboard-card-header {
+  padding: 0.95rem 1.05rem !important;
+  background: var(--fc-industrial-panel-soft) !important;
+  border-bottom: 1px solid var(--fc-industrial-line) !important;
+}
+
+.fc-leaderboard-card-header h3 {
+  color: var(--fc-industrial-ink) !important;
+  font-size: 0.92rem !important;
+  font-weight: 560 !important;
+  letter-spacing: -0.025em !important;
+}
+
+.fc-leaderboard-card-header p {
+  color: var(--fc-industrial-muted) !important;
+  font-size: 0.78rem !important;
+}
+
+.fc-table-wrap th,
+.fc-table-wrap td {
+  border-bottom: 1px solid var(--fc-industrial-line) !important;
+  padding: 1rem 0.72rem !important;
+  vertical-align: middle !important;
+}
+
+.fc-table-wrap th {
+  color: var(--fc-industrial-faint) !important;
+  font-size: 0.62rem !important;
+  font-weight: 520 !important;
+  letter-spacing: 0.12em !important;
+}
+
+.fc-table-wrap td {
+  color: var(--fc-industrial-muted) !important;
+  font-size: 0.82rem !important;
+}
+
+.fc-model-name,
+.fc-table-wrap td:nth-child(2),
+.fc-table-wrap td:last-child {
+  color: var(--fc-industrial-ink) !important;
+}
+
+.fc-model-entry {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  min-height: 1.4rem;
+  line-height: 1.25;
+  vertical-align: middle;
+}
+
+.fc-model-name {
+  display: inline-block;
+  line-height: 1.25;
+}
+
+.fc-model-logo {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex: 0 0 auto;
+  display: inline-block;
+  overflow: hidden;
+  color: transparent;
+  font-size: 0;
+  line-height: 0;
+  background-color: transparent;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.fc-model-logo-google {
+  background-image: url("https://www.google.com/s2/favicons?domain=google.com&sz=64");
+}
+
+.fc-model-logo-openai {
+  background-image: url("https://www.google.com/s2/favicons?domain=openai.com&sz=64");
+}
+
+.fc-model-logo-deepseek {
+  background-image: url("https://www.google.com/s2/favicons?domain=deepseek.com&sz=64");
+}
+
+.fc-model-logo-xai {
+  background-image: url("https://www.google.com/s2/favicons?domain=x.ai&sz=64");
+}
+
+.fc-table-wrap tbody tr:nth-child(1),
+.fc-table-wrap tbody tr:hover {
+  background: #eef3f9 !important;
+}
+
+.fc-leaderboard-tabs {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0 0 1rem;
+  padding: 0.28rem;
+  border: 1px solid var(--fc-industrial-line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.fc-leaderboard-tab {
+  min-width: 7.6rem;
+  padding: 0.62rem 1rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--fc-industrial-muted);
+  cursor: pointer;
+  font-family: var(--fc-font-sans);
+  font-size: 0.82rem;
+  font-weight: 560;
+  letter-spacing: 0.024em;
+}
+
+.fc-leaderboard-tab.is-active {
+  background: var(--fc-industrial-blue-dark);
+  color: #ffffff;
+}
+
+.fc-leaderboard-panel {
+  display: none;
+}
+
+.fc-leaderboard-panel.is-active {
+  display: block;
+}
+
+.fc-leaderboard-empty {
+  min-height: 18rem;
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+  color: var(--fc-industrial-muted);
+  text-align: center;
+}
+
+.fc-leaderboard-empty p {
+  max-width: 30rem;
+  margin: 0;
+  color: var(--fc-industrial-muted) !important;
+  font-family: Georgia, "Times New Roman", Times, serif !important;
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
+.fc-human-reference {
+  background: transparent !important;
+  border-top: 1px solid var(--fc-industrial-line) !important;
+  color: var(--fc-industrial-muted) !important;
+  font-size: 0.78rem;
+}
+
+.fc-tasks {
+  position: relative;
+  z-index: 0;
+  max-width: 1080px !important;
+  padding-top: clamp(3.4rem, 5.5vw, 4.8rem) !important;
+  padding-bottom: clamp(3.4rem, 5.5vw, 4.8rem) !important;
+}
+
+.fc-tasks::before,
+.fc-tasks::after {
+  content: "";
+  position: absolute;
+  left: calc(50% - 50vw);
+  right: calc(50% - 50vw);
+  pointer-events: none;
+}
+
+.fc-tasks::before {
+  top: 0;
+  bottom: 0;
+  z-index: -1;
+  background: var(--fc-industrial-bg);
+}
+
+.fc-tasks::after {
+  top: 0;
+  height: 1px;
+  background: var(--fc-industrial-line);
+}
+
+.fc-task-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.fc-task-card {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.86fr) minmax(0, 1.02fr);
+  min-height: 260px;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #d4e0ef;
+  color: var(--fc-industrial-ink) !important;
+  text-decoration: none !important;
+  transition: transform 0.18s ease, background 0.18s ease;
+}
+
+.fc-task-card:hover {
+  background: #cbd9ea;
+  transform: translateY(-2px);
+}
+
+.fc-task-visual,
+.fc-task-placeholder {
+  min-height: 100%;
+  background:
+    linear-gradient(90deg, rgba(42, 67, 101, 0.08) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(42, 67, 101, 0.08) 1px, transparent 1px),
+    #c8d8ea;
+  background-size: 18px 18px;
+}
+
+.fc-task-visual img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: fill;
+  object-position: center;
+}
+
+.fc-task-placeholder {
+  display: grid;
+  place-items: center;
+}
+
+.fc-task-placeholder span {
+  width: 3.4rem;
+  height: 3.4rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(42, 67, 101, 0.18);
+  border-radius: 999px;
+  color: var(--fc-industrial-blue-dark);
+  font-family: var(--fc-font-mono);
+  font-size: 1.5rem;
+  background: rgba(251, 253, 255, 0.46);
+}
+
+.fc-task-body {
+  display: flex;
+  flex-direction: column;
+  padding: clamp(1.25rem, 2.2vw, 1.75rem);
+}
+
+.fc-task-tag {
+  margin: 0 0 0.75rem;
+  color: var(--fc-industrial-blue-dark) !important;
+  font-family: var(--fc-font-mono);
+  font-size: 0.62rem !important;
+  letter-spacing: 0.16em !important;
+  text-transform: uppercase;
+}
+
+.fc-task-body h3 {
+  margin: 0 0 0.75rem;
+  color: var(--fc-industrial-ink);
+  font-size: clamp(1.02rem, 1.35vw, 1.22rem);
+  line-height: 1.08;
+  font-weight: 620;
+  letter-spacing: 0.012em;
+}
+
+.fc-task-body > p:not(.fc-task-tag) {
+  margin: 0;
+  color: #1f2937 !important;
+  font-family: "Times New Roman", Times, serif !important;
+  font-size: 0.94rem;
+  line-height: 1.38;
+}
+
+.fc-task-body > span {
+  margin-top: auto;
+  color: var(--fc-industrial-blue-dark);
+  font-size: 0.82rem;
+  font-weight: 520;
+}
+
+.fc-contributors {
+  max-width: 1080px !important;
+  padding-top: clamp(2.4rem, 4vw, 3.4rem) !important;
+  padding-bottom: clamp(2.2rem, 4vw, 3rem) !important;
+}
+
+.fc-contributors h2 {
+  color: var(--fc-industrial-ink) !important;
+  font-size: clamp(1.2rem, 2vw, 1.6rem) !important;
+  font-weight: 640 !important;
+  letter-spacing: -0.04em;
+}
+
+.fc-contributors-label {
+  color: var(--fc-industrial-faint) !important;
+  font-size: 0.58rem !important;
+  font-weight: 560 !important;
+  letter-spacing: 0.28em !important;
+}
+
+.fc-logo-track {
+  gap: 1.05rem !important;
+}
+
+.fc-school-card {
+  width: 104px !important;
+}
+
+.fc-school-card img {
+  width: 52px !important;
+  height: 52px !important;
+  border: 1px solid var(--fc-industrial-line) !important;
+  border-radius: 12px !important;
+  background: rgba(251, 253, 255, 0.9) !important;
+  box-shadow: none !important;
+}
+
+.fc-school-mark {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--fc-industrial-line);
+  border-radius: 12px;
+  background: rgba(251, 253, 255, 0.9);
+  color: var(--fc-industrial-blue-dark);
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+.fc-school-card p {
+  color: var(--fc-industrial-muted) !important;
+  font-size: 0.72rem !important;
+  font-weight: 520 !important;
+}
+
+.fc-bottom-nav {
+  min-height: 44px !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-bottom: 0 !important;
+  padding: 0 !important;
+}
+
+.fc-bottom-brand {
+  align-items: center !important;
+}
+
+.fc-bottom-brand span {
+  color: var(--fc-industrial-ink) !important;
+  font-size: 0.92rem !important;
+  font-weight: 560 !important;
+  letter-spacing: 0.024em !important;
+}
+
+.fc-bottom-brand em,
+.fc-bottom-nav nav a {
+  color: var(--fc-industrial-muted) !important;
+}
+
+.fc-bottom-brand em {
+  font-size: 0.7rem !important;
+}
+
+.fc-bottom-nav nav a {
+  font-size: 0.82rem !important;
+  font-weight: 480 !important;
+}
+
+.fc-bottom-nav nav {
+  align-items: center !important;
+  justify-content: flex-end !important;
+}
+
+.fc-bottom-brand,
+.fc-bottom-nav nav,
+.fc-bottom-nav nav a {
+  line-height: 1 !important;
+}
+
+@media (max-width: 900px) {
+  .navbar > .container,
+  .fc-hero.fc-hero-bench,
+  .fc-section,
+  .fc-bottom-nav {
+    max-width: calc(100vw - 2rem) !important;
+  }
+
+  .navbar > .container {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .fc-hero.fc-hero-bench {
+    grid-template-columns: 1fr !important;
+    padding-top: 2.6rem !important;
+    gap: 2.2rem !important;
+  }
+
+  .fc-hero-bench h1 {
+    font-size: clamp(2.8rem, 13vw, 4.5rem) !important;
+  }
+
+  .fc-task-grid,
+  .fc-task-card {
+    grid-template-columns: 1fr !important;
+  }
+
+  .fc-task-visual,
+  .fc-task-placeholder {
+    min-height: 180px;
+  }
+}
+
+// Looser global tracking for the current homepage design.
+body,
+p,
+li,
+td,
+th,
+figcaption,
+.nav-link,
+.navbar-brand,
+.fc-section-heading-row a,
+.fc-section-heading-row > span,
+.fc-bottom-nav,
+.fc-post-card,
+.fc-leaderboard-card {
+  letter-spacing: 0.024em !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.fc-hero-bench h1,
+.fc-section h2,
+.fc-post-grid .fc-post-card h3 {
+  letter-spacing: 0.024em !important;
+}
+
+.fc-kicker,
+.fc-post-card-details dt,
+.fc-table-wrap th {
+  letter-spacing: 0.2em !important;
+}
+
+.navbar.navbar-light .navbar-brand {
+  letter-spacing: 0.024em !important;
+}
+
+.fc-latest h2,
+.fc-leaderboard h2,
+.fc-latest .fc-section-heading h2,
+.fc-leaderboard .fc-section-heading h2,
+.fc-tasks h2,
+.fc-tasks .fc-section-heading h2 {
+  font-size: clamp(1.6rem, 1.8vw, 1.8rem) !important;
+}
+
+.fc-latest,
+.fc-leaderboard,
+.fc-tasks {
+  padding-top: clamp(0.8rem, 1vw, 1.8rem) !important;
+}
+
+.fc-latest h2,
+.fc-latest .fc-section-heading h2,
+.fc-leaderboard h2,
+.fc-leaderboard .fc-section-heading h2,
+.fc-tasks h2,
+.fc-tasks .fc-section-heading h2 {
+  font-weight: 620 !important;
+}
+
+// Final overflow guard for full-bleed homepage bands and oversized headings.
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden !important;
+  overscroll-behavior-x: none;
+  touch-action: pan-y;
+}
+
+body {
+  position: relative;
+}
+
+body > .container.mt-5 {
+  width: 100% !important;
+  max-width: 100vw !important;
+  overflow-x: clip !important;
+  overflow-y: visible !important;
+}
+
+.container,
+.container-fluid,
+main,
+.post,
+.page-content,
+.fc-hero,
+.fc-section,
+.fc-latest,
+.fc-leaderboard,
+.fc-tasks,
+.fc-contributors,
+.fc-bottom-nav {
+  max-width: 100%;
+}
+
+.fc-hero *,
+.fc-section *,
+.fc-bottom-nav * {
+  min-width: 0;
+}
+
+.fc-hero.fc-hero-bench,
+.fc-tasks,
+.fc-contributors,
+.fc-logo-marquee {
+  overflow-x: clip !important;
+  overflow-y: visible !important;
+}
+
+.fc-latest::before,
+.fc-leaderboard::before,
+.fc-contributors::before,
+.fc-latest::after,
+.fc-leaderboard::after,
+.fc-contributors::after,
+.fc-bottom-nav::before {
+  left: calc(50% - 50vw) !important;
+  right: calc(50% - 50vw) !important;
+  width: auto !important;
+  max-width: none !important;
+  transform: none !important;
+}
+
+// Black bottom navigation bar.
+.fc-bottom-nav {
+  width: 100vw !important;
+  max-width: 100vw !important;
+  min-height: 64px !important;
+  margin-left: calc(50% - 50vw) !important;
+  margin-right: calc(50% - 50vw) !important;
+  padding: 0.85rem max(1rem, calc((100vw - 1080px) / 2)) !important;
+  box-sizing: border-box;
+  background: #000000 !important;
+}
+
+.fc-bottom-nav::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(50% - 50vw);
+  right: calc(50% - 50vw);
+  background: #000000;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.fc-bottom-nav::before {
+  top: 0 !important;
+  bottom: 0 !important;
+  height: auto !important;
+  background: #000000 !important;
+  z-index: -1;
+}
+
+.fc-bottom-brand span,
+.fc-bottom-brand em,
+.fc-bottom-nav nav a {
+  color: #ffffff !important;
+}
+
+.fc-bottom-brand em {
+  opacity: 0.68;
+}
+
+.fc-bottom-nav nav a:hover {
+  color: #dbeafe !important;
+}
+
+// Disable card lift effects.
+.fc-post-card,
+.keep-reading-card,
+.blog-card,
+.fc-task-card {
+  transition: border-color 0.18s ease, background 0.18s ease !important;
+}
+
+.fc-post-card:hover,
+.keep-reading-card:hover,
+.blog-card:hover,
+.fc-task-card:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+// Match blog listing width to homepage content.
+.blog-hero,
+.blog-list-grid {
+  width: 100%;
+  max-width: 1080px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+// Keep the reusable bottom nav at the bottom of every page.
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+body > .container.mt-5,
+body > .post.distill {
+  flex: 1 0 auto;
+}
+
+.fc-bottom-nav {
+  width: 100% !important;
+  max-width: none !important;
+  margin: auto 0 0 !important;
+  border: 0 !important;
+}
+
+.fc-bottom-nav::before,
+.fc-bottom-nav::after {
+  display: none !important;
+}
+
+d-appendix:empty,
+.fc-bottom-nav ~ d-appendix {
+  display: none !important;
+}
+
+// Remove the empty Distill appendix gap above the bottom nav.
+.post.distill + d-appendix {
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 3.1rem 0 0 !important;
+  border: 0 !important;
+}
+
+.post.distill + d-appendix::before,
+.post.distill + d-appendix::after {
+  display: none !important;
+}
+
+.keep-reading {
+  border-top: 0 !important;
+}
+
+// Blog index hero: editorial two-column intro.
+.blog-hero {
+  width: 100%;
+  max-width: 1080px !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: clamp(2rem, 7vw, 6rem);
+  align-items: start;
+  margin: 0 auto !important;
+  padding: clamp(3.25rem, 6vw, 4.75rem) 0 !important;
+  text-align: left !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+body > .container.mt-5:has(.blog-hero) {
+  margin-top: 0 !important;
+}
+
+.blog-hero h1 {
+  max-width: none !important;
+  margin: 0 !important;
+  color: #000000 !important;
+  font-size: clamp(1rem, 3vw, 3.15rem) !important;
+  line-height: 0.96 !important;
+  letter-spacing: 0.024rem !important;
+  font-weight: 600 !important;
+}
+
+.blog-hero p {
+  max-width: 620px;
+  margin: 0 !important;
+  color: #000000 !important;
+  font-family: Georgia, "Times New Roman", Times, serif !important;
+  font-size: clamp(1rem, 1.45vw, 1.22rem);
+  line-height: 1.35;
+  letter-spacing: 0;
+}
+
+@media (max-width: 760px) {
+  .blog-hero {
+    grid-template-columns: 1fr !important;
+    gap: 1.2rem;
+    margin-top: 3.5rem !important;
+  }
+
+  .fc-projects-hero,
+  .fc-project-card-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Use the editorial serif font for blog excerpts and article body text.
+.blog-card-body > p,
+.fc-post-grid .fc-post-card-body > p,
+.keep-reading-card-body p,
+.post-content p,
+.post-content li,
+.post.distill d-article p,
+.post.distill d-article li,
+.post.distill d-article figcaption {
+  font-family: Georgia, "Times New Roman", Times, serif !important;
+  color: #000000 !important;
+}
+
+.blog-card-meta,
+.blog-card-body > p.blog-card-meta,
+.fc-post-meta,
+.fc-post-card-body > p.fc-post-meta,
+.keep-reading-card-meta,
+.keep-reading-card-body > p.keep-reading-card-meta,
+.post-meta,
+.post-tags,
+.fc-post-card-details {
+  font-family: var(--fc-font-sans) !important;
+  color: var(--fc-industrial-faint) !important;
+}
+
+.fc-post-card-details dt,
+.fc-post-card-details dd {
+  font-family: var(--fc-font-sans) !important;
+  color: #000000 !important;
+}
+
+// Restore normal vertical flow for blog index cards.
+.blog-card-body {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: stretch !important;
+  gap: 0 !important;
+}
+
+.blog-card-body > * {
+  width: auto !important;
+  max-width: none !important;
+}
+
+.blog-card-link {
+  align-self: flex-end !important;
+  justify-self: auto !important;
+  margin-top: 0.65rem !important;
+  white-space: normal !important;
+}
+
+// Guard against blog-list card styles leaking into the homepage grid.
+.fc-post-grid .blog-card {
+  min-height: 440px !important;
+  display: flex !important;
+  grid-template-columns: none !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 22px !important;
+  background: #d4e0ef !important;
+  box-shadow: none !important;
+}
+
+.fc-post-grid .blog-card-thumb,
+.fc-post-grid .blog-card-placeholder,
+.fc-post-grid .blog-card-meta,
+.fc-post-grid .blog-card-badge,
+.fc-post-grid .blog-card-link {
+  display: none !important;
+}
+
+.fc-post-grid .blog-card-body {
+  width: 100% !important;
+  min-height: 440px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  padding: clamp(1.55rem, 2.8vw, 2rem) !important;
+}
+
+.fc-post-grid .blog-card h2 {
+  margin: 0 0 0.8rem !important;
+  font-size: clamp(1.02rem, 1.32vw, 1.22rem) !important;
+  line-height: 1.12 !important;
+  letter-spacing: 0.024em !important;
+}
+
+.fc-post-grid .blog-card-body > p:not(.blog-card-meta):not(.blog-card-badge) {
+  max-width: 95% !important;
+  margin: 0 !important;
+  color: #111827 !important;
+  font-family: Georgia, "Times New Roman", Times, serif !important;
+  font-size: clamp(0.92rem, 1.05vw, 1rem) !important;
+  line-height: 1.35 !important;
+}
+
+// Use serif typography across blog article content, excluding the main title.
+.post.distill d-title p,
+.post.distill d-byline,
+.post.distill d-byline *,
+.post.distill d-contents,
+.post.distill d-contents *,
+.post.distill d-article p,
+.post.distill d-article li,
+.post.distill d-article h2,
+.post.distill d-article h3,
+.post.distill d-article h4,
+.post.distill d-article h5,
+.post.distill d-article h6,
+.post.distill d-article blockquote,
+.post.distill d-article figcaption,
+.post.distill d-article table,
+.post.distill d-article th,
+.post.distill d-article td,
+.post-content p,
+.post-content li,
+.post-content h2,
+.post-content h3,
+.post-content h4,
+.post-content h5,
+.post-content h6,
+.post-content blockquote,
+.post-content figcaption,
+.post-content table,
+.post-content th,
+.post-content td {
+  font-family: Georgia, "Times New Roman", Times, serif !important;
+}
+
+.post.distill d-title h1,
+.post-header .post-title,
+.post.distill d-article h2,
+.post.distill d-article h3,
+.post.distill d-article h4,
+.post.distill d-article h5,
+.post.distill d-article h6,
+.post-content h2,
+.post-content h3,
+.post-content h4,
+.post-content h5,
+.post-content h6 {
+  font-family: var(--fc-font-sans) !important;
+  letter-spacing: -0.01em !important;
+}
+
+// Article callout modules.
+.post.distill d-article div[style*="background: #f0ece6"],
+.post.distill d-article div[style*="border-left: 4px"] {
+  background: #d4e0ef !important;
+  border-left-color: var(--fc-industrial-blue) !important;
+  color: var(--fc-industrial-blue-dark) !important;
+  font-family: Georgia, "Times New Roman", Times, serif !important;
+}
+
+.post.distill d-article div[style*="background: #f0ece6"] *,
+.post.distill d-article div[style*="border-left: 4px"] * {
+  color: var(--fc-industrial-blue-dark) !important;
+  font-family: Georgia, "Times New Roman", Times, serif !important;
+}
+
+// Article inline-code and code-block fills.
+.post.distill d-article code,
+.post.distill d-article pre,
+.post.distill d-article figure.highlight,
+.post.distill d-article .highlight,
+.post.distill d-article .highlight pre,
+.post-content code,
+.post-content pre,
+.post-content figure.highlight,
+.post-content .highlight,
+.post-content .highlight pre {
+  background: #d4e0ef !important;
+  background-color: #d4e0ef !important;
+}
+
+.post.distill d-contents nav,
+.post.distill d-contents nav * {
+  letter-spacing: 0.006em !important;
+  font-family: var(--fc-font-sans) !important;
+  font-weight: 560 !important;
+}
+
+.post.distill d-contents h3 {
+  color: #111827 !important;
+  font-weight: 650 !important;
+}
+
+.post.distill d-contents a {
+  color: var(--fc-industrial-blue) !important;
+  font-weight: 560 !important;
+}
+
+.post.distill d-title h1 {
+  font-size: clamp(2rem, 2vw, 4rem) !important;
+  font-family: var(--fc-font-sans) !important;
+}
+
+// Distill article header spacing and byline columns.
+.post.distill {
+  padding-top: clamp(2rem, 4vw, 3.5rem) !important;
+}
+
+.post.distill d-byline .byline {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: clamp(1.5rem, 4vw, 3rem) !important;
+}
+
+.post.distill d-byline .authors-affiliations {
+  display: grid !important;
+  grid-column: span 2 !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  column-gap: clamp(1.5rem, 4vw, 3rem) !important;
+}
+
+// Remove homepage section divider lines.
+.fc-latest::after,
+.fc-leaderboard::after,
+.fc-tasks::after,
+.fc-contributors::after {
+  display: none !important;
+}
+
+// Leaderboard tabs show one full-width track at a time.
+.fc-leaderboard .fc-leaderboard-grid {
+  grid-template-columns: 1fr !important;
+}
+
+.fc-leaderboard .fc-table-wrap th:first-child,
+.fc-leaderboard .fc-table-wrap td:first-child {
+  padding-left: 2.4rem !important;
+}
+
+.fc-leaderboard .fc-table-wrap th:first-child {
+  color: var(--fc-industrial-faint) !important;
+  font-size: 0.62rem !important;
+  font-weight: 520 !important;
+  letter-spacing: 0.12em !important;
+}
+
+.fc-leaderboard .fc-table-wrap th:nth-child(2),
+.fc-leaderboard .fc-table-wrap td:nth-child(2) {
+  padding-left: 4rem !important;
+}
+
+.fc-leaderboard .fc-table-wrap th:last-child,
+.fc-leaderboard .fc-table-wrap td:last-child {
+  padding-right: 2.4rem !important;
+}
+
+@media (max-width: 640px) {
+  .fc-leaderboard-tabs {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+    border-radius: 18px;
+  }
+
+  .fc-leaderboard-tab {
+    width: 100%;
+  }
+}
+
+// Remove divider lines under blog section headings.
+.post.distill d-article h1,
+.post.distill d-article h2,
+.post.distill d-article h3,
+.post-content h1,
+.post-content h2,
+.post-content h3 {
+  border-bottom: 0 !important;
+}
+
+.post.distill d-article h2,
+.post.distill d-article h3,
+.post-content h2,
+.post-content h3 {
+  margin-bottom: 0.4rem !important;
+}
+
+.post.distill d-article h2 + p,
+.post.distill d-article h3 + p,
+.post-content h2 + p,
+.post-content h3 + p {
+  margin-top: 0 !important;
+}
+
+// Keep the left table-of-contents aligned across all distill posts.
+@media (min-width: 1025px) {
+  .post.distill d-article d-contents {
+    grid-column: screen-start / text-start !important;
+    justify-self: start !important;
+    width: 240px !important;
+    min-width: 240px !important;
+    max-width: 240px !important;
+    grid-template-columns: [toc] minmax(0, 1fr) [toc-line] 1px !important;
+    padding-left: 20px !important;
+    padding-right: 1rem !important;
+    margin-right: 0 !important;
+  }
+
+  .post.distill d-article d-contents nav {
+    grid-column: toc !important;
+    justify-self: start !important;
+  }
+}
+
+// Final terminal spacing override: keep progress rows compact.
+.fc-terminal-body p.fc-terminal-run-row {
+  min-height: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  line-height: 1 !important;
+}
+
+.fc-terminal-body p.fc-terminal-run-row + p.fc-terminal-run-row {
+  margin-top: 0.18rem !important;
+}
+
+.fc-terminal-body p.fc-terminal-run-row + p.fc-terminal-rule-line {
+  margin-top: 0.22rem !important;
 }

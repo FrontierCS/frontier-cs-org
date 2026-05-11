@@ -15,7 +15,7 @@ footer_text: >
 keywords: machine-learning, ml, deep-learning, frontier-cs, blog  # add your own keywords or leave empty
 
 lang: en # the language of your site (for example: en, fr, cn, ru, etc.)
-icon:  # favicon (optional; leave blank for default)
+icon: frontier-favicon.png # favicon (optional; leave blank for default)
 
 url: '' # the base hostname & protocol for your site
 baseurl: /2025 # the subpath of your site, e.g. /blog/

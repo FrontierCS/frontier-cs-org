@@ -113,8 +113,12 @@
               <li class="nav-item">
                 <a class="nav-link" href="https://discord.com/invite/k4hd2nU4UE" target="_blank" rel="noopener noreferrer">Discord</a>
               </li>
-              <li class="nav-item">
-                <a class="nav-link" href="https://github.com/FrontierCS/Frontier-CS" target="_blank" rel="noopener noreferrer">Repo</a>
+              <li class="nav-item {% if page.url contains 'projects' %}active{% endif %}">
+                <a class="nav-link" href="{{ '/projects/' | relative_url }}">Projects
+                  {%- if page.url contains 'projects' -%}
+                  <span class="sr-only">(current)</span>
+                  {%- endif -%}
+                </a>
               </li>
             </ul>
           </div>
