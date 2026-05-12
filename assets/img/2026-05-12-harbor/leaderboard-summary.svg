@@ -1,16 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="760" height="260" viewBox="0 0 760 260">
-<style>text{font-family:Inter,Arial,sans-serif;fill:#111}.label{font-size:13px}.num{font-size:16px;font-weight:700}.axis{stroke:#ddd}.bar1,.bar2{fill:#111}</style>
-<text x="24" y="32" font-size="18" font-weight="700">FrontierCS on Harbor: score vs. long-horizon trace length</text>
-<text class="label" x="24" y="90">Claude Opus 4.7</text>
-<rect class="bar1" x="190" y="76" width="330.5" height="22" rx="3"/>
-<text class="num" x="530.5" y="93">43.0 score</text>
-<rect class="bar2" x="190" y="108" width="360.0" height="22" rx="3"/>
-<text class="num" x="560.0" y="125">77.2 avg steps</text>
-<text class="label" x="24" y="172">Kimi K2.6</text>
-<rect class="bar1" x="190" y="158" width="360.0" height="22" rx="3"/>
-<text class="num" x="560.0" y="175">46.9 score</text>
-<rect class="bar2" x="190" y="190" width="313.0" height="22" rx="3"/>
-<text class="num" x="513.0" y="207">67.2 avg steps</text>
-<text class="label" x="190" y="236">upper bar = partial score (0-100)</text>
-<text class="label" x="430" y="236">lower bar = average trajectory steps</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="360" viewBox="0 0 1100 360">
+<style>text{font-family:Inter,Arial,sans-serif;fill:#111}.label{font-size:18px}.num{font-size:22px;font-weight:700}.note{font-size:17px}.bar1,.bar2{fill:#111}</style>
+<text x="44" y="52" font-size="28" font-weight="700">FrontierCS on Harbor: score vs. long-horizon trace length</text>
+<text class="label" x="44" y="135">Claude Opus 4.7</text>
+<rect class="bar1" x="285" y="112" width="478.9" height="32" rx="5"/>
+<text class="num" x="788.9" y="136">43.0 score</text>
+<rect class="bar2" x="285" y="160" width="520.0" height="32" rx="5"/>
+<text class="num" x="830.0" y="184">77.2 avg steps</text>
+<text class="label" x="44" y="250">Kimi K2.6</text>
+<rect class="bar1" x="285" y="227" width="520.0" height="32" rx="5"/>
+<text class="num" x="830.0" y="251">46.9 score</text>
+<rect class="bar2" x="285" y="275" width="452.1" height="32" rx="5"/>
+<text class="num" x="762.1" y="299">67.2 avg steps</text>
+<text class="note" x="285" y="340">upper bar = partial score (0-100)</text>
+<text class="note" x="640" y="340">lower bar = average trajectory steps</text>
 </svg>
