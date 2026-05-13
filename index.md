@@ -300,27 +300,24 @@ permalink: /
               <th>Avg Steps</th>
               <th>Avg Tools</th>
               <th>Avg Tokens</th>
-              <th>Zero Score</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td>1</td>
-              <td><span class="fc-model-entry"><span class="fc-model-logo" aria-hidden="true">K</span><span class="fc-model-name">Kimi K2.6</span></span></td>
+              <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-kimi" aria-hidden="true">K</span><span class="fc-model-name">Kimi K2.6</span></span></td>
               <td>46.9</td>
               <td>67.2</td>
               <td>70.6</td>
               <td>155.6K</td>
-              <td>58 / 178</td>
             </tr>
             <tr>
               <td>2</td>
-              <td><span class="fc-model-entry"><span class="fc-model-logo" aria-hidden="true">C</span><span class="fc-model-name">Claude Code Opus 4.7</span></span></td>
+              <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-anthropic" aria-hidden="true">C</span><span class="fc-model-name">Claude Code Opus 4.7</span></span></td>
               <td>43.0</td>
               <td>77.2</td>
               <td>42.2</td>
               <td>251K</td>
-              <td>69 / 178</td>
             </tr>
           </tbody>
         </table>
