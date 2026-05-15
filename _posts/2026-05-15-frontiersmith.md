@@ -2,6 +2,7 @@
 layout: distill
 title: "FrontierSmith: Synthesizing Open-Ended Coding Problems at Scale"
 description: "We release FrontierSmith, a system that converts closed-ended coding problems into open-ended optimization tasks for training long-horizon coding agents."
+image: assets/img/2026-05-15-frontiersmith/pipeline.png
 
 date: 2026-05-15
 date_display: "May 15, 2026"
@@ -47,9 +48,9 @@ _styles: >
     text-align: center;
   }
   d-article video.hero-video {
-    width: 100%;
+    width: min(100%, 920px);
     display: block;
-    margin: 0.5rem auto 1.8rem;
+    margin: 0.5rem auto 1.8rem !important;
     border-radius: 8px;
     background: #000;
   }
