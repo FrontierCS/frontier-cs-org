@@ -114,16 +114,16 @@ Closed-ended coding tasks are already abundant. Given a LeetCode-style or compet
 ![FrontierSmith pipeline: seed, mutate, filter, build environment, and output open-ended problems.]({{ 'assets/img/2026-05-15-frontiersmith/pipeline.png' | relative_url }}){: .full}
 <div class="caption">FrontierSmith starts from closed-ended seed problems, mutates them into open-ended candidates, filters them by solution diversity, and builds runnable training environments.</div>
 
-We describe a problem as a tuple: an objective \(O\), input constraints \(C_I\), and output constraints \(C_O\). FrontierSmith mutates the formulation along three axes:
+We describe a problem as a tuple: an objective $O$, input constraints $C_I$, and output constraints $C_O$. FrontierSmith mutates the formulation along three axes:
 
-1. **Changing the goal** \((O \rightarrow O')\): replace an exact or binary goal with an optimization objective.
-2. **Restricting the output** \((C_O \rightarrow C_O')\): add constraints that make exact solutions infeasible at scale.
-3. **Generalizing the input** \((C_I \rightarrow C_I')\): relax input assumptions so a previously tractable problem becomes hard.
+1. **Changing the goal** $(O \rightarrow O')$: replace an exact or binary goal with an optimization objective.
+2. **Restricting the output** $(C_O \rightarrow C_O')$: add constraints that make exact solutions infeasible at scale.
+3. **Generalizing the input** $(C_I \rightarrow C_I')$: relax input assumptions so a previously tractable problem becomes hard.
 
 ![Three ways to mutate closed-ended problem formulations into open-ended ones.]({{ 'assets/img/2026-05-15-frontiersmith/formulation.png' | relative_url }}){: .full}
 <div class="caption">FrontierSmith mutates problem formulations by changing goals, restricting outputs, or generalizing inputs.</div>
 
-A simple example is minimum spanning tree. The original problem has a clean greedy solution. If we add a degree constraint and require every vertex in the tree to have degree at most \(D\), the problem becomes a degree-constrained spanning tree problem. When \(D = 2\), this reduces to a classic TSP-like setting. At realistic scales, exact optimality is no longer practical, and solution quality becomes continuous.
+A simple example is minimum spanning tree. The original problem has a clean greedy solution. If we add a degree constraint and require every vertex in the tree to have degree at most $D$, the problem becomes a degree-constrained spanning tree problem. When $D = 2$, this reduces to a classic TSP-like setting. At realistic scales, exact optimality is no longer practical, and solution quality becomes continuous.
 
 ## Filtering for Real Diversity
 
@@ -143,13 +143,13 @@ FrontierSmith uses this signal in two stages. Before building an execution envir
 The surviving ideas are converted into clean, runnable training environments. We reuse the FrontierCS judge sandbox and generate two pieces for each task:
 
 1. A test-case generator.
-2. A verifier that returns a normalized score in \([0, 1]\).
+2. A verifier that returns a normalized score in $[0, 1]$.
 
-For scoring, FrontierSmith uses a simple baseline-normalization scheme. For a task, we generate a trivial baseline solution. Suppose the baseline obtains objective value \(x\), and a submitted solution obtains \(y\). For a minimization problem, a normalized improvement score can be computed as:
+For scoring, FrontierSmith uses a simple baseline-normalization scheme. For a task, we generate a trivial baseline solution. Suppose the baseline obtains objective value $x$, and a submitted solution obtains $y$. For a minimization problem, a normalized improvement score can be computed as:
 
-\[
+$$
 \max\left\{\frac{x - y}{\max(x, y)}, 0\right\}
-\]
+$$
 
 with the analogous form for maximization. Crashes, timeouts, and invalid outputs receive zero. This gives the RL system a continuous reward instead of binary pass/fail feedback.
 
