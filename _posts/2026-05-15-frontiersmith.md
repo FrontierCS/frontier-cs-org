@@ -3,6 +3,8 @@ layout: distill
 title: "FrontierSmith: Synthesizing Open-Ended Coding Problems at Scale"
 description: "We release FrontierSmith, a system that converts closed-ended coding problems into open-ended optimization tasks for training long-horizon coding agents."
 image: assets/img/2026-05-15-frontiersmith/pipeline.png
+thumbnail: assets/img/2026-05-15-frontiersmith/pipeline.png
+og_image: assets/img/2026-05-15-frontiersmith/pipeline.png
 
 date: 2026-05-15
 date_display: "May 15, 2026"
@@ -47,10 +49,20 @@ _styles: >
     line-height: 1.45;
     text-align: center;
   }
-  d-article video.hero-video {
+  .post.distill > .fc-post-hero {
+    display: none;
+  }
+  d-article .hero-video-wrap {
+    grid-column: page;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: 0.5rem auto 1.8rem !important;
+  }
+  d-article .hero-video-wrap video.hero-video {
     width: min(100%, 920px);
     display: block;
-    margin: 0.5rem auto 1.8rem !important;
+    margin: 0 auto;
     border-radius: 8px;
     background: #000;
   }
@@ -70,9 +82,11 @@ _styles: >
   }
 ---
 
-<video class="hero-video" autoplay muted loop playsinline controls>
-  <source src="{{ 'assets/img/2026-05-15-frontiersmith/frontier-smith.mp4' | relative_url }}" type="video/mp4">
-</video>
+<div class="hero-video-wrap">
+  <video class="hero-video" autoplay muted loop playsinline controls>
+    <source src="{{ 'assets/img/2026-05-15-frontiersmith/frontier-smith.mp4' | relative_url }}" type="video/mp4">
+  </video>
+</div>
 
 **TL;DR.** We are releasing **[FrontierSmith](https://arxiv.org/abs/2605.14445)**, a system for synthesizing open-ended coding problems at scale. Starting from closed-ended programming tasks, FrontierSmith produces optimization-style problems with continuous scores, filters them for real solution diversity, and builds runnable training environments. In our experiments, models trained on FrontierSmith data can outperform models trained on human-curated open-ended data, and the resulting tasks elicit genuinely long-horizon agent behavior.
 
