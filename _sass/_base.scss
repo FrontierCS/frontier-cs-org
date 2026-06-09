@@ -2774,8 +2774,8 @@ body > .container.mt-5:has(.fc-projects-page) {
 
 .fc-projects-hero {
   display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-  gap: clamp(2rem, 7vw, 6rem);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 21rem;
   align-items: center;
   margin-bottom: clamp(2rem, 4vw, 3.2rem);
 }
@@ -3426,10 +3426,10 @@ body > .container.mt-5 {
 
 .fc-terminal-body {
   min-height: 190px !important;
-  padding: 1.15rem 1.2rem 1.35rem !important;
+  padding: 1.05rem 1.2rem 1.2rem !important;
   color: var(--fc-industrial-ink) !important;
   font-size: 0.82rem !important;
-  line-height: 1.7 !important;
+  line-height: 1.56 !important;
   background: linear-gradient(180deg, #fbfdff 0%, #f6faff 100%) !important;
 }
 
@@ -3447,7 +3447,7 @@ body > .container.mt-5 {
 }
 
 .fc-terminal-body p {
-  margin-bottom: 0.38rem !important;
+  margin-bottom: 0.3rem !important;
 }
 
 .fc-terminal-muted {
@@ -3457,16 +3457,17 @@ body > .container.mt-5 {
 .fc-terminal-rule-line {
   width: 100%;
   height: 1px;
-  margin: 0.9rem 0 1.1rem !important;
+  margin: 0.72rem 0 0.9rem !important;
   background: var(--fc-industrial-line);
 }
 
 .fc-terminal-body .fc-terminal-rule-line {
-  margin-bottom: 1.2rem !important;
+  margin-bottom: 0.9rem !important;
 }
 
 .fc-terminal-spacer::after,
-.fc-terminal-rule-line::after {
+.fc-terminal-rule-line::after,
+.fc-terminal-run-row::after {
   display: none !important;
 }
 
@@ -3513,11 +3514,15 @@ body > .container.mt-5 {
 
 .fc-terminal-bar-warn {
   --bar-color: #d8a22d;
-  --bar-width: 62%;
+  --bar-width: 55.8%;
+}
+
+.fc-terminal-bar-mid {
+  --bar-width: 64%;
 }
 
 .fc-terminal-bar-long {
-  --bar-width: 86%;
+  --bar-width: 78.5%;
 }
 
 .fc-terminal-bar-full {
@@ -4091,29 +4096,36 @@ body > .container.mt-5 {
 .fc-task-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
+  gap: clamp(1rem, 2vw, 1.25rem);
+}
+
+.fc-task-intro {
+  max-width: 620px;
+  margin: 0.9rem 0 0;
+  color: var(--fc-industrial-muted);
+  font-size: 0.98rem;
+  line-height: 1.58;
 }
 
 .fc-task-card {
-  display: grid;
-  grid-template-columns: minmax(220px, 0.86fr) minmax(0, 1.02fr);
-  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
   overflow: hidden;
-  border-radius: 18px;
-  background: #d4e0ef;
+  border-radius: 14px;
+  background: #eef4fb;
   color: var(--fc-industrial-ink) !important;
   text-decoration: none !important;
-  transition: transform 0.18s ease, background 0.18s ease;
+  transition: border-color 0.18s ease, background 0.18s ease;
 }
 
 .fc-task-card:hover {
-  background: #cbd9ea;
-  transform: translateY(-2px);
+  background: #f7fbff;
 }
 
 .fc-task-visual,
 .fc-task-placeholder {
-  min-height: 100%;
+  min-height: 0;
   background:
     linear-gradient(90deg, rgba(42, 67, 101, 0.08) 1px, transparent 1px),
     linear-gradient(0deg, rgba(42, 67, 101, 0.08) 1px, transparent 1px),
@@ -4127,6 +4139,32 @@ body > .container.mt-5 {
   display: block;
   object-fit: fill;
   object-position: center;
+}
+
+.fc-task-visual-showcase {
+  --fc-task-preview-height: clamp(560px, 48vw, 700px);
+  --fc-task-preview-pad: 0px;
+
+  display: grid;
+  place-items: center;
+  height: var(--fc-task-preview-height);
+  overflow: hidden;
+  padding: var(--fc-task-preview-pad);
+  background: #ebf2fa;
+  border-bottom: 1px solid rgba(42, 67, 101, 0.14);
+  box-sizing: border-box;
+}
+
+.fc-task-visual-showcase img {
+  width: auto !important;
+  height: calc(var(--fc-task-preview-height) - var(--fc-task-preview-pad) - var(--fc-task-preview-pad)) !important;
+  max-width: 100%;
+  object-fit: contain;
+  object-position: center;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .fc-task-placeholder {
@@ -4150,11 +4188,19 @@ body > .container.mt-5 {
 .fc-task-body {
   display: flex;
   flex-direction: column;
-  padding: clamp(1.25rem, 2.2vw, 1.75rem);
+  gap: 0.78rem;
+  padding: clamp(1.15rem, 2vw, 1.45rem);
+}
+
+.fc-task-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.9rem;
 }
 
 .fc-task-tag {
-  margin: 0 0 0.75rem;
+  margin: 0;
   color: var(--fc-industrial-blue-dark) !important;
   font-family: var(--fc-font-mono);
   font-size: 0.62rem !important;
@@ -4162,10 +4208,14 @@ body > .container.mt-5 {
   text-transform: uppercase;
 }
 
+.fc-task-card .fc-task-tag {
+  color: var(--fc-industrial-blue-dark) !important;
+}
+
 .fc-task-body h3 {
-  margin: 0 0 0.75rem;
+  margin: 0;
   color: var(--fc-industrial-ink);
-  font-size: clamp(1.02rem, 1.35vw, 1.22rem);
+  font-size: clamp(1.12rem, 1.45vw, 1.28rem);
   line-height: 1.08;
   font-weight: 620;
   letter-spacing: 0.012em;
@@ -4176,11 +4226,11 @@ body > .container.mt-5 {
   color: #1f2937 !important;
   font-family: "Times New Roman", Times, serif !important;
   font-size: 0.94rem;
-  line-height: 1.38;
+  line-height: 1.46;
 }
 
-.fc-task-body > span {
-  margin-top: auto;
+.fc-task-meta > span {
+  flex: 0 0 auto;
   color: var(--fc-industrial-blue-dark);
   font-size: 0.82rem;
   font-weight: 520;
@@ -4932,18 +4982,18 @@ body > .container.mt-5:has(.blog-hero) {
   }
 }
 
-// Final terminal spacing override: keep progress rows compact.
+// Final terminal spacing override: keep progress rows compact but readable.
 .fc-terminal-body p.fc-terminal-run-row {
   min-height: 0 !important;
   margin-top: 0 !important;
   margin-bottom: 0 !important;
-  line-height: 1 !important;
+  line-height: 1.22 !important;
 }
 
 .fc-terminal-body p.fc-terminal-run-row + p.fc-terminal-run-row {
-  margin-top: 0.18rem !important;
+  margin-top: 0.5rem !important;
 }
 
 .fc-terminal-body p.fc-terminal-run-row + p.fc-terminal-rule-line {
-  margin-top: 0.22rem !important;
+  margin-top: 0.9rem !important;
 }

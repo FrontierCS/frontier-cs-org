@@ -113,11 +113,17 @@
               <li class="nav-item">
                 <a class="nav-link" href="https://discord.com/invite/k4hd2nU4UE" target="_blank" rel="noopener noreferrer">Discord</a>
               </li>
-              <li class="nav-item {% if page.url contains 'projects' %}active{% endif %}">
-                <a class="nav-link" href="{{ '/projects/' | relative_url }}">Projects
-                  {%- if page.url contains 'projects' -%}
+              <li class="nav-item {% if page.url contains 'paper' %}active{% endif %}">
+                <a class="nav-link" href="{{ '/paper/' | relative_url }}">Paper
+                  {%- if page.url contains 'paper' -%}
                   <span class="sr-only">(current)</span>
                   {%- endif -%}
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="https://github.com/FrontierCS/Frontier-CS" target="_blank" rel="noopener noreferrer" aria-label="FrontierCS on GitHub">
+                  <i class="fab fa-github" aria-hidden="true"></i>
+                  <span class="sr-only">GitHub</span>
                 </a>
               </li>
             </ul>

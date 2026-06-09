@@ -34,32 +34,30 @@ permalink: /
     <p class="fc-release-link">→ Read our paper <a href="{{ '/blog/feb-release/' | relative_url }}">here</a>.</p>
   </div>
 
-  <div class="fc-terminal-card" aria-label="Frontier-CS command line benchmark preview">
+  <div class="fc-terminal-card" aria-label="Frontier-CS Harbor agent evaluation preview">
     <div class="fc-terminal-top">
       <span></span>
       <span></span>
       <span></span>
-      <p>frontier-cs · codebase_adaptation · evaluation</p>
+      <p>frontier-cs · harbor trial · 2.0</p>
     </div>
     <div class="fc-terminal-body">
-      <p class="fc-terminal-line fc-terminal-comment" style="--line-delay: 0.1s;"># Run with any standard agent CLI</p>
-      <p class="fc-terminal-line" style="--line-delay: 0.45s;"><span class="fc-prompt">$</span> uv run harbor run -d frontier-cs-algorithm \
-    -a claude-code -m "anthropic/claude-opus-4-6"</p>
+      <p class="fc-terminal-line fc-terminal-comment" style="--line-delay: 0.1s;"># Run a Frontier-CS 2.0 task through Harbor</p>
+      <p class="fc-terminal-line" style="--line-delay: 0.45s;"><span class="fc-prompt">$</span> uv run frontier harbor trial 2.0 erdos_unit_distance \
+    -a codex -m gpt-5.5 --json</p>
       <p class="fc-terminal-line fc-terminal-spacer" style="--line-delay: 1.025s;" aria-hidden="true">&nbsp;</p>
-      <p class="fc-terminal-line fc-terminal-comment" style="--line-delay: 1.15s;"># Try your own solution!</p>
-      <p class="fc-terminal-line" style="--line-delay: 1.825s;"><span class="fc-prompt">$</span> uv run frontier eval algorithmic 0 &lt;your_solution.cpp&gt;</p>
-      <p class="fc-terminal-line fc-terminal-spacer" style="--line-delay: 2.05s;" aria-hidden="true">&nbsp;</p>
-      <p class="fc-terminal-line fc-terminal-muted" style="--line-delay: 2.175s;">track.algorithmic  problem.0  backend.docker</p>
-      <p class="fc-terminal-line fc-terminal-muted" style="--line-delay: 2.5s;">continuous scoring enabled...</p>
-      <p class="fc-terminal-line fc-terminal-muted" style="--line-delay: 2.825s;">running public test instances...</p>
-      <p class="fc-terminal-line fc-terminal-rule-line" style="--line-delay: 3.125s;" aria-hidden="true"></p>
-      <div class="fc-terminal-line fc-terminal-test-block" style="--line-delay: 3.425s;">
-        <div class="fc-terminal-run-row">test 5 / 10 <span>score: 43.2</span><i class="fc-terminal-bar fc-terminal-bar-warn"></i></div>
-        <div class="fc-terminal-run-row">test 10 / 10 <span>score: 57.8</span><i class="fc-terminal-bar"></i></div>
-      </div>
-      <p class="fc-terminal-line fc-terminal-rule-line" style="--line-delay: 4s;" aria-hidden="true"></p>
-      <p class="fc-terminal-line fc-terminal-success" style="--line-delay: 5.05s;">✓ Score@1 72.6</p>
-      <p class="fc-terminal-line fc-terminal-success" style="--line-delay: 5.7s;">✓ leaderboard submission ready</p>
+      <p class="fc-terminal-line fc-terminal-muted" style="--line-delay: 1.15s;">generating frontier-cs-2-0-erdos-unit-distance</p>
+      <p class="fc-terminal-line fc-terminal-muted" style="--line-delay: 1.45s;">starting Harbor trial with iterative submissions...</p>
+      <p class="fc-terminal-line fc-terminal-rule-line" style="--line-delay: 1.85s;" aria-hidden="true"></p>
+      <p class="fc-terminal-line fc-terminal-run-row" style="--line-delay: 2.15s;">submit #1 <span>score: 55.80</span><i class="fc-terminal-bar fc-terminal-bar-warn"></i></p>
+      <p class="fc-terminal-line fc-terminal-run-row" style="--line-delay: 2.65s;">submit #2 <span>score: 78.50</span><i class="fc-terminal-bar fc-terminal-bar-long"></i></p>
+      <p class="fc-terminal-line fc-terminal-rule-line" style="--line-delay: 2.8s;" aria-hidden="true"></p>
+      <p class="fc-terminal-line fc-terminal-muted" style="--line-delay: 3.1s;">trial_status=scored  agent_status=completed</p>
+      <p class="fc-terminal-line fc-terminal-muted" style="--line-delay: 3.4s;">reward=0.7850  cost=$1.94  submissions=2</p>
+      <p class="fc-terminal-line fc-terminal-muted" style="--line-delay: 3.7s;">tokens: 1.51M input / 19.9K output</p>
+      <p class="fc-terminal-line fc-terminal-rule-line" style="--line-delay: 4.1s;" aria-hidden="true"></p>
+      <p class="fc-terminal-line fc-terminal-success" style="--line-delay: 4.55s;">✓ Harbor trial scored: 78.50</p>
+      <p class="fc-terminal-line fc-terminal-success" style="--line-delay: 5.05s;">✓ result.json and verifier artifacts saved</p>
     </div>
   </div>
 </section>
@@ -358,29 +356,35 @@ permalink: /
   <div class="fc-section-heading fc-section-heading-row">
     <div>
       <h2>Example tasks</h2>
+      <p class="fc-task-intro">Frontier-CS tasks are open-ended, verifiable optimization challenges: agents can inspect the task, iterate on submissions, and climb a continuous score instead of passing a single hidden test.</p>
     </div>
+    <a href="https://github.com/FrontierCS/Frontier-CS" target="_blank" rel="noopener noreferrer">Browse tasks →</a>
   </div>
 
   <div class="fc-task-grid">
-    <a class="fc-task-card" href="https://github.com/FrontierCS/Frontier-CS/blob/main/algorithmic/problems/2/statement.txt" target="_blank" rel="noopener noreferrer">
-      <div class="fc-task-placeholder" aria-hidden="true">
-        <span>?</span>
+    <a class="fc-task-card" href="https://github.com/FrontierCS/Frontier-CS/tree/main/2.0/problems/erdos_unit_distance" target="_blank" rel="noopener noreferrer">
+      <div class="fc-task-visual fc-task-visual-showcase">
+        <img src="{{ 'assets/img/example-tasks/erdos-unit-distance.gif' | relative_url }}" alt="Animated Erdos unit distance task visualization">
       </div>
       <div class="fc-task-body">
-        <h3>Permutation Recovery</h3>
-        <p>Recover a hidden permutation using as few adaptive queries as possible. The task tests information-efficient probing, feedback-driven planning, and reasoning under sparse signals.</p>
-        <span>View task →</span>
+        <div class="fc-task-meta">
+          <h3>Erdos Unit Distance</h3>
+          <span>View task →</span>
+        </div>
+        <p>Place a fixed set of planar points so that as many pairs as possible sit exactly one unit apart. The task rewards geometric search, symmetry-aware construction, and steady agent iteration.</p>
       </div>
     </a>
 
-    <a class="fc-task-card" href="https://github.com/FrontierCS/Frontier-CS" target="_blank" rel="noopener noreferrer">
-      <div class="fc-task-visual">
-        <img src="{{ 'assets/img/2026-03-06-agent-evaluation/evolution.gif' | relative_url }}" alt="Polyomino packing evolution preview">
+    <a class="fc-task-card" href="https://github.com/FrontierCS/Frontier-CS/blob/main/algorithmic/problems/0/statement.txt" target="_blank" rel="noopener noreferrer">
+      <div class="fc-task-visual fc-task-visual-showcase">
+        <img src="{{ 'assets/img/example-tasks/polyomino-packing-square.gif' | relative_url }}" alt="Animated polyomino packing task visualization">
       </div>
       <div class="fc-task-body">
-        <h3>Polyomino Packing</h3>
-        <p>Pack geometric pieces into increasingly dense layouts. The task rewards iterative search, heuristic design, symmetry handling, and long-horizon improvement.</p>
-        <span>View task →</span>
+        <div class="fc-task-meta">
+          <h3>Polyomino Packing</h3>
+          <span>View task →</span>
+        </div>
+        <p>Pack thousands of small geometric pieces into the tightest possible rectangle. The task rewards heuristic design, rotation/reflection handling, and long-horizon layout improvement.</p>
       </div>
     </a>
   </div>
