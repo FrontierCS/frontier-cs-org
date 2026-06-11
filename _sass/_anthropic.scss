@@ -577,6 +577,7 @@ h4 { font-size: var(--fc-fs-h4); font-weight: 580 !important; letter-spacing: -0
   box-shadow: none !important;
   background: var(--fc-industrial-panel) !important;
   padding: 2rem !important;
+  min-height: 27rem !important;
   display: flex !important;
   flex-direction: column !important;
   gap: 0.6rem !important;
@@ -596,6 +597,51 @@ h4 { font-size: var(--fc-fs-h4); font-weight: 580 !important; letter-spacing: -0
   font-weight: 560 !important;
   color: var(--fc-industrial-faint) !important;
   margin: 0 !important;
+}
+
+.fc-project-card-logo {
+  position: relative !important;
+  width: 100% !important;
+  height: 9.35rem !important;
+  display: grid !important;
+  place-items: center !important;
+  overflow: hidden !important;
+  margin: -0.35rem 0 0.9rem !important;
+  padding: 1rem 1.1rem 1.25rem !important;
+  border: 0 !important;
+  border-radius: 8px !important;
+  background:
+    radial-gradient(circle at 50% 26%, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.48) 48%, rgba(247, 250, 254, 0.18) 72%),
+    linear-gradient(180deg, rgba(229, 236, 247, 0.34), rgba(229, 236, 247, 0.08)) !important;
+}
+
+.fc-project-card-logo::after {
+  content: "" !important;
+  position: absolute !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  height: 1px !important;
+  background: linear-gradient(90deg, transparent, rgba(116, 133, 158, 0.24), transparent) !important;
+}
+
+.fc-project-card-logo img {
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+}
+
+.fc-project-card-logo-wide img {
+  width: 96% !important;
+  max-height: 5.25rem !important;
+}
+
+.fc-project-card-logo-mark img {
+  max-width: 78% !important;
+  max-height: 8.25rem !important;
 }
 
 .fc-project-card h2 {

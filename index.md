@@ -32,6 +32,7 @@ permalink: /
     </div>
     <p class="fc-release-link">→ Read our blog <a href="{{ '/blog/feb-release/' | relative_url }}">here</a>.</p>
     <p class="fc-release-link">→ Read our paper <a href="{{ '/blog/feb-release/' | relative_url }}">here</a>.</p>
+    <p class="fc-release-link">→ View our GitHub <a href="https://github.com/FrontierCS/Frontier-CS" target="_blank" rel="noopener noreferrer">here</a>.</p>
   </div>
 
   <div class="fc-terminal-card" aria-label="Frontier-CS Harbor agent evaluation preview">
