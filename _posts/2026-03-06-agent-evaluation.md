@@ -5,7 +5,9 @@ description: "Evolving agent systems are advancing fast, but evaluation hasn't k
 
 date: 2026-03-10
 date_display: "Mar 10, 2026"
-image: assets/img/2026-03-06-agent-evaluation/permutation.png
+image: assets/img/2026-03-06-agent-evaluation/preview.png
+thumbnail: assets/img/2026-03-06-agent-evaluation/preview.png
+og_image: assets/img/2026-03-06-agent-evaluation/preview.png
 htmlwidgets: true
 
 authors:
