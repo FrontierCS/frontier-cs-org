@@ -25,6 +25,9 @@ authors:
   - name: Shreyas Pimpalgaonkar
     affiliations:
       name: Bespoke Labs
+  - name: Luke Zettlemoyer
+    affiliations:
+      name: University of Washington
   - name: Alex Dimakis
     url: "https://people.eecs.berkeley.edu/~alexdimakis/"
     affiliations:
@@ -244,7 +247,7 @@ Our full paper is coming soon. In the meantime, please cite this blog post if yo
 ```bibtex
 @misc{mang2026humansstillbeatai,
   title  = {Humans Still Beat AI in the Long Horizon: Revisiting Test-Time Scaling in the Agent Era},
-  author = {Qiuyang Mang and Kaiyuan Liu and Bo Peng and Shreyas Pimpalgaonkar and Alex Dimakis and Alvin Cheung},
+  author = {Qiuyang Mang and Kaiyuan Liu and Bo Peng and Shreyas Pimpalgaonkar and Luke Zettlemoyer and Alex Dimakis and Alvin Cheung},
   year   = {2026},
   url    = {https://joyemang33.github.io/blog/2026/humans-dont-just-sample/}
 }
