@@ -1,6 +1,6 @@
 ---
 layout: distill
-title: LLM Defeated in Open-ended Problems
+title: The Reverse Optimization Trap - LLM Defeated in Open-ended Problems
 description: "Modern LLMs claim superhuman algorithmic abilities, but what happens when there is no strict verifier? We analyze how multi-turn 'optimization' in Frontier-CS exposes the cognitive ceiling and catastrophic failures of AI in open-ended problem solving."
 thumbnail: assets/img/2026-02-14-negative-optimization/preview.png
 og_image: assets/img/2026-02-14-negative-optimization/preview.png
