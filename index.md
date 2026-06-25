@@ -445,3 +445,13 @@ permalink: /
     </div>
   </div>
 </section>
+
+<section class="fc-section fc-contributors fc-sponsors">
+  <h2>Sponsors</h2>
+  <div class="fc-sponsor-grid" aria-label="Frontier-CS sponsors">
+    <a class="fc-sponsor-card" href="https://www.laude.org/" target="_blank" rel="noopener noreferrer">
+      <img src="{{ 'assets/img/sponsors/laude-institute.svg' | relative_url }}" alt="Laude Institute logo">
+      <p>Laude Institute</p>
+    </a>
+  </div>
+</section>
