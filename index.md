@@ -115,7 +115,7 @@ permalink: /
     <div>
       <h2>Leaderboard</h2>
     </div>
-    <span>Updated 2026-05-13</span>
+    <span>Updated 2026-07-16</span>
   </div>
 
   <div class="fc-leaderboard-tabs" role="tablist" aria-label="Leaderboard tracks">
@@ -287,7 +287,7 @@ permalink: /
     <article class="fc-leaderboard-card fc-leaderboard-panel" data-fc-leaderboard-panel="agent">
       <div class="fc-leaderboard-card-header">
         <h3>Agent Track</h3>
-        <p>178 tasks</p>
+        <p>188 tasks</p>
       </div>
       <div class="fc-table-wrap">
         <table>
@@ -304,19 +304,27 @@ permalink: /
           <tbody>
             <tr>
               <td>1</td>
+              <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-qwen" aria-hidden="true">Q</span><span class="fc-model-name">Qwen3.7 Max</span></span></td>
+              <td>61.9</td>
+              <td>133.9</td>
+              <td>139.1</td>
+              <td>13.85M</td>
+            </tr>
+            <tr>
+              <td>2</td>
               <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-kimi" aria-hidden="true">K</span><span class="fc-model-name">Kimi K2.6</span></span></td>
               <td>46.9</td>
               <td>67.2</td>
               <td>70.6</td>
-              <td>155.6K</td>
+              <td>6.79M</td>
             </tr>
             <tr>
-              <td>2</td>
+              <td>3</td>
               <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-anthropic" aria-hidden="true">C</span><span class="fc-model-name">Claude Code Opus 4.7</span></span></td>
               <td>43.0</td>
               <td>77.2</td>
               <td>42.2</td>
-              <td>251K</td>
+              <td>10.96M</td>
             </tr>
           </tbody>
         </table>
@@ -450,7 +458,7 @@ permalink: /
   <h2>Sponsors</h2>
   <div class="fc-sponsor-grid" aria-label="Frontier-CS sponsors">
     <a class="fc-sponsor-card" href="https://www.laude.org/" target="_blank" rel="noopener noreferrer">
-      <img src="{{ 'assets/img/sponsors/laude-institute.svg' | relative_url }}" alt="Laude Institute logo">
+      <img src="{{ 'assets/img/sponsors/laude-institute.png' | relative_url }}" alt="Laude Institute logo">
       <p>Laude Institute</p>
     </a>
   </div>
