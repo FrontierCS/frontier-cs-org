@@ -304,7 +304,7 @@ permalink: /
           <tbody>
             <tr>
               <td>1</td>
-              <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-qwen" aria-hidden="true">Q</span><span class="fc-model-name">Qwen3.7 Max</span></span></td>
+              <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-qwen" aria-hidden="true">Q</span><span class="fc-model-name">Qwen3.7 Max (Claude Code)</span></span></td>
               <td>61.9</td>
               <td>133.9</td>
               <td>139.1</td>
@@ -312,6 +312,14 @@ permalink: /
             </tr>
             <tr>
               <td>2</td>
+              <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-google" aria-hidden="true">G</span><span class="fc-model-name">Gemini 3.1 Pro (Gemini CLI)</span></span></td>
+              <td>60.2</td>
+              <td>74.3</td>
+              <td>41.6</td>
+              <td>2M</td>
+            </tr>
+            <tr>
+              <td>3</td>
               <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-kimi" aria-hidden="true">K</span><span class="fc-model-name">Kimi K2.6</span></span></td>
               <td>46.9</td>
               <td>67.2</td>
@@ -319,7 +327,7 @@ permalink: /
               <td>6.79M</td>
             </tr>
             <tr>
-              <td>3</td>
+              <td>4</td>
               <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-anthropic" aria-hidden="true">C</span><span class="fc-model-name">Claude Code Opus 4.7</span></span></td>
               <td>43.0</td>
               <td>77.2</td>
