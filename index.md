@@ -305,7 +305,7 @@ permalink: /
             <tr>
               <td>1</td>
               <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-openai" aria-hidden="true">OA</span><span class="fc-model-name">GPT-5.5 (Codex)</span></span></td>
-              <td>72.07</td>
+              <td>72.1</td>
               <td>48.3</td>
               <td>55.8</td>
               <td>2.02M</td>
