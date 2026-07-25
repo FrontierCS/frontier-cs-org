@@ -115,17 +115,17 @@ permalink: /
     <div>
       <h2>Leaderboard</h2>
     </div>
-    <span>Updated 2026-07-16</span>
+    <span>Updated 2026-07-25</span>
   </div>
 
   <div class="fc-leaderboard-tabs" role="tablist" aria-label="Leaderboard tracks">
-    <button class="fc-leaderboard-tab is-active" type="button" role="tab" aria-selected="true" data-fc-leaderboard-tab="algorithmic">Algorithmic</button>
+    <button class="fc-leaderboard-tab" type="button" role="tab" aria-selected="false" data-fc-leaderboard-tab="algorithmic">Algorithmic</button>
     <button class="fc-leaderboard-tab" type="button" role="tab" aria-selected="false" data-fc-leaderboard-tab="research">Research</button>
-    <button class="fc-leaderboard-tab" type="button" role="tab" aria-selected="false" data-fc-leaderboard-tab="agent">Agent</button>
+    <button class="fc-leaderboard-tab is-active" type="button" role="tab" aria-selected="true" data-fc-leaderboard-tab="agent">Agent</button>
   </div>
 
   <div class="fc-leaderboard-grid">
-    <article class="fc-leaderboard-card fc-leaderboard-panel is-active" data-fc-leaderboard-panel="algorithmic">
+    <article class="fc-leaderboard-card fc-leaderboard-panel" data-fc-leaderboard-panel="algorithmic">
       <div class="fc-leaderboard-card-header">
         <h3>Algorithmic Track</h3>
         <p>172 problems</p>
@@ -284,7 +284,7 @@ permalink: /
       </div>
     </article>
 
-    <article class="fc-leaderboard-card fc-leaderboard-panel" data-fc-leaderboard-panel="agent">
+    <article class="fc-leaderboard-card fc-leaderboard-panel is-active" data-fc-leaderboard-panel="agent">
       <div class="fc-leaderboard-card-header">
         <h3>Agent Track</h3>
         <p>188 tasks</p>
@@ -304,6 +304,14 @@ permalink: /
           <tbody>
             <tr>
               <td>1</td>
+              <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-openai" aria-hidden="true">OA</span><span class="fc-model-name">GPT-5.6-sol (Codex)</span></span></td>
+              <td>76.4</td>
+              <td>57.8</td>
+              <td>51.8</td>
+              <td>1.93M</td>
+            </tr>
+            <tr>
+              <td>2</td>
               <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-anthropic" aria-hidden="true">C</span><span class="fc-model-name">Claude Code Opus 4.8</span></span></td>
               <td>74.5</td>
               <td>355.4</td>
@@ -311,7 +319,7 @@ permalink: /
               <td>14.72M</td>
             </tr>
             <tr>
-              <td>2</td>
+              <td>3</td>
               <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-openai" aria-hidden="true">OA</span><span class="fc-model-name">GPT-5.5 (Codex)</span></span></td>
               <td>72.1</td>
               <td>48.3</td>
@@ -319,7 +327,7 @@ permalink: /
               <td>2.02M</td>
             </tr>
             <tr>
-              <td>3</td>
+              <td>4</td>
               <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-qwen" aria-hidden="true">Q</span><span class="fc-model-name">Qwen3.7 Max (Claude Code)</span></span></td>
               <td>61.9</td>
               <td>133.9</td>
@@ -327,7 +335,7 @@ permalink: /
               <td>13.85M</td>
             </tr>
             <tr>
-              <td>4</td>
+              <td>5</td>
               <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-google" aria-hidden="true">G</span><span class="fc-model-name">Gemini 3.1 Pro (Gemini CLI)</span></span></td>
               <td>60.2</td>
               <td>74.3</td>
@@ -335,7 +343,7 @@ permalink: /
               <td>2M</td>
             </tr>
             <tr>
-              <td>5</td>
+              <td>6</td>
               <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-kimi" aria-hidden="true">K</span><span class="fc-model-name">Kimi K2.6</span></span></td>
               <td>46.9</td>
               <td>67.2</td>
@@ -343,7 +351,7 @@ permalink: /
               <td>6.79M</td>
             </tr>
             <tr>
-              <td>6</td>
+              <td>7</td>
               <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-anthropic" aria-hidden="true">C</span><span class="fc-model-name">Claude Code Opus 4.7</span></span></td>
               <td>43.0</td>
               <td>77.2</td>
