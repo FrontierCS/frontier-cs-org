@@ -328,6 +328,14 @@ permalink: /
             </tr>
             <tr>
               <td>4</td>
+              <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-google" aria-hidden="true">G</span><span class="fc-model-name">Gemini 3.1 Pro (Amplio)</span></span></td>
+              <td>68.9</td>
+              <td>—</td>
+              <td>—</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td>5</td>
               <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-qwen" aria-hidden="true">Q</span><span class="fc-model-name">Qwen3.7 Max (Claude Code)</span></span></td>
               <td>61.9</td>
               <td>133.9</td>
@@ -335,7 +343,7 @@ permalink: /
               <td>13.85M</td>
             </tr>
             <tr>
-              <td>5</td>
+              <td>6</td>
               <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-google" aria-hidden="true">G</span><span class="fc-model-name">Gemini 3.1 Pro (Gemini CLI)</span></span></td>
               <td>60.2</td>
               <td>74.3</td>
@@ -343,7 +351,7 @@ permalink: /
               <td>2M</td>
             </tr>
             <tr>
-              <td>6</td>
+              <td>7</td>
               <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-kimi" aria-hidden="true">K</span><span class="fc-model-name">Kimi K2.6</span></span></td>
               <td>46.9</td>
               <td>67.2</td>
@@ -351,7 +359,7 @@ permalink: /
               <td>6.79M</td>
             </tr>
             <tr>
-              <td>7</td>
+              <td>8</td>
               <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-anthropic" aria-hidden="true">C</span><span class="fc-model-name">Claude Code Opus 4.7</span></span></td>
               <td>43.0</td>
               <td>77.2</td>
