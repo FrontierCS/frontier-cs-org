@@ -1,0 +1,72 @@
+{%- comment -%}
+Report layout shared by the distill and post layouts (ported from blogs/loopdit.html):
+crumb + badge/date + title + standfirst + byline, sticky Contents column on the left,
+body column on the right. The body keeps the <d-article> element so per-post `_styles`
+written against it continue to apply.
+{%- endcomment -%}
+{%- assign primary_tag = page.tags | first -%}
+<div class="ar-page post distill">
+
+  <div class="ar-head" id="main" tabindex="-1">
+    <div class="ar-crumb"><b><a href="{{ '/blog/' | relative_url }}">Blog</a></b><span>›</span><span>{{ page.title }}</span></div>
+    <div class="ar-eyebrow">
+      {%- if primary_tag %}<span class="ar-badge">{{ primary_tag }}</span>{% endif -%}
+      <span>{% if page.date_display %}{{ page.date_display }}{% else %}{{ page.date | date: "%b %-d, %Y" }}{% endif %}</span>
+    </div>
+    <h1>{{ page.title }}</h1>
+    {% if page.description %}<p class="ar-standfirst">{{ page.description }}</p>{% endif %}
+    {% if page.authors %}
+    <div class="ar-authors">
+      <span class="ar-by">By</span>
+      {% for author in page.authors -%}
+      <span class="ar-author">
+        {% if author.url %}<a href="{{ author.url }}">{{ author.name }}</a>{% else %}<span>{{ author.name }}</span>{% endif %}
+        {% if author.affiliations.name %}<em>{% if author.affiliations.url %}<a href="{{ author.affiliations.url }}">{{ author.affiliations.name }}</a>{% else %}{{ author.affiliations.name }}{% endif %}</em>{% endif %}
+      </span>
+      {% endfor %}
+    </div>
+    {% elsif page.author %}
+    <div class="ar-authors"><span class="ar-by">By</span><span class="ar-author"><span>{{ page.author }}</span></span></div>
+    {% endif %}
+  </div>
+
+  {% if page.toc %}
+  <aside class="ar-toc" aria-label="Contents">
+    <h3>Contents</h3>
+    <ol>
+      {% for section in page.toc -%}
+      <li><a href="#{{ section.name | slugify }}">{{ section.name }}</a>
+        {% if section.subsections -%}
+        <ul>
+          {% for subsection in section.subsections -%}
+          <li><a href="#{{ subsection.name | slugify }}">{{ subsection.name }}</a></li>
+          {% endfor %}
+        </ul>
+        {%- endif %}
+      </li>
+      {%- endfor %}
+    </ol>
+  </aside>
+  {% endif %}
+
+  <div class="ar-main">
+    {% if page.image %}
+    <figure class="fc-post-hero">
+      <img src="{{ page.image | relative_url }}" alt="{{ page.title }}">
+    </figure>
+    {% endif %}
+
+    <d-article>
+      {{ content }}
+    </d-article>
+
+    {{ include.after }}
+
+    <div class="article-foot">
+      <a href="{{ '/blog/' | relative_url }}">← All posts</a>
+      <a href="#main">Back to top ↑</a>
+    </div>
+
+    {% include keep_reading.html %}
+  </div>
+</div>

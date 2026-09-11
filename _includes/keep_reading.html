@@ -2,11 +2,11 @@
 {% assign shown_posts = 0 %}
 
 <section class="keep-reading">
-  <div class="keep-reading-header">
-    <h2>Keep reading</h2>
+  <div class="sec-head">
+    <h2 class="sec-title">Keep reading</h2>
   </div>
 
-  <div class="keep-reading-grid">
+  <div class="card-grid">
     {% for post in related_posts %}
       {% if post.url != page.url %}
         {% assign post_link = post.url | relative_url %}
@@ -29,24 +29,20 @@
             {% assign thumb = "assets/img/" | append: image_rel %}
           {% endif %}
         {% endif %}
+        {% assign primary_tag = post.tags | first %}
 
-        <article class="keep-reading-card">
-          <a class="keep-reading-card-thumb" href="{{ post_link }}"{% if is_external %} target="_blank" rel="noopener noreferrer"{% endif %}>
-            {% if thumb != blank %}
-            <img src="{{ thumb | relative_url }}" alt="{{ post.title }}">
-            {% else %}
-            <div class="keep-reading-card-placeholder" aria-hidden="true"></div>
-            {% endif %}
-          </a>
-          <div class="keep-reading-card-body">
-            {% assign primary_tag = post.tags | first %}
-            {% if primary_tag %}
-            <p class="keep-reading-card-badge">{{ primary_tag }}</p>
-            {% endif %}
-            <h3><a href="{{ post_link }}"{% if is_external %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ post.title }}</a></h3>
-            <p>{{ post.description }}</p>
-            <p class="keep-reading-card-meta">{{ post.date | date: '%b %-d, %Y' }}</p>
+        <article class="tile">
+          {% if thumb != blank %}
+          <a class="tile-thumb" href="{{ post_link }}"{% if is_external %} target="_blank" rel="noopener noreferrer"{% endif %}><img src="{{ thumb | relative_url }}" alt="{{ post.title }}" loading="lazy" decoding="async"></a>
+          {% else %}
+          <a class="tile-thumb placeholder" href="{{ post_link }}"{% if is_external %} target="_blank" rel="noopener noreferrer"{% endif %} aria-hidden="true"></a>
+          {% endif %}
+          <div class="tile-meta">
+            {% if primary_tag %}<span>{{ primary_tag }}</span><span class="dot">·</span>{% endif -%}
+            <span>{{ post.date | date: '%b %-d, %Y' }}</span>
           </div>
+          <h3 class="tile-title"><a href="{{ post_link }}"{% if is_external %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ post.title }}</a></h3>
+          <p class="tile-desc">{{ post.description }}</p>
         </article>
 
         {% assign shown_posts = shown_posts | plus: 1 %}

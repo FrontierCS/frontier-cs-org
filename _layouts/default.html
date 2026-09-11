@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{ site.lang }}">
 
-  <!-- Head -->
   <head>
   {%- if page.redirect -%}
     <meta http-equiv="refresh" content="3; url={{ site.baseurl }}/" />
@@ -9,29 +8,22 @@
   {% include head.html %}
   </head>
 
-  <!-- Body -->
-  <body class="{% if site.navbar_fixed %}fixed-top-nav{% endif %} {% unless site.footer_fixed %}sticky-bottom-footer{% endunless %}">
+  <body data-active="{{ page.url }}">
 
-    <!-- Header -->
     {%- include header.html %}
 
-    <div class="header-background"><div class="img"></div></div>      
-
-    <!-- Content -->
-    <div class="container mt-5">
+    <main>
       {{ content }}
-    </div>
+    </main>
 
-    <!-- Footer -->
     {%- include bottom_nav.html %}
-    <!-- {%- include footer.html %} -->
 
-    <!-- JavaScripts -->
-    {% include scripts/jquery.html %}
-    {% include scripts/bootstrap.html %}
-    {% include scripts/masonry.html %}
-    {% include scripts/misc.html %}
+    <script defer src="{{ '/assets/js/site.js' | relative_url }}"></script>
     {% include scripts/mathjax.html %}
+    {%- if site.enable_medium_zoom %}
+    <script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@{{ site.medium_zoom.version }}/dist/medium-zoom.min.js" integrity="{{ site.medium_zoom.integrity }}" crossorigin="anonymous"></script>
+    <script defer src="{{ '/assets/js/zoom.js' | relative_url }}"></script>
+    {%- endif %}
     {% include scripts/analytics.html %}
   </body>
 </html>

@@ -18,9 +18,11 @@ pagination:
 show_year: 2026
 ---
 
-<section class="blog-hero">
-  <h1>Blog Posts</h1>
-  <p>Research notes, benchmark releases, and agent evaluation insights.</p>
+<section class="page-hero">
+  <div class="page" id="main" tabindex="-1">
+    <h1>Blog Posts</h1>
+    <p class="lede">Research notes, benchmark releases, and agent evaluation insights.</p>
+  </div>
 </section>
 
 {% if page.show_year %}
@@ -30,16 +32,20 @@ show_year: 2026
 {% assign posts_to_iterate = paginator.posts %}
 {% endif %}
 
-<section class="blog-list-grid">
-  {% for post in posts_to_iterate %}
-  {% assign post_year = post.date | date: "%Y" %}
-  {% unless page.show_year %}{% assign show_post = true %}{% else %}{% if post_year == year_str %}{% assign show_post = true %}{% else %}{% assign show_post = false %}{% endif %}{% endunless %}
-  {% if show_post %}
-  {% include blog_card.html post=post %}
-  {% endif %}
-  {% endfor %}
-</section>
+<section class="journal">
+  <div class="page">
+    <div class="post-list">
+      {% for post in posts_to_iterate %}
+      {% assign post_year = post.date | date: "%Y" %}
+      {% unless page.show_year %}{% assign show_post = true %}{% else %}{% if post_year == year_str %}{% assign show_post = true %}{% else %}{% assign show_post = false %}{% endif %}{% endunless %}
+      {% if show_post %}
+      {% include blog_card.html post=post %}
+      {% endif %}
+      {% endfor %}
+    </div>
 
-{% unless page.show_year %}
-{% include pagination.html %}
-{% endunless %}
+    {% unless page.show_year %}
+    {% include pagination.html %}
+    {% endunless %}
+  </div>
+</section>
