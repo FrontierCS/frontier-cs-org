@@ -5,12 +5,19 @@ title: "Page not found"
 description: "We can't find the page you're looking for."
 ---
 
-<section class="fc-not-found">
-  <p class="fc-not-found-eyebrow">Error 404</p>
-  <h1>We can't find that page.</h1>
-  <p>The page you're looking for may have moved, or never existed. Try the homepage or browse the latest blog posts.</p>
-  <div class="fc-not-found-actions">
-    <a class="primary" href="{{ '/' | relative_url }}">Go home <span aria-hidden="true">→</span></a>
-    <a class="secondary" href="{{ '/blog/' | relative_url }}">Read the blog</a>
+<section class="page-hero">
+  <div class="page" id="main" tabindex="-1">
+    <p class="eyebrow">Error 404</p>
+    <h1>We can't find that page.</h1>
+    <p class="lede">The page you're looking for may have moved, or never existed. Try the homepage or browse the latest blog posts.</p>
+  </div>
+</section>
+
+<section class="journal">
+  <div class="page">
+    <div class="fc-actions">
+      <a href="{{ '/' | relative_url }}">Go home <span aria-hidden="true">→</span></a>
+      <a href="{{ '/blog/' | relative_url }}">Read the blog</a>
+    </div>
   </div>
 </section>

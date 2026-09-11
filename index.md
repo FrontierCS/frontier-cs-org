@@ -4,10 +4,13 @@ title: Frontier-CS
 permalink: /
 ---
 
-<section class="fc-hero fc-hero-bench">
+<section class="journal" id="hero">
+<div class="page" id="main" tabindex="-1">
+<div class="fc-hero">
   <div class="fc-hero-copy">
-    <h1><span>Frontier-CS</span><span>Benchmark</span></h1>
-    <p class="fc-hero-tagline">A benchmark that doesn't saturate.</p>
+    <h1 class="hero-name"><span>Frontier-CS</span><span>Benchmark</span></h1>
+    <div class="hero-rule"></div>
+    <p class="hero-bio fc-hero-tagline">A benchmark that doesn't saturate.</p>
     <div class="fc-hero-features">
       <div class="fc-hero-feature">
         <span class="fc-hero-feature-num">01</span>
@@ -30,9 +33,11 @@ permalink: /
         <p class="fc-hero-feature-body">Systems, ML, algorithms, security, and more.</p>
       </div>
     </div>
+    <div class="fc-release-links">
     <p class="fc-release-link">→ Read our blog <a href="{{ '/blog/feb-release/' | relative_url }}">here</a>.</p>
     <p class="fc-release-link">→ Read our paper <a href="{{ '/blog/feb-release/' | relative_url }}">here</a>.</p>
     <p class="fc-release-link">→ View our GitHub <a href="https://github.com/FrontierCS/Frontier-CS" target="_blank" rel="noopener noreferrer">here</a>.</p>
+    </div>
   </div>
 
   <div class="fc-terminal-card" aria-label="Frontier-CS Harbor agent evaluation preview">
@@ -43,36 +48,37 @@ permalink: /
       <p>frontier-cs · harbor trial · 2.0</p>
     </div>
     <div class="fc-terminal-body">
-      <p class="fc-terminal-line fc-terminal-comment" style="--line-delay: 0.1s;"># Run a Frontier-CS 2.0 task through Harbor</p>
-      <p class="fc-terminal-line" style="--line-delay: 0.45s;"><span class="fc-prompt">$</span> uv run frontier harbor trial 2.0 erdos_unit_distance \
+      <p class="fc-terminal-line fc-terminal-comment"># Run a Frontier-CS 2.0 task through Harbor</p>
+      <p class="fc-terminal-line"><span class="fc-prompt">$</span> uv run frontier harbor trial 2.0 erdos_unit_distance \
     -a codex -m gpt-5.5 --json</p>
-      <p class="fc-terminal-line fc-terminal-spacer" style="--line-delay: 1.025s;" aria-hidden="true">&nbsp;</p>
-      <p class="fc-terminal-line fc-terminal-muted" style="--line-delay: 1.15s;">generating frontier-cs-2-0-erdos-unit-distance</p>
-      <p class="fc-terminal-line fc-terminal-muted" style="--line-delay: 1.45s;">starting Harbor trial with iterative submissions...</p>
-      <p class="fc-terminal-line fc-terminal-rule-line" style="--line-delay: 1.85s;" aria-hidden="true"></p>
-      <p class="fc-terminal-line fc-terminal-run-row" style="--line-delay: 2.15s;">submit #1 <span>score: 55.80</span><i class="fc-terminal-bar fc-terminal-bar-warn"></i></p>
-      <p class="fc-terminal-line fc-terminal-run-row" style="--line-delay: 2.65s;">submit #2 <span>score: 78.50</span><i class="fc-terminal-bar fc-terminal-bar-long"></i></p>
-      <p class="fc-terminal-line fc-terminal-rule-line" style="--line-delay: 2.8s;" aria-hidden="true"></p>
-      <p class="fc-terminal-line fc-terminal-muted" style="--line-delay: 3.1s;">trial_status=scored  agent_status=completed</p>
-      <p class="fc-terminal-line fc-terminal-muted" style="--line-delay: 3.4s;">reward=0.7850  cost=$1.94  submissions=2</p>
-      <p class="fc-terminal-line fc-terminal-muted" style="--line-delay: 3.7s;">tokens: 1.51M input / 19.9K output</p>
-      <p class="fc-terminal-line fc-terminal-rule-line" style="--line-delay: 4.1s;" aria-hidden="true"></p>
-      <p class="fc-terminal-line fc-terminal-success" style="--line-delay: 4.55s;">✓ Harbor trial scored: 78.50</p>
-      <p class="fc-terminal-line fc-terminal-success" style="--line-delay: 5.05s;">✓ result.json and verifier artifacts saved</p>
+      <p class="fc-terminal-line fc-terminal-spacer" aria-hidden="true">&nbsp;</p>
+      <p class="fc-terminal-line fc-terminal-muted">generating frontier-cs-2-0-erdos-unit-distance</p>
+      <p class="fc-terminal-line fc-terminal-muted">starting Harbor trial with iterative submissions...</p>
+      <p class="fc-terminal-line fc-terminal-rule-line" aria-hidden="true"></p>
+      <p class="fc-terminal-line fc-terminal-run-row">submit #1 <span>score: 55.80</span><i class="fc-terminal-bar fc-terminal-bar-warn"></i></p>
+      <p class="fc-terminal-line fc-terminal-run-row">submit #2 <span>score: 78.50</span><i class="fc-terminal-bar fc-terminal-bar-long"></i></p>
+      <p class="fc-terminal-line fc-terminal-rule-line" aria-hidden="true"></p>
+      <p class="fc-terminal-line fc-terminal-muted">trial_status=scored  agent_status=completed</p>
+      <p class="fc-terminal-line fc-terminal-muted">reward=0.7850  cost=$1.94  submissions=2</p>
+      <p class="fc-terminal-line fc-terminal-muted">tokens: 1.51M input / 19.9K output</p>
+      <p class="fc-terminal-line fc-terminal-rule-line" aria-hidden="true"></p>
+      <p class="fc-terminal-line fc-terminal-success">✓ Harbor trial scored: 78.50</p>
+      <p class="fc-terminal-line fc-terminal-success">✓ result.json and verifier artifacts saved</p>
     </div>
   </div>
+</div>
+</div>
 </section>
 
-<section class="fc-section fc-latest">
-  <div class="fc-section-heading fc-section-heading-row">
-    <div>
-      <h2>Recent blog posts</h2>
-    </div>
+<section class="journal fc-latest">
+<div class="page">
+  <div class="sec-head">
+    <h2 class="sec-title">Recent blog posts</h2>
   </div>
 
   {% assign latest_posts = site.posts | sort: "date" | reverse %}
 
-  <div class="fc-post-grid">
+  <div class="card-grid">
     {% assign featured_shown = 0 %}
     {% for post in latest_posts %}
       {% unless post.path contains "2025-04-28-distill-example" %}
@@ -84,7 +90,7 @@ permalink: /
     {% endfor %}
   </div>
 
-  <ul class="fc-post-list" aria-label="More recent posts">
+  <ul class="log" aria-label="More recent posts">
     {% assign list_shown = 0 %}
     {% assign list_skipped = 0 %}
     {% for post in latest_posts %}
@@ -92,11 +98,11 @@ permalink: /
         {% if list_skipped < 3 %}
           {% assign list_skipped = list_skipped | plus: 1 %}
         {% elsif list_shown < 5 %}
-          <li class="fc-post-list-item">
+          <li>
             <a href="{{ post.url | relative_url }}">
-              <span class="fc-post-list-date">{{ post.date | date: '%b %-d, %Y' }}</span>
-              <span class="fc-post-list-title">{{ post.title }}</span>
-              <span class="fc-post-list-arrow" aria-hidden="true">→</span>
+              <span class="date">{{ post.date | date: '%b %-d, %Y' }}</span>
+              <span class="title">{{ post.title }}</span>
+              <span class="arrow" aria-hidden="true">→</span>
             </a>
           </li>
           {% assign list_shown = list_shown | plus: 1 %}
@@ -105,17 +111,17 @@ permalink: /
     {% endfor %}
   </ul>
 
-  <p class="fc-blog-cta">
+  <p class="fc-cta">
     <a href="{{ '/blog/' | relative_url }}">Read more posts <span aria-hidden="true">→</span></a>
   </p>
+</div>
 </section>
 
-<section id="leaderboard" class="fc-section fc-leaderboard">
-  <div class="fc-section-heading fc-section-heading-row">
-    <div>
-      <h2>Leaderboard</h2>
-    </div>
-    <span>Updated 2026-07-25</span>
+<section id="leaderboard" class="journal fc-leaderboard">
+<div class="page">
+  <div class="sec-head">
+    <h2 class="sec-title">Leaderboard</h2>
+    <span class="sec-count">Updated 2026-07-25</span>
   </div>
 
   <div class="fc-leaderboard-tabs" role="tablist" aria-label="Leaderboard tracks">
@@ -373,9 +379,10 @@ permalink: /
     </article>
   </div>
 
-  <p class="fc-leaderboard-cta">
+  <p class="fc-cta">
     <a href="https://github.com/FrontierCS/Frontier-CS" target="_blank" rel="noopener noreferrer">View benchmark on GitHub <span aria-hidden="true">→</span></a>
   </p>
+</div>
 </section>
 
 <script>
@@ -401,18 +408,19 @@ permalink: /
   })();
 </script>
 
-<section class="fc-section fc-tasks">
-  <div class="fc-section-heading fc-section-heading-row">
+<section class="journal fc-tasks">
+<div class="page">
+  <div class="sec-head">
     <div>
-      <h2>Example tasks</h2>
-      <p class="fc-task-intro">Frontier-CS tasks are open-ended, verifiable optimization challenges: agents can inspect the task, iterate on submissions, and climb a continuous score instead of passing a single hidden test.</p>
+      <h2 class="sec-title">Example tasks</h2>
+      <p class="sec-intro">Frontier-CS tasks are open-ended, verifiable optimization challenges: agents can inspect the task, iterate on submissions, and climb a continuous score instead of passing a single hidden test.</p>
     </div>
-    <a href="https://github.com/FrontierCS/Frontier-CS" target="_blank" rel="noopener noreferrer">Browse tasks →</a>
+    <a class="sec-more" href="https://github.com/FrontierCS/Frontier-CS" target="_blank" rel="noopener noreferrer">Browse tasks →</a>
   </div>
 
   <div class="fc-task-grid">
     <a class="fc-task-card" href="https://github.com/FrontierCS/Frontier-CS/tree/main/2.0/problems/erdos_unit_distance" target="_blank" rel="noopener noreferrer">
-      <div class="fc-task-visual fc-task-visual-showcase">
+      <div class="fc-task-visual">
         <img src="{{ 'assets/img/example-tasks/erdos-unit-distance.gif' | relative_url }}" alt="Animated Erdos unit distance task visualization">
       </div>
       <div class="fc-task-body">
@@ -425,7 +433,7 @@ permalink: /
     </a>
 
     <a class="fc-task-card" href="https://github.com/FrontierCS/Frontier-CS/blob/main/algorithmic/problems/0/statement.txt" target="_blank" rel="noopener noreferrer">
-      <div class="fc-task-visual fc-task-visual-showcase">
+      <div class="fc-task-visual">
         <img src="{{ 'assets/img/example-tasks/polyomino-packing-square.gif' | relative_url }}" alt="Animated polyomino packing task visualization">
       </div>
       <div class="fc-task-body">
@@ -437,10 +445,14 @@ permalink: /
       </div>
     </a>
   </div>
+</div>
 </section>
 
-<section class="fc-section fc-contributors">
-  <h2>100+ Contributors from</h2>
+<section class="journal fc-contributors">
+<div class="page">
+  <div class="sec-head">
+    <h2 class="sec-title">100+ Contributors from</h2>
+  </div>
   <p class="fc-contributors-label">Academic institutions</p>
   <div class="fc-school-grid" aria-label="Contributing academic institutions">
     <div class="fc-school-card">
@@ -492,14 +504,19 @@ permalink: /
       <p>NTU</p>
     </div>
   </div>
+</div>
 </section>
 
-<section class="fc-section fc-contributors fc-sponsors">
-  <h2>Sponsors</h2>
+<section class="journal fc-sponsors">
+<div class="page">
+  <div class="sec-head">
+    <h2 class="sec-title">Sponsors</h2>
+  </div>
   <div class="fc-sponsor-grid" aria-label="Frontier-CS sponsors">
     <a class="fc-sponsor-card" href="https://www.laude.org/" target="_blank" rel="noopener noreferrer">
       <img src="{{ 'assets/img/sponsors/laude-institute.png' | relative_url }}" alt="Laude Institute logo">
       <p>Laude Institute</p>
     </a>
   </div>
+</div>
 </section>
