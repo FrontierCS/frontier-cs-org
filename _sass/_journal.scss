@@ -1020,6 +1020,154 @@ footer.foot {
 .fc-actions a:hover { color: var(--ink); }
 
 /* ============================================================
+   Workshop page (/workshop/)
+   ============================================================ */
+.ws-status {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  margin: 22px 0 0;
+  max-width: 72ch;
+}
+.ws-facts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0 clamp(20px, 3vw, 36px);
+  margin: 36px 0 0;
+}
+.ws-fact { border-top: 1px solid var(--rule); padding: 14px 0 4px; }
+.ws-fact-label {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 6px;
+}
+.ws-fact-value {
+  font-family: var(--font-serif);
+  font-size: 17px;
+  line-height: 1.4;
+  color: var(--ink);
+  margin: 0;
+}
+.ws-subhead {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  margin: 44px 0 14px;
+}
+.ws-subhead:first-child, .sec-head + .ws-subhead { margin-top: 0; }
+.ws-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 clamp(28px, 4vw, 56px);
+  align-items: start;
+  margin-top: 44px;
+}
+.ws-columns .ws-subhead { margin-top: 0; }
+.ws-list { list-style: none; padding: 0; margin: 0; counter-reset: ws; }
+.ws-list li {
+  position: relative;
+  border-top: 1px solid var(--rule-2);
+  padding: 12px 0 12px 40px;
+  font-family: var(--font-serif);
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+.ws-list li:last-child { border-bottom: 1px solid var(--rule-2); }
+.ws-list li::before {
+  counter-increment: ws;
+  content: counter(ws, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: 15px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+.ws-topics {
+  columns: 2;
+  column-gap: clamp(28px, 4vw, 56px);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.ws-topics li {
+  break-inside: avoid;
+  border-top: 1px solid var(--rule-2);
+  padding: 10px 0;
+  font-family: var(--font-serif);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+.ws-tracks {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0 clamp(20px, 3vw, 36px);
+}
+.ws-prose-gap { margin-top: 40px; }
+.ws-dates.log li { grid-template-columns: 150px 1fr; }
+.ws-schedule td { white-space: normal; }
+.ws-schedule td:first-child { white-space: nowrap; }
+.ws-schedule td:last-child { width: 100%; }
+.ws-schedule tbody tr:first-child td { color: var(--ink-2); }
+.ws-schedule tbody tr:first-child td:first-child { color: var(--ink-4); }
+.ws-people {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0 clamp(20px, 2.5vw, 32px);
+}
+.ws-person { border-top: 1px solid var(--rule); padding: 18px 0 24px; }
+.ws-person-name {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  margin: 0 0 6px;
+}
+.ws-person-name a { transition: color 0.15s; border-bottom: 1px solid transparent; }
+.ws-person-name a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+.ws-person-affil {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  margin: 0 0 10px;
+}
+.ws-person-bio {
+  font-family: var(--font-serif);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink-2);
+  margin: 0;
+}
+@media (max-width: 1000px) {
+  .ws-people { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+}
+@media (max-width: 900px) {
+  .ws-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ws-columns { grid-template-columns: 1fr; }
+  .ws-columns > div + div { margin-top: 36px; }
+  .ws-tracks { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .ws-topics { columns: 1; }
+  .ws-dates.log li { grid-template-columns: 104px 1fr; }
+  .ws-dates.log .date { white-space: normal; line-height: 1.5; }
+}
+
+
+/* ============================================================
    Article — report layout (blogs/loopdit.html)
    ============================================================ */
 .ar-page {
