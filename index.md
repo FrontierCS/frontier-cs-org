@@ -517,6 +517,11 @@ permalink: /
       <img src="{{ 'assets/img/sponsors/laude-institute.png' | relative_url }}" alt="Laude Institute logo">
       <p>Laude Institute</p>
     </a>
+    <a class="fc-sponsor-card" href="https://modal.com/" target="_blank" rel="noopener noreferrer">
+      <img class="fc-modal-logo fc-modal-logo--dark" src="{{ 'assets/img/sponsors/modal.svg' | relative_url }}" alt="">
+      <img class="fc-modal-logo fc-modal-logo--light" src="{{ 'assets/img/sponsors/modal-light.svg' | relative_url }}" alt="">
+      <p>Modal</p>
+    </a>
   </div>
 </div>
 </section>

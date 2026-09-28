@@ -989,6 +989,7 @@ footer.foot {
   mix-blend-mode: multiply;
 }
 .fc-sponsor-card img { height: 48px; }
+.fc-sponsor-card img.fc-modal-logo { height: 40px; }
 .fc-school-card p, .fc-sponsor-card p {
   font-family: var(--font-mono);
   font-size: 10.5px;
@@ -1577,4 +1578,7 @@ html[data-theme="midnight"] .fc-task-visual img,
 html[data-theme="midnight"] .fc-school-card img,
 html[data-theme="midnight"] .fc-sponsor-card img,
 html[data-theme="midnight"] .fc-paper-logo img { mix-blend-mode: normal; filter: brightness(0.92); }
+html[data-theme="midnight"] .fc-modal-logo--dark { display: none; }
+.fc-modal-logo--light { display: none; }
+html[data-theme="midnight"] .fc-modal-logo--light { display: block; }
 html[data-theme="midnight"] .ar-main img, html[data-theme="midnight"] .fc-post-hero img { filter: brightness(0.94); }
