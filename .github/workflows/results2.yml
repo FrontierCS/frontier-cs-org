@@ -1,7 +1,8 @@
-name: Evaluation results
+name: Evaluation results withdrawal
 on:
   pull_request:
     paths:
+      - '_config.yml'
       - '_pages/results2.html'
       - 'assets/**/results2*'
       - 'bin/*results2*'
@@ -10,6 +11,7 @@ on:
   push:
     branches: [main]
     paths:
+      - '_config.yml'
       - '_pages/results2.html'
       - 'assets/**/results2*'
       - 'bin/*results2*'
@@ -36,19 +38,15 @@ jobs:
           bundler-cache: true
       - name: Build production website
         run: JEKYLL_ENV=production bundle exec jekyll build
-      - name: Check published route and assets
+      - name: Verify public results are withdrawn
         run: |
-          test -f _site/results2/index.html
-          test -f _site/assets/data/results2.json
-          grep -q 'noindex, nofollow' _site/results2/index.html
+          test -f _site/index.html
+          test ! -e _site/results2
+          test ! -e _site/assets/data/results2.json
+          test ! -e _site/assets/css/results2.css
+          test ! -e _site/assets/js/results2.js
           ! grep -q '/results2/' _site/sitemap.xml
-      - name: Browser interaction checks
-        run: |
-          npm install --prefix "$RUNNER_TEMP/results2-browser" playwright@1.58.2
-          "$RUNNER_TEMP/results2-browser/node_modules/.bin/playwright" install --with-deps chromium
-          python3 -m http.server 18082 --bind 127.0.0.1 --directory _site > /tmp/results2-server.log 2>&1 &
-          RESULTS2_PLAYWRIGHT="$RUNNER_TEMP/results2-browser/node_modules/playwright" node bin/test_results2_browser.cjs
       - uses: actions/upload-artifact@v4
         with:
-          name: results2-website
+          name: website-without-results2
           path: _site

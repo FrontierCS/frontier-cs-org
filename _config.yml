@@ -154,6 +154,11 @@ kramdown:
 # Includes & excludes
 include: ['_pages']
 exclude:
+  # Evaluation results are local-only; never publish this route or its assets.
+  - _pages/results2.html
+  - assets/data/results2.json
+  - assets/css/results2.css
+  - assets/js/results2.js
   - bin
   - Gemfile
   - Gemfile.lock
