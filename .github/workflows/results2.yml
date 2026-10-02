@@ -1,0 +1,47 @@
+name: Results notebook
+on:
+  pull_request:
+    paths:
+      - '_pages/results2.html'
+      - 'assets/**/results2*'
+      - 'bin/*results2*'
+      - '.github/workflows/results2.yml'
+      - '.github/workflows/filter-files.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: python3 -m unittest discover -s bin -p 'test_results2*.py'
+      - run: node --check assets/js/results2.js
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.0.2'
+          bundler-cache: true
+      - name: Build production website
+        run: JEKYLL_ENV=production bundle exec jekyll build
+      - name: Check published route and assets
+        run: |
+          test -f _site/results2/index.html
+          test -f _site/assets/data/results2.json
+          grep -q 'noindex, nofollow' _site/results2/index.html
+          ! grep -q '/results2/' _site/sitemap.xml
+      - name: Browser interaction checks
+        run: |
+          npm install --prefix "$RUNNER_TEMP/results2-browser" playwright@1.58.2
+          "$RUNNER_TEMP/results2-browser/node_modules/.bin/playwright" install --with-deps chromium
+          python3 -m http.server 18082 --bind 127.0.0.1 --directory _site > /tmp/results2-server.log 2>&1 &
+          RESULTS2_PLAYWRIGHT="$RUNNER_TEMP/results2-browser/node_modules/playwright" node bin/test_results2_browser.cjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: results2-website
+          path: _site

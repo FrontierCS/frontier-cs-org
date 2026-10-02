@@ -4,6 +4,15 @@ on:
   pull_request:
     branches:
       - main
+    # Site maintenance is validated by the dedicated results2 workflow.
+    paths-ignore:
+      - "_pages/results2.html"
+      - "assets/css/results2.css"
+      - "assets/js/results2.js"
+      - "assets/data/results2.json"
+      - "bin/*results2*"
+      - ".github/workflows/results2.yml"
+      - ".github/workflows/filter-files.yml"
 
 # hack for https://github.com/actions/cache/issues/810#issuecomment-1222550359
 #env:
