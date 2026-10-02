@@ -122,8 +122,8 @@
       status = $("status").value;
     let tasks = data.tasks.filter(
       (t) =>
-        `${t.label} ${t.id}`.toLowerCase().includes(query) &&
-        (!category || t.category === category) &&
+        t.label.toLowerCase().includes(query) &&
+        (!category || t.labels.includes(category)) &&
         (!status ||
           (status === "unpublished" &&
             models().some((m) => !resultFor(t.id, m.id))) ||
@@ -176,7 +176,11 @@
           block: "start",
         });
       });
-      name.append(button, el("span", task.category, "category"));
+      const labels = el("span", undefined, "task-labels");
+      task.labels.forEach((label) =>
+        labels.append(el("span", label, "task-label")),
+      );
+      name.append(button, labels);
       row.append(name);
       models().forEach((model) => {
         const r = resultFor(task.id, model.id),
@@ -248,7 +252,8 @@
           history.append(row);
         });
     });
-    $("detail-description").textContent = `${task.label} · ${task.category}`;
+    $("detail-description").textContent =
+      `${task.label} · ${task.labels.join(" / ")}`;
     $("chart-note").textContent =
       "Points are observed submission outcomes, not a best-so-far envelope. Run elapsed time includes infrastructure and judging. Missing measurements are omitted from the selected axis.";
     const container = $("chart");
@@ -351,7 +356,7 @@
     const rows = [
       [
         "task",
-        "category",
+        "labels",
         "model",
         "score",
         "pass_fail",
@@ -369,7 +374,7 @@
         if (r)
           rows.push([
             t.label,
-            t.category,
+            t.labels.join("; "),
             m.label,
             r.score,
             r.verdict,
@@ -454,8 +459,8 @@
         $("model-filter").append(control);
       });
       const priorCategory = $("category").value;
-      $("category").replaceChildren(new Option("All categories", ""));
-      [...new Set(data.tasks.map((t) => t.category))]
+      $("category").replaceChildren(new Option("All labels", ""));
+      [...new Set(data.tasks.flatMap((t) => t.labels))]
         .sort()
         .forEach((c) => $("category").add(new Option(c, c)));
       $("category").value = priorCategory;

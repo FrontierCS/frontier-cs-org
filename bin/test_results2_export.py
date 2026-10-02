@@ -15,6 +15,18 @@ END = '2026-10-01T00:10:00Z'
 
 
 class ExportTest(unittest.TestCase):
+    def setUp(self):
+        self.catalog = patch.dict(subject.TASK_CATALOG, {'task_one': {'label': 'Official task title', 'category': 'systems', 'labels': ['Systems', 'Optimization']}})
+        self.catalog.start()
+        self.addCleanup(self.catalog.stop)
+
+    def test_official_title_and_multiple_labels(self):
+        metadata = subject.task_metadata('task_one')
+        self.assertEqual(metadata['label'], 'Official task title')
+        self.assertEqual(metadata['labels'], ['Systems', 'Optimization'])
+        with self.assertRaisesRegex(ValueError, 'reviewed official title'):
+            subject.task_metadata('unreviewed_snake_case_id')
+
     def row(self, **extra):
         return {'task': 'task_one', 'category': 'preview/systems', 'm_score': '0', 'm_pass_fail': 'FAIL', 'run_state': 'COMPLETED', **extra}
 

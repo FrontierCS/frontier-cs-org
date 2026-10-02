@@ -22,6 +22,18 @@ import urllib.request
 import urllib.parse
 
 
+TASK_CATALOG = json.loads(Path(__file__).with_name('results2-task-catalog.json').read_text())['tasks']
+
+
+def task_metadata(task_id):
+    if task_id not in TASK_CATALOG:
+        raise ValueError('Task needs a reviewed official title and subject labels')
+    entry = TASK_CATALOG[task_id]
+    if not entry.get('label') or not entry.get('labels'):
+        raise ValueError('Task title and subject labels are required')
+    return {'id': task_id, **{key: entry[key] for key in ('label', 'category', 'labels')}}
+
+
 def number(value, integer=False):
     if value in (None, ''):
         return None
@@ -263,7 +275,7 @@ def export(specs, base, evidence, observed_at, private_rows=None, publication=No
                 run_id = row.get('run_id')
                 run = fetch(base, run_id) if base and run_id else {}
                 events = fetch_events(base, run_id) if base and run_id else None
-                task = {'id': task_id, 'label': run.get('task_name') or row.get('label') or task_id.replace('_', ' ').title(), 'category': row['category'].rsplit('/', 1)[-1]}
+                task = task_metadata(task_id)
                 if task_id in tasks and tasks[task_id]['category'] != task['category']:
                     raise ValueError('Conflicting task category')
                 tasks.setdefault(task_id, task)

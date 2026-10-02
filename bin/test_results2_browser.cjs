@@ -14,6 +14,18 @@ const base = process.env.RESULTS2_URL || "http://127.0.0.1:18082/results2/";
     () => document.querySelectorAll("#matrix tbody .task-name").length === 10,
   );
   assert.equal(await page.locator("#models .model-card").count(), 1);
+  assert.equal(await page.locator("h1").innerText(), "Evaluation\nResults");
+  await page.selectOption("#category", "Programming Languages");
+  assert.equal(
+    await page.locator("#matrix .task-name").innerText(),
+    "Reusable Library Candidates",
+  );
+  assert.equal(
+    await page.locator("#matrix .task-label").innerText(),
+    "Programming Languages",
+  );
+  await page.selectOption("#category", "");
+
   const snapshot = await (
     await page.request.get(new URL("/assets/data/results2.json", base).href)
   ).json();
@@ -73,6 +85,9 @@ const base = process.env.RESULTS2_URL || "http://127.0.0.1:18082/results2/";
     await page.request.get(new URL("/assets/data/results2.json", base).href)
   ).json();
   const extra = structuredClone(data);
+  extra.tasks
+    .find((t) => t.id === "join_tree_rewriting")
+    .labels.push("Query Optimization");
   extra.models.push({ id: "browser-test", label: "Browser test only" });
   extra.results.push({
     ...extra.results.find((r) => r.task_id === "join_tree_rewriting"),
@@ -90,6 +105,13 @@ const base = process.env.RESULTS2_URL || "http://127.0.0.1:18082/results2/";
     () => document.querySelectorAll("#models .model-card").length === 2,
   );
   assert.equal(await page.locator("#matrix thead th").count(), 3);
+  await page.selectOption("#category", "Query Optimization");
+  assert.equal(
+    await page.locator("#matrix .task-name").innerText(),
+    "Join-Tree Rewriting",
+  );
+  assert.equal(await page.locator("#matrix .task-label").count(), 2);
+  await page.selectOption("#category", "");
   await page.locator('#model-filter input[value="kimi_k2_7"]').uncheck();
   assert.equal(await page.locator("#models .model-card").count(), 1);
   await page.locator('#model-filter input[value="kimi_k2_7"]').check();

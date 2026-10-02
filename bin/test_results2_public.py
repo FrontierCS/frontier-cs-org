@@ -13,12 +13,17 @@ class PublicSnapshotTests(unittest.TestCase):
         self.assertEqual(set(data), {'schema_version', 'updated_at', 'models', 'tasks', 'results'})
         self.assertEqual(data['schema_version'], 1)
         models, tasks, pairs = set(), set(), set()
+        catalog = json.loads((ROOT / 'bin/results2-task-catalog.json').read_text())['tasks']
         for model in data['models']:
             self.assertEqual(set(model), {'id', 'label'})
             self.assertNotIn(model['id'], models)
             models.add(model['id'])
         for task in data['tasks']:
-            self.assertEqual(set(task), {'id', 'label', 'category'})
+            self.assertEqual(set(task), {'id', 'label', 'category', 'labels'})
+            self.assertTrue(task['labels'])
+            self.assertEqual(task['label'], catalog[task['id']]['label'])
+            self.assertEqual(task['labels'], catalog[task['id']]['labels'])
+            self.assertNotEqual(task['label'], task['id'])
             self.assertNotIn(task['id'], tasks)
             tasks.add(task['id'])
         for result in data['results']:

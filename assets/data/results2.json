@@ -11,52 +11,82 @@
     {
       "id": "batch_local_counting",
       "label": "Batch Local Counting",
-      "category": "systems"
+      "category": "databases",
+      "labels": [
+        "Databases"
+      ]
     },
     {
       "id": "bounded_evm_path_prediction",
       "label": "Bounded EVM Path Prediction",
-      "category": "systems"
+      "category": "databases",
+      "labels": [
+        "Databases"
+      ]
     },
     {
       "id": "evm_state_checkpoints",
       "label": "EVM State Checkpoints",
-      "category": "systems"
+      "category": "databases",
+      "labels": [
+        "Databases"
+      ]
     },
     {
       "id": "graph_mining_method_selection",
       "label": "Graph Mining Method Selection",
-      "category": "systems"
+      "category": "databases",
+      "labels": [
+        "Databases"
+      ]
     },
     {
       "id": "join_tree_rewriting",
       "label": "Join-Tree Rewriting",
-      "category": "databases"
+      "category": "databases",
+      "labels": [
+        "Databases"
+      ]
     },
     {
       "id": "sparse_video_attention_policy",
       "label": "Sparse Video Attention Policy",
-      "category": "systems"
+      "category": "machine_learning",
+      "labels": [
+        "Machine Learning"
+      ]
     },
     {
       "id": "bbq_packet_scheduling",
       "label": "BBQ bitmap traversal",
-      "category": "systems"
+      "category": "systems",
+      "labels": [
+        "Systems"
+      ]
     },
     {
       "id": "adaptive_robustness_evaluation_for_prompt_inject",
       "label": "Adaptive Robustness Evaluation for Prompt-Injection Defense",
-      "category": "ai-safety"
+      "category": "security",
+      "labels": [
+        "Security"
+      ]
     },
     {
       "id": "babble_anti_unification",
       "label": "Reusable Library Candidates",
-      "category": "algorithms"
+      "category": "programming_languages",
+      "labels": [
+        "Programming Languages"
+      ]
     },
     {
       "id": "shockwave_dynamic_gpu_allocation",
       "label": "Dynamic GPU Allocation",
-      "category": "systems"
+      "category": "systems",
+      "labels": [
+        "Systems"
+      ]
     }
   ],
   "results": [

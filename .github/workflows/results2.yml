@@ -1,4 +1,4 @@
-name: Results notebook
+name: Evaluation results
 on:
   pull_request:
     paths:
@@ -7,6 +7,13 @@ on:
       - 'bin/*results2*'
       - '.github/workflows/results2.yml'
       - '.github/workflows/filter-files.yml'
+  push:
+    branches: [main]
+    paths:
+      - '_pages/results2.html'
+      - 'assets/**/results2*'
+      - 'bin/*results2*'
+      - '.github/workflows/results2.yml'
   workflow_dispatch:
 permissions:
   contents: read

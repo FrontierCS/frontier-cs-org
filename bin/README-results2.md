@@ -1,4 +1,4 @@
-# Preview evaluation notebook
+# Frontier-CS 2.0 evaluation results
 
 `/results2/` is an unlisted public page, excluded from the sitemap and marked
 `noindex, nofollow`. It is not an authenticated page. It never connects a visitor
@@ -89,6 +89,19 @@ filters, valid zero scores, train/final curves, CSV download, multiple models,
 and a failed refresh. Synthetic model records exist only inside browser routing
 for tests, never in the published snapshot.
 
-The dedicated Results notebook workflow runs exporter tests, a production Jekyll
+The dedicated Evaluation results workflow runs exporter tests, a production Jekyll
 build and browser checks. The legacy ICLR submission-only workflow ignores this
 narrow maintenance surface; its unrelated blog submission rules are unchanged.
+
+## Official task names and subject labels
+
+`bin/results2-task-catalog.json` records each task's exact first-level title from
+its scientific statement (`agent-base/frontier/task/repo/README.md`) and subject
+labels from the Preview source directory taxonomy. The catalog pins the source
+commit, statement path and content hash for review. The public task schema adds
+`labels: string[]`; the table renders these as chips and the filter matches any
+label. It does not show namespace categories or derive titles from task IDs.
+
+The exporter rejects uncatalogued tasks rather than applying automatic title
+case. Add and review a new catalog entry when publishing another task. Multiple
+subject labels are supported; only source-supported labels should be assigned.
