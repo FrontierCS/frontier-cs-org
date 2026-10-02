@@ -33,7 +33,10 @@ const base = process.env.RESULTS2_URL || "http://127.0.0.1:18082/results2/";
   );
   await page.selectOption("#category", "");
   await page.selectOption("#status", "FAIL");
-  assert.equal(await page.locator("#matrix .task-name").count(), 5);
+  assert.equal(
+    await page.locator("#matrix .task-name").count(),
+    snapshot.results.filter((r) => r.verdict === "FAIL").length,
+  );
   await page.selectOption("#status", "");
   await page.fill("#search", "nothing matches");
   await page.getByText("No results match these filters.").waitFor();
@@ -44,7 +47,11 @@ const base = process.env.RESULTS2_URL || "http://127.0.0.1:18082/results2/";
     .click();
   assert.equal(
     await page.locator("#matrix .task-name").first().innerText(),
-    "Graph Mining Method Selection",
+    snapshot.tasks.find(
+      (t) =>
+        t.id ===
+        [...snapshot.results].sort((a, b) => b.score - a.score)[0].task_id,
+    ).label,
   );
   await page.locator("#columns-menu summary").click();
   await page.locator('#column-filter input[value="output_tokens"]').uncheck();
@@ -56,7 +63,11 @@ const base = process.env.RESULTS2_URL || "http://127.0.0.1:18082/results2/";
   assert.equal(await page.locator("#matrix th").count(), 10);
   assert.equal(
     await page.locator("#matrix .task-name").first().innerText(),
-    "Graph Mining Method Selection",
+    snapshot.tasks.find(
+      (t) =>
+        t.id ===
+        [...snapshot.results].sort((a, b) => b.score - a.score)[0].task_id,
+    ).label,
   );
   await page.locator("#columns-menu summary").click();
   await page.locator('#column-filter input[value="output_tokens"]').check();

@@ -47,6 +47,18 @@ def number(value, integer=False):
     return int(result) if integer else result
 
 
+def same_score(left, right):
+    """Allow only identical or adjacent finite binary64 values after transport."""
+    if any(isinstance(value, bool) or not isinstance(value, (int, float)) for value in (left, right)):
+        return False
+    try:
+        left, right = float(left), float(right)
+    except (OverflowError, ValueError):
+        return False
+    return (math.isfinite(left) and math.isfinite(right)
+            and (left == right or math.nextafter(left, right) == right))
+
+
 def instant(value):
     return datetime.fromisoformat(value.replace('Z', '+00:00')) if value else None
 
@@ -153,7 +165,7 @@ def normalize(row, model_id, run, events, usage, observed_at):
             raise ValueError('CSV/live run states disagree; refresh the private ledger')
         live_score = number(run.get('score'))
         if ((score is None) != (live_score is None) or
-                (score is not None and (state != 'COMPLETED' or not math.isclose(score, live_score, rel_tol=1e-12, abs_tol=1e-12)))):
+                (score is not None and (state != 'COMPLETED' or not same_score(score, live_score)))):
             raise ValueError('CSV/live final scores disagree; refresh the private ledger')
         if run.get('verdict') in ('PASS', 'FAIL') and verdict != run['verdict']:
             raise ValueError('CSV/live final verdicts disagree')
@@ -254,7 +266,7 @@ def publishable(row, result, run, approval, proof):
         return False
     raw = number(proof.get('raw_score'))
     beat = proof.get('beats_reference')
-    return (raw is not None and math.isclose(raw, result['score'], rel_tol=1e-12, abs_tol=1e-12)
+    return (raw is not None and same_score(raw, result['score'])
             and beat in (0, 1) and result['verdict'] == ('PASS' if beat == 1 else 'FAIL'))
 
 

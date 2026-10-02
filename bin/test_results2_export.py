@@ -2,6 +2,7 @@
 import csv
 from datetime import datetime, timezone
 import json
+import math
 import io
 from pathlib import Path
 import tempfile
@@ -19,6 +20,22 @@ class ExportTest(unittest.TestCase):
         self.catalog = patch.dict(subject.TASK_CATALOG, {'task_one': {'label': 'Official task title', 'category': 'systems', 'labels': ['Systems', 'Optimization']}})
         self.catalog.start()
         self.addCleanup(self.catalog.stop)
+
+    def test_score_transport_accepts_only_one_ulp(self):
+        score = 93.4485590924286
+        adjacent = math.nextafter(score, math.inf)
+        self.assertEqual(adjacent, 93.44855909242861)
+        for left, right in [(score, score), (score, adjacent), (adjacent, score), (0.0, -0.0)]:
+            self.assertTrue(subject.same_score(left, right))
+        for other in [math.nextafter(adjacent, math.inf), score + 1e-10, None, True, '93.4485590924286', math.inf, -math.inf, math.nan]:
+            self.assertFalse(subject.same_score(score, other))
+        for value in [True, False, math.inf, -math.inf, math.nan]:
+            self.assertFalse(subject.same_score(value, value))
+        row = self.row(m_score=str(score), m_pass_fail='FAIL')
+        result = subject.normalize(row, 'm', {'state': 'COMPLETED', 'score': adjacent}, [], None, END)
+        self.assertEqual(result['score'], score)
+        with self.assertRaisesRegex(ValueError, 'scores disagree'):
+            subject.normalize(row, 'm', {'state': 'COMPLETED', 'score': math.nextafter(adjacent, math.inf)}, [], None, END)
 
     def test_official_title_and_multiple_labels(self):
         metadata = subject.task_metadata('task_one')

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-10-02T08:14:52.937607+00:00",
+  "updated_at": "2026-10-02T09:14:44.365207+00:00",
   "models": [
     {
       "id": "kimi_k2_7",
@@ -247,6 +247,174 @@
           "elapsed_seconds": 5768.507835,
           "total_tokens": 4691846,
           "score": 81.17512828995993,
+          "phase": "final"
+        }
+      ]
+    },
+    {
+      "task_id": "evm_state_checkpoints",
+      "model_id": "kimi_k2_7",
+      "score": 93.4485590924286,
+      "verdict": "FAIL",
+      "status": "completed",
+      "input_tokens": 25526411,
+      "output_tokens": 189589,
+      "total_tokens": 25716000,
+      "elapsed_seconds": 5204.716,
+      "submissions": 22,
+      "history": [
+        {
+          "submission": 1,
+          "elapsed_seconds": 692.470538,
+          "total_tokens": 1879915,
+          "score": 0.0,
+          "phase": "train"
+        },
+        {
+          "submission": 2,
+          "elapsed_seconds": 1004.976959,
+          "total_tokens": 4930230,
+          "score": 0.0,
+          "phase": "train"
+        },
+        {
+          "submission": 3,
+          "elapsed_seconds": 1191.295826,
+          "total_tokens": 6675010,
+          "score": 0.0,
+          "phase": "train"
+        },
+        {
+          "submission": 4,
+          "elapsed_seconds": 1306.513173,
+          "total_tokens": 7648705,
+          "score": 0.0,
+          "phase": "train"
+        },
+        {
+          "submission": 5,
+          "elapsed_seconds": 1377.740423,
+          "total_tokens": 8227945,
+          "score": 0.0,
+          "phase": "train"
+        },
+        {
+          "submission": 6,
+          "elapsed_seconds": 1479.72726,
+          "total_tokens": 8831826,
+          "score": 0.0,
+          "phase": "train"
+        },
+        {
+          "submission": 7,
+          "elapsed_seconds": 1640.101791,
+          "total_tokens": 9302818,
+          "score": 0.0,
+          "phase": "train"
+        },
+        {
+          "submission": 8,
+          "elapsed_seconds": 1737.326352,
+          "total_tokens": 9793992,
+          "score": 0.0,
+          "phase": "train"
+        },
+        {
+          "submission": 9,
+          "elapsed_seconds": 1922.458887,
+          "total_tokens": 10666821,
+          "score": 0.0,
+          "phase": "train"
+        },
+        {
+          "submission": 10,
+          "elapsed_seconds": 2129.901287,
+          "total_tokens": 11598136,
+          "score": 0.0,
+          "phase": "train"
+        },
+        {
+          "submission": 11,
+          "elapsed_seconds": 2326.613033,
+          "total_tokens": 12376544,
+          "score": 0.0,
+          "phase": "train"
+        },
+        {
+          "submission": 12,
+          "elapsed_seconds": 2591.58074,
+          "total_tokens": 13001859,
+          "score": 0.9907915281577618,
+          "phase": "train"
+        },
+        {
+          "submission": 13,
+          "elapsed_seconds": 2815.494951,
+          "total_tokens": 13945082,
+          "score": 6.343621702147972,
+          "phase": "train"
+        },
+        {
+          "submission": 14,
+          "elapsed_seconds": 3461.770038,
+          "total_tokens": 16691379,
+          "score": 6.665313347794649,
+          "phase": "train"
+        },
+        {
+          "submission": 15,
+          "elapsed_seconds": 3784.3895,
+          "total_tokens": 18481484,
+          "score": 6.318677562825975,
+          "phase": "train"
+        },
+        {
+          "submission": 16,
+          "elapsed_seconds": 4024.897711,
+          "total_tokens": 19332541,
+          "score": 27.635162080465104,
+          "phase": "train"
+        },
+        {
+          "submission": 17,
+          "elapsed_seconds": 4392.138797,
+          "total_tokens": 22297981,
+          "score": 40.491011602382855,
+          "phase": "train"
+        },
+        {
+          "submission": 18,
+          "elapsed_seconds": 4552.668469,
+          "total_tokens": 22884522,
+          "score": 45.79431515323506,
+          "phase": "train"
+        },
+        {
+          "submission": 19,
+          "elapsed_seconds": 4698.899397,
+          "total_tokens": 23788299,
+          "score": 45.74129702289129,
+          "phase": "train"
+        },
+        {
+          "submission": 20,
+          "elapsed_seconds": 4843.246235,
+          "total_tokens": 24252614,
+          "score": 94.72189275753944,
+          "phase": "train"
+        },
+        {
+          "submission": 21,
+          "elapsed_seconds": 5020.978098,
+          "total_tokens": 24895273,
+          "score": 92.5015136782977,
+          "phase": "train"
+        },
+        {
+          "submission": 22,
+          "elapsed_seconds": 5199.48937,
+          "total_tokens": 25716000,
+          "score": 93.4485590924286,
           "phase": "final"
         }
       ]

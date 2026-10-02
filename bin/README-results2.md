@@ -120,3 +120,8 @@ Model selectors control table rows, comparison coverage, summaries and all
 charts. Export CSV follows the current table filters; chart CSV follows the
 selected task, models and train/final split. Missing measurements stay unknown.
 Operational metadata remains excluded from both public exports.
+
+Score consistency checks accept only identical or immediately adjacent finite
+binary64 values (one ULP) to accommodate a JSON numeric round trip. They reject
+broader tolerances, booleans and non-finite values, and never rewrite the accepted
+API score or verifier evidence to force a match.
