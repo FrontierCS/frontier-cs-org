@@ -105,3 +105,18 @@ label. It does not show namespace categories or derive titles from task IDs.
 The exporter rejects uncatalogued tasks rather than applying automatic title
 case. Add and review a new catalog entry when publishing another task. Multiple
 subject labels are supported; only source-supported labels should be assigned.
+
+## Analysis dashboard
+
+The results page uses a compact task/model table with persistent column visibility
+and sorting. Table values are sorted at full numeric precision; hover reveals
+exact values and CSV exports retain them. Row selection updates three linked
+score-versus-time, tokens and submission charts. Each chart can expand, and
+train/final measurements stay separate. Best train score is derived only from
+verified training points and never changes the final score. Train request count
+is the verified total minus the observed final evaluation count.
+
+Model selectors control table rows, comparison coverage, summaries and all
+charts. Export CSV follows the current table filters; chart CSV follows the
+selected task, models and train/final split. Missing measurements stay unknown.
+Operational metadata remains excluded from both public exports.
