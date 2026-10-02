@@ -1,0 +1,32 @@
+---
+layout: null
+permalink: /results2/
+title: Preview Results | Frontier-CS
+sitemap: false
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#F6F3EC">
+  <title>Preview Results | Frontier-CS</title>
+  <link rel="icon" href="{{ '/assets/img/frontier-favicon.png' | relative_url }}">
+  <link rel="stylesheet" href="{{ '/assets/css/results2.css' | relative_url }}">
+  <script defer src="{{ '/assets/js/results2.js' | relative_url }}"></script>
+</head>
+<body>
+<a class="skip" href="#results">Skip to results</a>
+<header class="masthead"><a href="{{ '/' | relative_url }}" class="brand">Frontier-CS<span>Research without a ceiling.</span></a><span class="edition">2.0 / PREVIEW</span></header>
+<main id="results" data-source="{{ '/assets/data/results2.json' | relative_url }}">
+  <section class="hero"><div><p class="eyebrow">THE EVALUATION NOTEBOOK</p><h1>Beyond the<br><em>final score.</em></h1><p class="intro">Compare models on open-ended research tasks.<br>Explore verified scores, token use, and submissions.</p></div><aside class="hero-note"><span class="note-mark">02</span><p>Frontier-CS Preview</p><p>Task-level evidence.<br>Independent scores and pass criteria.<br>Verified submission histories.</p><span id="updated" class="timestamp">Loading published snapshot...</span><button id="refresh" type="button" class="text-button">Refresh snapshot <span aria-hidden="true">↻</span></button></aside></section>
+  <div id="notice" role="status" class="notice">Loading evaluation results...</div>
+  <noscript><p class="notice">JavaScript is required for interactive comparisons. <a href="{{ '/assets/data/results2.json' | relative_url }}">Download the results JSON</a>.</p></noscript>
+  <section aria-label="Evaluation overview" class="summary" id="summary"></section>
+  <section class="section" aria-labelledby="comparison-heading"><div class="section-heading"><div><p class="eyebrow">01 / THE BIG PICTURE</p><h2 id="comparison-heading">Model comparison</h2></div><button id="download" class="button" type="button" disabled>Download CSV <span aria-hidden="true">↓</span></button></div><p class="muted">Final scores only. A failed scientific criterion can still have a positive score. Unpublished results do not count as zero or failure.</p><fieldset id="model-filter" class="model-filter"><legend>Models to compare</legend></fieldset><div id="models" class="model-cards"></div></section>
+  <section class="section" aria-labelledby="tasks-heading"><div class="section-heading"><div><p class="eyebrow">02 / ACROSS THE FRONTIER</p><h2 id="tasks-heading">Task results</h2></div><span id="task-count" class="muted"></span></div><div class="filters"><label>Find a task<input id="search" type="search" placeholder="Search tasks..." autocomplete="off"></label><label>Category<select id="category"><option value="">All categories</option></select></label><label>Show<select id="status"><option value="">All results</option><option value="PASS">Has a pass</option><option value="FAIL">Has a fail</option><option value="unpublished">Not published</option></select></label><label>Order<select id="sort"><option value="name">Task name</option><option value="score-desc">Highest score</option><option value="score-asc">Lowest score</option></select></label></div><div class="table-scroll" tabindex="0" aria-label="Task scores; scroll horizontally for more models"><table id="matrix"><caption class="sr-only">Task results by model. Select a task to inspect its submission history.</caption><thead></thead><tbody></tbody></table></div><p class="muted small">Select a task to explore submissions. A dash means no verified measurement is available.</p></section>
+  <section class="section detail" aria-labelledby="detail-heading"><div class="section-heading"><div><p class="eyebrow">03 / A CLOSER LOOK</p><h2 id="detail-heading">Progress, measured</h2></div></div><div class="detail-controls"><label>Task<select id="detail-task"></select></label><label>Horizontal axis<select id="axis"><option value="elapsed_seconds">Run elapsed time</option><option value="total_tokens">Tokens consumed</option><option value="submission">Submission number</option></select></label><label>Evidence<select id="phase"><option value="train">Training submissions</option><option value="final">Final submissions</option></select></label></div><p id="detail-description" class="muted"></p><div id="legend" class="legend"></div><div id="chart" class="chart" role="region" aria-label="Submission score chart"></div><p id="chart-note" class="muted small"></p><details><summary>View chart data</summary><div class="table-scroll"><table id="history"><thead><tr><th>Model</th><th>Submission</th><th>Score</th><th>Run elapsed time</th><th>Tokens</th></tr></thead><tbody></tbody></table></div></details></section>
+  <section class="method"><h2>Reading these results</h2><div><p><strong>Score and pass are separate.</strong> Scores describe solution quality; pass/fail checks the task's scientific acceptance criteria. Scores are task-specific and can exceed 100.</p><p><strong>Evidence, without interpolation.</strong> Curves connect observed submissions within the selected train or final split. They do not imply scores between measurements. Final scores are never replaced with the best training score.</p><p><strong>Coverage comes first.</strong> Model summaries show scored-task coverage. The comparable mean uses only tasks with final scores for every displayed model. Missing token or time measurements stay unavailable.</p><p><strong>Tokens and submissions.</strong> Tokens sum provider-reported input and output across calls, including cached prompt tokens where reported. They are not unique context length. Submissions count distinct training verification requests (including failed requests), plus the final evaluation when scored.</p><p><strong>A published snapshot.</strong> Refresh checks for a newer publication, not a live connection to evaluation infrastructure. Operational metadata stays in the internal evaluation CSV. This unlisted page is public, not access-controlled.</p></div></section>
+</main><footer><span>Frontier-CS / Evaluation notebook</span><a href="https://github.com/FrontierCS/FrontierCS-2.0-Preview">Explore the benchmark ↗</a></footer>
+</body></html>
