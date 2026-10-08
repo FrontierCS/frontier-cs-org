@@ -20,7 +20,7 @@ show_year: 2026
 
 <section class="page-hero">
   <div class="page" id="main" tabindex="-1">
-    <h1>Blog Posts</h1>
+    <h1>Blog</h1>
     <p class="lede">Research notes, benchmark releases, and agent evaluation insights.</p>
   </div>
 </section>

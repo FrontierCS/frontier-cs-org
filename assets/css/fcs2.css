@@ -1,0 +1,209 @@
+/* FrontierCS 2 page. Shared tokens, header and footer live in _sass/_fcs.scss. */
+/* Layout: a research data hub (Epoch-style structure, Google GM2 / Material 3 colours). Left-aligned 1320px column; intro, search, three stat cards,
+   then chart + settings panel, an activity list, a filterable task index, questions, deep-teal footer.
+   Single light theme on purpose (the reference site has none). */
+[hidden]{display:none!important}
+html{scroll-padding-top:60px}
+@media (prefers-reduced-motion: no-preference){ html{scroll-behavior:smooth} }
+.fcs2{padding-inline:var(--gutter)}
+a{color:inherit}
+button{font:inherit; color:inherit; cursor:pointer}
+:focus-visible{outline:2px solid var(--teal); outline-offset:2px}
+.col{max-width:1320px; margin-inline:auto}
+.num{font-variant-numeric:tabular-nums}
+
+.sub{position:sticky; top:env(safe-area-inset-top,0px); z-index:25; background:var(--bg); margin-inline:calc(-1 * var(--gutter)); padding-inline:var(--gutter); border-bottom:1px solid var(--line)}
+.sub .col{display:flex; gap:30px; overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch}
+.sub .col::-webkit-scrollbar{display:none}
+.sub a{flex:none; text-decoration:none; color:var(--ink-2); font-size:16px; padding:15px 0 13px; border-bottom:2px solid transparent; white-space:nowrap}
+.sub a.on{border-bottom-color:var(--teal); color:var(--ink)}
+
+/* intro */
+.intro{padding-block:72px 0}
+.upd{display:flex; align-items:center; gap:7px; font-size:14px; font-weight:600; color:var(--ink-2); margin:0 0 12px}
+.upd i{width:12px; height:12px; border-radius:50%; background:#5f6368; display:inline-block}
+h1{font-weight:600; font-size:clamp(34px,4.6vw,46px); line-height:1.1; margin:0; max-width:15em; text-wrap:balance}
+.lead{font-size:clamp(18px,1.6vw,20px); line-height:1.3; color:var(--ink-2); max-width:32em; margin:22px 0 0}
+h2{font-weight:600; font-size:clamp(25px,2.4vw,30px); line-height:1.2; margin:0}
+.field{display:flex; align-items:center; gap:10px; border:1px solid #80868b; border-radius:4px; height:42px; padding-inline:12px; background:#fff}
+.field:focus-within{border-color:var(--teal); box-shadow:0 0 0 3px rgba(11,87,208,.15)}
+.field input{border:0; outline:0; font:inherit; font-size:16px; width:100%; min-width:0; background:transparent; color:var(--ink)}
+.field input::placeholder{color:var(--faint)}
+.field svg{flex:none; color:var(--muted)}
+.stats{display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:30px}
+@media (max-width:900px){ .stats{grid-template-columns:1fr} }
+.stat{border:1px solid var(--line); border-radius:6px; padding:22px 20px 20px; display:flex; flex-direction:column; min-width:0}
+.stat h3{font-size:18px; font-weight:600; margin:0}
+.big{display:flex; align-items:baseline; gap:8px; margin:12px 0 10px}
+.big b{font-size:42px; font-weight:500; line-height:1; letter-spacing:-.01em}
+.big span{font-size:14px; color:var(--ink-2)}
+.stat p{margin:0 0 22px; color:var(--ink-2); font-size:15.5px; line-height:1.4}
+.pill{display:inline-flex; align-items:center; align-self:flex-start; gap:8px; background:var(--mint); color:#041e49; border:0; border-radius:50px; font-weight:600; font-size:14px; padding:6px 11px; text-decoration:none; margin-top:auto}
+.pill:hover{background:var(--mint-2)}
+.pill.lg{font-size:18px; padding:12px 16px}
+
+/* chart section */
+.sec{padding-top:100px}
+.sec > h2{margin-bottom:22px}
+.cgrid{display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:20px; align-items:start}
+@media (max-width:1000px){ .cgrid{grid-template-columns:1fr} }
+.chart{min-width:0}
+.chead{display:flex; flex-wrap:wrap; justify-content:space-between; align-items:baseline; font-size:13px; font-weight:600; color:var(--ink); margin-bottom:6px; gap:12px}
+.chead .r{color:var(--faint); font-weight:400}
+.plot{position:relative}
+.plot svg{display:block; width:100%; overflow:visible}
+.plot text{font-family:var(--sans); font-size:12px; fill:var(--muted)}
+.plot .lab{fill:var(--ink); font-size:13px; font-weight:500}
+.plot .val{font-size:12.5px; font-weight:600}
+.plot .ax{fill:var(--ink); font-size:13px; font-weight:500}
+.tip{position:absolute; z-index:5; pointer-events:none; background:#fff; border:1px solid var(--line-2); box-shadow:0 6px 18px rgba(32,33,36,.14); border-radius:6px; padding:8px 10px; font-size:13px; line-height:1.35; white-space:nowrap; transform:translate(-50%,calc(-100% - 12px))}
+.tip b{font-weight:600}
+.legend{display:flex; flex-wrap:wrap; gap:6px 16px; margin-top:14px; font-size:14px}
+.legend span{display:inline-flex; align-items:center; gap:7px}
+.legend i{width:12px; height:12px; display:inline-block}
+.cfoot{display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:16px; padding-top:14px; border-top:1px solid var(--line); font-size:13px; color:var(--muted-2)}
+.cfoot b{white-space:nowrap; font-weight:700; letter-spacing:.06em; font-size:12px; color:var(--muted)}
+.settings{border:1px solid var(--line); border-radius:6px; padding:20px 20px 24px}
+.settings h3{font-size:20px; font-weight:600; margin:0 0 14px; padding-bottom:14px; border-bottom:1px solid var(--line)}
+.settings h4{font-size:14px; font-weight:600; margin:18px 0 10px}
+.chips{display:flex; flex-wrap:wrap; gap:8px}
+.chip{border:1px solid #bdc1c6; background:#fff; border-radius:100px; padding:5px 11px; font-size:14px; color:var(--ink-2)}
+.chip[aria-pressed="true"]{background:var(--ink-2); border-color:var(--ink-2); color:#fff}
+.radios{display:flex; flex-direction:column; gap:8px; font-size:15px}
+.radios label{display:flex; align-items:center; gap:9px; cursor:pointer}
+.radios input{accent-color:var(--teal); width:15px; height:15px; margin:0}
+.radios .n{color:var(--faint); margin-left:auto; font-size:13px}
+.toggle{display:flex; align-items:center; gap:10px; font-size:15px; cursor:pointer; padding-bottom:16px; border-bottom:1px solid var(--line)}
+.toggle input{appearance:none; width:30px; height:16px; border-radius:20px; border:1px solid var(--ink-2); position:relative; margin:0; cursor:pointer; background:#fff; flex:none}
+.toggle input::after{content:""; position:absolute; top:2px; left:2px; width:10px; height:10px; border-radius:50%; background:var(--ink-2); transition:left .15s}
+.toggle input:checked{background:#e8f0fe; border-color:var(--teal-d)} .toggle input:checked::after{left:16px; background:var(--teal)}
+.custom{display:none}
+@media (max-width:1000px){
+  .custom{display:flex; justify-content:center; width:100%; margin-top:16px}
+  .settings{display:none; margin-top:12px} .settings.open{display:block}
+}
+
+/* domain table */
+.tbl-wrap{margin-top:56px}
+.tbl-wrap h3{font-size:22px; font-weight:600; margin:0 0 14px}
+table.res{width:100%; border-collapse:collapse; font-size:15px}
+.res th{text-align:right; font-weight:600; font-size:13px; color:var(--ink-2); padding:10px 12px; border-bottom:1px solid var(--ink-2); vertical-align:bottom}
+.res th:first-child,.res td:first-child{text-align:left; padding-left:0}
+.res td{text-align:right; padding:11px 12px; border-bottom:1px solid var(--line)}
+.res td.e{color:var(--faint)}
+.res td .sq{display:inline-block; width:10px; height:10px; margin-right:9px; vertical-align:0}
+.res tr.all td{font-weight:600; border-bottom:1px solid var(--ink-2)}
+.res .tk{color:var(--muted)}
+.res .best{font-weight:700}
+.res th .mn{display:inline-block; width:9px; height:9px; margin-right:6px}
+@media (max-width:640px){ .res{font-size:14px} .res .tk{display:none} .res th,.res td{padding-inline:6px} .res .full{display:none} }
+@media (min-width:641px){ .res .short{display:none} }
+
+/* shared row meta */
+.meta{display:flex; align-items:center; gap:12px; font-size:13.5px; font-weight:600; color:var(--ink-2); margin-bottom:12px; flex-wrap:wrap}
+.tag{border:1px solid #a8c7fa; border-radius:2px; padding:4px 10px; font-weight:500; color:var(--ink-2); font-size:13.5px; background:#fff}
+.dotm{display:inline-flex; align-items:center; gap:7px} .dotm i{width:12px; height:12px; border-radius:50%; background:var(--m-astra)}
+
+/* case studies: one chart per run, Epoch data-insight grammar (legend row, axis title above, light grid,
+   in-chart annotations with curved arrows, a source note and the wordmark under the chart) */
+.ctabs{display:flex; gap:28px; border-bottom:1px solid var(--line); overflow-x:auto; scrollbar-width:none; margin-bottom:34px}
+.ctabs::-webkit-scrollbar{display:none}
+.ctabs button{flex:none; background:none; border:0; border-bottom:2px solid transparent; padding:0 0 12px; font-size:16px; color:var(--ink-2); white-space:nowrap}
+.ctabs button[aria-selected="true"]{border-bottom-color:var(--teal); color:var(--ink); font-weight:600}
+.ctabs button:hover{color:var(--ink)}
+.case{max-width:880px}
+.case .meta{gap:14px; font-weight:500; color:var(--muted)}
+.case .meta .dotm{font-weight:600; color:var(--ink-2)}
+.vd{display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:600; border-radius:100px; padding:3px 10px 3px 8px; background:var(--soft); color:var(--muted); white-space:nowrap}
+.vd::before{content:""; width:7px; height:7px; border-radius:50%; background:currentColor; opacity:.8}
+.vd.yes{background:#e6f4ea; color:#137333}
+.case h3{font-size:clamp(23px,2.4vw,30px); font-weight:500; line-height:1.18; margin:0 0 12px; text-wrap:balance}
+.case .desc{margin:0 0 28px; font-size:17px; line-height:1.5; color:var(--ink-2); max-width:44em}
+.case .desc span{color:var(--muted)}
+.clegend{display:flex; flex-wrap:wrap; gap:6px 20px; font-size:13.5px; color:var(--ink); margin-bottom:22px}
+.clegend span{display:inline-flex; align-items:center; gap:7px}
+.clegend i{width:10px; height:10px; display:inline-block}
+.cplot{position:relative}
+.cplot svg{display:block; width:100%; overflow:visible; touch-action:pan-y}
+.cplot text{font-family:var(--sans)}
+.cplot .pt{font-size:13px; font-weight:600; fill:var(--ink)}
+.cplot .tk{font-size:12px; fill:#3c4043}
+.cplot .tk.fam{fill:var(--ink); font-size:12.5px}
+.cplot .an{font-size:13px; fill:var(--ink); paint-order:stroke; stroke:#fff; stroke-width:4px; stroke-linejoin:round} .cplot .an.b{font-weight:600}
+.cplot .fbar{cursor:default}
+@media (max-width:560px){ .cplot .an{font-size:12px} .cplot .tk.fam{font-size:11.5px} }
+.ctip{position:absolute; z-index:5; pointer-events:none; background:#fff; border:1px solid var(--line-2); box-shadow:0 6px 18px rgba(32,33,36,.14); border-radius:6px; padding:10px 12px; font-size:13px; line-height:1.35; width:max-content; max-width:min(280px,82vw)}
+.ctip .th{font-weight:600; margin-bottom:6px} .ctip .th span{font-weight:400; color:var(--muted); margin-left:6px}
+.ctip .tr{display:flex; align-items:center; gap:8px; margin-top:3px} .ctip .tr i{width:9px; height:9px; border-radius:50%; flex:none} .ctip .tr span{color:var(--ink-2)} .ctip .tr b{margin-left:auto; padding-left:14px; font-weight:600}
+.ctip p{margin:7px 0 0; color:var(--muted); white-space:normal}
+.case .cnote{margin:26px 0 0; font-size:14px; line-height:1.45; color:var(--muted); max-width:52em}
+
+/* task index */
+.idx{display:grid; grid-template-columns:240px minmax(0,1fr); gap:24px 56px}
+@media (max-width:900px){ .idx{grid-template-columns:1fr} }
+.filter h3{font-size:26px; font-weight:500; margin:0 0 22px}
+.filter h4{font-size:21px; font-weight:500; margin:0 0 14px}
+.checks{display:flex; flex-direction:column; gap:7px; font-size:17px}
+.checks label{display:flex; align-items:center; gap:8px; cursor:pointer}
+.checks input{width:14px; height:14px; margin:0; accent-color:var(--ink-2)}
+.ftoggle{display:none}
+@media (max-width:900px){
+  .filter h3{display:none}
+  .ftoggle{display:inline-flex; align-items:center; gap:8px; border:1px solid #80868b; background:#fff; border-radius:4px; height:42px; padding-inline:14px; font-weight:600}
+  .filter .fbody{display:none; margin-top:14px} .filter.open .fbody{display:block}
+  .checks{display:grid; grid-template-columns:1fr 1fr; gap:8px 12px; font-size:15px}
+}
+.bar{display:flex; gap:12px; align-items:center; flex-wrap:wrap}
+.bar .field{flex:1 1 260px}
+.sel{height:42px; border:1px solid var(--line-2); border-radius:4px; padding:0 10px; font:inherit; font-size:15px; background:#fff; color:var(--ink-2)}
+.cnt{font-size:15px; color:var(--ink-2); white-space:nowrap}
+.rows{margin-top:10px}
+.row{padding:24px 0; border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.row h3{font-size:clamp(20px,2vw,24px); font-weight:500; margin:0 0 6px; overflow-wrap:anywhere}
+.row p{margin:0 0 10px; color:var(--ink-2); font-size:16px; line-height:1.4}
+.row .lk{display:flex; gap:18px; font-size:14px; color:var(--muted-2)}
+.row .lk a{color:var(--ink-2); text-decoration:underline; text-underline-offset:3px; text-decoration-color:var(--line-2)} .row .lk a:hover{color:var(--teal); text-decoration-color:currentColor}
+.row .ran{display:inline-flex; align-items:center; gap:7px; font-weight:600; font-size:13.5px; color:var(--ink-2)}
+.row .ran i{width:10px; height:10px; border-radius:50%; background:var(--teal)}
+.row.flash{background:#e8f0fe; box-shadow:-12px 0 0 #e8f0fe, 12px 0 0 #e8f0fe}
+.empty{color:var(--muted); padding:30px 0}
+.showmore{margin-top:16px}
+
+/* task teaser: the paper's treemap, one block per domain; a click filters the index */
+.tz{margin-bottom:44px}
+.tz-head{display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:6px 16px; margin-bottom:16px}
+.tz-head h2{margin:0}
+.tz-head span{font-size:14px; color:var(--muted)}
+.map{position:relative}
+.map svg{display:block; width:100%; -webkit-tap-highlight-color:transparent}
+.map .blk{cursor:pointer; transition:opacity .2s; outline:none}
+.map .blk text{font-family:var(--sans); pointer-events:none}
+.map .blk:focus-visible rect{stroke:var(--teal); stroke-width:2}
+@media (hover:hover){ .map .blk:hover rect{filter:brightness(.96)} }
+.map .tip{white-space:normal; width:max-content; max-width:min(280px,80vw)}
+.areas{display:flex; flex-wrap:wrap; gap:6px 18px; margin-top:12px; font-size:13.5px; color:var(--ink-2)}
+.areas span{display:inline-flex; align-items:center; gap:7px}
+.areas i{width:12px; height:12px; border-radius:3px; display:inline-block}
+
+/* questions */
+.faq{display:grid; grid-template-columns:300px minmax(0,1fr); gap:24px 40px; align-items:start}
+.faq h2{font-size:clamp(30px,3.2vw,40px); font-weight:500; line-height:1.1}
+.fqlist{max-width:720px; border-top:1px solid var(--ink-2)}
+.faq details{border-bottom:1px solid var(--line)}
+.faq summary{list-style:none; display:flex; justify-content:space-between; align-items:center; gap:18px; padding:16px 0; font-size:clamp(18px,1.7vw,21px); font-weight:500; line-height:1.3; cursor:pointer}
+.faq summary:hover{color:var(--teal-d)}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:""; flex:none; width:14px; height:14px; background:linear-gradient(currentColor,currentColor) center/14px 1.6px no-repeat, linear-gradient(currentColor,currentColor) center/1.6px 14px no-repeat; transition:background-size .2s}
+.faq details[open] summary::after{background-size:14px 1.6px, 1.6px 0}
+.ans{padding:0 0 20px; max-width:40em}
+.ans p{margin:0 0 10px; color:var(--ink-2); font-size:17px; line-height:1.5}
+.ans p:last-child{margin-bottom:0}
+.ans a{color:var(--ink); text-decoration:underline; text-underline-offset:3px; text-decoration-color:var(--line-2)} .ans a:hover{color:var(--teal); text-decoration-color:currentColor}
+.ans code{font-family:"Google Sans Code",ui-monospace,Menlo,monospace; font-size:.88em; background:var(--soft); border-radius:3px; padding:1px 5px}
+@media (max-width:800px){ .faq{grid-template-columns:1fr} }
+@media (prefers-reduced-motion: no-preference){
+  :root{interpolate-size:allow-keywords}
+  .faq details::details-content{block-size:0; overflow:hidden; transition:block-size .22s ease, content-visibility .22s allow-discrete}
+  .faq details[open]::details-content{block-size:auto}
+}

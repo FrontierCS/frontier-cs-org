@@ -23,7 +23,7 @@
       {% if include.min-height %}min-height="{{ include.min-height }}"{% endif %} 
       {% if include.max-width %}max-width="{{ include.max-width }}"{% endif %} 
       {% if include.max-height %}height="{{ include.max-height }}"{% endif %} 
-      {% if include.alt %}alt="{{ include.alt }}"{% endif %} 
+      alt="{{ include.alt | default: include.caption | strip_html | escape }}" 
       {% if include.title %}title="{{ include.title }}"{% endif %} 
       {% if include.zoomable %}data-zoomable{% endif %}
       onerror="this.onerror=null; document.querySelectorAll('.responsive-img-srcset').forEach(function (s) { s.remove(); });"

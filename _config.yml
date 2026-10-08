@@ -2,7 +2,7 @@
 # Site settings
 # -----------------------------------------------------------------------------
 
-title: Frontier-CS Blog Posts
+title: FrontierCS
 first_name: Frontier-CS
 middle_name:
 last_name: Blog
@@ -159,6 +159,8 @@ exclude:
   - assets/data/results2.json
   - assets/css/results2.css
   - assets/js/results2.js
+  # al-folio template example; its own front matter is commented out
+  - _posts/2025-04-28-distill-example.md
   - bin
   - Gemfile
   - Gemfile.lock

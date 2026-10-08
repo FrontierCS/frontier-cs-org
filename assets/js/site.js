@@ -1,5 +1,5 @@
 // Frontier-CS — shared page behaviour (ported from wenhaochai.com site.js).
-// Topbar shadow, mobile nav, T-key colour theme, article contents scrollspy,
+// Topbar shadow, mobile nav, article contents scrollspy,
 // heading ids for the contents links, and small shims for distill.pub tags.
 (function () {
   // Topbar: hairline shadow once the page is scrolled.
@@ -12,7 +12,7 @@
 
   // Mobile nav: the hamburger drops the nav down as a panel.
   var toggle = document.querySelector('.nav-toggle');
-  var nav = document.querySelector('.topbar .nav');
+  var nav = document.querySelector('.topbar .nav-aux');
   if (toggle && nav) {
     var close = function () { nav.classList.remove('open'); toggle.setAttribute('aria-expanded', 'false'); };
     toggle.addEventListener('click', function () {
@@ -27,26 +27,12 @@
     window.addEventListener('resize', close);
   }
 
-  // Colour scheme: follows the OS; T toggles light <-> midnight and remembers it.
-  document.addEventListener('keydown', function (e) {
-    if (e.key !== 't' && e.key !== 'T') return;
-    if (e.metaKey || e.ctrlKey || e.altKey) return;
-    var t = e.target;
-    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
-    var root = document.documentElement;
-    var midnight = root.getAttribute('data-theme') === 'midnight';
-    if (midnight) root.removeAttribute('data-theme'); else root.setAttribute('data-theme', 'midnight');
-    try { localStorage.setItem('site-theme', midnight ? 'light' : 'midnight'); } catch (err) {}
-  });
-
   // Article body: make sure every h2/h3 carries the id the contents column links to.
   var article = document.querySelector('d-article') || document.querySelector('.post-content');
   if (article) {
     article.querySelectorAll('h2, h3').forEach(function (h) {
-      if (!h.id) {
-        var slug = h.textContent.trim().toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
-        if (slug) h.id = slug;
-      }
+      var slug = h.textContent.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');   // same as Jekyll's slugify, which builds the contents links
+      if (slug && (!h.id || document.querySelector('.ar-toc a[href="#' + slug + '"]'))) h.id = slug;
     });
 
     // <d-math>x</d-math> → inline TeX for MathJax.

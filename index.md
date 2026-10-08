@@ -1,527 +1,114 @@
 ---
 layout: default
-title: Frontier-CS
+title: FrontierCS 2
+description: A benchmark of 92 open-ended computer-science R&D tasks built from published papers, where the authors’ own code is the reference to beat.
 permalink: /
+page_css: fcs2
 ---
+<div class="fcs2">
+<nav class="sub" aria-label="Sections"><div class="col" id="subnav">
+  <a href="#overview" class="on">Overview</a><a href="#leaderboard">Leaderboard</a><a href="#cases">Case studies</a><a href="#tasks">Tasks</a><a href="#questions">Questions</a>
+</div></nav>
 
-<section class="journal" id="hero">
-<div class="page" id="main" tabindex="-1">
-<div class="fc-hero">
-  <div class="fc-hero-copy">
-    <h1 class="hero-name"><span>Frontier-CS</span><span>Benchmark</span></h1>
-    <div class="hero-rule"></div>
-    <p class="hero-bio fc-hero-tagline">A benchmark that doesn't saturate.</p>
-    <div class="fc-hero-features">
-      <div class="fc-hero-feature">
-        <span class="fc-hero-feature-num">01</span>
-        <p class="fc-hero-feature-label">Unsolved</p>
-        <p class="fc-hero-feature-body">No solution has achieved perfect scores.</p>
-      </div>
-      <div class="fc-hero-feature">
-        <span class="fc-hero-feature-num">02</span>
-        <p class="fc-hero-feature-label">Open-ended</p>
-        <p class="fc-hero-feature-body">Research and optimization challenges.</p>
-      </div>
-      <div class="fc-hero-feature">
-        <span class="fc-hero-feature-num">03</span>
-        <p class="fc-hero-feature-label">Verifiable</p>
-        <p class="fc-hero-feature-body">Continuous scoring, always room to improve.</p>
-      </div>
-      <div class="fc-hero-feature">
-        <span class="fc-hero-feature-num">04</span>
-        <p class="fc-hero-feature-label">Diverse</p>
-        <p class="fc-hero-feature-body">Systems, ML, algorithms, security, and more.</p>
-      </div>
-    </div>
-    <div class="fc-release-links">
-    <p class="fc-release-link">→ Read our blog <a href="{{ '/blog/feb-release/' | relative_url }}">here</a>.</p>
-    <p class="fc-release-link">→ Read our paper <a href="{{ '/blog/feb-release/' | relative_url }}">here</a>.</p>
-    <p class="fc-release-link">→ View our GitHub <a href="https://github.com/FrontierCS/Frontier-CS" target="_blank" rel="noopener noreferrer">here</a>.</p>
-    </div>
-  </div>
+<div class="col" id="main" tabindex="-1">
+<section class="intro" id="overview">
+  <p class="upd"><i></i>Preliminary results, Oct. 2026</p>
+  <h1>FrontierCS 2: A benchmark for agentic computer-science R&amp;D</h1>
+  <p class="lead">Each task deletes a published paper’s contribution from the repository its authors released. The agent writes it back, and the authors’ own code is the reference it must beat.</p>
 
-  <div class="fc-terminal-card" aria-label="Frontier-CS Harbor agent evaluation preview">
-    <div class="fc-terminal-top">
-      <span></span>
-      <span></span>
-      <span></span>
-      <p>frontier-cs · harbor trial · 2.0</p>
-    </div>
-    <div class="fc-terminal-body">
-      <p class="fc-terminal-line fc-terminal-comment"># Run a Frontier-CS 2.0 task through Harbor</p>
-      <p class="fc-terminal-line"><span class="fc-prompt">$</span> uv run frontier harbor trial 2.0 erdos_unit_distance \
-    -a codex -m gpt-5.5 --json</p>
-      <p class="fc-terminal-line fc-terminal-spacer" aria-hidden="true">&nbsp;</p>
-      <p class="fc-terminal-line fc-terminal-muted">generating frontier-cs-2-0-erdos-unit-distance</p>
-      <p class="fc-terminal-line fc-terminal-muted">starting Harbor trial with iterative submissions...</p>
-      <p class="fc-terminal-line fc-terminal-rule-line" aria-hidden="true"></p>
-      <p class="fc-terminal-line fc-terminal-run-row">submit #1 <span>score: 55.80</span><i class="fc-terminal-bar fc-terminal-bar-warn"></i></p>
-      <p class="fc-terminal-line fc-terminal-run-row">submit #2 <span>score: 78.50</span><i class="fc-terminal-bar fc-terminal-bar-long"></i></p>
-      <p class="fc-terminal-line fc-terminal-rule-line" aria-hidden="true"></p>
-      <p class="fc-terminal-line fc-terminal-muted">trial_status=scored  agent_status=completed</p>
-      <p class="fc-terminal-line fc-terminal-muted">reward=0.7850  cost=$1.94  submissions=2</p>
-      <p class="fc-terminal-line fc-terminal-muted">tokens: 1.51M input / 19.9K output</p>
-      <p class="fc-terminal-line fc-terminal-rule-line" aria-hidden="true"></p>
-      <p class="fc-terminal-line fc-terminal-success">✓ Harbor trial scored: 78.50</p>
-      <p class="fc-terminal-line fc-terminal-success">✓ result.json and verifier artifacts saved</p>
-    </div>
+  <div class="stats">
+    <article class="stat"><h3>Tasks</h3><div class="big"><b class="num">92</b><span>open-ended</span></div>
+      <p>90 start from a published paper. Structured LWE and Gigatoken have none.</p><a class="pill" href="#tasks">Browse tasks</a></article>
+    <article class="stat"><h3>Domains</h3><div class="big"><b class="num">13</b><span>areas of computer science</span></div>
+      <p>The largest are Machine Learning, with 22 tasks, and MLSys, with 17.</p><a class="pill" href="#domains">Results by domain</a></article>
+    <article class="stat"><h3>Runs</h3><div class="big"><b class="num">31</b><span>on 18 tasks</span></div>
+      <p>GPT-6 Astra, GPT-5.6 Sol and Kimi K2.7 have run so far.</p><a class="pill" href="#leaderboard">Go to leaderboard</a></article>
   </div>
-</div>
-</div>
 </section>
 
-<section class="journal fc-latest">
-<div class="page">
-  <div class="sec-head">
-    <h2 class="sec-title">Recent blog posts</h2>
+<section class="sec" id="leaderboard">
+  <h2>Leaderboard</h2>
+  <div class="cgrid">
+    <figure class="chart" style="margin:0">
+      <div class="chead"><span id="ylab">Final score, mean over runs</span><span class="r" id="nres">31 runs</span></div>
+      <div class="plot" id="lbplot"><svg id="lbsvg" role="img" aria-label="Leaderboard chart"></svg><div class="tip" id="lbtip" hidden></div></div>
+      <div class="legend" id="lblegend"></div>
+      <button class="pill lg custom" id="custom" type="button" aria-expanded="false" aria-controls="settings">
+        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3M5.5 5.5l2.1 2.1M16.4 16.4l2.1 2.1M5.5 18.5l2.1-2.1M16.4 7.6l2.1-2.1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Customize graph</button>
+      <div class="cfoot"><b>FRONTIERCS 2</b><span>Preliminary · scores on each task’s own 0–100 scale</span></div>
+    </figure>
+    <aside class="settings" id="settings" aria-label="Graph settings">
+      <h3>Settings</h3>
+      <label class="toggle"><input type="checkbox" id="showruns" checked> Show individual runs</label>
+      <h4>Group by</h4>
+      <div class="chips" id="groupby"><button class="chip" type="button" data-g="model" aria-pressed="true">Model</button><button class="chip" type="button" data-g="task" aria-pressed="false">Task</button></div>
+      <h4>Domain</h4>
+      <div class="radios" id="domradios"></div>
+    </aside>
   </div>
 
-  {% assign latest_posts = site.posts | sort: "date" | reverse %}
-
-  <div class="card-grid">
-    {% assign featured_shown = 0 %}
-    {% for post in latest_posts %}
-      {% unless post.path contains "2025-04-28-distill-example" %}
-        {% if featured_shown < 3 %}
-          {% include blog_card.html post=post variant="compact" %}
-          {% assign featured_shown = featured_shown | plus: 1 %}
-        {% endif %}
-      {% endunless %}
-    {% endfor %}
+  <div class="tbl-wrap" id="domains">
+    <h3>Results by domain</h3>
+    <table class="res num" id="restbl"></table>
+    <p class="cfoot" style="border-top:0; margin-top:10px; padding-top:0">Mean final score over each model’s runs. A dash means no run yet. Bold marks the best score in a row.</p>
   </div>
-
-  <ul class="log" aria-label="More recent posts">
-    {% assign list_shown = 0 %}
-    {% assign list_skipped = 0 %}
-    {% for post in latest_posts %}
-      {% unless post.path contains "2025-04-28-distill-example" %}
-        {% if list_skipped < 3 %}
-          {% assign list_skipped = list_skipped | plus: 1 %}
-        {% elsif list_shown < 5 %}
-          <li>
-            <a href="{{ post.url | relative_url }}">
-              <span class="date">{{ post.date | date: '%b %-d, %Y' }}</span>
-              <span class="title">{{ post.title }}</span>
-              <span class="arrow" aria-hidden="true">→</span>
-            </a>
-          </li>
-          {% assign list_shown = list_shown | plus: 1 %}
-        {% endif %}
-      {% endunless %}
-    {% endfor %}
-  </ul>
-
-  <p class="fc-cta">
-    <a href="{{ '/blog/' | relative_url }}">Read more posts <span aria-hidden="true">→</span></a>
-  </p>
-</div>
 </section>
 
-<section id="leaderboard" class="journal fc-leaderboard">
-<div class="page">
-  <div class="sec-head">
-    <h2 class="sec-title">Leaderboard</h2>
-    <span class="sec-count">Updated 2026-07-25</span>
-  </div>
-
-  <div class="fc-leaderboard-tabs" role="tablist" aria-label="Leaderboard tracks">
-    <button class="fc-leaderboard-tab" type="button" role="tab" aria-selected="false" data-fc-leaderboard-tab="algorithmic">Algorithmic</button>
-    <button class="fc-leaderboard-tab" type="button" role="tab" aria-selected="false" data-fc-leaderboard-tab="research">Research</button>
-    <button class="fc-leaderboard-tab is-active" type="button" role="tab" aria-selected="true" data-fc-leaderboard-tab="agent">Agent</button>
-  </div>
-
-  <div class="fc-leaderboard-grid">
-    <article class="fc-leaderboard-card fc-leaderboard-panel" data-fc-leaderboard-panel="algorithmic">
-      <div class="fc-leaderboard-card-header">
-        <h3>Algorithmic Track</h3>
-        <p>172 problems</p>
-      </div>
-      <div class="fc-table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Rank</th>
-              <th>Model</th>
-              <th>Score@1</th>
-              <th>Avg@5</th>
-              <th>Score@5</th>
-              <th>Elo</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>1</td>
-              <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-google" aria-hidden="true">G</span><span class="fc-model-name">gemini-3.0-pro</span></span></td>
-              <td>33.12</td>
-              <td>34.58</td>
-              <td>56.09</td>
-              <td>1265</td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-openai" aria-hidden="true">OA</span><span class="fc-model-name">gpt-5.2-thinking</span></span></td>
-              <td>32.40</td>
-              <td>33.11</td>
-              <td>47.19</td>
-              <td>1242</td>
-            </tr>
-            <tr>
-              <td>3</td>
-              <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-openai" aria-hidden="true">OA</span><span class="fc-model-name">gpt-5-thinking</span></span></td>
-              <td>23.10</td>
-              <td>22.58</td>
-              <td>39.73</td>
-              <td>1196</td>
-            </tr>
-            <tr>
-              <td>4</td>
-              <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-deepseek" aria-hidden="true">DS</span><span class="fc-model-name">deepseek-3.2</span></span></td>
-              <td>24.83</td>
-              <td>23.89</td>
-              <td>41.44</td>
-              <td>1193</td>
-            </tr>
-            <tr>
-              <td>5</td>
-              <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-xai" aria-hidden="true">xAI</span><span class="fc-model-name">grok-4</span></span></td>
-              <td>24.04</td>
-              <td>22.98</td>
-              <td>36.81</td>
-              <td>1174</td>
-            </tr>
-            <tr>
-              <td>6</td>
-              <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-google" aria-hidden="true">G</span><span class="fc-model-name">gemini-2.5-pro</span></span></td>
-              <td>20.34</td>
-              <td>19.32</td>
-              <td>36.65</td>
-              <td>1167</td>
-            </tr>
-            <tr>
-              <td>7</td>
-              <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-openai" aria-hidden="true">OA</span><span class="fc-model-name">gpt-5.1-thinking</span></span></td>
-              <td>20.64</td>
-              <td>21.49</td>
-              <td>34.76</td>
-              <td>1164</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <p class="fc-human-reference">Human reference: 86.99 (Score@1)</p>
-    </article>
-
-    <article class="fc-leaderboard-card fc-leaderboard-panel" data-fc-leaderboard-panel="research">
-      <div class="fc-leaderboard-card-header">
-        <h3>Research Track</h3>
-        <p>68 problems</p>
-      </div>
-      <div class="fc-table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Rank</th>
-              <th>Model</th>
-              <th>Score@1</th>
-              <th>Avg@5</th>
-              <th>Score@5</th>
-              <th>Elo</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>1</td>
-              <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-google" aria-hidden="true">G</span><span class="fc-model-name">gemini-3.0-pro</span></span></td>
-              <td>46.55</td>
-              <td>43.14</td>
-              <td>59.22</td>
-              <td>1283</td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-openai" aria-hidden="true">OA</span><span class="fc-model-name">gpt-5-thinking</span></span></td>
-              <td>30.91</td>
-              <td>34.94</td>
-              <td>55.25</td>
-              <td>1218</td>
-            </tr>
-            <tr>
-              <td>3</td>
-              <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-openai" aria-hidden="true">OA</span><span class="fc-model-name">gpt-5.1-thinking</span></span></td>
-              <td>32.12</td>
-              <td>33.70</td>
-              <td>56.79</td>
-              <td>1214</td>
-            </tr>
-            <tr>
-              <td>4</td>
-              <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-openai" aria-hidden="true">OA</span><span class="fc-model-name">gpt-5.2-thinking</span></span></td>
-              <td>30.29</td>
-              <td>34.09</td>
-              <td>58.90</td>
-              <td>1210</td>
-            </tr>
-            <tr>
-              <td>5</td>
-              <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-google" aria-hidden="true">G</span><span class="fc-model-name">gemini-2.5-pro</span></span></td>
-              <td>21.66</td>
-              <td>25.74</td>
-              <td>51.57</td>
-              <td>1180</td>
-            </tr>
-            <tr>
-              <td>6</td>
-              <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-xai" aria-hidden="true">xAI</span><span class="fc-model-name">grok-4</span></span></td>
-              <td>26.75</td>
-              <td>24.01</td>
-              <td>48.15</td>
-              <td>1149</td>
-            </tr>
-            <tr>
-              <td>7</td>
-              <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-deepseek" aria-hidden="true">DS</span><span class="fc-model-name">deepseek-3.2</span></span></td>
-              <td>21.51</td>
-              <td>21.76</td>
-              <td>44.41</td>
-              <td>1146</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </article>
-
-    <article class="fc-leaderboard-card fc-leaderboard-panel is-active" data-fc-leaderboard-panel="agent">
-      <div class="fc-leaderboard-card-header">
-        <h3>Agent Track</h3>
-        <p>188 tasks</p>
-      </div>
-      <div class="fc-table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Rank</th>
-              <th>Agent</th>
-              <th>Score</th>
-              <th>Avg Steps</th>
-              <th>Avg Tools</th>
-              <th>Avg Tokens</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>1</td>
-              <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-openai" aria-hidden="true">OA</span><span class="fc-model-name">GPT-5.6-sol (Codex)</span></span></td>
-              <td>76.4</td>
-              <td>57.8</td>
-              <td>51.8</td>
-              <td>1.93M</td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-anthropic" aria-hidden="true">C</span><span class="fc-model-name">Claude Code Opus 4.8</span></span></td>
-              <td>74.5</td>
-              <td>355.4</td>
-              <td>145.7</td>
-              <td>14.72M</td>
-            </tr>
-            <tr>
-              <td>3</td>
-              <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-openai" aria-hidden="true">OA</span><span class="fc-model-name">GPT-5.5 (Codex)</span></span></td>
-              <td>72.1</td>
-              <td>48.3</td>
-              <td>55.8</td>
-              <td>2.02M</td>
-            </tr>
-            <tr>
-              <td>4</td>
-              <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-google" aria-hidden="true">G</span><span class="fc-model-name">Gemini 3.1 Pro (Amplio)</span></span></td>
-              <td>68.9</td>
-              <td>—</td>
-              <td>—</td>
-              <td>—</td>
-            </tr>
-            <tr>
-              <td>5</td>
-              <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-qwen" aria-hidden="true">Q</span><span class="fc-model-name">Qwen3.7 Max (Claude Code)</span></span></td>
-              <td>61.9</td>
-              <td>133.9</td>
-              <td>139.1</td>
-              <td>13.85M</td>
-            </tr>
-            <tr>
-              <td>6</td>
-              <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-google" aria-hidden="true">G</span><span class="fc-model-name">Gemini 3.1 Pro (Gemini CLI)</span></span></td>
-              <td>60.2</td>
-              <td>74.3</td>
-              <td>41.6</td>
-              <td>2M</td>
-            </tr>
-            <tr>
-              <td>7</td>
-              <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-kimi" aria-hidden="true">K</span><span class="fc-model-name">Kimi K2.6</span></span></td>
-              <td>46.9</td>
-              <td>67.2</td>
-              <td>70.6</td>
-              <td>6.79M</td>
-            </tr>
-            <tr>
-              <td>8</td>
-              <td><span class="fc-model-entry"><span class="fc-model-logo fc-model-logo-anthropic" aria-hidden="true">C</span><span class="fc-model-name">Claude Code Opus 4.7</span></span></td>
-              <td>43.0</td>
-              <td>77.2</td>
-              <td>42.2</td>
-              <td>10.96M</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <p class="fc-human-reference">Preview Harbor runs with a 5-hour timeout per task. See the <a href="{{ '/blog/harbor/' | relative_url }}">release blog</a> for trace-level analysis.</p>
-    </article>
-  </div>
-
-  <p class="fc-cta">
-    <a href="https://github.com/FrontierCS/Frontier-CS" target="_blank" rel="noopener noreferrer">View benchmark on GitHub <span aria-hidden="true">→</span></a>
-  </p>
-</div>
+<section class="sec" id="cases">
+  <h2>Case studies</h2>
+  <div class="ctabs" id="ctabs" role="tablist" aria-label="Case study"></div>
+  <article class="case" role="tabpanel">
+    <div class="meta" id="cmeta"></div>
+    <h3 id="ctitle"></h3>
+    <p class="desc" id="cdesc"></p>
+    <div class="clegend" id="clegend"></div>
+    <div class="cplot" id="cplot"><svg id="csvg" role="img" aria-label="Development submissions of one GPT-6 Astra run"></svg><div class="ctip" id="ctip" hidden></div></div>
+    <p class="cnote" id="cnote"></p>
+    <div class="cfoot"><b>FRONTIERCS 2</b><span>GPT-6 Astra, one run per task</span></div>
+  </article>
 </section>
 
-<script>
-  (function () {
-    var tabs = Array.prototype.slice.call(document.querySelectorAll("[data-fc-leaderboard-tab]"));
-    var panels = Array.prototype.slice.call(document.querySelectorAll("[data-fc-leaderboard-panel]"));
-
-    tabs.forEach(function (tab) {
-      tab.addEventListener("click", function () {
-        var target = tab.getAttribute("data-fc-leaderboard-tab");
-
-        tabs.forEach(function (item) {
-          var isActive = item === tab;
-          item.classList.toggle("is-active", isActive);
-          item.setAttribute("aria-selected", isActive ? "true" : "false");
-        });
-
-        panels.forEach(function (panel) {
-          panel.classList.toggle("is-active", panel.getAttribute("data-fc-leaderboard-panel") === target);
-        });
-      });
-    });
-  })();
-</script>
-
-<section class="journal fc-tasks">
-<div class="page">
-  <div class="sec-head">
+<section class="sec" id="tasks">
+  <div class="tz">
+    <div class="tz-head"><h2>Tasks</h2><span id="tzhint">Select a domain to filter the list</span></div>
+    <div class="map" id="map"><svg id="mapsvg" aria-label="The 92 tasks by domain. Select a domain to filter the list."></svg><div class="tip" id="maptip" hidden></div></div>
+    <div class="areas" id="areas"></div>
+  </div>
+  <div class="idx">
+    <div class="filter" id="filter">
+      <h3>Filter</h3>
+      <button class="ftoggle" type="button" id="ftoggle" aria-expanded="false">Filter by domain <span id="fcount"></span></button>
+      <div class="fbody">
+        <h4>Domain</h4>
+        <div class="checks" id="checks"></div>
+      </div>
+    </div>
     <div>
-      <h2 class="sec-title">Example tasks</h2>
-      <p class="sec-intro">Frontier-CS tasks are open-ended, verifiable optimization challenges: agents can inspect the task, iterate on submissions, and climb a continuous score instead of passing a single hidden test.</p>
+      <div class="bar">
+        <label class="field" for="q"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <input id="q" type="search" placeholder="Search" autocomplete="off"></label>
+        <select class="sel" id="sort" aria-label="Sort tasks"><option value="domain">By domain</option><option value="name">A–Z</option><option value="runs">With runs first</option></select>
+        <span class="cnt num" id="cnt">92 tasks</span>
+      </div>
+      <div class="rows" id="rows"></div>
+      <button class="pill lg showmore" type="button" id="showmore">Show more</button>
     </div>
-    <a class="sec-more" href="https://github.com/FrontierCS/Frontier-CS" target="_blank" rel="noopener noreferrer">Browse tasks →</a>
   </div>
-
-  <div class="fc-task-grid">
-    <a class="fc-task-card" href="https://github.com/FrontierCS/Frontier-CS/tree/main/2.0/problems/erdos_unit_distance" target="_blank" rel="noopener noreferrer">
-      <div class="fc-task-visual">
-        <img src="{{ 'assets/img/example-tasks/erdos-unit-distance.gif' | relative_url }}" alt="Animated Erdos unit distance task visualization">
-      </div>
-      <div class="fc-task-body">
-        <div class="fc-task-meta">
-          <h3>Erdos Unit Distance</h3>
-          <span>View task →</span>
-        </div>
-        <p>Place a fixed set of planar points so that as many pairs as possible sit exactly one unit apart. The task rewards geometric search, symmetry-aware construction, and steady agent iteration.</p>
-      </div>
-    </a>
-
-    <a class="fc-task-card" href="https://github.com/FrontierCS/Frontier-CS/blob/main/algorithmic/problems/0/statement.txt" target="_blank" rel="noopener noreferrer">
-      <div class="fc-task-visual">
-        <img src="{{ 'assets/img/example-tasks/polyomino-packing-square.gif' | relative_url }}" alt="Animated polyomino packing task visualization">
-      </div>
-      <div class="fc-task-body">
-        <div class="fc-task-meta">
-          <h3>Polyomino Packing</h3>
-          <span>View task →</span>
-        </div>
-        <p>Pack thousands of small geometric pieces into the tightest possible rectangle. The task rewards heuristic design, rotation/reflection handling, and long-horizon layout improvement.</p>
-      </div>
-    </a>
-  </div>
-</div>
 </section>
 
-<section class="journal fc-contributors">
-<div class="page">
-  <div class="sec-head">
-    <h2 class="sec-title">100+ Contributors from</h2>
-  </div>
-  <p class="fc-contributors-label">Academic institutions</p>
-  <div class="fc-school-grid" aria-label="Contributing academic institutions">
-    <div class="fc-school-card">
-      <img src="{{ 'assets/img/institutions/berkeley.svg' | relative_url }}" alt="UC Berkeley logo">
-      <p>UC Berkeley</p>
-    </div>
-    <div class="fc-school-card">
-      <img src="{{ 'assets/img/institutions/princeton.svg' | relative_url }}" alt="Princeton University logo">
-      <p>Princeton</p>
-    </div>
-    <div class="fc-school-card">
-      <img src="{{ 'assets/img/institutions/stanford.svg' | relative_url }}" alt="Stanford University logo">
-      <p>Stanford</p>
-    </div>
-    <div class="fc-school-card">
-      <img src="{{ 'assets/img/institutions/mit.svg' | relative_url }}" alt="MIT logo">
-      <p>MIT</p>
-    </div>
-    <div class="fc-school-card">
-      <img src="{{ 'assets/img/institutions/ucsd.svg' | relative_url }}" alt="UCSD logo">
-      <p>UCSD</p>
-    </div>
-    <div class="fc-school-card">
-      <img src="{{ 'assets/img/institutions/washington.png' | relative_url }}" alt="University of Washington logo">
-      <p>UW</p>
-    </div>
-    <div class="fc-school-card">
-      <img src="{{ 'assets/img/institutions/gatech.svg' | relative_url }}" alt="Georgia Tech logo">
-      <p>Georgia Tech</p>
-    </div>
-    <div class="fc-school-card">
-      <img src="{{ 'assets/img/institutions/michigan.svg' | relative_url }}" alt="University of Michigan logo">
-      <p>Michigan</p>
-    </div>
-    <div class="fc-school-card">
-      <img src="{{ 'assets/img/institutions/nyu.svg' | relative_url }}" alt="New York University logo">
-      <p>NYU</p>
-    </div>
-    <div class="fc-school-card">
-      <img src="{{ 'assets/img/institutions/uiuc.png' | relative_url }}" alt="UIUC logo">
-      <p>UIUC</p>
-    </div>
-    <div class="fc-school-card">
-      <img src="{{ 'assets/img/institutions/toronto.svg' | relative_url }}" alt="University of Toronto logo">
-      <p>Toronto</p>
-    </div>
-    <div class="fc-school-card">
-      <img src="{{ 'assets/img/institutions/ntu.svg' | relative_url }}" alt="Nanyang Technological University logo">
-      <p>NTU</p>
+<section class="sec" id="questions">
+  <div class="faq">
+    <h2>Questions</h2>
+    <div class="fqlist">
+      <details id="q-built"><summary>How is a task built?</summary><div class="ans"><p>We delete a paper’s contribution from its own repository. The agent writes it back and is scored against the authors’ code.</p></div></details>
+      <details id="q-see"><summary>What does the agent see?</summary><div class="ans"><p>It sees its repository and, for each patch, a development score and one message. The evaluator, the hidden suite and the reference stay with the judge.</p></div></details>
+      <details id="q-bar"><summary>What counts as beating the reference?</summary><div class="ans"><p>The agent must meet criteria set from the reference’s own measurements, on every workload. For SVG-EAR, its latency must be at most 0.96 of the reference’s, with PSNR, SSIM and LPIPS within fixed bands.</p></div></details>
+      <details id="q-score"><summary>How are scores computed?</summary><div class="ans"><p>Each task’s evaluator scores the final submission on the hidden suite, from 0 to 100. The leaderboard averages these scores over runs. The results are preliminary: 31 runs on 18 tasks.</p></div></details>
+      <details id="q-run"><summary>Can I run it?</summary><div class="ans"><p>We will release the tasks, evaluators and judge as one evaluation environment.</p></div></details>
     </div>
   </div>
-</div>
 </section>
-
-<section class="journal fc-sponsors">
-<div class="page">
-  <div class="sec-head">
-    <h2 class="sec-title">Sponsors</h2>
-  </div>
-  <div class="fc-sponsor-grid" aria-label="Frontier-CS sponsors">
-    <a class="fc-sponsor-card" href="https://www.laude.org/" target="_blank" rel="noopener noreferrer">
-      <img src="{{ 'assets/img/sponsors/laude-institute.png' | relative_url }}" alt="Laude Institute logo">
-      <p>Laude Institute</p>
-    </a>
-    <a class="fc-sponsor-card" href="https://modal.com/" target="_blank" rel="noopener noreferrer">
-      <img class="fc-modal-logo fc-modal-logo--dark" src="{{ 'assets/img/sponsors/modal.svg' | relative_url }}" alt="">
-      <img class="fc-modal-logo fc-modal-logo--light" src="{{ 'assets/img/sponsors/modal-light.svg' | relative_url }}" alt="">
-      <p>Modal</p>
-    </a>
-  </div>
 </div>
-</section>
+</div>
+<script defer src="{{ '/assets/js/fcs2.js' | relative_url }}"></script>

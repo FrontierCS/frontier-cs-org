@@ -1,21 +1,16 @@
     <!-- Metadata, OpenGraph and Schema.org -->
     {% include metadata.html %}
 
-    {% if site.icon and site.icon != '' and site.icon.size >= 3 %}
-    <link rel="icon" type="image/png" href="{{ site.icon | prepend: '/assets/img/' | relative_url }}"/>
-    <link rel="shortcut icon" type="image/png" href="{{ site.icon | prepend: '/assets/img/' | relative_url }}"/>
-    {% else %}
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23003262' rx='4'/%3E%3Ctext x='16' y='22' font-family='Georgia, serif' font-size='20' font-weight='bold' fill='%23f6c85f' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E"/>
-    {% endif %}
-    <meta name="theme-color" content="#F6F3EC">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='49 47 81 100'%3E%3Cpath d='M59.78 135.86 L75.94 71.24 A17.5 17.5 0 0 1 92.89 58 L118.5 58' fill='none' stroke='%230B57D0' stroke-width='21' stroke-linecap='round'/%3E%3Ccircle cx='109' cy='97' r='10.5' fill='%230B57D0'/%3E%3C/svg%3E"/>
+    <meta name="theme-color" content="#ffffff">
     <link rel="canonical" href="{{ page.url | replace:'index.html','' | absolute_url }}">
 
-    <!-- Colour scheme before first paint: follows the OS, T key toggles, stored in localStorage -->
-    <script>try{var st=localStorage.getItem("site-theme");if(st==="midnight"||(!st&&matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.setAttribute("data-theme","midnight")}catch(e){}</script>
-
-    <!-- Styles (self-hosted Newsreader / Inter Tight / JetBrains Mono) -->
-    <link rel="preload" href="{{ '/assets/fonts/Newsreader-normal-latin.woff2' | relative_url }}" as="font" type="font/woff2" crossorigin>
+    <!-- Styles: Hanken Grotesk (text), Instrument Sans (wordmark), Google Sans Code (code) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Instrument+Sans:wght@500&family=Google+Sans+Code:wght@400;500&display=swap">
     <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
+    {% if page.page_css %}<link rel="stylesheet" href="{{ '/assets/css/' | append: page.page_css | append: '.css' | relative_url }}">{% endif %}
 
     {% if page._styles %}
     <!-- Page/Post style -->

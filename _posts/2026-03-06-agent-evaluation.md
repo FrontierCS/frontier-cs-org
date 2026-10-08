@@ -40,7 +40,7 @@ authors:
 toc:
   - name: Evolving Agents Are the Next Frontier for LLMs
   - name: A Promising Direction, Bottlenecked by Evaluation
-  - name: Why the Evaluation Gap?
+  - name: Why Current Evaluation Fails?
   - name: Frontier-CS as the Standard Benchmark for Evolving Agents
   - name: From Small Case Studies to Comprehensive Evaluation
   - name: "Use Case 1: Online Evolution"
