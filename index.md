@@ -28,16 +28,16 @@ page_css: fcs2
 
 <section class="sec" id="leaderboard">
   <h2>Leaderboard</h2>
-  <div class="chips mtabs" id="metric" role="group" aria-label="Metric"><button class="chip" type="button" data-k="eci" aria-pressed="true">ECI</button><button class="chip" type="button" data-k="pass" aria-pressed="false">Pass rate</button><button class="chip" type="button" data-k="score" aria-pressed="false">Mean score</button></div>
+  <div class="chips mtabs" id="metric" role="group" aria-label="Metric"><button class="chip" type="button" data-k="eci" aria-pressed="true">FrontierCS ECI</button><button class="chip" type="button" data-k="pass" aria-pressed="false">Pass rate</button><button class="chip" type="button" data-k="score" aria-pressed="false">Mean score</button></div>
   <div class="cgrid one">
     <figure class="chart" style="margin:0">
-      <div class="chead"><span id="ylab">ECI, FrontierCS 2 capabilities index</span><span class="r" id="nres">297 runs</span></div>
+      <div class="chead"><span id="ylab">FrontierCS ECI, a capabilities index</span><span class="r" id="nres">297 runs</span></div>
       <div class="plot" id="lbplot"><svg id="lbsvg" role="img" aria-label="Leaderboard chart"></svg><div class="tip" id="lbtip" hidden></div></div>
       <div class="legend" id="lblegend"></div>
       <button class="pill lg custom" id="custom" type="button" aria-expanded="false" aria-controls="settings" hidden>
         <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3M5.5 5.5l2.1 2.1M16.4 16.4l2.1 2.1M5.5 18.5l2.1-2.1M16.4 7.6l2.1-2.1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
         Customize graph</button>
-      <div class="cfoot"><b>FRONTIERCS 2</b><span id="lbnote">Preliminary · Human = 100 (the authors’ reference code), Kimi K2.7 Code = 20 · bars are 90% intervals</span></div>
+      <div class="cfoot"><b>FRONTIERCS 2</b><span id="lbnote">Preliminary · Human = 60 (the authors’ reference code), Kimi K2.7 Code = 0 · bars are 90% intervals</span></div>
     </figure>
     <aside class="settings" id="settings" aria-label="Graph settings">
       <h3>Settings</h3>
@@ -105,7 +105,7 @@ page_css: fcs2
       <details id="q-built"><summary>How is a task built?</summary><div class="ans"><p>We delete a paper’s contribution from its own repository. The agent writes it back and is scored against the authors’ code.</p></div></details>
       <details id="q-see"><summary>What does the agent see?</summary><div class="ans"><p>It sees its repository and, for each patch, a development score and one message. The evaluator, the hidden suite and the reference stay with the judge.</p></div></details>
       <details id="q-bar"><summary>What counts as beating the reference?</summary><div class="ans"><p>The agent must meet criteria set from the reference’s own measurements, on every workload. For SVG-EAR, its latency must be at most 0.96 of the reference’s, with PSNR, SSIM and LPIPS within fixed bands.</p></div></details>
-      <details id="q-score"><summary>How are scores computed?</summary><div class="ans"><p>Each task’s evaluator scores the final submission on the hidden suite, from 0 to 100, and a run that times out scores 0. The leaderboard’s main number is ECI, a capabilities index in the style of Epoch AI’s. It fits one logistic curve per task to every model’s score and to the human reference, the authors’ own code, then scales the result so Human is 100 and Kimi K2.7 Code is 20. Above 100 means above the authors’ code on each task’s own scale. Pass rate is the share of runs whose final submission beats the authors’ code by the criteria above. The bars are 90% intervals from resampling tasks. The results are preliminary: <span data-fill="summary">297 runs on 42 tasks by 8 models</span>.</p></div></details>
+      <details id="q-score"><summary>How are scores computed?</summary><div class="ans"><p>Each task’s evaluator scores the final submission on the hidden suite, from 0 to 100, and a run that times out scores 0. The leaderboard’s main number is FrontierCS ECI, a capabilities index in the style of Epoch AI’s ECI. It fits one logistic curve per task to every model’s score and to the human reference, the authors’ own code, then scales the result so Human is 60 and Kimi K2.7 Code is 0. Above 60 means above the authors’ code on each task’s own scale. FrontierCS ECI’s bars are 90% intervals from resampling tasks. Pass rate is the share of runs whose final submission beats the authors’ code by the criteria above. The results are preliminary: <span data-fill="summary">297 runs on 42 tasks by 8 models</span>.</p></div></details>
       <details id="q-run"><summary>Can I run it?</summary><div class="ans"><p>We will release the tasks, evaluators and judge as one evaluation environment.</p></div></details>
     </div>
   </div>

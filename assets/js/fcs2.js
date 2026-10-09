@@ -30,11 +30,11 @@ const MODELS = [
   {id:'glm', name:'GLM 5.3', short:'GLM 5.3', h:'ZCode', lab:'Z.ai'},
 ];
 const UPDATED = 'October 8, 2026';
-// ECI per model: [point, 90% low, 90% high, tasks]; Human (the authors' reference) is 100 and Kimi K2.7 Code is 20 (300 task resamples).
-// Pass rate per model: [percent, 90% low, 90% high, runs].
-const PASS = {"astra": [66.7, 53.3, 80.0, 30], "ds": [46.7, 30.0, 63.3, 30], "glm": [35.0, 22.5, 47.5, 40], "k27": [17.6, 5.9, 29.4, 34], "k3": [35.0, 22.5, 47.5, 40], "muse": [37.5, 25.0, 50.0, 40], "qwen": [36.8, 21.1, 52.6, 19], "sol": [46.9, 34.3, 59.7, 64]};
-const ECI = {"astra": [129.3, 115.1, 174.3, 30], "sol": [125.5, 105.8, 164.0, 40], "muse": [95.0, 85.9, 124.1, 40], "k3": [95.2, 87.1, 132.2, 40], "k27": [20.0, 20.0, 20.0, 34], "qwen": [93.6, 80.2, 127.3, 19], "ds": [100.4, 99.8, 137.1, 30], "glm": [101.5, 87.5, 130.9, 40]};
-const ECI_LOW = 'k27', ECI_REF_TASKS = 38;
+// FrontierCS ECI per model: [point, 90% low, 90% high, tasks]; Human (the authors' reference) is 60 and Kimi K2.7 Code is 0 (300 task resamples).
+// Pass rate per model: [percent, runs that pass, runs].
+const PASS = {"astra": [66.7, 20, 30], "ds": [46.7, 14, 30], "glm": [35.0, 14, 40], "k27": [17.6, 6, 34], "k3": [35.0, 14, 40], "muse": [37.5, 15, 40], "qwen": [36.8, 7, 19], "sol": [46.9, 30, 64]};
+const ECI = {"astra": [82.0, 71.3, 115.7, 30], "sol": [79.2, 64.3, 108.0, 40], "muse": [56.2, 49.4, 78.0, 40], "k3": [56.4, 50.3, 84.2, 40], "k27": [0.0, 0.0, 0.0, 34], "qwen": [55.2, 45.2, 80.5, 19], "ds": [60.3, 59.9, 87.8, 30], "glm": [61.1, 50.6, 83.2, 40]};
+const ECI_HUMAN = 60, ECI_LOW = 'k27', ECI_REF_TASKS = 38;
 const RAN = new Set(RUNS.map(r => r.t));
 const mean = a => a.reduce((x, y) => x + y, 0) / a.length;
 const f1 = x => x.toFixed(1);
@@ -116,7 +116,7 @@ const sv = (tag, a = {}, text) => { const e = document.createElementNS(NS, tag);
   for (const k in a) if (a[k] != null) { if (tag === 'text' && /^(fill|font-size|font-weight)$/.test(k)) e.style.setProperty(k, k === 'font-size' ? a[k] + 'px' : a[k]); else e.setAttribute(k, a[k]); }
   if (text != null) e.textContent = text; return e; };
 const MCOL = Object.fromEntries(MODELS.map(m => [m.id, `var(--m-${m.id})`]));
-// Models ranked by ECI, the leaderboard's main number (bin/fcs2_runs_from_db.py fits it).
+// Models ranked by FrontierCS ECI, the leaderboard's main number (bin/fcs2_runs_from_db.py fits it).
 const RANKED = [...MODELS].sort((a, b) => ECI[b.id][0] - ECI[a.id][0]);
 const NTASK = rs => new Set(rs.map(r => r.t)).size;
 /* numbers in the page text come from the data, so they cannot drift from the chart */
@@ -153,13 +153,13 @@ $('#showruns').addEventListener('change', e => { showRuns = e.target.checked; dr
 $('#custom').addEventListener('click', () => { const s = $('#settings'); const o = !s.classList.contains('open'); s.classList.toggle('open', o); $('#custom').setAttribute('aria-expanded', String(o)); });
 $('#lblegend').innerHTML = RANKED.map(m => `<span><i style="background:${MCOL[m.id]}"></i>${esc(m.name)}</span>`).join('');
 
-/* ECI and pass-rate views: one row per model ranked by the metric, its 90% interval as a bar.
-   ECI also draws Human (the authors' reference code) as a dashed line at 100. */
+/* FrontierCS ECI and pass-rate views: one row per model ranked by the metric.
+   ECI also draws its 90% interval as a bar and Human (the authors' reference code) as a dashed line at ECI_HUMAN. */
 const RANKVIEW = {
-  eci:  {data:ECI, title:'ECI, FrontierCS 2 capabilities index', axis:'ECI', fmt:v => String(Math.round(v)),
-         note:'Preliminary · Human = 100 (the authors’ reference code), Kimi K2.7 Code = 20 · bars are 90% intervals'},
+  eci:  {data:ECI, title:'FrontierCS ECI, a capabilities index', axis:'FrontierCS ECI', fmt:v => String(Math.round(v)),
+         note:`Preliminary · Human = ${ECI_HUMAN} (the authors’ reference code), Kimi K2.7 Code = ${ECI[ECI_LOW][0]} · bars are 90% intervals`},
   pass: {data:PASS, title:'Pass rate, share of runs that beat the authors’ code', axis:'Pass rate (%)', fmt:v => Math.round(v) + '%', max:100,
-         note:'Preliminary · a run passes when its final submission beats the authors’ code on every workload · bars are 90% intervals'},
+         note:'Preliminary · a run passes when its final submission beats the authors’ code on every workload · each model ran its own set of tasks'},
 };
 function drawRanked(kind) {
   const V = RANKVIEW[kind], D = V.data;
@@ -176,23 +176,23 @@ function drawRanked(kind) {
     svg.append(sv('text', {x:X(v), y:H - B + 22, 'text-anchor':'middle'}, v));
   }
   if (kind === 'eci') {
-    svg.append(sv('line', {x1:X(100), x2:X(100), y1:T - 6, y2:H - B + 6, stroke:'var(--ink-2)', 'stroke-width':1.2, 'stroke-dasharray':'4 4'}));
-    svg.append(sv('text', {x:X(100) + (narrow ? -6 : 6), y:T - 12, 'text-anchor': narrow ? 'end' : 'start', 'font-size':12.5}, 'Human = 100'));
+    svg.append(sv('line', {x1:X(ECI_HUMAN), x2:X(ECI_HUMAN), y1:T - 6, y2:H - B + 6, stroke:'var(--ink-2)', 'stroke-width':1.2, 'stroke-dasharray':'4 4'}));
+    svg.append(sv('text', {x:X(ECI_HUMAN) + (narrow ? -6 : 6), y:T - 12, 'text-anchor': narrow ? 'end' : 'start', 'font-size':12.5}, `Human = ${ECI_HUMAN}`));
   }
   svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, V.axis));
   const pts = [];
   order.forEach((m, i) => {
-    const [e, lo, hi, n] = D[m.id], y0 = T + i * lane, yc = y0 + lane / 2, anchor = kind === 'eci' && m.id === ECI_LOW;
+    const [e, lo, hi] = D[m.id], y0 = T + i * lane, yc = y0 + lane / 2, anchor = kind === 'eci' && m.id === ECI_LOW;
     if (i) svg.append(sv('line', {x1:0, x2:W - R, y1:y0, y2:y0, stroke:'var(--line)', 'stroke-width':1}));
     svg.append(sv('text', {class:'lab', x:0, y:yc + (m.h ? -3 : 4)}, narrow ? m.short : m.name));
     if (m.h) svg.append(sv('text', {x:0, y:yc + 14, 'font-size':12}, m.h));
-    if (!anchor) svg.append(sv('line', {x1:X(lo), x2:X(hi), y1:yc, y2:yc, stroke:MCOL[m.id], 'stroke-width':6, 'stroke-linecap':'round', opacity:.25}));
+    if (kind === 'eci' && !anchor) svg.append(sv('line', {x1:X(lo), x2:X(hi), y1:yc, y2:yc, stroke:MCOL[m.id], 'stroke-width':6, 'stroke-linecap':'round', opacity:.25}));
     svg.append(sv('circle', {cx:X(e), cy:yc, r:7, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':2}));
     svg.append(sv('text', {class:'val halo', x:X(e), y:yc - 13, fill:MCOL[m.id], 'text-anchor':'middle'}, V.fmt(e)));
     const mine = RUNS.filter(r => r.m === m.id), np = mine.filter(r => r.p).length;
     const body = kind === 'eci'
-      ? `ECI <b>${f1(e)}</b>${anchor ? ` (anchor, fixed at ${e})` : `<br>90% interval ${Math.round(lo)}–${Math.round(hi)}`}`
-      : `Pass rate <b>${f1(e)}%</b>, ${np} of ${mine.length} runs<br>90% interval ${Math.round(lo)}–${Math.round(hi)}%`;
+      ? `FrontierCS ECI <b>${f1(e)}</b>${anchor ? ` (anchor, fixed at ${e})` : `<br>90% interval ${Math.round(lo)}–${Math.round(hi)}`}`
+      : `Pass rate <b>${f1(e)}%</b>, ${np} of ${mine.length} runs pass`;
     pts.push({x:X(e), y:yc, mean:true, html:`<b>${esc(m.name)}</b><br>${body}<br>${mine.length} runs on ${NTASK(mine)} tasks`});
   });
   attachTip(svg, W, H, pts);

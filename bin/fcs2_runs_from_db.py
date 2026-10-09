@@ -9,16 +9,16 @@ Tasks are matched to the paper's task list by display name (TASK below): the dom
 task's folder under tasks/frontier-cs-2.0-demo/problems/ in FrontierCS-2.0-Preview, and the
 short name is the paper's name for the task, or the database name when the paper list has none.
 
-ECI, the leaderboard's main number, follows Epoch's Capabilities Index: every task is one benchmark with
+FrontierCS ECI, the leaderboard's main number, follows Epoch's Capabilities Index: every task is one benchmark with
 score/100 = sigmoid(a_t * (theta_m - b_t)), fitted by least squares over all (respondent, task) pairs
 with an L2 penalty of 0.01 on theta, b and log a (weaker penalties did not converge to one answer across seeds).
 Respondents are the models (mean score over their runs on a task) and the authors' reference
 (median reference_score over the task's runs; references of 0 mean the task has none and are left out).
-theta is mapped linearly so that Human (the authors' reference) is 100 and LOW_ANCHOR is LOW_VALUE. The 90% interval comes from
+theta is mapped linearly so that Human (the authors' reference) is HUMAN_VALUE and LOW_ANCHOR is LOW_VALUE. The 90% interval comes from
 resampling tasks with replacement (300 draws, fixed seeds), so the output is reproducible.
 
 Pass rate is the share of scored runs whose verdict is PASS: the final submission meets the task's
-beat-the-reference criteria on every workload. Its 90% interval also comes from resampling tasks.
+beat-the-reference criteria on every workload. It is a plain count, so it has no interval.
 """
 import json, re, sqlite3, sys
 from collections import Counter, defaultdict
@@ -84,7 +84,8 @@ MODEL = {
     'GLM 5.3 (ZCode)': ('glm', 'GLM 5.3', 'GLM 5.3', 'ZCode', 'Z.ai'),
 }
 
-LOW_ANCHOR, LOW_VALUE = 'Kimi K2.7 Code', 20   # Kimi K3 = 20 is degenerate on the 2026-10-08 data: K3 scores level with the reference
+HUMAN_VALUE = 60                               # owner's choice, 2026-10-09 (was 100; K2.7 was 20)
+LOW_ANCHOR, LOW_VALUE = 'Kimi K2.7 Code', 0   # Kimi K3 = 20 is degenerate on the 2026-10-08 data: K3 scores level with the reference
 for a in sys.argv[2:]:   # optional: --low='Model name=value' to try another anchor
     if a.startswith('--low='): LOW_ANCHOR, LOW_VALUE = a[6:].rsplit('=', 1)[0], float(a[6:].rsplit('=', 1)[1])
 
@@ -117,7 +118,7 @@ def eci(rows):
     resp = sorted({m for m, _ in obs}); tasks = sorted({t for _, t in obs})
     R = {m: i for i, m in enumerate(resp)}; T = {t: j for j, t in enumerate(tasks)}
     I = np.array([R[m] for m, _ in obs]); J = np.array([T[t] for _, t in obs]); Y = np.array(list(obs.values()))
-    scale = lambda th: LOW_VALUE + (100 - LOW_VALUE) * (th - th[R[LOW_ANCHOR]]) / (th[R['reference']] - th[R[LOW_ANCHOR]])
+    scale = lambda th: LOW_VALUE + (HUMAN_VALUE - LOW_VALUE) * (th - th[R[LOW_ANCHOR]]) / (th[R['reference']] - th[R[LOW_ANCHOR]])
     point = scale(irt_fit(I, J, Y, len(resp), len(tasks)))
     rng, boot = np.random.default_rng(1), []
     for it in range(300):
@@ -149,16 +150,11 @@ dropped = Counter(r[3] for r in rows if r[2] is None)
 
 
 def pass_rate(runs):
-    """Per model: [percent PASS, 90% low, 90% high, runs]; the interval comes from resampling tasks (fixed seed)."""
-    by = defaultdict(list)
-    for m, _, t, _, p in runs: by[(m, t)].append(p)
-    rng, out = np.random.default_rng(2), {}
+    """Per model: [percent PASS, runs that pass, runs]."""
+    out = {}
     for m in sorted({r[0] for r in runs}):
-        mine = sorted(t for mm, t in by if mm == m)
-        allp = [p for t in mine for p in by[(m, t)]]
-        boot = [100 * np.mean([p for t in rng.choice(mine, len(mine)) for p in by[(m, t)]]) for _ in range(2000)]
-        lo, hi = np.percentile(boot, [5, 95])
-        out[m] = [round(100 * float(np.mean(allp)), 1), round(float(lo), 1), round(float(hi), 1), len(allp)]
+        p = [r[4] for r in runs if r[0] == m]
+        out[m] = [round(100 * sum(p) / len(p), 1), sum(p), len(p)]
     return out
 
 js_path = 'assets/js/fcs2.js'
@@ -173,10 +169,10 @@ block = (f'// One entry per scored run in the preview results database of {when:
          f'const RUNS = {json.dumps(runs, ensure_ascii=False)}.map(([m, d, t, s, p]) => ({{m, d, t, s, p}}));\n'
          'const MODELS = [\n' + ''.join(f"  {{id:'{i}', name:'{n}', short:'{s}', h:'{h}', lab:'{l}'}},\n" for i, n, s, h, l in models) + '];\n'
          f"const UPDATED = '{when:%B} {when.day}, {when.year}';\n"
-         f"// ECI per model: [point, 90% low, 90% high, tasks]; Human (the authors' reference) is 100 and {LOW_ANCHOR} is {LOW_VALUE:g} ({nboot} task resamples).\n"
-         f"// Pass rate per model: [percent, 90% low, 90% high, runs].\nconst PASS = {json.dumps(pass_rate(runs))};\n"
-         f"const ECI = {json.dumps(eci_js)};\nconst ECI_LOW = '{MODEL[LOW_ANCHOR][0]}', ECI_REF_TASKS = {E['reference'][3]};\n")
-js, n = re.subn(r'// One entry per .*?\nconst MODELS = \[\n.*?\];\n(const UPDATED = .*?\n)?(// ECI per model.*?\n(// Pass rate.*?\nconst PASS = .*?\n)?const ECI = .*?\nconst ECI_LOW = .*?\n)?', lambda m: block, js, flags=re.S)
+         f"// FrontierCS ECI per model: [point, 90% low, 90% high, tasks]; Human (the authors' reference) is {HUMAN_VALUE:g} and {LOW_ANCHOR} is {LOW_VALUE:g} ({nboot} task resamples).\n"
+         f"// Pass rate per model: [percent, runs that pass, runs].\nconst PASS = {json.dumps(pass_rate(runs))};\n"
+         f"const ECI = {json.dumps(eci_js)};\nconst ECI_HUMAN = {HUMAN_VALUE:g}, ECI_LOW = '{MODEL[LOW_ANCHOR][0]}', ECI_REF_TASKS = {E['reference'][3]};\n")
+js, n = re.subn(r'// One entry per .*?\nconst MODELS = \[\n.*?\];\n(const UPDATED = .*?\n)?(// (FrontierCS )?ECI per model.*?\n(// Pass rate.*?\nconst PASS = .*?\n)?const ECI = .*?\nconst (ECI_HUMAN = .*?, )?ECI_LOW = .*?\n)?', lambda m: block, js, flags=re.S)
 assert n == 1, 'RUNS block not found'
 open(js_path, 'w', encoding='utf-8').write(js)
 print('PASS', pass_rate(runs))
