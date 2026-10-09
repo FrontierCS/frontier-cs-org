@@ -85,6 +85,7 @@ MODEL = {
 }
 
 HUMAN_VALUE = 60                               # owner's choice, 2026-10-09 (was 100; K2.7 was 20)
+HIDDEN = {'Kimi K2.7 Code'}                    # owner's call, 2026-10-09: off the leaderboard, kept in the ECI fit as its 0 point
 LOW_ANCHOR, LOW_VALUE = 'Kimi K2.7 Code', 0   # Kimi K3 = 20 is degenerate on the 2026-10-08 data: K3 scores level with the reference
 for a in sys.argv[2:]:   # optional: --low='Model name=value' to try another anchor
     if a.startswith('--low='): LOW_ANCHOR, LOW_VALUE = a[6:].rsplit('=', 1)[0], float(a[6:].rsplit('=', 1)[1])
@@ -143,10 +144,10 @@ assert not {c for c, *_ in rows} - set(MODEL), 'unmapped model'
 
 runs = []
 for cand, task, score, state, verdict in rows:
-    if score is None: continue
+    if score is None or cand in HIDDEN: continue
     folder, short = TASK[task]
     runs.append([MODEL[cand][0], SHOWN.get(folder, folder), short or task.split(' — ')[0], round(score, 2), int(verdict == 'PASS')])
-dropped = Counter(r[3] for r in rows if r[2] is None)
+dropped = Counter(r[3] for r in rows if r[2] is None and r[0] not in HIDDEN)
 
 
 def pass_rate(runs):
@@ -160,18 +161,18 @@ def pass_rate(runs):
 js_path = 'assets/js/fcs2.js'
 js = open(js_path, encoding='utf-8').read()
 when = datetime.fromisoformat(generated[:19])
-models = [MODEL[c] for c in MODEL]
+models = [MODEL[c] for c in MODEL if c not in HIDDEN]
 E, nboot = eci(db.execute('''select c.name, t.name, r.display_score, r.feedback_json from cells ce
   join runs r on r.id = ce.run_id join candidates c on c.id = ce.candidate_id join tasks t on t.id = ce.task_id''').fetchall())
-eci_js = {MODEL[c][0]: list(E[c]) for c in MODEL}
+eci_js = {MODEL[c][0]: list(E[c]) for c in MODEL if c not in HIDDEN}
 block = (f'// One entry per scored run in the preview results database of {when:%Y-%m-%d} (bin/fcs2_runs_from_db.py):\n'
-         f'// model, domain, task, final score (0-100, the task\'s own scale), passed (1 = beats the reference). Timeouts score 0; {sum(dropped.values())} unscored runs are left out.\n'
+         f'// model, domain, task, final score (0-100, the task\'s own scale), passed (1 = beats the reference). Timeouts score 0; {sum(dropped.values())} unscored runs are left out' + ''.join(f'; {c} is left out (only the ECI 0 point)' for c in sorted(HIDDEN)) + '.\n'
          f'const RUNS = {json.dumps(runs, ensure_ascii=False)}.map(([m, d, t, s, p]) => ({{m, d, t, s, p}}));\n'
          'const MODELS = [\n' + ''.join(f"  {{id:'{i}', name:'{n}', short:'{s}', h:'{h}', lab:'{l}'}},\n" for i, n, s, h, l in models) + '];\n'
          f"const UPDATED = '{when:%B} {when.day}, {when.year}';\n"
          f"// FrontierCS ECI per model: [point, 90% low, 90% high, tasks]; Human (the authors' reference) is {HUMAN_VALUE:g} and {LOW_ANCHOR} is {LOW_VALUE:g} ({nboot} task resamples).\n"
          f"// Pass rate per model: [percent, runs that pass, runs].\nconst PASS = {json.dumps(pass_rate(runs))};\n"
-         f"const ECI = {json.dumps(eci_js)};\nconst ECI_HUMAN = {HUMAN_VALUE:g}, ECI_LOW = '{MODEL[LOW_ANCHOR][0]}', ECI_REF_TASKS = {E['reference'][3]};\n")
+         f"const ECI = {json.dumps(eci_js)};\nconst ECI_HUMAN = {HUMAN_VALUE:g}, ECI_LOW = '{MODEL[LOW_ANCHOR][0]}', ECI_LOW_NAME = '{MODEL[LOW_ANCHOR][1]}', ECI_LOW_VALUE = {LOW_VALUE:g}, ECI_REF_TASKS = {E['reference'][3]};\n")
 js, n = re.subn(r'// One entry per .*?\nconst MODELS = \[\n.*?\];\n(const UPDATED = .*?\n)?(// (FrontierCS )?ECI per model.*?\n(// Pass rate.*?\nconst PASS = .*?\n)?const ECI = .*?\nconst (ECI_HUMAN = .*?, )?ECI_LOW = .*?\n)?', lambda m: block, js, flags=re.S)
 assert n == 1, 'RUNS block not found'
 open(js_path, 'w', encoding='utf-8').write(js)
