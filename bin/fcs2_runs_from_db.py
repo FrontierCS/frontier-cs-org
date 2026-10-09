@@ -10,7 +10,7 @@ Tasks are matched to the paper's task list by display name (TASK below): the dom
 task's folder under tasks/frontier-cs-2.0-demo/problems/ in FrontierCS-2.0-Preview, and the
 short name is the paper's name for the task, or the database name when the paper list has none.
 
-FrontierCS ECI, the leaderboard's main number, is fitted with Epoch AI's own ECI code (bin/eci_fitting.py, vendored
+FECI, the leaderboard's main number, is fitted with Epoch AI's own ECI code (bin/eci_fitting.py, vendored
 from epoch-research/eci-public): every task is one benchmark with score/100 = sigmoid(slope_t * (capability_m - difficulty_t)),
 fitted by bounded least squares with Epoch's defaults (L2 penalty 0.1 over the parameter count, scores clipped to [0.001, 0.999]).
 Epoch pins one benchmark's slope to 1; here that is the task with the most observations (ties: first by name).
@@ -28,7 +28,7 @@ if it has none yet; once B passes the run's end, its hidden final
 score. Dev scores are calibrated to the hidden suite per task: hidden - dev of the final patch, averaged over the
 task's runs with 1 pseudo-run of the global average (leave-one-out RMSE 5.4 points, against 8.6 uncalibrated).
 ECI(model, B) keeps every task's curve from the leaderboard fit and solves one capability per (model, budget) by
-least squares, so it is on the FrontierCS ECI scale and equals the leaderboard value at full budget. Its 90% interval
+least squares, so it is on the FECI scale and equals the leaderboard value at full budget. Its 90% interval
 resamples the model's tasks (SCALE_BOOT draws, task curves held fixed).
 
 Pass rate is the share of scored runs whose verdict is PASS: the final submission meets the task's
@@ -256,13 +256,13 @@ block = (f'// One entry per scored run in the preview results database of {when:
          f'const RUNS = {json.dumps(runs, ensure_ascii=False)}.map(([m, d, t, s, p]) => ({{m, d, t, s, p}}));\n'
          'const MODELS = [\n' + ''.join(f"  {{id:'{i}', name:'{n}', short:'{s}', h:'{h}', lab:'{l}'}},\n" for i, n, s, h, l in models) + '];\n'
          f"const UPDATED = '{when:%B} {when.day}, {when.year}';\n"
-         f"// FrontierCS ECI per model: [point, 90% low, 90% high, tasks]; Human (the authors' reference) is {HUMAN_VALUE:g} and {LOW_ANCHOR} is {LOW_VALUE:g} ({nboot} bootstrap draws kept, {nbad} dropped with the anchors inverted; pinned slope: {pinned}).\n"
+         f"// FECI per model: [point, 90% low, 90% high, tasks]; Human (the authors' reference) is {HUMAN_VALUE:g} and {LOW_ANCHOR} is {LOW_VALUE:g} ({nboot} bootstrap draws kept, {nbad} dropped with the anchors inverted; pinned slope: {pinned}).\n"
          f"// Pass rate per model: [percent, runs that pass, runs].\nconst PASS = {json.dumps(pass_rate(runs))};\n"
          f"const ECI = {json.dumps(eci_js)};\nconst ECI_HUMAN = {HUMAN_VALUE:g}, ECI_LOW = '{MODEL[LOW_ANCHOR][0]}', ECI_LOW_NAME = '{MODEL[LOW_ANCHOR][1]}', ECI_LOW_VALUE = {LOW_VALUE:g}, ECI_REF_TASKS = {E['reference'][3]};\n"
          f"// Test-time scaling per model: [US$ budget per run, ECI, 90% low, 90% high, share of runs still going] (see the converter's docstring).\nconst SCALE = {json.dumps(SC, separators=(',', ':'))};\n"
          f"// Cost per model: [mean US$ per scored run, runs]; output tokens x output price + every token x cache-read price (PRICE above).\nconst COST = {json.dumps(CO)};\nconst PRICE = {json.dumps(PRICE)};\n")
 js = open(js_path, encoding='utf-8').read()   # read late: the fits above take minutes
-js, n = re.subn(r'// One entry per .*?\nconst MODELS = \[\n.*?\];\n(const UPDATED = .*?\n)?(// (FrontierCS )?ECI per model.*?\n(// Pass rate.*?\nconst PASS = .*?\n)?const ECI = .*?\nconst (ECI_HUMAN = .*?, )?ECI_LOW = .*?\n(// Test-time scaling.*?\nconst SCALE = .*?\n((// Tokens|// Cost) per model.*?\nconst (TOK|COST) = .*?\n(const PRICE = .*?\n)?)?)?)?', lambda m: block, js, flags=re.S)
+js, n = re.subn(r'// One entry per .*?\nconst MODELS = \[\n.*?\];\n(const UPDATED = .*?\n)?(// (FrontierCS |F)?ECI per model.*?\n(// Pass rate.*?\nconst PASS = .*?\n)?const ECI = .*?\nconst (ECI_HUMAN = .*?, )?ECI_LOW = .*?\n(// Test-time scaling.*?\nconst SCALE = .*?\n((// Tokens|// Cost) per model.*?\nconst (TOK|COST) = .*?\n(const PRICE = .*?\n)?)?)?)?', lambda m: block, js, flags=re.S)
 assert n == 1, 'RUNS block not found'
 open(js_path, 'w', encoding='utf-8').write(js)
 print('PASS', pass_rate(runs))

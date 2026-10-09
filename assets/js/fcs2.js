@@ -29,7 +29,7 @@ const MODELS = [
   {id:'glm', name:'GLM 5.3', short:'GLM 5.3', h:'ZCode', lab:'Z.ai'},
 ];
 const UPDATED = 'October 8, 2026';
-// FrontierCS ECI per model: [point, 90% low, 90% high, tasks]; Human (the authors' reference) is 60 and Kimi K2.7 Code is 0 (494 bootstrap draws kept, 6 dropped with the anchors inverted; pinned slope: Adaptive Robustness Evaluation for Prompt-Injection Defense).
+// FECI per model: [point, 90% low, 90% high, tasks]; Human (the authors' reference) is 60 and Kimi K2.7 Code is 0 (494 bootstrap draws kept, 6 dropped with the anchors inverted; pinned slope: Adaptive Robustness Evaluation for Prompt-Injection Defense).
 // Pass rate per model: [percent, runs that pass, runs].
 const PASS = {"astra": [66.7, 20, 30], "ds": [46.7, 14, 30], "glm": [35.0, 14, 40], "k3": [35.0, 14, 40], "muse": [37.5, 15, 40], "qwen": [36.8, 7, 19], "sol": [46.9, 30, 64]};
 const ECI = {"astra": [84.3, 73.0, 148.9, 30], "sol": [80.5, 66.2, 133.5, 40], "muse": [53.7, 44.0, 91.4, 40], "k3": [54.5, 46.5, 96.6, 40], "qwen": [51.4, 36.4, 89.1, 19], "ds": [62.0, 53.2, 107.6, 30], "glm": [62.8, 45.8, 105.0, 40]};
@@ -53,7 +53,7 @@ const sv = (tag, a = {}, text) => { const e = document.createElementNS(NS, tag);
   for (const k in a) if (a[k] != null) { if (tag === 'text' && /^(fill|font-size|font-weight)$/.test(k)) e.style.setProperty(k, k === 'font-size' ? a[k] + 'px' : a[k]); else e.setAttribute(k, a[k]); }
   if (text != null) e.textContent = text; return e; };
 const MCOL = Object.fromEntries(MODELS.map(m => [m.id, `var(--m-${m.id})`]));
-// Models ranked by FrontierCS ECI, the leaderboard's main number (bin/fcs2_runs_from_db.py fits it).
+// Models ranked by FECI, the leaderboard's main number (bin/fcs2_runs_from_db.py fits it).
 const RANKED = [...MODELS].sort((a, b) => ECI[b.id][0] - ECI[a.id][0]);
 const NTASK = rs => new Set(rs.map(r => r.t)).size;
 /* numbers in the page text come from the data, so they cannot drift from the chart */
@@ -127,7 +127,7 @@ function drawPassCost() {
 }
 $('#pclegend').innerHTML = [...MODELS].sort((a, b) => PASS[b.id][0] - PASS[a.id][0]).map(m => `<span><i style="background:${MCOL[m.id]}"></i>${esc(m.name)}</span>`).join('');
 
-/* FrontierCS ECI: one row per model ranked by ECI, its 90% interval as a bar. */
+/* FECI: one row per model ranked by ECI, its 90% interval as a bar. */
 function drawECI() {
   const order = [...MODELS].sort((a, b) => ECI[b.id][0] - ECI[a.id][0]);
   const svg = $('#ecisvg'), W = Math.max(300, $('#eciplot').clientWidth), narrow = W < 560;
@@ -140,7 +140,7 @@ function drawECI() {
     svg.append(sv('line', {x1:X(v), x2:X(v), y1:T, y2:H - B + 6, stroke:'var(--grid)', 'stroke-width':1}));
     svg.append(sv('text', {x:X(v), y:H - B + 22, 'text-anchor':'middle'}, v));
   }
-  svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'FrontierCS ECI'));
+  svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'FECI'));
   const pts = [];
   order.forEach((m, i) => {
     const [e, lo, hi] = ECI[m.id], y0 = T + i * lane, yc = y0 + lane / 2;
@@ -151,7 +151,7 @@ function drawECI() {
     svg.append(sv('circle', {cx:X(e), cy:yc, r:7, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':2}));
     svg.append(sv('text', {class:'val halo', x:X(e), y:yc - 13, fill:MCOL[m.id], 'text-anchor':'middle'}, String(Math.round(e))));
     const mine = RUNS.filter(r => r.m === m.id);
-    pts.push({x:X(e), y:yc, mean:true, html:`<b>${esc(m.name)}</b><br>FrontierCS ECI <b>${f1(e)}</b><br>90% interval ${Math.round(lo)}–${Math.round(hi)}<br>${mine.length} runs on ${NTASK(mine)} tasks`});
+    pts.push({x:X(e), y:yc, mean:true, html:`<b>${esc(m.name)}</b><br>FECI <b>${f1(e)}</b><br>90% interval ${Math.round(lo)}–${Math.round(hi)}<br>${mine.length} runs on ${NTASK(mine)} tasks`});
   });
   attachTip(svg, W, H, pts, $('#ecitip'));
 }
@@ -165,7 +165,7 @@ function attachTip(svg, W, H, pts, tip = $('#lbtip')) {
   svg.onpointerleave = () => { if (!isTouch) tip.hidden = true; };
 }
 
-/* Test-time scaling: FrontierCS ECI when every run stops at a US$ budget (SCALE, from bin/fcs2_runs_from_db.py).
+/* Test-time scaling: FECI when every run stops at a US$ budget (SCALE, from bin/fcs2_runs_from_db.py).
    Values below 0 leave the plot through its bottom edge. */
 const usdfmt = v => v >= 1 ? `$${+v.toPrecision(2)}` : `$${+v.toPrecision(1)}`;
 function drawTTS() {
@@ -197,7 +197,7 @@ function drawTTS() {
     g.append(sv('path', {d:path, fill:'none', stroke:MCOL[m.id], 'stroke-width':2.2, 'stroke-linejoin':'round'}));
     const e = c[c.length - 1];
     g.append(sv('circle', {cx:X(e[0]), cy:Y(e[1]), r:4.5, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':1.5}));
-    c.forEach(p => { if (p[1] >= 0) pts.push({x:X(p[0]), y:Y(p[1]), html:`<b>${esc(m.name)}</b><br>FrontierCS ECI <b>${f1(p[1])}</b> at ${usdfmt(p[0])} per run`
+    c.forEach(p => { if (p[1] >= 0) pts.push({x:X(p[0]), y:Y(p[1]), html:`<b>${esc(m.name)}</b><br>FECI <b>${f1(p[1])}</b> at ${usdfmt(p[0])} per run`
       + `<br>90% interval ${Math.round(Math.max(p[2], 0))}–${Math.round(p[3])}<br>${Math.round(p[4] * 100)}% of runs still going`}); });
   });
   attachTip(svg, W, H, pts, $('#ttstip'));

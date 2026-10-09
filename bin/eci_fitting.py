@@ -1,5 +1,5 @@
 # Vendored verbatim from https://github.com/epoch-research/eci-public (src/eci/fitting.py, commit e937446).
-# Used by bin/fcs2_runs_from_db.py for FrontierCS ECI. Do not edit; copy again to update.
+# Used by bin/fcs2_runs_from_db.py for FECI. Do not edit; copy again to update.
 #
 # MIT License
 #
