@@ -29,11 +29,11 @@ const MODELS = [
   {id:'glm', name:'GLM 5.3', short:'GLM 5.3', h:'ZCode', lab:'Z.ai'},
 ];
 const UPDATED = 'October 8, 2026';
-// FrontierCS ECI per model: [point, 90% low, 90% high, tasks]; Human (the authors' reference) is 60 and Kimi K2.7 Code is 0 (300 task resamples).
+// FrontierCS ECI per model: [point, 90% low, 90% high, tasks]; Human (the authors' reference) is 25 and Kimi K2.7 Code is 0 (300 task resamples).
 // Pass rate per model: [percent, runs that pass, runs].
 const PASS = {"astra": [66.7, 20, 30], "ds": [46.7, 14, 30], "glm": [35.0, 14, 40], "k3": [35.0, 14, 40], "muse": [37.5, 15, 40], "qwen": [36.8, 7, 19], "sol": [46.9, 30, 64]};
-const ECI = {"astra": [82.0, 71.3, 115.7, 30], "sol": [79.2, 64.3, 108.0, 40], "muse": [56.2, 49.4, 78.0, 40], "k3": [56.4, 50.3, 84.2, 40], "qwen": [55.2, 45.2, 80.5, 19], "ds": [60.3, 59.9, 87.8, 30], "glm": [61.1, 50.6, 83.2, 40]};
-const ECI_HUMAN = 60, ECI_LOW = 'k27', ECI_LOW_NAME = 'Kimi K2.7 Code', ECI_LOW_VALUE = 0, ECI_REF_TASKS = 38;
+const ECI = {"astra": [34.2, 29.7, 48.2, 30], "sol": [33.0, 26.8, 45.0, 40], "muse": [23.4, 20.6, 32.5, 40], "k3": [23.5, 21.0, 35.1, 40], "qwen": [23.0, 18.8, 33.5, 19], "ds": [25.1, 24.9, 36.6, 30], "glm": [25.5, 21.1, 34.7, 40]};
+const ECI_HUMAN = 25, ECI_LOW = 'k27', ECI_LOW_NAME = 'Kimi K2.7 Code', ECI_LOW_VALUE = 0, ECI_REF_TASKS = 38;
 const RAN = new Set(RUNS.map(r => r.t));
 const mean = a => a.reduce((x, y) => x + y, 0) / a.length;
 const f1 = x => x.toFixed(1);
@@ -153,7 +153,7 @@ $('#custom').addEventListener('click', () => { const s = $('#settings'); const o
 $('#lblegend').innerHTML = RANKED.map(m => `<span><i style="background:${MCOL[m.id]}"></i>${esc(m.name)}</span>`).join('');
 
 /* FrontierCS ECI and pass-rate views: one row per model ranked by the metric.
-   ECI also draws its 90% interval as a bar and Human (the authors' reference code) as a dashed line at ECI_HUMAN. */
+   ECI also draws its 90% interval as a bar. */
 const RANKVIEW = {
   eci:  {data:ECI, title:'FrontierCS ECI, a capabilities index', axis:'FrontierCS ECI', fmt:v => String(Math.round(v)),
          note:`Preliminary · Human = ${ECI_HUMAN} (the authors’ reference code), ${ECI_LOW_NAME} = ${ECI_LOW_VALUE} (in the fit, not shown) · bars are 90% intervals`},
@@ -173,10 +173,6 @@ function drawRanked(kind) {
   for (let v = 0; v <= xmax; v += step) {
     svg.append(sv('line', {x1:X(v), x2:X(v), y1:T, y2:H - B + 6, stroke:'var(--grid)', 'stroke-width':1}));
     svg.append(sv('text', {x:X(v), y:H - B + 22, 'text-anchor':'middle'}, v));
-  }
-  if (kind === 'eci') {
-    svg.append(sv('line', {x1:X(ECI_HUMAN), x2:X(ECI_HUMAN), y1:T - 6, y2:H - B + 6, stroke:'var(--ink-2)', 'stroke-width':1.2, 'stroke-dasharray':'4 4'}));
-    svg.append(sv('text', {x:X(ECI_HUMAN) + (narrow ? -6 : 6), y:T - 12, 'text-anchor': narrow ? 'end' : 'start', 'font-size':12.5}, `Human = ${ECI_HUMAN}`));
   }
   svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, V.axis));
   const pts = [];

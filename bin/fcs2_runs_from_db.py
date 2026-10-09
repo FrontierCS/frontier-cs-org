@@ -84,7 +84,7 @@ MODEL = {
     'GLM 5.3 (ZCode)': ('glm', 'GLM 5.3', 'GLM 5.3', 'ZCode', 'Z.ai'),
 }
 
-HUMAN_VALUE = 60                               # owner's choice, 2026-10-09 (was 100; K2.7 was 20)
+HUMAN_VALUE = 25                               # owner's choice, 2026-10-09 (was 100, then 60; K2.7 was 20)
 HIDDEN = {'Kimi K2.7 Code'}                    # owner's call, 2026-10-09: off the leaderboard, kept in the ECI fit as its 0 point
 LOW_ANCHOR, LOW_VALUE = 'Kimi K2.7 Code', 0   # Kimi K3 = 20 is degenerate on the 2026-10-08 data: K3 scores level with the reference
 for a in sys.argv[2:]:   # optional: --low='Model name=value' to try another anchor
