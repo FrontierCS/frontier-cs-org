@@ -16,6 +16,9 @@ Respondents are the models (mean score over their runs on a task) and the author
 (median reference_score over the task's runs; references of 0 mean the task has none and are left out).
 theta is mapped linearly so that Human (the authors' reference) is 100 and LOW_ANCHOR is LOW_VALUE. The 90% interval comes from
 resampling tasks with replacement (300 draws, fixed seeds), so the output is reproducible.
+
+Pass rate is the share of scored runs whose verdict is PASS: the final submission meets the task's
+beat-the-reference criteria on every workload. Its 90% interval also comes from resampling tasks.
 """
 import json, re, sqlite3, sys
 from collections import Counter, defaultdict
@@ -130,19 +133,33 @@ def eci(rows):
 
 db = sqlite3.connect(sys.argv[1])
 generated = db.execute('select generated_at from release').fetchone()[0]
-rows = db.execute('''select c.name, t.name, r.display_score, r.state from cells ce
+rows = db.execute('''select c.name, t.name, r.display_score, r.state, r.display_verdict from cells ce
   join runs r on r.id = ce.run_id join candidates c on c.id = ce.candidate_id join tasks t on t.id = ce.task_id
   order by c.ordinal, t.ordinal''').fetchall()
-missing = {t for _, t, _, _ in rows} - set(TASK)
+missing = {r[1] for r in rows} - set(TASK)
 assert not missing, f'unmapped tasks: {missing}'
 assert not {c for c, *_ in rows} - set(MODEL), 'unmapped model'
 
 runs = []
-for cand, task, score, state in rows:
+for cand, task, score, state, verdict in rows:
     if score is None: continue
     folder, short = TASK[task]
-    runs.append([MODEL[cand][0], SHOWN.get(folder, folder), short or task.split(' — ')[0], round(score, 2)])
-dropped = Counter(state for _, _, s, state in rows if s is None)
+    runs.append([MODEL[cand][0], SHOWN.get(folder, folder), short or task.split(' — ')[0], round(score, 2), int(verdict == 'PASS')])
+dropped = Counter(r[3] for r in rows if r[2] is None)
+
+
+def pass_rate(runs):
+    """Per model: [percent PASS, 90% low, 90% high, runs]; the interval comes from resampling tasks (fixed seed)."""
+    by = defaultdict(list)
+    for m, _, t, _, p in runs: by[(m, t)].append(p)
+    rng, out = np.random.default_rng(2), {}
+    for m in sorted({r[0] for r in runs}):
+        mine = sorted(t for mm, t in by if mm == m)
+        allp = [p for t in mine for p in by[(m, t)]]
+        boot = [100 * np.mean([p for t in rng.choice(mine, len(mine)) for p in by[(m, t)]]) for _ in range(2000)]
+        lo, hi = np.percentile(boot, [5, 95])
+        out[m] = [round(100 * float(np.mean(allp)), 1), round(float(lo), 1), round(float(hi), 1), len(allp)]
+    return out
 
 js_path = 'assets/js/fcs2.js'
 js = open(js_path, encoding='utf-8').read()
@@ -152,14 +169,16 @@ E, nboot = eci(db.execute('''select c.name, t.name, r.display_score, r.feedback_
   join runs r on r.id = ce.run_id join candidates c on c.id = ce.candidate_id join tasks t on t.id = ce.task_id''').fetchall())
 eci_js = {MODEL[c][0]: list(E[c]) for c in MODEL}
 block = (f'// One entry per scored run in the preview results database of {when:%Y-%m-%d} (bin/fcs2_runs_from_db.py):\n'
-         f'// model, domain, task, final score (0-100, the task\'s own scale). Timeouts score 0; {sum(dropped.values())} unscored runs are left out.\n'
-         f'const RUNS = {json.dumps(runs, ensure_ascii=False)}.map(([m, d, t, s]) => ({{m, d, t, s}}));\n'
+         f'// model, domain, task, final score (0-100, the task\'s own scale), passed (1 = beats the reference). Timeouts score 0; {sum(dropped.values())} unscored runs are left out.\n'
+         f'const RUNS = {json.dumps(runs, ensure_ascii=False)}.map(([m, d, t, s, p]) => ({{m, d, t, s, p}}));\n'
          'const MODELS = [\n' + ''.join(f"  {{id:'{i}', name:'{n}', short:'{s}', h:'{h}', lab:'{l}'}},\n" for i, n, s, h, l in models) + '];\n'
          f"const UPDATED = '{when:%B} {when.day}, {when.year}';\n"
          f"// ECI per model: [point, 90% low, 90% high, tasks]; Human (the authors' reference) is 100 and {LOW_ANCHOR} is {LOW_VALUE:g} ({nboot} task resamples).\n"
+         f"// Pass rate per model: [percent, 90% low, 90% high, runs].\nconst PASS = {json.dumps(pass_rate(runs))};\n"
          f"const ECI = {json.dumps(eci_js)};\nconst ECI_LOW = '{MODEL[LOW_ANCHOR][0]}', ECI_REF_TASKS = {E['reference'][3]};\n")
-js, n = re.subn(r'// One entry per .*?\nconst MODELS = \[\n.*?\];\n(const UPDATED = .*?\n)?(// ECI per model.*?\nconst ECI = .*?\nconst ECI_LOW = .*?\n)?', lambda m: block, js, flags=re.S)
+js, n = re.subn(r'// One entry per .*?\nconst MODELS = \[\n.*?\];\n(const UPDATED = .*?\n)?(// ECI per model.*?\n(// Pass rate.*?\nconst PASS = .*?\n)?const ECI = .*?\nconst ECI_LOW = .*?\n)?', lambda m: block, js, flags=re.S)
 assert n == 1, 'RUNS block not found'
 open(js_path, 'w', encoding='utf-8').write(js)
+print('PASS', pass_rate(runs))
 print('ECI', eci_js, 'reference tasks', E['reference'][3])
 print(f'{len(runs)} runs, {len({r[2] for r in runs})} tasks, {len(models)} models; dropped {dict(dropped)}; generated {generated}')
