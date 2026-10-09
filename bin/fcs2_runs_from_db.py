@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Rewrite the FrontierCS 2 leaderboard data in assets/js/fcs2.js from a preview-result sqlite.db.
+"""Rewrite the FrontierCS 2 data block in assets/js/fcs2-data.js from a preview-result sqlite.db.
+
+The block sits between the BEGIN/END converter markers; the rest of the file (task list, helpers) is hand-written.
+Task descriptions come from bin/fcs2_descriptions.tsv, a copy of the paper repo's notes/descriptions_{a,b,c}.tsv.
 
 usage: python3 bin/fcs2_runs_from_db.py path/to/sqlite.db [--json=out.json]   (needs numpy, scipy, pandas, tqdm)
 --json also writes every number the page shows, for the paper's figures.
@@ -148,11 +151,11 @@ def eci(rows):
 
 SCALE_BOOT, SCALE_POINTS = 100, 32
 
-# US$ per million tokens, list prices found 2026-10-09: (output, cache read; the input price where no cache price is listed).
+# US$ per million tokens, list prices found 2026-10-09: (output, cache read).
 # DeepSeek is its off-peak rate (peak hours double it). Sources: eesel.ai and yottalabs.ai (GPT-6 Astra, GPT-6.1 Sol, Kimi K3,
-# DeepSeek), anotherwrapper.com and QwenCloud (Qwen implicit cache), pricepertoken.com (GLM), anotherwrapper.com (Muse, no cache price).
+# DeepSeek), anotherwrapper.com and QwenCloud (Qwen implicit cache), pricepertoken.com (GLM), anotherwrapper.com (Muse output). Muse lists no cache price; its cache read is the $0.15 that the preview's LiteLLM gateway charged (owner, 2026-10-09).
 PRICE = {'astra': (50.00, 1.00), 'sol': (10.00, 0.10), 'k3': (15.00, 0.30), 'qwen': (6.00, 0.25),
-         'ds': (0.60, 0.003), 'glm': (4.40, 0.26), 'muse': (4.25, 1.25)}
+         'ds': (0.60, 0.003), 'glm': (4.40, 0.26), 'muse': (4.25, 0.15)}
 
 
 def usd(m, total, output):
@@ -236,6 +239,44 @@ for cand, task, score, state, verdict in rows:
 dropped = Counter(r[3] for r in rows if r[2] is None and r[0] not in HIDDEN)
 
 
+def trajectories(db):
+    """One entry per scored run, for the overview's run curve and the task pages:
+    [model id, task short name, final score, passed, US$ at the run's end, hours, [[US$ spent, dev score], ...]].
+    Each point is a development submission in order; its spend is usd() at that submission; failed ones score 0."""
+    pts = {(r, sid): (sc, tt, ot) for r, sid, sc, tt, ot in db.execute('select run_id, submission_id, score, total_tokens, output_tokens from score_points')}
+    subs = defaultdict(list)
+    for r, sid, kind in db.execute('select run_id, id, kind from submissions order by run_id, ordinal'): subs[r].append((sid, kind))
+    out = []
+    for r, c, t, s, v, el in db.execute('''select r.id, cd.name, t.name, r.display_score, r.display_verdict, r.elapsed_seconds from cells ce join runs r on r.id = ce.run_id
+        join candidates cd on cd.id = ce.candidate_id join tasks t on t.id = ce.task_id order by r.id'''):
+        if s is None or c in HIDDEN: continue
+        m = MODEL[c][0]
+        seq = [[round(usd(m, pts[(r, sid)][1], pts[(r, sid)][2]), 4), round(pts[(r, sid)][0], 1)] for sid, kind in subs[r] if kind == 'train' and (r, sid) in pts]
+        end = max((usd(m, p[1], p[2]) for (rr, _), p in pts.items() if rr == r), default=0)
+        out.append([m, TASK[t][1] or t.split(' — ')[0], round(s, 1), int(v == 'PASS'), round(end, 4), round((el or 0) / 3600, 2), seq])
+    return out
+
+
+def task_facts(db, curves):
+    """Per task short name: the authors' reference score (median reference_score over its runs, left out when 0) and the
+    task's FECI curve from the leaderboard fit, [difficulty, slope]: expected score = 100 / (1 + exp(-slope (FECI - difficulty)))."""
+    ref = defaultdict(list)
+    for t, fj in db.execute('select t.name, r.feedback_json from cells ce join runs r on r.id = ce.run_id join tasks t on t.id = ce.task_id'):
+        f = json.loads(fj) if fj else {}
+        if f.get('reference_score') is not None: ref[TASK[t][1] or t.split(' — ')[0]].append(f['reference_score'])
+    REF = {t: round(float(np.median(v)), 1) for t, v in sorted(ref.items()) if np.median(v) > 0}
+    FIT = {TASK[b][1] or b.split(' — ')[0]: [round(float(e), 2), round(float(k), 4)]
+           for b, e, k in zip(curves['benchmark'], curves['edi'], curves['discriminability_scaled'])}
+    return REF, dict(sorted(FIT.items()))
+
+
+def descriptions():
+    """Task short name -> description, from bin/fcs2_descriptions.tsv (tab-separated: short, description)."""
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fcs2_descriptions.tsv')
+    rows = [l.rstrip('\n').split('\t') for l in open(path, encoding='utf-8')][1:]
+    return {r[0]: r[1] for r in rows if len(r) == 2}
+
+
 def pass_rate(runs):
     """Per model: [percent PASS, runs that pass, runs]."""
     out = {}
@@ -244,12 +285,13 @@ def pass_rate(runs):
         out[m] = [round(100 * sum(p) / len(p), 1), sum(p), len(p)]
     return out
 
-js_path = 'assets/js/fcs2.js'
+js_path = 'assets/js/fcs2-data.js'
 when = datetime.fromisoformat(generated[:19])
 models = [MODEL[c] for c in MODEL if c not in HIDDEN]
 E, nboot, nbad, pinned, curves = eci(db.execute('''select c.name, t.name, r.display_score, r.feedback_json from cells ce
   join runs r on r.id = ce.run_id join candidates c on c.id = ce.candidate_id join tasks t on t.id = ce.task_id''').fetchall())
 SC, CO = scaling(db, curves), cost(db)
+REF, TFIT = task_facts(db, curves)
 eci_js = {MODEL[c][0]: list(E[c]) for c in MODEL if c not in HIDDEN}
 block = (f'// One entry per scored run in the preview results database of {when:%Y-%m-%d} (bin/fcs2_runs_from_db.py):\n'
          f'// model, domain, task, final score (0-100, the task\'s own scale), passed (1 = verdict PASS). Timeouts score 0; {sum(dropped.values())} unscored runs are left out' + ''.join(f'; {c} is left out (only the ECI 0 point)' for c in sorted(HIDDEN)) + '.\n'
@@ -260,10 +302,14 @@ block = (f'// One entry per scored run in the preview results database of {when:
          f"// Pass rate per model: [percent, runs that pass, runs].\nconst PASS = {json.dumps(pass_rate(runs))};\n"
          f"const ECI = {json.dumps(eci_js)};\nconst ECI_HUMAN = {HUMAN_VALUE:g}, ECI_LOW = '{MODEL[LOW_ANCHOR][0]}', ECI_LOW_NAME = '{MODEL[LOW_ANCHOR][1]}', ECI_LOW_VALUE = {LOW_VALUE:g}, ECI_REF_TASKS = {E['reference'][3]};\n"
          f"// Test-time scaling per model: [US$ budget per run, ECI, 90% low, 90% high, share of runs still going] (see the converter's docstring).\nconst SCALE = {json.dumps(SC, separators=(',', ':'))};\n"
-         f"// Cost per model: [mean US$ per scored run, runs]; output tokens x output price + every token x cache-read price (PRICE above).\nconst COST = {json.dumps(CO)};\nconst PRICE = {json.dumps(PRICE)};\n")
+         f"// Cost per model: [mean US$ per scored run, runs]; output tokens x output price + every token x cache-read price (PRICE above).\nconst COST = {json.dumps(CO)};\nconst PRICE = {json.dumps(PRICE)};\n"
+         f"// Every scored run: [model, task, final score, passed, US$ at end, hours, [[US$, dev score] per development submission]].\nconst TRAJ = {json.dumps(trajectories(db), separators=(',', ':'), ensure_ascii=False)};\n"
+         f"// Per task: the authors' reference score, and its FECI curve [difficulty, slope] (score = 100 / (1 + exp(-slope (FECI - difficulty)))).\nconst REF = {json.dumps(REF, ensure_ascii=False)};\nconst TFIT = {json.dumps(TFIT, ensure_ascii=False)};\n"
+         f"// Task descriptions from the paper repo (bin/fcs2_descriptions.tsv).\nconst DESC = {json.dumps(descriptions(), ensure_ascii=False)};\n")
 js = open(js_path, encoding='utf-8').read()   # read late: the fits above take minutes
-js, n = re.subn(r'// One entry per .*?\nconst MODELS = \[\n.*?\];\n(const UPDATED = .*?\n)?(// (FrontierCS |F)?ECI per model.*?\n(// Pass rate.*?\nconst PASS = .*?\n)?const ECI = .*?\nconst (ECI_HUMAN = .*?, )?ECI_LOW = .*?\n(// Test-time scaling.*?\nconst SCALE = .*?\n((// Tokens|// Cost) per model.*?\nconst (TOK|COST) = .*?\n(const PRICE = .*?\n)?)?)?)?', lambda m: block, js, flags=re.S)
-assert n == 1, 'RUNS block not found'
+BEGIN, END = '// BEGIN converter block (bin/fcs2_runs_from_db.py writes everything up to END)\n', '// END converter block\n'
+assert js.count(BEGIN) == 1 and js.count(END) == 1, 'converter markers not found'
+js = js[:js.index(BEGIN) + len(BEGIN)] + block + js[js.index(END):]
 open(js_path, 'w', encoding='utf-8').write(js)
 print('PASS', pass_rate(runs))
 print('ECI', eci_js, 'reference tasks', E['reference'][3])

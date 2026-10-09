@@ -16,14 +16,32 @@ page_css: fcs2
   <h1>FrontierCS 2: A benchmark for agentic computer-science R&amp;D</h1>
   <p class="lead">Each task deletes a published paper’s contribution from the repository its authors released. The agent writes it back, and the authors’ own code is the reference it must beat.</p>
 
-  <div class="stats">
-    <article class="stat"><h3>Tasks</h3><div class="big"><b class="num">92</b><span>open-ended</span></div>
-      <p>90 start from a published paper. Structured LWE and Gigatoken have none.</p><a class="pill" href="#tasks">Browse tasks</a></article>
-    <article class="stat"><h3>Domains</h3><div class="big"><b class="num">13</b><span>areas of computer science</span></div>
-      <p>The largest are Machine Learning, with 22 tasks, and MLSys, with 17.</p><a class="pill" href="#domains">Results by domain</a></article>
-    <article class="stat"><h3>Runs</h3><div class="big"><b class="num" data-fill="runs">263</b><span data-fill="runtasks">on 42 tasks</span></div>
-      <p data-fill="models">7 models from 6 labs have run so far.</p><a class="pill" href="#leaderboard">Go to leaderboard</a></article>
+  <div class="links"><a class="pill lg" id="paperlink" aria-disabled="true">Paper (coming soon)</a></div>
+  <a id="taskbase" href="{{ '/task/' | relative_url }}" hidden></a>
+
+  <div class="example" id="example">
+    <div class="ex-task">
+      <div class="meta"><span class="tag" id="extag"></span><span class="exlab">Example run</span></div>
+      <h3 class="ex-name"><a id="exname" href="{{ '/task/' | relative_url }}"></a></h3>
+      <p class="ex-paper" id="expaper"></p>
+      <p class="ex-desc" id="exdesc"></p>
+      <figure class="chart ex-strip">
+        <div class="chead"><span>Final scores on this task</span><span class="r" id="exstriplab"></span></div>
+        <div class="plot" id="stripplot"><svg id="stripsvg" role="img" aria-label="Final score of every run on this task, and the authors’ code"></svg><div class="tip" id="striptip" hidden></div></div>
+      </figure>
+    </div>
+    <figure class="chart ex-run" id="runcurve">
+      <div class="chead"><span id="runhead">Development score against cost</span></div>
+      <div class="plot" id="runplot"><svg id="runsvg" role="img" aria-label="Development score against cost for one run"></svg><div class="tip" id="runtip" hidden></div></div>
+      <div class="cfoot"><span id="runnote"></span><button class="pill" type="button" id="runnext">Another run</button></div>
+    </figure>
   </div>
+
+  <figure class="chart" id="teaser">
+    <div class="chead"><span>Tasks</span><span class="r" id="tzhint">Select a domain to filter the list</span></div>
+    <div class="map" id="map"><svg id="mapsvg" aria-label="The 92 tasks by domain. Select a domain to filter the list."></svg><div class="tip" id="maptip" hidden></div></div>
+    <div class="areas" id="areas"></div>
+  </figure>
 </section>
 
 <section class="sec" id="leaderboard">
@@ -35,11 +53,11 @@ page_css: fcs2
     <div class="cfoot"><b>FRONTIERCS 2</b><span>Preliminary · a run passes when its final submission meets the task’s pass criteria on every workload · cost is estimated from tokens and list prices</span></div>
   </figure>
 
-  <div class="tbl-wrap" id="domains">
-    <h3>Pass rate by domain</h3>
+  <details class="tbl-wrap fold" id="domains">
+    <summary><h3>Pass rate by domain</h3></summary>
     <div class="res-scroll"><table class="res num" id="restbl"></table></div>
     <p class="cfoot" style="border-top:0; margin-top:10px; padding-top:0">Share of each model’s runs that pass. A dash means no run yet. Bold marks the best in a row.</p>
-  </div>
+  </details>
 
   <div class="tbl-wrap" id="meanscore">
     <h3>Mean score</h3>
@@ -86,11 +104,7 @@ page_css: fcs2
 </section>
 
 <section class="sec" id="tasks">
-  <div class="tz">
-    <div class="tz-head"><h2>Tasks</h2><span id="tzhint">Select a domain to filter the list</span></div>
-    <div class="map" id="map"><svg id="mapsvg" aria-label="The 92 tasks by domain. Select a domain to filter the list."></svg><div class="tip" id="maptip" hidden></div></div>
-    <div class="areas" id="areas"></div>
-  </div>
+  <h2>Tasks</h2>
   <div class="idx">
     <div class="filter" id="filter">
       <h3>Filter</h3>
@@ -118,15 +132,16 @@ page_css: fcs2
     <h2>Questions</h2>
     <div class="fqlist">
       <details id="q-built"><summary>How is a task built?</summary><div class="ans"><p>We delete a paper’s contribution from its own repository. The agent writes it back and is scored against the authors’ code.</p></div></details>
-      <details id="q-see"><summary>What does the agent see?</summary><div class="ans"><p>It sees its repository and, for each patch, a development score and one message. The evaluator, the hidden suite and the reference stay with the judge.</p></div></details>
+      <details id="q-see"><summary>What does the agent see?</summary><div class="ans"><p>It sees its repository and, for each patch, a development score and one message. The evaluator, the hidden suite and the reference stay with the judge. Each run has a wall-clock budget of 5 hours.</p></div></details>
       <details id="q-bar"><summary>What counts as a pass?</summary><div class="ans"><p>A run passes when its final submission meets the task’s pass criteria on every workload. The criteria are set from the reference’s own measurements. For SVG-EAR, its latency must be at most 0.96 of the reference’s, with PSNR, SSIM and LPIPS within fixed bands.</p></div></details>
       <details id="q-score"><summary>How are scores computed?</summary><div class="ans"><p>The leaderboard’s main number is pass rate, the share of runs that pass by the criteria above. Each task’s evaluator also scores the final submission on the hidden suite, from 0 to 100, and a run that times out scores 0. The mean score chart averages these scores. FECI, the FrontierCS Epoch Capabilities Index, is fitted with Epoch AI’s own ECI code. It fits one logistic curve per task to every model’s score and to the human reference, the authors’ own code, then scales the result so Human is 60 and Kimi K2.7 Code is 0. Kimi K2.7 Code takes part in the fit as this 0 point but is not on the leaderboard. Above 60 means above the authors’ code on each task’s own scale. FECI’s bars are 90% intervals from Epoch’s bootstrap, which resamples each model’s task results. Costs are estimates; “How is cost estimated?” below gives the method. The results are preliminary: <span data-fill="summary">263 runs on 42 tasks by 7 models</span>.</p></div></details>
       <details id="q-scaling"><summary>How is test-time scaling computed?</summary><div class="ans"><p>The agent submits many times during a run, and each submission is scored on the task’s development workloads. At a cost budget, a run counts its latest valid submission within that budget, the latest whose development score is above 0, or a score of 0 if it has none yet. One submission in ten scores 0, mostly from a failed build, validation or correctness gate, and agents usually recover from it; counting such a failure as the run’s result would score an experiment instead of the agent’s working code. Taking the best submission so far instead would choose with hindsight, and agents keep their best development submission as the final one in only 72% of runs. Development scores run above hidden-suite scores, so we shift them by each task’s average gap between the final submission’s development and hidden scores. This leaves an error of 5.5 points per run, against 8.9 without the shift. Once the budget covers a whole run, its hidden final score counts, so every curve ends at the model’s leaderboard value. The budget is the estimated cost, as the next answer explains.</p></div></details>
-      <details id="q-cost"><summary>How is cost estimated?</summary><div class="ans"><p>The results record tokens, not dollars. We price a run’s output tokens at the model’s output price and every token it used at the cache-read price, as if all input were a cache hit; Muse Spark 1.3 lists no cache price, so its input price stands in. Prices are list prices in US$ per million tokens, found on October 9, 2026, output and then cache read: GPT-6 Astra 50 and 1.00, GPT-6.1 Sol 10 and 0.10, Kimi K3 15 and 0.30, Qwen 3.8 Max 6 and 0.25, DeepSeek V4.1 Flash 0.60 and 0.003 (off-peak), GLM 5.3 4.40 and 0.26, Muse Spark 1.3 4.25 and 1.25 (input). Each agent tool counts tokens its own way, so costs compare orders of magnitude better than small gaps.</p></div></details>
+      <details id="q-cost"><summary>How is cost estimated?</summary><div class="ans"><p>The results record tokens, not dollars. We price a run’s output tokens at the model’s output price and every token it used at the cache-read price, as if all input were a cache hit. Muse Spark 1.3 lists no cache price, so we use the cache-read price its model gateway charged. Prices are list prices in US$ per million tokens, found on October 9, 2026, output and then cache read: GPT-6 Astra 50 and 1.00, GPT-6.1 Sol 10 and 0.10, Kimi K3 15 and 0.30, Qwen 3.8 Max 6 and 0.25, DeepSeek V4.1 Flash 0.60 and 0.003 (off-peak), GLM 5.3 4.40 and 0.26, Muse Spark 1.3 4.25 and 0.15 (gateway). Each agent tool counts tokens its own way, so costs compare orders of magnitude better than small gaps.</p></div></details>
       <details id="q-run"><summary>Can I run it?</summary><div class="ans"><p>We will release the tasks, evaluators and judge as one evaluation environment.</p></div></details>
     </div>
   </div>
 </section>
 </div>
 </div>
+<script defer src="{{ '/assets/js/fcs2-data.js' | relative_url }}"></script>
 <script defer src="{{ '/assets/js/fcs2.js' | relative_url }}"></script>
