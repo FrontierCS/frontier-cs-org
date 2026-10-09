@@ -159,7 +159,7 @@ const RANKVIEW = {
   eci:  {data:ECI, title:'FrontierCS ECI, a capabilities index', axis:'FrontierCS ECI', fmt:v => String(Math.round(v)),
          note:`Preliminary · Human = ${ECI_HUMAN} (the authors’ reference code), Kimi K2.7 Code = ${ECI[ECI_LOW][0]} · bars are 90% intervals`},
   pass: {data:PASS, title:'Pass rate, share of runs that beat the authors’ code', axis:'Pass rate (%)', fmt:v => Math.round(v) + '%', max:100,
-         note:'Preliminary · a run passes when its final submission beats the authors’ code on every workload · each model ran its own set of tasks'},
+         note:'Preliminary · a run passes when its final submission beats the authors’ code on every workload'},
 };
 function drawRanked(kind) {
   const V = RANKVIEW[kind], D = V.data;
@@ -211,7 +211,7 @@ function attachTip(svg, W, H, pts) {
 function drawLB() {
   if (metric !== 'score') return drawRanked(metric);
   $('#ylab').textContent = 'Final score, mean over runs';
-  $('#lbnote').textContent = 'Preliminary · scores on each task’s own 0–100 scale · each model ran its own set of tasks';
+  $('#lbnote').textContent = 'Preliminary · scores on each task’s own 0–100 scale';
   const runs = RUNS.filter(r => dom === 'All' || r.d === dom);
   $('#nres').textContent = `${runs.length} run${runs.length === 1 ? '' : 's'}`;
   let rows;
@@ -291,7 +291,7 @@ function drawTable() {
   };
   $('#restbl').innerHTML = head + DOMS_WITH_RUNS.map(d => line(d)).join('') + line('All', 'all');
   $('#tblnote').textContent = (metric === 'score' ? 'Mean final score over each model’s runs.' : 'Share of each model’s runs that beat the authors’ code.')
-    + ' Each model ran its own set of tasks. A dash means no run yet. Bold marks the best in a row.';
+    + ' A dash means no run yet. Bold marks the best in a row.';
 }
 
 /* ---------- case studies: one chart per run, in the grammar of Epoch's data insights ---------- */
