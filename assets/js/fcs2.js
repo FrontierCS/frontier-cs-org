@@ -141,10 +141,20 @@ $('#ttslegend').innerHTML = RANKED.map(m => `<span><i style="background:${MCOL[m
 
 /* Overview: an example run, rotating. Left, its task: domain, name (a link to the task page), paper, description, and
    every run's final score on the task against the authors' code. Right, the run's development score against what it had
-   spent at each submission. Runs come from RUNPOOL: tasks with a description, runs with at least 4 development
-   submissions whose score moves by 10 points or more. A new run every 9 s; hovering or focusing the block pauses it,
-   and reduced motion turns the rotation off. */
-const RUNPOOL = TRAJ.filter(r => DESC[r[1]] && r[6].length >= 4 && Math.max(...r[6].map(p => p[1])) - Math.min(...r[6].map(p => p[1])) >= 10);
+   spent at each submission. A new run every 9 s; hovering or focusing the block pauses it, and reduced motion turns the
+   rotation off. The pool keeps clean, rising traces only (owner, 2026-10-09: no ugly traces): the task has a description;
+   the run has at most 15 submissions, at least 4 valid ones (score above 0) and no failed one after its first valid one;
+   its score rises by 15 points or more (from 0 if it opened with failed submissions, else from its first score), never
+   drops by more than 5, and ends within 5% of its best; its final score is at least the authors' code. */
+function cleanTrace([, task, fin, , , , seq]) {
+  const ys = seq.map(p => p[1]), k = ys.findIndex(v => v > 0);
+  if (k < 0 || ys.length > 15) return false;
+  const body = ys.slice(k), best = Math.max(...body);
+  return body.length >= 4 && !body.includes(0) && best - (k ? 0 : body[0]) >= 15
+    && body.every((v, i) => !i || body[i - 1] - v <= 5) && body[body.length - 1] >= .95 * best
+    && (REF[task] == null || fin >= REF[task]);
+}
+const RUNPOOL = TRAJ.filter(r => DESC[r[1]] && cleanTrace(r));
 const TASK_OF = Object.fromEntries(TASKS.map(t => [t.s, t]));
 let runIx = -1, runTimer = null, runHold = false;
 const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
