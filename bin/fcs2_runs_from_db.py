@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Rewrite the FrontierCS 2 leaderboard data in assets/js/fcs2.js from a preview-result sqlite.db.
 
-usage: python3 bin/fcs2_runs_from_db.py path/to/sqlite.db   (needs numpy, scipy, pandas, tqdm)
+usage: python3 bin/fcs2_runs_from_db.py path/to/sqlite.db [--json=out.json]   (needs numpy, scipy, pandas, tqdm)
+--json also writes every number the page shows, for the paper's figures.
 
 The database lists one run per (model, task version) in `cells`. A run's score is `display_score`:
 the verifier's final score, with timeouts shown as 0. Runs without a score are left out.
@@ -22,7 +23,8 @@ wrong order; those draws are left out and counted.
 
 Test-time scaling (SCALE) uses development scores, the score each submission gets on the task's development
 workloads while the agent runs. At a budget B of US$ (usd() below), a run's submission is its latest
-dev-scored submission before B, or nothing (score 0) if it has none yet; once B passes the run's end, its hidden final
+valid submission, the latest with a dev score above 0 (a failed build or validation scores 0), or nothing (score 0)
+if it has none yet; once B passes the run's end, its hidden final
 score. Dev scores are calibrated to the hidden suite per task: hidden - dev of the final patch, averaged over the
 task's runs with 1 pseudo-run of the global average (leave-one-out RMSE 5.4 points, against 8.6 uncalibrated).
 ECI(model, B) keeps every task's curve from the leaderboard fit and solves one capability per (model, budget) by
@@ -97,7 +99,7 @@ MODEL = {
     'Muse Code - Muse Spark 1.3': ('muse', 'Muse Spark 1.3', 'Muse Spark', 'Muse Code', 'Meta'),
     'Kimi K3 (Modal)': ('k3', 'Kimi K3', 'Kimi K3', 'Kimi Code', 'Kimi'),
     'Kimi K2.7 Code': ('k27', 'Kimi K2.7 Code', 'Kimi K2.7', 'Kimi CLI', 'Kimi'),
-    'Qwen 3.8 Max Code': ('qwen', 'Qwen 3.8 Max Code', 'Qwen 3.8 Max', '', 'Qwen'),
+    'Qwen 3.8 Max Code': ('qwen', 'Qwen 3.8 Max', 'Qwen 3.8 Max', '', 'Qwen'),   # shown without 'Code' (owner, 2026-10-09)
     'DeepSeek V4.1 Flash (DSH)': ('ds', 'DeepSeek V4.1 Flash', 'DeepSeek V4.1', 'DSH', 'DeepSeek'),
     'GLM 5.3 (ZCode)': ('glm', 'GLM 5.3', 'GLM 5.3', 'ZCode', 'Z.ai'),
 }
@@ -200,17 +202,19 @@ def scaling(db, curves):
             for sid, kind, ph in subs[r]:
                 if (r, sid) not in pts: continue
                 p = pts[(r, sid)]; end = usd(MODEL[c][0], p[1], p[2])
-                if kind == 'train': seq.append((end, float(np.clip(p[0] + off.get(t, g), 0, 100))))
+                if kind == 'train' and p[0] > 0: seq.append((end, float(np.clip(p[0] + off.get(t, g), 0, 100))))
             traj[r] = (seq, end, hidden)
-        at = lambda r, B: traj[r][2] if B >= traj[r][1] else next((d for tok, d in reversed(traj[r][0]) if tok <= B), 0.0)
+        # stopped at B, the run's result is its latest valid submission: the latest with a dev score above 0 (owner, 2026-10-09)
+        at = lambda r, B: traj[r][2] if B >= traj[r][1] else next((d for spend, d in reversed(traj[r][0]) if spend <= B), 0.0)
         out[axis] = {}
         for c in sorted({v[0] for v in info.values()}, key=lambda c: MODEL[c][0]):
             runs = [r for r in info if info[r][0] == c]; tasks = sorted({info[r][1] for r in runs}); ends = [traj[r][1] for r in runs]
             rng, curve = np.random.default_rng(3), []
-            for B in np.geomspace(1e-3, max(ends), SCALE_POINTS):
+            # budgets are rounded up to the stored precision before use, so each point is exact at its stored budget
+            for B in np.ceil(np.geomspace(1e-3, max(ends), SCALE_POINTS) * 1e5) / 1e5:
                 ys = {t: float(np.mean([at(r, B) for r in runs if info[r][1] == t])) for t in tasks}
                 lo, hi = np.percentile([cap({t: ys[t] for t in rng.choice(tasks, len(tasks))}) for _ in range(SCALE_BOOT)], [5, 95])
-                curve.append([round(float(B), 5), round(float(cap(ys)), 1), round(float(lo), 1), round(float(hi), 1), round(float(np.mean([e > B for e in ends])), 2)])
+                curve.append([float(B), round(float(cap(ys)), 1), round(float(lo), 1), round(float(hi), 1), round(float(np.mean([e > B for e in ends])), 2)])
             out[axis][MODEL[c][0]] = curve
     return out['usd']
 
@@ -245,6 +249,7 @@ when = datetime.fromisoformat(generated[:19])
 models = [MODEL[c] for c in MODEL if c not in HIDDEN]
 E, nboot, nbad, pinned, curves = eci(db.execute('''select c.name, t.name, r.display_score, r.feedback_json from cells ce
   join runs r on r.id = ce.run_id join candidates c on c.id = ce.candidate_id join tasks t on t.id = ce.task_id''').fetchall())
+SC, CO = scaling(db, curves), cost(db)
 eci_js = {MODEL[c][0]: list(E[c]) for c in MODEL if c not in HIDDEN}
 block = (f'// One entry per scored run in the preview results database of {when:%Y-%m-%d} (bin/fcs2_runs_from_db.py):\n'
          f'// model, domain, task, final score (0-100, the task\'s own scale), passed (1 = verdict PASS). Timeouts score 0; {sum(dropped.values())} unscored runs are left out' + ''.join(f'; {c} is left out (only the ECI 0 point)' for c in sorted(HIDDEN)) + '.\n'
@@ -254,8 +259,8 @@ block = (f'// One entry per scored run in the preview results database of {when:
          f"// FrontierCS ECI per model: [point, 90% low, 90% high, tasks]; Human (the authors' reference) is {HUMAN_VALUE:g} and {LOW_ANCHOR} is {LOW_VALUE:g} ({nboot} bootstrap draws kept, {nbad} dropped with the anchors inverted; pinned slope: {pinned}).\n"
          f"// Pass rate per model: [percent, runs that pass, runs].\nconst PASS = {json.dumps(pass_rate(runs))};\n"
          f"const ECI = {json.dumps(eci_js)};\nconst ECI_HUMAN = {HUMAN_VALUE:g}, ECI_LOW = '{MODEL[LOW_ANCHOR][0]}', ECI_LOW_NAME = '{MODEL[LOW_ANCHOR][1]}', ECI_LOW_VALUE = {LOW_VALUE:g}, ECI_REF_TASKS = {E['reference'][3]};\n"
-         f"// Test-time scaling per model: [US$ budget per run, ECI, 90% low, 90% high, share of runs still going] (see the converter's docstring).\nconst SCALE = {json.dumps(scaling(db, curves), separators=(',', ':'))};\n"
-         f"// Cost per model: [mean US$ per scored run, runs]; output tokens x output price + every token x cache-read price (PRICE above).\nconst COST = {json.dumps(cost(db))};\nconst PRICE = {json.dumps(PRICE)};\n")
+         f"// Test-time scaling per model: [US$ budget per run, ECI, 90% low, 90% high, share of runs still going] (see the converter's docstring).\nconst SCALE = {json.dumps(SC, separators=(',', ':'))};\n"
+         f"// Cost per model: [mean US$ per scored run, runs]; output tokens x output price + every token x cache-read price (PRICE above).\nconst COST = {json.dumps(CO)};\nconst PRICE = {json.dumps(PRICE)};\n")
 js = open(js_path, encoding='utf-8').read()   # read late: the fits above take minutes
 js, n = re.subn(r'// One entry per .*?\nconst MODELS = \[\n.*?\];\n(const UPDATED = .*?\n)?(// (FrontierCS )?ECI per model.*?\n(// Pass rate.*?\nconst PASS = .*?\n)?const ECI = .*?\nconst (ECI_HUMAN = .*?, )?ECI_LOW = .*?\n(// Test-time scaling.*?\nconst SCALE = .*?\n((// Tokens|// Cost) per model.*?\nconst (TOK|COST) = .*?\n(const PRICE = .*?\n)?)?)?)?', lambda m: block, js, flags=re.S)
 assert n == 1, 'RUNS block not found'
@@ -263,3 +268,13 @@ open(js_path, 'w', encoding='utf-8').write(js)
 print('PASS', pass_rate(runs))
 print('ECI', eci_js, 'reference tasks', E['reference'][3])
 print(f'{len(runs)} runs, {len({r[2] for r in runs})} tasks, {len(models)} models; dropped {dict(dropped)}; generated {generated}')
+
+for a in sys.argv[2:]:
+    if a.startswith('--json='):
+        out = {'source': sys.argv[1], 'generated_at': generated, 'runs_columns': ['model', 'domain', 'task', 'score', 'passed'], 'runs': runs,
+               'models': [dict(zip(['id', 'name', 'short', 'harness', 'lab'], m)) for m in models], 'dropped': dict(dropped),
+               'pass': pass_rate(runs), 'cost_usd': CO, 'price_per_mtok': PRICE, 'eci': eci_js, 'eci_human': HUMAN_VALUE,
+               'eci_low': [LOW_ANCHOR, LOW_VALUE], 'eci_boot_kept': nboot, 'eci_boot_dropped': nbad, 'eci_pinned_task': pinned,
+               'eci_reference_tasks': E['reference'][3], 'scaling_columns': ['usd', 'eci', 'lo90', 'hi90', 'share_running'], 'scaling': SC}
+        json.dump(out, open(a[7:], 'w'), indent=1)
+        print('wrote', a[7:])

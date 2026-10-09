@@ -24,7 +24,7 @@ const MODELS = [
   {id:'sol', name:'GPT-6.1 Sol', short:'GPT-6.1 Sol', h:'Codex CLI', lab:'OpenAI'},
   {id:'muse', name:'Muse Spark 1.3', short:'Muse Spark', h:'Muse Code', lab:'Meta'},
   {id:'k3', name:'Kimi K3', short:'Kimi K3', h:'Kimi Code', lab:'Kimi'},
-  {id:'qwen', name:'Qwen 3.8 Max Code', short:'Qwen 3.8 Max', h:'', lab:'Qwen'},
+  {id:'qwen', name:'Qwen 3.8 Max', short:'Qwen 3.8 Max', h:'', lab:'Qwen'},
   {id:'ds', name:'DeepSeek V4.1 Flash', short:'DeepSeek V4.1', h:'DSH', lab:'DeepSeek'},
   {id:'glm', name:'GLM 5.3', short:'GLM 5.3', h:'ZCode', lab:'Z.ai'},
 ];
@@ -35,7 +35,7 @@ const PASS = {"astra": [66.7, 20, 30], "ds": [46.7, 14, 30], "glm": [35.0, 14, 4
 const ECI = {"astra": [84.3, 73.0, 148.9, 30], "sol": [80.5, 66.2, 133.5, 40], "muse": [53.7, 44.0, 91.4, 40], "k3": [54.5, 46.5, 96.6, 40], "qwen": [51.4, 36.4, 89.1, 19], "ds": [62.0, 53.2, 107.6, 30], "glm": [62.8, 45.8, 105.0, 40]};
 const ECI_HUMAN = 60, ECI_LOW = 'k27', ECI_LOW_NAME = 'Kimi K2.7 Code', ECI_LOW_VALUE = 0, ECI_REF_TASKS = 38;
 // Test-time scaling per model: [US$ budget per run, ECI, 90% low, 90% high, share of runs still going] (see the converter's docstring).
-const SCALE = {"astra":[[0.001,-400.0,-400.0,-400.0,1.0],[0.00142,-400.0,-400.0,-400.0,1.0],[0.00201,-400.0,-400.0,-400.0,1.0],[0.00284,-400.0,-400.0,-400.0,1.0],[0.00402,-400.0,-400.0,-400.0,1.0],[0.0057,-400.0,-400.0,-400.0,1.0],[0.00807,-400.0,-400.0,-400.0,1.0],[0.01143,-400.0,-400.0,-400.0,1.0],[0.01618,-400.0,-400.0,-400.0,1.0],[0.02292,-400.0,-400.0,-400.0,1.0],[0.03245,-400.0,-400.0,-400.0,1.0],[0.04596,-400.0,-400.0,-400.0,1.0],[0.06509,-400.0,-400.0,-400.0,1.0],[0.09218,-400.0,-400.0,-400.0,1.0],[0.13054,-400.0,-400.0,-400.0,1.0],[0.18487,-400.0,-400.0,-400.0,1.0],[0.26182,-400.0,-400.0,-400.0,1.0],[0.37079,-400.0,-400.0,-400.0,1.0],[0.52511,-400.0,-400.0,-354.9,1.0],[0.74366,-26.7,-309.0,-2.0,1.0],[1.05317,-5.4,-44.7,13.3,1.0],[1.4915,17.9,2.3,39.1,0.97],[2.11227,23.5,14.0,39.6,0.97],[2.99139,41.9,23.5,51.0,0.83],[4.23641,58.8,45.2,73.4,0.73],[5.99961,75.0,54.6,79.6,0.6],[8.49666,81.4,78.3,85.6,0.33],[12.03298,82.9,73.6,86.4,0.13],[17.04111,83.6,78.1,87.6,0.13],[24.13364,84.1,79.0,88.2,0.07],[34.17809,84.2,80.3,89.8,0.03],[48.40305,84.3,80.3,89.1,0.0]],"ds":[[0.001,-400.0,-400.0,-400.0,1.0],[0.00122,-400.0,-400.0,-400.0,1.0],[0.0015,-400.0,-400.0,-400.0,1.0],[0.00183,-400.0,-400.0,-400.0,1.0],[0.00225,-400.0,-400.0,-400.0,1.0],[0.00275,-400.0,-400.0,-400.0,1.0],[0.00337,-400.0,-400.0,-400.0,1.0],[0.00412,-400.0,-400.0,-400.0,1.0],[0.00504,-400.0,-400.0,-400.0,1.0],[0.00617,-400.0,-400.0,-400.0,1.0],[0.00756,-400.0,-400.0,-400.0,1.0],[0.00925,-400.0,-400.0,-400.0,1.0],[0.01132,-400.0,-400.0,-400.0,1.0],[0.01386,-400.0,-400.0,-400.0,1.0],[0.01697,-400.0,-400.0,-400.0,1.0],[0.02077,-400.0,-400.0,-400.0,1.0],[0.02543,-400.0,-400.0,-400.0,1.0],[0.03113,-400.0,-400.0,-400.0,1.0],[0.0381,-400.0,-400.0,-152.5,1.0],[0.04664,-400.0,-400.0,-46.4,1.0],[0.0571,-41.5,-400.0,-13.4,1.0],[0.0699,-35.9,-400.0,-10.3,0.97],[0.08556,-13.6,-400.0,-1.5,0.97],[0.10474,3.3,-285.1,21.1,0.97],[0.12822,13.8,-10.7,31.8,0.93],[0.15695,28.9,14.4,47.0,0.83],[0.19213,37.8,23.4,47.1,0.67],[0.2352,46.9,31.8,57.3,0.67],[0.28792,60.4,56.0,61.4,0.43],[0.35245,62.1,60.5,63.1,0.27],[0.43145,62.3,60.5,64.0,0.2],[0.52815,62.0,60.8,63.5,0.0]],"glm":[[0.001,-400.0,-400.0,-400.0,1.0],[0.00138,-400.0,-400.0,-400.0,1.0],[0.00191,-400.0,-400.0,-400.0,1.0],[0.00263,-400.0,-400.0,-400.0,1.0],[0.00364,-400.0,-400.0,-400.0,1.0],[0.00502,-400.0,-400.0,-400.0,1.0],[0.00694,-400.0,-400.0,-400.0,1.0],[0.00958,-400.0,-400.0,-400.0,1.0],[0.01323,-400.0,-400.0,-400.0,1.0],[0.01828,-400.0,-400.0,-400.0,1.0],[0.02524,-400.0,-400.0,-400.0,1.0],[0.03486,-400.0,-400.0,-400.0,1.0],[0.04814,-400.0,-400.0,-400.0,1.0],[0.06648,-400.0,-400.0,-400.0,1.0],[0.09181,-400.0,-400.0,-400.0,1.0],[0.1268,-400.0,-400.0,-400.0,1.0],[0.17511,-400.0,-400.0,-400.0,1.0],[0.24183,-400.0,-400.0,-400.0,1.0],[0.33398,-400.0,-400.0,-400.0,1.0],[0.46125,-400.0,-400.0,-400.0,1.0],[0.637,-400.0,-400.0,-400.0,1.0],[0.87972,-400.0,-400.0,-281.9,1.0],[1.21494,-400.0,-400.0,-228.8,1.0],[1.67788,-400.0,-400.0,-225.0,1.0],[2.31722,-400.0,-400.0,-251.5,0.95],[3.20018,-129.1,-400.0,-40.1,0.93],[4.41958,-5.7,-94.9,26.5,0.8],[6.10363,25.8,7.0,61.8,0.62],[8.42937,61.2,37.8,63.6,0.47],[11.64132,62.2,48.2,64.4,0.4],[16.07715,62.8,53.9,64.2,0.2],[22.20323,62.8,51.5,64.4,0.0]],"k3":[[0.001,-400.0,-400.0,-400.0,1.0],[0.00141,-400.0,-400.0,-400.0,1.0],[0.00199,-400.0,-400.0,-400.0,1.0],[0.00281,-400.0,-400.0,-400.0,1.0],[0.00396,-400.0,-400.0,-400.0,1.0],[0.00558,-400.0,-400.0,-400.0,1.0],[0.00787,-400.0,-400.0,-400.0,1.0],[0.01111,-400.0,-400.0,-400.0,1.0],[0.01567,-400.0,-400.0,-400.0,1.0],[0.0221,-400.0,-400.0,-400.0,1.0],[0.03117,-400.0,-400.0,-400.0,1.0],[0.04396,-400.0,-400.0,-400.0,1.0],[0.062,-400.0,-400.0,-400.0,1.0],[0.08746,-400.0,-400.0,-400.0,1.0],[0.12336,-400.0,-400.0,-400.0,1.0],[0.17399,-400.0,-400.0,-400.0,1.0],[0.24541,-400.0,-400.0,-400.0,1.0],[0.34615,-400.0,-400.0,-400.0,1.0],[0.48824,-400.0,-400.0,-281.1,1.0],[0.68865,-225.3,-400.0,-136.6,1.0],[0.97133,-51.2,-129.5,-25.8,1.0],[1.37005,-50.1,-108.5,-19.7,0.93],[1.93244,-32.1,-58.0,14.5,0.88],[2.72567,27.2,11.0,38.3,0.75],[3.84452,40.6,27.1,52.0,0.65],[5.42264,51.6,46.3,57.6,0.47],[7.64855,52.4,49.2,58.2,0.38],[10.78816,53.4,51.0,60.1,0.25],[15.21653,54.5,52.9,61.1,0.17],[21.46269,54.7,53.0,63.4,0.07],[30.27279,54.5,52.5,62.0,0.03],[42.69932,54.5,52.5,60.8,0.0]],"muse":[[0.001,-400.0,-400.0,-400.0,1.0],[0.00146,-400.0,-400.0,-400.0,1.0],[0.00213,-400.0,-400.0,-400.0,1.0],[0.00312,-400.0,-400.0,-400.0,1.0],[0.00455,-400.0,-400.0,-400.0,1.0],[0.00665,-400.0,-400.0,-400.0,1.0],[0.00971,-400.0,-400.0,-400.0,1.0],[0.01418,-400.0,-400.0,-400.0,1.0],[0.02072,-400.0,-400.0,-400.0,1.0],[0.03026,-400.0,-400.0,-400.0,1.0],[0.0442,-400.0,-400.0,-400.0,1.0],[0.06456,-400.0,-400.0,-400.0,1.0],[0.09429,-400.0,-400.0,-400.0,1.0],[0.13773,-400.0,-400.0,-400.0,1.0],[0.20117,-400.0,-400.0,-400.0,1.0],[0.29383,-400.0,-400.0,-400.0,1.0],[0.42918,-400.0,-400.0,-400.0,1.0],[0.62687,-400.0,-400.0,-400.0,1.0],[0.91562,-400.0,-400.0,-400.0,1.0],[1.33738,-400.0,-400.0,-285.8,1.0],[1.95341,-288.9,-400.0,-93.8,1.0],[2.85321,-108.8,-400.0,-76.9,0.97],[4.16748,-44.8,-93.9,14.0,0.95],[6.08713,11.5,-22.8,24.9,0.88],[8.89104,29.7,18.4,43.5,0.75],[12.9865,41.6,32.0,51.6,0.6],[18.96845,47.1,38.9,53.4,0.42],[27.70585,47.4,38.2,54.0,0.4],[40.46795,48.2,39.1,54.1,0.25],[59.10863,53.8,51.9,61.1,0.15],[86.33574,53.9,51.8,60.1,0.05],[126.10441,53.7,51.5,59.7,0.0]],"qwen":[[0.001,-400.0,-400.0,-400.0,1.0],[0.00137,-400.0,-400.0,-400.0,1.0],[0.00188,-400.0,-400.0,-400.0,1.0],[0.00258,-400.0,-400.0,-400.0,1.0],[0.00353,-400.0,-400.0,-400.0,1.0],[0.00484,-400.0,-400.0,-400.0,1.0],[0.00664,-400.0,-400.0,-400.0,1.0],[0.0091,-400.0,-400.0,-400.0,1.0],[0.01248,-400.0,-400.0,-400.0,1.0],[0.01711,-400.0,-400.0,-400.0,1.0],[0.02346,-400.0,-400.0,-400.0,1.0],[0.03216,-400.0,-400.0,-400.0,1.0],[0.04409,-400.0,-400.0,-400.0,1.0],[0.06044,-400.0,-400.0,-400.0,1.0],[0.08286,-400.0,-400.0,-400.0,1.0],[0.1136,-400.0,-400.0,-400.0,1.0],[0.15574,-400.0,-400.0,-400.0,1.0],[0.21352,-400.0,-400.0,-400.0,1.0],[0.29272,-400.0,-400.0,-400.0,1.0],[0.40131,-400.0,-400.0,-400.0,1.0],[0.55018,-400.0,-400.0,-400.0,1.0],[0.75428,-400.0,-400.0,-400.0,1.0],[1.03409,-400.0,-400.0,-400.0,1.0],[1.4177,-64.5,-400.0,-15.4,1.0],[1.94361,-59.7,-129.6,-8.4,0.95],[2.66462,-2.3,-39.8,12.9,0.95],[3.65309,37.9,25.6,44.7,0.84],[5.00824,43.6,39.1,47.9,0.74],[6.86611,45.6,37.9,51.8,0.63],[9.41318,51.1,47.5,57.0,0.42],[12.90511,51.3,48.5,57.3,0.16],[17.69241,51.4,47.6,58.2,0.0]],"sol":[[0.001,-400.0,-400.0,-400.0,1.0],[0.00133,-400.0,-400.0,-400.0,1.0],[0.00176,-400.0,-400.0,-400.0,1.0],[0.00234,-400.0,-400.0,-400.0,1.0],[0.00311,-400.0,-400.0,-400.0,1.0],[0.00414,-400.0,-400.0,-400.0,1.0],[0.00549,-400.0,-400.0,-400.0,1.0],[0.0073,-400.0,-400.0,-400.0,1.0],[0.0097,-400.0,-400.0,-400.0,1.0],[0.01288,-400.0,-400.0,-400.0,1.0],[0.01711,-400.0,-400.0,-400.0,1.0],[0.02273,-400.0,-400.0,-400.0,1.0],[0.03019,-400.0,-400.0,-400.0,1.0],[0.04011,-400.0,-400.0,-400.0,1.0],[0.05328,-400.0,-400.0,-400.0,1.0],[0.07078,-400.0,-400.0,-281.4,1.0],[0.09402,-202.2,-382.4,-121.5,1.0],[0.1249,-128.4,-207.6,-92.5,1.0],[0.16591,-93.8,-180.6,-59.6,1.0],[0.2204,8.9,-28.9,21.4,1.0],[0.29277,19.8,6.0,28.7,0.98],[0.38892,34.3,24.1,46.0,0.89],[0.51663,41.2,28.7,49.5,0.81],[0.68629,55.3,48.4,72.8,0.72],[0.91166,67.7,58.5,77.7,0.58],[1.21105,68.8,58.9,78.5,0.48],[1.60874,60.4,54.7,81.5,0.34],[2.13704,71.4,60.1,80.8,0.22],[2.83883,72.6,63.2,81.4,0.12],[3.77108,73.9,65.8,82.7,0.06],[5.00948,73.8,64.7,82.3,0.05],[6.65456,80.5,71.8,83.0,0.0]]};
+const SCALE = {"astra":[[0.001,-400.0,-400.0,-400.0,1.0],[0.00142,-400.0,-400.0,-400.0,1.0],[0.00201,-400.0,-400.0,-400.0,1.0],[0.00285,-400.0,-400.0,-400.0,1.0],[0.00403,-400.0,-400.0,-400.0,1.0],[0.0057,-400.0,-400.0,-400.0,1.0],[0.00807,-400.0,-400.0,-400.0,1.0],[0.01143,-400.0,-400.0,-400.0,1.0],[0.01619,-400.0,-400.0,-400.0,1.0],[0.02292,-400.0,-400.0,-400.0,1.0],[0.03246,-400.0,-400.0,-400.0,1.0],[0.04596,-400.0,-400.0,-400.0,1.0],[0.06509,-400.0,-400.0,-400.0,1.0],[0.09218,-400.0,-400.0,-400.0,1.0],[0.13055,-400.0,-400.0,-400.0,1.0],[0.18488,-400.0,-400.0,-400.0,1.0],[0.26182,-400.0,-400.0,-400.0,1.0],[0.37079,-400.0,-400.0,-400.0,1.0],[0.52511,-400.0,-400.0,-354.9,1.0],[0.74366,-26.7,-309.0,-2.0,1.0],[1.05318,-5.4,-44.7,13.3,1.0],[1.49151,17.9,2.3,39.1,0.97],[2.11227,27.3,17.7,47.2,0.97],[2.9914,48.9,31.5,57.1,0.83],[4.23642,59.1,46.0,74.2,0.73],[5.99962,75.2,54.6,80.0,0.6],[8.49666,81.6,78.8,86.4,0.33],[12.03298,82.9,73.6,86.4,0.13],[17.04112,83.6,78.1,87.6,0.13],[24.13365,84.1,79.0,88.2,0.07],[34.1781,84.2,80.3,89.8,0.03],[48.40306,84.3,80.3,89.1,0.0]],"ds":[[0.001,-400.0,-400.0,-400.0,1.0],[0.00123,-400.0,-400.0,-400.0,1.0],[0.0015,-400.0,-400.0,-400.0,1.0],[0.00184,-400.0,-400.0,-400.0,1.0],[0.00225,-400.0,-400.0,-400.0,1.0],[0.00275,-400.0,-400.0,-400.0,1.0],[0.00337,-400.0,-400.0,-400.0,1.0],[0.00412,-400.0,-400.0,-400.0,1.0],[0.00505,-400.0,-400.0,-400.0,1.0],[0.00618,-400.0,-400.0,-400.0,1.0],[0.00756,-400.0,-400.0,-400.0,1.0],[0.00925,-400.0,-400.0,-400.0,1.0],[0.01133,-400.0,-400.0,-400.0,1.0],[0.01387,-400.0,-400.0,-400.0,1.0],[0.01697,-400.0,-400.0,-400.0,1.0],[0.02078,-400.0,-400.0,-400.0,1.0],[0.02543,-400.0,-400.0,-400.0,1.0],[0.03113,-400.0,-400.0,-400.0,1.0],[0.03811,-400.0,-400.0,-152.5,1.0],[0.04665,-400.0,-400.0,-46.4,1.0],[0.0571,-41.5,-400.0,-13.4,1.0],[0.0699,-35.9,-400.0,-10.3,0.97],[0.08557,-13.6,-400.0,-1.5,0.97],[0.10474,3.3,-285.1,21.1,0.97],[0.12822,13.8,-10.7,31.8,0.93],[0.15696,29.5,14.8,47.1,0.83],[0.19214,38.0,23.9,47.1,0.67],[0.2352,46.6,31.8,57.3,0.67],[0.28792,60.4,56.0,61.4,0.43],[0.35245,62.2,60.7,63.2,0.27],[0.43145,62.3,60.5,64.0,0.2],[0.52816,62.0,60.8,63.5,0.0]],"glm":[[0.001,-400.0,-400.0,-400.0,1.0],[0.00139,-400.0,-400.0,-400.0,1.0],[0.00191,-400.0,-400.0,-400.0,1.0],[0.00264,-400.0,-400.0,-400.0,1.0],[0.00364,-400.0,-400.0,-400.0,1.0],[0.00503,-400.0,-400.0,-400.0,1.0],[0.00694,-400.0,-400.0,-400.0,1.0],[0.00959,-400.0,-400.0,-400.0,1.0],[0.01324,-400.0,-400.0,-400.0,1.0],[0.01828,-400.0,-400.0,-400.0,1.0],[0.02524,-400.0,-400.0,-400.0,1.0],[0.03486,-400.0,-400.0,-400.0,1.0],[0.04814,-400.0,-400.0,-400.0,1.0],[0.06648,-400.0,-400.0,-400.0,1.0],[0.09182,-400.0,-400.0,-400.0,1.0],[0.1268,-400.0,-400.0,-400.0,1.0],[0.17512,-400.0,-400.0,-400.0,1.0],[0.24184,-400.0,-400.0,-400.0,1.0],[0.33399,-400.0,-400.0,-400.0,1.0],[0.46125,-400.0,-400.0,-400.0,1.0],[0.637,-400.0,-400.0,-400.0,1.0],[0.87973,-400.0,-400.0,-281.9,1.0],[1.21494,-400.0,-400.0,-228.8,1.0],[1.67788,-400.0,-400.0,-225.0,1.0],[2.31723,-400.0,-400.0,-251.5,0.95],[3.20018,-129.1,-400.0,-40.1,0.93],[4.41959,-5.7,-94.9,26.5,0.8],[6.10363,27.9,13.0,62.1,0.62],[8.42938,61.2,37.8,63.6,0.47],[11.64132,62.2,48.2,64.5,0.4],[16.07716,62.8,53.6,64.2,0.2],[22.20323,62.8,51.5,64.4,0.0]],"k3":[[0.001,-400.0,-400.0,-400.0,1.0],[0.00142,-400.0,-400.0,-400.0,1.0],[0.00199,-400.0,-400.0,-400.0,1.0],[0.00281,-400.0,-400.0,-400.0,1.0],[0.00396,-400.0,-400.0,-400.0,1.0],[0.00559,-400.0,-400.0,-400.0,1.0],[0.00788,-400.0,-400.0,-400.0,1.0],[0.01111,-400.0,-400.0,-400.0,1.0],[0.01567,-400.0,-400.0,-400.0,1.0],[0.0221,-400.0,-400.0,-400.0,1.0],[0.03117,-400.0,-400.0,-400.0,1.0],[0.04396,-400.0,-400.0,-400.0,1.0],[0.06201,-400.0,-400.0,-400.0,1.0],[0.08746,-400.0,-400.0,-400.0,1.0],[0.12336,-400.0,-400.0,-400.0,1.0],[0.174,-400.0,-400.0,-400.0,1.0],[0.24542,-400.0,-400.0,-400.0,1.0],[0.34615,-400.0,-400.0,-400.0,1.0],[0.48824,-400.0,-400.0,-281.1,1.0],[0.68866,-225.3,-400.0,-136.6,1.0],[0.97134,-51.2,-129.5,-25.8,1.0],[1.37006,-50.1,-108.5,-19.7,0.93],[1.93244,-32.1,-58.0,14.5,0.88],[2.72568,27.2,11.0,38.3,0.75],[3.84452,40.6,27.1,52.0,0.65],[5.42264,51.6,46.3,57.6,0.47],[7.64855,52.5,49.2,58.2,0.38],[10.78816,53.6,51.1,60.4,0.25],[15.21654,54.5,52.9,61.1,0.17],[21.46269,54.7,53.0,63.4,0.07],[30.2728,54.5,52.5,62.0,0.03],[42.69932,54.5,52.5,60.8,0.0]],"muse":[[0.001,-400.0,-400.0,-400.0,1.0],[0.00147,-400.0,-400.0,-400.0,1.0],[0.00214,-400.0,-400.0,-400.0,1.0],[0.00312,-400.0,-400.0,-400.0,1.0],[0.00456,-400.0,-400.0,-400.0,1.0],[0.00665,-400.0,-400.0,-400.0,1.0],[0.00972,-400.0,-400.0,-400.0,1.0],[0.01419,-400.0,-400.0,-400.0,1.0],[0.02072,-400.0,-400.0,-400.0,1.0],[0.03026,-400.0,-400.0,-400.0,1.0],[0.0442,-400.0,-400.0,-400.0,1.0],[0.06456,-400.0,-400.0,-400.0,1.0],[0.0943,-400.0,-400.0,-400.0,1.0],[0.13773,-400.0,-400.0,-400.0,1.0],[0.20117,-400.0,-400.0,-400.0,1.0],[0.29383,-400.0,-400.0,-400.0,1.0],[0.42918,-400.0,-400.0,-400.0,1.0],[0.62687,-400.0,-400.0,-400.0,1.0],[0.91562,-400.0,-400.0,-400.0,1.0],[1.33738,-400.0,-400.0,-285.8,1.0],[1.95342,-288.9,-400.0,-93.8,1.0],[2.85321,-104.5,-400.0,-74.6,0.97],[4.16748,-44.8,-93.9,14.0,0.95],[6.08714,11.5,-22.8,24.9,0.88],[8.89104,29.7,18.4,43.4,0.75],[12.98651,42.8,34.7,52.5,0.6],[18.96846,47.1,38.9,53.4,0.42],[27.70586,47.5,38.4,54.0,0.4],[40.46796,48.2,39.1,54.1,0.25],[59.10864,53.8,51.9,61.1,0.15],[86.33574,53.9,51.8,60.1,0.05],[126.10442,53.7,51.5,59.7,0.0]],"qwen":[[0.001,-400.0,-400.0,-400.0,1.0],[0.00138,-400.0,-400.0,-400.0,1.0],[0.00188,-400.0,-400.0,-400.0,1.0],[0.00258,-400.0,-400.0,-400.0,1.0],[0.00354,-400.0,-400.0,-400.0,1.0],[0.00485,-400.0,-400.0,-400.0,1.0],[0.00664,-400.0,-400.0,-400.0,1.0],[0.00911,-400.0,-400.0,-400.0,1.0],[0.01248,-400.0,-400.0,-400.0,1.0],[0.01711,-400.0,-400.0,-400.0,1.0],[0.02346,-400.0,-400.0,-400.0,1.0],[0.03216,-400.0,-400.0,-400.0,1.0],[0.04409,-400.0,-400.0,-400.0,1.0],[0.06045,-400.0,-400.0,-400.0,1.0],[0.08287,-400.0,-400.0,-400.0,1.0],[0.11361,-400.0,-400.0,-400.0,1.0],[0.15575,-400.0,-400.0,-400.0,1.0],[0.21352,-400.0,-400.0,-400.0,1.0],[0.29273,-400.0,-400.0,-400.0,1.0],[0.40132,-400.0,-400.0,-400.0,1.0],[0.55019,-400.0,-400.0,-400.0,1.0],[0.75429,-400.0,-400.0,-400.0,1.0],[1.0341,-400.0,-400.0,-353.2,1.0],[1.4177,-64.5,-400.0,-15.4,1.0],[1.94362,-59.7,-129.6,-8.4,0.95],[2.66462,-2.3,-39.8,12.9,0.95],[3.65309,37.8,25.6,44.0,0.84],[5.00825,43.4,39.1,47.3,0.74],[6.86612,45.3,37.9,51.8,0.63],[9.41318,50.7,46.5,57.0,0.42],[12.90511,50.8,47.8,57.3,0.16],[17.69242,51.4,47.6,58.2,0.0]],"sol":[[0.001,-400.0,-400.0,-400.0,1.0],[0.00133,-400.0,-400.0,-400.0,1.0],[0.00177,-400.0,-400.0,-400.0,1.0],[0.00235,-400.0,-400.0,-400.0,1.0],[0.00312,-400.0,-400.0,-400.0,1.0],[0.00414,-400.0,-400.0,-400.0,1.0],[0.0055,-400.0,-400.0,-400.0,1.0],[0.0073,-400.0,-400.0,-400.0,1.0],[0.0097,-400.0,-400.0,-400.0,1.0],[0.01289,-400.0,-400.0,-400.0,1.0],[0.01712,-400.0,-400.0,-400.0,1.0],[0.02273,-400.0,-400.0,-400.0,1.0],[0.0302,-400.0,-400.0,-400.0,1.0],[0.04011,-400.0,-400.0,-400.0,1.0],[0.05329,-400.0,-400.0,-400.0,1.0],[0.07078,-400.0,-400.0,-281.4,1.0],[0.09403,-202.2,-382.4,-121.5,1.0],[0.1249,-128.4,-207.6,-92.5,1.0],[0.16592,-93.8,-180.6,-59.6,1.0],[0.2204,8.9,-28.9,21.4,1.0],[0.29278,19.8,6.0,28.7,0.98],[0.38892,35.6,25.4,48.6,0.89],[0.51664,42.5,31.2,50.9,0.81],[0.6863,55.9,49.2,73.3,0.72],[0.91167,68.2,58.5,78.2,0.58],[1.21105,68.9,58.9,78.6,0.48],[1.60875,71.6,60.1,82.0,0.34],[2.13705,71.9,60.6,80.9,0.22],[2.83884,72.6,63.2,81.4,0.12],[3.77109,73.9,65.8,82.7,0.06],[5.00949,75.2,66.4,82.3,0.05],[6.65456,80.5,71.8,83.0,0.0]]};
 // Cost per model: [mean US$ per scored run, runs]; output tokens x output price + every token x cache-read price (PRICE above).
 const COST = {"astra": [9.3052, 30], "ds": [0.2829, 30], "glm": [9.8448, 40], "k3": [8.7123, 40], "muse": [29.5909, 40], "qwen": [8.523, 19], "sol": [1.5532, 64]};
 const PRICE = {"astra": [50.0, 1.0], "sol": [10.0, 0.1], "k3": [15.0, 0.3], "qwen": [6.0, 0.25], "ds": [0.6, 0.003], "glm": [4.4, 0.26], "muse": [4.25, 1.25]};
@@ -43,74 +43,7 @@ const RAN = new Set(RUNS.map(r => r.t));
 const mean = a => a.reduce((x, y) => x + y, 0) / a.length;
 const f1 = x => x.toFixed(1);
 
-// Four GPT-6 Astra runs from the paper's case studies (tex/4_experiments.tex, fig/case_*.py and the source notes there).
-// Indices are 0-based submissions. fin = the run's final score (Table 1 run). min = minutes into the run, from the submission ULIDs.
-const CASES = [
-  {id:'dbscan', name:'GPU DBSCAN', domain:'MLSys', fin:63.98,
-   title:'Latency falls from 46.5 to 3.6 ms in three steps',
-   task:[['Task','Speed up a naive but correct DBSCAN implementation in PyTorch and Triton on one H100.'],
-         ['Score','Grows with the speedup over the naive code. Zero if any clustering has an adjusted Rand index below 0.99.'],
-         ['To pass','It must be faster than flashlib’s kernel on every workload with no loss in quality.']],
-   score:[38.1,38.4,52.8,0.0,0.0,53.3,0.0,0.0,54.3,59.2,57.3,64.5],
-   metric:{label:'Latency on one development workload', unit:'ms', log:true, y:[46.5,45.0,14.9,15.3,14.9,13.1,13.1,18.4,12.6,7.0,5.7,3.6], ydom:[2.5,64], yt:[3,10,30], lower:true},
-   bad:[3,4,6,7], badLabel:'Correctness gate missed', badNote:'One development workload has an adjusted Rand index of 0.714, below the 0.99 gate.',
-   phases:[{a:2,b:2,l:'64 nearest neighbors', s:'64 NN',n:'The patch keeps only each core point’s 64 nearest core neighbors. The speedup triples, but on some inputs the subset disconnects a cluster.'},
-           {a:3,b:8,l:'Variant and repair alternate', s:'Variant, repair',n:'The agent alternates between the 64-neighbor variant and a repair. 4 of these 6 submissions score zero.'},
-           {a:9,b:11,l:'Tiled bf16 GEMM, bit-packed adjacency', s:'bf16 GEMM',n:'A tiled bfloat16 GEMM builds the radius graph and connected components run on the GPU. A bit-packed adjacency then gives the final speedup.'}],
-   ann:[{p:'metric', i:2, t:['64 nearest neighbors','speedup triples'], dx:46, dy:-40},
-        {p:'score', i:4, t:['4 submissions miss','the correctness gate'], dx:34, dy:-24},
-        {p:'metric', i:9, t:['Tiled bf16 GEMM,','bit-packed adjacency'], dx:-40, dy:42}],
-   final:{beat:false, chip:'Did not pass', short:'Faster on 3 of 4 workloads', n:'The final patch is byte-identical to submission 12. It is faster than the reference on 3 of 4 final workloads and keeps clustering quality on all 4.'}},
-  {id:'lwe', name:'Structured LWE', domain:'Cryptography', fin:82.0,
-   title:'153 of 200 instances solved in the first 36 minutes',
-   task:[['Task','Recover the secret of 200 learning-with-errors instances in 10 families, with 8 CPU cores, fplll and 3 hours.'],
-         ['Score','The percentage of instances solved.'],
-         ['To pass','It must solve all 200.']],
-   min:[10.1,19.7,36.2,45.5,84.0,88.3,118.5], finMin:130.4,
-   metric:{label:'Instances solved, of 200', unit:'solved', y:[86,146,153,161,162,164,166], fy:164, ydom:[0,200], yt:[0,100,200]},
-   fam:{names:['Dense A, binary s','Dense A, ternary s','Dense A, small s','Sparse A, mod-q s','Sparse small A, mod-q s','Dense binary A, mod-q s','Dense ternary A, mod-q s','Sparse A, sparse s','Sparse small A, sparse s','Dense small A, small s'],
-        // solved per family at submissions 1..7, then the final submission
-        v:[[6,6,7,10,11,13,14,13],[6,6,6,6,6,6,6,6],[5,6,6,6,6,6,6,6],[5,20,20,20,20,20,20,20],[6,20,20,20,20,20,20,20],
-           [6,18,20,20,20,20,20,20],[6,19,20,20,20,20,20,20],[6,11,14,19,19,19,20,19],[20,20,20,20,20,20,20,20],[20,20,20,20,20,20,20,20]]},
-   bad:[],
-   phases:[{a:0,b:2,l:'Six families complete',n:'6 of the 10 families are complete by 36 minutes.'},
-           {a:3,b:6,l:'Two families gain',n:'The remaining 80 minutes add solutions in only 2 families.'}],
-   ann:[{p:'metric', i:2, t:['153 solved by 36 min','6 families complete'], dx:40, dy:46}],
-   final:{beat:false, chip:'Did not pass', short:'164 of 200 solved', n:'The stored final submission holds 164 solutions, 2 fewer than submission 7. Dense A with a ternary or small secret never exceeds 6 of 20.'}},
-  {id:'hygra', name:'Hypergraph cores', domain:'HPC', fin:48.74,
-   title:'The fourth submission halves the runtime, and no later one is faster',
-   task:[['Task','Write the k-core peeling of Hygra, a hypergraph framework, on 8 OpenMP threads.'],
-         ['Score','Falls exponentially with runtime. Zero for any wrong core number.'],
-         ['To pass','It must be at least 3% faster than the authors’ code on every workload.']],
-   min:[3.1,6.6,10.7,14.0,18.2,20.9,23.1,24.7], finMin:27.8,
-   score:[19.8,36.2,37.0,60.9,60.5,49.6,49.6,49.3],
-   metric:{label:'Median runtime of the complete process', unit:'s', y:[0.405,0.254,0.249,0.124,0.126,0.175,0.175,0.177], ydom:[0,0.45], yt:[0,0.2,0.4], lower:true},
-   bad:[],
-   phases:[{a:3,b:3,l:'Parallel frontier',n:'A parallel frontier with per-thread buffers halves the runtime, from 0.41 s at the first submission to 0.12 s.'},
-           {a:4,b:7,l:'Slower variants',n:'Variants with prefetch hints and other OpenMP schedules are all slower, and the agent keeps submission 4.'}],
-   ann:[{p:'metric', i:3, t:['Parallel frontier','runtime halves to 0.12 s'], dx:30, dy:-66},
-        {p:'metric', i:6, t:['Prefetch hints, other','schedules: all slower'], dx:10, dy:-62, mob:false}],
-   final:{beat:true, chip:'Passed', short:'Faster on 4 of 4 workloads', n:'The final patch is submission 4. It passes on all 4 final workloads, yet runs only 1.03 to 1.04× faster on 8 threads than on 1. The reference runs 5.8 to 6.1× faster.'}},
-  {id:'metaopt', name:'MetaOpt', domain:'Network', fin:51.54,
-   title:'7 of 10 submissions fail validation',
-   task:[['Task','Find a traffic matrix with at most 9 demands that maximizes the gap between optimal routing and the better of POP and demand pinning.'],
-         ['Score','Grows with the mean gap. 256 oracle queries per instance, within 30 s.'],
-         ['To pass','Its gap must match or exceed the reference’s on every instance.']],
-   min:[4.2,7.4,11.5,13.3,15.7,17.1,20.2,21.7,24.0,26.1], finMin:30.9,
-   score:[31.7,0,0,0,0,48.5,0,0,0,51.0],
-   metric:{label:'Mean adversarial gap, 15 development instances', unit:'gap', y:[15.3,null,null,null,null,26.6,null,null,null,28.5], ydom:[0,32], yt:[0,15,30]},
-   bad:[1,2,3,4,6,7,8], badLabel:'Failed validation', badNote:'The submission fails validation, so it scores zero.',
-   phases:[{a:0,b:0,l:'Random local search', s:'Local search',n:'A random local search reaches a mean gap of 15.3.'},
-           {a:5,b:5,l:'Own LP evaluator', s:'Own LP',n:'The agent’s own linear-program evaluator raises the mean gap to 26.6.'},
-           {a:9,b:9,l:'OR-Tools dual simplex', s:'OR-Tools',n:'An OR-Tools dual simplex raises the mean gap to 28.5.'}],
-   ann:[{p:'score', i:2, t:['7 of 10 submissions','fail validation'], dx:34, dy:-24},
-        {p:'metric', i:0, t:['Random local search'], dx:24, dy:-22, mob:false},
-        {p:'metric', i:5, t:['Own LP evaluator'], dx:-26, dy:-22},
-        {p:'metric', i:9, t:['OR-Tools dual simplex'], dx:-24, dy:48}],
-   final:{beat:false, chip:'Did not pass', short:'Short on 1 of 30 instances', n:'The final score is 51.5 against the reference’s 47.8, but the gap falls short of the reference on 1 of the 30 final instances.'}},
-];
 
-const yfmt = (u, v) => u === 's' ? (v === 0 ? '0' : v.toFixed(2).replace(/0$/, '')) : String(v);
 const esc = s => String(s).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
 
 
@@ -351,152 +284,8 @@ function drawTable() {
   $('#restbl').innerHTML = head + DOMS_WITH_RUNS.map(d => line(d)).join('') + line('All', 'all');
 }
 
-/* ---------- case studies: one chart per run, in the grammar of Epoch's data insights ---------- */
-const MSHORT = {ms:'Latency', s:'Runtime', solved:'Instances solved', gap:'Mean gap'};
-const ufmt = (u, v) => u === 'ms' || u === 's' ? yfmt(u, v) + ' ' + u : String(v);
-const NFIN = c => c.metric.y.length;
-const C_ON = '#0b57d0', C_OFF = '#bdc1c6', C_FIN = '#1f1f1f', C_INK = '#1f1f1f';
-let cur = CASES[0];
-const ctabs = $('#ctabs');
-ctabs.innerHTML = CASES.map((c, i) => `<button type="button" role="tab" aria-selected="${i === 0}" data-i="${i}">${esc(c.name)}</button>`).join('');
-ctabs.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; cur = CASES[+b.dataset.i];
-  [...ctabs.children].forEach(x => x.setAttribute('aria-selected', String(x === b))); reveal(b); renderCase(); });
-
-function renderCase() {
-  const c = cur;
-  $('#cmeta').innerHTML = `<span class="dotm"><i></i>GPT-6 Astra</span><span>${esc(c.domain)}</span><span class="vd ${c.final.beat ? 'yes' : 'no'}">${esc(c.final.chip)}</span>`;
-  $('#ctitle').textContent = c.title;
-  $('#cdesc').innerHTML = `${esc(c.task[0][1])} <span>${esc(c.task[2][1])}</span>`;
-  const sw = (col, round) => `<i style="background:${col}${round ? ';border-radius:50%' : ''}"></i>`;
-  const leg = c.fam ? [[C_ON, 'Instances solved', 1], [C_FIN, 'Final submission, hidden suite', 1], [C_ON, 'Family complete'], [C_OFF, 'Family incomplete']]
-    : [[C_ON, 'Scored submission', 1], ...(c.bad.length ? [[C_OFF, c.badLabel + ', score 0', 1]] : []), [C_FIN, 'Final submission, hidden suite', 1]];
-  $('#clegend').innerHTML = leg.map(([col, l, r]) => `<span>${sw(col, r)}${esc(l)}</span>`).join('');
-  $('#cnote').textContent = c.final.n;
-  drawCase();
-}
-
-let cgeo = null;
-function drawCase() {
-  const c = cur, n = NFIN(c), m = c.metric, svg = $('#csvg'), box = $('#cplot'), W = Math.max(280, box.clientWidth), narrow = W < 560;
-  const FS = narrow ? 12 : 13, L = narrow ? 36 : 46, R = narrow ? 34 : 44, byTime = !!c.fam;
-  svg.replaceChildren();
-  const defs = sv('defs'), mk = sv('marker', {id:'carr', viewBox:'0 0 8 8', refX:7, refY:4, markerWidth:8, markerHeight:8, orient:'auto'});
-  mk.append(sv('path', {d:'M1,1 L7,4 L1,7', fill:'none', stroke:C_INK, 'stroke-width':1.2, 'stroke-linecap':'round', 'stroke-linejoin':'round'})); defs.append(mk); svg.append(defs);
-  // x: submissions (or minutes for LWE), then a gap, then the final submission
-  const xd = byTime ? [0, c.finMin + 6] : [-0.5, n + 0.5];
-  const X = v => L + (v - xd[0]) / (xd[1] - xd[0]) * (W - L - R);
-  const xi = i => byTime ? X(i === n ? c.finMin : c.min[i]) : X(i === n ? n + 0.1 : i);
-  const sepX = byTime ? X((c.min[n - 1] + c.finMin) / 2) : X(n - 0.45);
-  const panels = [];
-  if (c.score) panels.push({k:'score', title:'Development score', h:narrow ? 120 : 150, yd:[0, 100], yt:[0, 50, 100]});
-  panels.push({k:'metric', title: m.label + (m.unit === 'ms' || m.unit === 's' ? ` (${m.unit}${m.log ? ', log scale' : ''})` : ''), h:narrow ? 140 : 180, yd:m.ydom, yt:m.yt, log:m.log});
-  let y = 0; const TT = 26, GAPP = 30;
-  panels.forEach((p, k) => { p.top = y + TT; p.bot = p.top + p.h; y = p.bot + (k < panels.length - 1 ? GAPP : 0);
-    p.Y = p.log ? v => p.bot - (Math.log(v) - Math.log(p.yd[0])) / (Math.log(p.yd[1]) - Math.log(p.yd[0])) * p.h : v => p.bot - (v - p.yd[0]) / (p.yd[1] - p.yd[0]) * p.h; });
-  const axisY = y, H0 = axisY + (narrow ? 38 : 40);
-  // x ticks
-  const ticks = [];
-  if (byTime) { [0, 30, 60, 90, 120].forEach(v => { if (Math.abs(X(v) - xi(n)) > 34) ticks.push([X(v), String(v)]); }); }
-  else { const step = (W - L - R) / (n + 1) < 24 ? 2 : 1; for (let i = 0; i < n; i++) if (i % step === 0 || (i === n - 1 && i % step === 0)) ticks.push([xi(i), String(i + 1)]); }
-  ticks.push([xi(n), 'Final']);
-  panels.forEach(p => {
-    svg.append(sv('text', {class:'pt', x:0, y:p.top - 12}, p.title));
-    ticks.forEach(([x]) => svg.append(sv('line', {x1:x, x2:x, y1:p.top, y2:p.bot, stroke:'#e8eef0'})));
-    p.yt.forEach(v => { svg.append(sv('line', {x1:L, x2:W - R + 14, y1:p.Y(v), y2:p.Y(v), stroke:'#e8eef0'}));
-      svg.append(sv('text', {class:'tk', x:L - 8, y:p.Y(v) + 4, 'text-anchor':'end'}, yfmt(m.unit === 's' && p.k === 'metric' ? 's' : '', v))); });
-    svg.append(sv('line', {x1:sepX, x2:sepX, y1:p.top - 4, y2:p.bot, stroke:'#9aa0a6', 'stroke-dasharray':'5 4'}));
-  });
-  const first = panels[0];
-  svg.append(sv('line', {x1:L, x2:W - R + 14, y1:axisY, y2:axisY, stroke:'#c7caca', 'stroke-width':1.5}));
-  ticks.forEach(([x, t]) => { svg.append(sv('line', {x1:x, x2:x, y1:axisY, y2:axisY + 5, stroke:'#c7caca', 'stroke-width':1.5}));
-    svg.append(sv('text', {class:'tk', x, y:axisY + 19, 'text-anchor':'middle', 'font-weight': t === 'Final' ? 600 : null}, t)); });
-  svg.append(sv('text', {class:'tk', x:L + (sepX - L) / 2, y:axisY + 36, 'text-anchor':'middle'}, byTime ? 'Minutes into the run' : 'Submission'));
-  // series
-  const bad = new Set(c.bad), pts = {};
-  panels.forEach(p => {
-    const vals = p.k === 'score' ? c.score : m.y, fin = p.k === 'score' ? c.fin : m.fy;
-    const P = vals.map((v, i) => v == null ? null : {i, x:xi(i), y:p.Y(v), v, ok:!bad.has(i)}).filter(Boolean);
-    const ok = P.filter(q => q.ok);
-    svg.append(sv('path', {d:'M' + ok.map(q => q.x.toFixed(1) + ',' + q.y.toFixed(1)).join(' L'), fill:'none', stroke:C_ON, 'stroke-width':1.5, 'stroke-linejoin':'round'}));
-    P.forEach(q => svg.append(sv('circle', {cx:q.x, cy:q.y, r:narrow ? 3.2 : 3.8, fill: q.ok ? C_ON : C_OFF})));
-    if (fin != null) { const fy = p.Y(fin); svg.append(sv('circle', {cx:xi(n), cy:fy, r:narrow ? 4 : 4.6, fill:C_FIN}));
-      const lab = sv('text', {class:'an b', x:xi(n), y: fy - 11, 'text-anchor':'middle'}, p.k === 'score' ? f1(fin) : ufmt(m.unit, fin)); svg.append(lab);
-      P.push({i:n, x:xi(n), y:fy, v:fin}); }
-    pts[p.k] = P; p.P = P;
-  });
-  // annotations: bold first line, regular second, a curved arrow to the point (Epoch's data-insight style)
-  const placed = [];
-  (c.ann || []).forEach(a => {
-    if (narrow && a.mob === false) return;
-    const p = panels.find(q => q.k === a.p), q = p && p.P.find(z => z.i === a.i); if (!q) return;
-    const k = narrow ? .75 : 1, start = a.dx >= 0, lh = FS + 3;
-    let bx = q.x + a.dx * k, by = q.y + a.dy * k;
-    const g = sv('g'); svg.append(g);
-    const ts = a.t.map((line, j) => { const t = sv('text', {class:'an' + (j === 0 ? ' b' : ''), x:0, y:0, 'text-anchor': start ? 'start' : 'end'}, line); g.append(t); return t; });
-    const w = Math.max(...ts.map(t => t.getComputedTextLength())), h = lh * a.t.length;
-    let x0 = start ? bx : bx - w; x0 = Math.max(0, Math.min(W - w, x0)); bx = start ? x0 : x0 + w;
-    let y0 = a.dy < 0 ? by - h : by; y0 = Math.max(p.top + 2, Math.min(p.bot - h, y0));
-    const rect = [x0 - 4, y0 - 2, x0 + w + 4, y0 + h + 2];
-    if (placed.some(r => !(rect[2] < r[0] || rect[0] > r[2] || rect[3] < r[1] || rect[1] > r[3]))) { g.remove(); return; }
-    placed.push(rect);
-    ts.forEach((t, j) => { t.setAttribute('x', bx); t.setAttribute('y', y0 + FS + j * lh); });
-    const sx = start ? x0 - 5 : x0 + w + 5, sy = a.dy < 0 ? y0 + h * .5 : y0 + FS * .6;
-    const ang = Math.atan2(q.y - sy, q.x - sx), ex = q.x - Math.cos(ang) * 8, ey = q.y - Math.sin(ang) * 8;
-    g.append(sv('path', {d:`M${sx},${sy} Q${ex},${sy} ${ex},${ey}`, fill:'none', stroke:C_INK, 'stroke-width':1.2, 'marker-end':'url(#carr)'}));
-  });
-  // LWE: solved per family at submission 7, as horizontal bars
-  let H = H0;
-  if (c.fam) {
-    const top = H0 + 34, rh = narrow ? 21 : 23, FR = 30,
-      FL = 10 + Math.max(...c.fam.names.map(nm => { const t = sv('text', {class:'tk fam', x:-999, y:-999}, nm); svg.append(t); const w = t.getComputedTextLength(); t.remove(); return w; })), k7 = n - 1, BX = v => FL + v / 20 * (W - FL - FR);
-    svg.append(sv('text', {class:'pt', x:0, y:top - 12}, `Solved per family at submission ${n}, of 20`));
-    [0, 10, 20].forEach(v => { svg.append(sv('line', {x1:BX(v), x2:BX(v), y1:top, y2:top + rh * 10, stroke:'#e8eef0'}));
-      svg.append(sv('text', {class:'tk', x:BX(v), y:top + rh * 10 + 18, 'text-anchor':'middle'}, v)); });
-    c.fam.names.forEach((nm, r) => { const v = c.fam.v[r][k7], yy = top + r * rh;
-      svg.append(sv('text', {class:'tk fam', x:FL - 10, y:yy + rh / 2 + 4, 'text-anchor':'end'}, nm));
-      svg.append(sv('rect', {x:FL, y:yy + 4, width:Math.max(1, BX(v) - FL), height:rh - 8, rx:2, fill: v === 20 ? C_ON : C_OFF, class:'fbar', 'data-r':r}));
-      svg.append(sv('text', {class:'tk', x:BX(v) + 6, y:yy + rh / 2 + 4}, v)); });
-    H = top + rh * 10 + 26;
-  }
-  svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H);
-  const cross = sv('line', {y1:first.top - 4, y2:axisY, stroke:'#5f6368', 'stroke-width':1, opacity:0, 'pointer-events':'none'}); svg.append(cross);
-  cgeo = {W, H, n, xi, axisY, top:first.top, cross, panels};
-}
-
-const ctip = $('#ctip');
-function caseTip(html, x, y) { const rc = $('#cplot').getBoundingClientRect(); ctip.innerHTML = html; ctip.hidden = false;
-  // beside the crosshair, on the side with more room, vertically at the pointer (clamped to the plot)
-  const k = rc.width / cgeo.W, tw = ctip.offsetWidth, th = ctip.offsetHeight, right = x * k + 14 + tw <= rc.width || x * k < rc.width / 2;
-  let left = right ? x * k + 14 : x * k - 14 - tw; left = Math.max(0, Math.min(rc.width - tw, left));
-  ctip.style.left = left + 'px'; ctip.style.top = Math.max(0, Math.min(cgeo.H * k - th, y * k - th / 2)) + 'px'; }
-function tipFor(i) {
-  const c = cur, n = NFIN(c), m = c.metric, fin = i === n, when = fin ? c.finMin : c.min && c.min[i];
-  const ph = fin ? null : c.phases.find(p => i >= p.a && i <= p.b), bad = c.bad.includes(i);
-  const row = (col, k, v) => `<div class="tr"><i style="background:${col}"></i><span>${k}</span><b>${v}</b></div>`;
-  let h = `<div class="th">${fin ? 'Final submission' : 'Submission ' + (i + 1)}${when != null ? ` <span>${when.toFixed(1)} min</span>` : ''}</div>`;
-  if (fin) { h += row(C_FIN, 'Final score', f1(c.fin)); if (m.fy != null) h += row(C_FIN, MSHORT[m.unit], ufmt(m.unit, m.fy)); h += `<p>${esc(c.final.chip)}. ${esc(c.final.short)}.</p>`; }
-  else { const col = bad ? C_OFF : C_ON;
-    if (c.score) h += row(col, 'Development score', f1(c.score[i]));
-    h += row(col, MSHORT[m.unit], m.y[i] == null ? 'no valid result' : ufmt(m.unit, m.y[i]));
-    if (c.fam) h += row(C_ON, 'Families complete', c.fam.v.filter(r => r[i] === 20).length + ' of 10');
-    if (bad) h += `<p>${esc(c.badLabel)}.</p>`; else if (ph) h += `<p>${esc(ph.n)}</p>`; }
-  return h;
-}
-$('#csvg').addEventListener('pointermove', e => {
-  if (!cgeo) return; const rc = e.currentTarget.getBoundingClientRect(), k = cgeo.W / rc.width, px = (e.clientX - rc.left) * k, py = (e.clientY - rc.top) * k;
-  const fb = e.target.closest('.fbar');
-  if (fb) { const r = +fb.dataset.r, v = cur.fam.v[r]; cgeo.cross.setAttribute('opacity', 0);
-    caseTip(`<div class="th">${esc(cur.fam.names[r])}</div><p>Solved after each submission: ${v.slice(0, -1).join(', ')}. Final: ${v.at(-1)} of 20.</p>`, px, py); return; }
-  if (py < cgeo.top - 20 || py > cgeo.axisY + 8) { ctip.hidden = true; cgeo.cross.setAttribute('opacity', 0); return; }
-  let best = 0; for (let i = 0; i <= cgeo.n; i++) if (Math.abs(cgeo.xi(i) - px) < Math.abs(cgeo.xi(best) - px)) best = i;
-  const x = cgeo.xi(best); cgeo.cross.setAttribute('x1', x); cgeo.cross.setAttribute('x2', x); cgeo.cross.setAttribute('opacity', .35);
-  caseTip(tipFor(best), x, py);
-});
-$('#csvg').addEventListener('pointerdown', e => $('#csvg').dispatchEvent(new PointerEvent('pointermove', e)));
-$('#csvg').addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') { ctip.hidden = true; cgeo && cgeo.cross.setAttribute('opacity', 0); } });
-document.addEventListener('pointerdown', e => { if (!e.target.closest('#cplot')) { ctip.hidden = true; cgeo && cgeo.cross.setAttribute('opacity', 0); } });
-const redraws = [drawCase];
-renderCase();
+/* ---------- case studies: a placeholder until the preview runs have their own (owner, 2026-10-09) ---------- */
+const redraws = [];
 
 /* ---------- questions ---------- */
 const fqHash = () => { const d = document.getElementById(location.hash.slice(1)); if (d && d.tagName === 'DETAILS') { d.open = true; d.scrollIntoView({block:'start'}); } };

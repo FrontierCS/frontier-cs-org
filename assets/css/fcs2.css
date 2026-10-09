@@ -212,3 +212,4 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
   .faq details::details-content{block-size:0; overflow:hidden; transition:block-size .22s ease, content-visibility .22s allow-discrete}
   .faq details[open]::details-content{block-size:auto}
 }
+.tbd{color:var(--ink-2); font-size:16px; margin:0}

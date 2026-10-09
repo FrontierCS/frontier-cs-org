@@ -72,26 +72,17 @@ page_css: fcs2
       <div class="cfoot"><b>FRONTIERCS 2</b><span id="ecinote">Preliminary · Human = 60 (the authors’ reference code), Kimi K2.7 Code = 0 (in the fit, not shown) · bars are 90% intervals</span></div>
     </figure>
     <figure class="chart" style="margin:40px 0 0" id="scaling">
-      <div class="chead"><span>FrontierCS ECI when every run stops at a cost budget</span></div>
+      <div class="chead"><span>Test-time scaling: FrontierCS ECI against cost budget per run</span></div>
       <div class="plot" id="ttsplot"><svg id="ttssvg" role="img" aria-label="Test-time scaling chart"></svg><div class="tip" id="ttstip" hidden></div></div>
       <div class="legend" id="ttslegend"></div>
-      <div class="cfoot"><b>FRONTIERCS 2</b><span>Preliminary · before a run ends, its latest submission is scored on the development workloads and calibrated to the hidden suite · bands are 90% intervals</span></div>
+      <div class="cfoot"><b>FRONTIERCS 2</b><span>Preliminary · within a budget, a run counts its latest valid submission, scored on the development workloads and calibrated to the hidden suite · bands are 90% intervals</span></div>
     </figure>
   </div>
 </section>
 
 <section class="sec" id="cases">
   <h2>Case studies</h2>
-  <div class="ctabs" id="ctabs" role="tablist" aria-label="Case study"></div>
-  <article class="case" role="tabpanel">
-    <div class="meta" id="cmeta"></div>
-    <h3 id="ctitle"></h3>
-    <p class="desc" id="cdesc"></p>
-    <div class="clegend" id="clegend"></div>
-    <div class="cplot" id="cplot"><svg id="csvg" role="img" aria-label="Development submissions of one GPT-6 Astra run"></svg><div class="ctip" id="ctip" hidden></div></div>
-    <p class="cnote" id="cnote"></p>
-    <div class="cfoot"><b>FRONTIERCS 2</b><span>GPT-6 Astra, one run per task</span></div>
-  </article>
+  <p class="tbd">Case studies of single runs from the preview will appear here.</p>
 </section>
 
 <section class="sec" id="tasks">
@@ -130,7 +121,7 @@ page_css: fcs2
       <details id="q-see"><summary>What does the agent see?</summary><div class="ans"><p>It sees its repository and, for each patch, a development score and one message. The evaluator, the hidden suite and the reference stay with the judge.</p></div></details>
       <details id="q-bar"><summary>What counts as a pass?</summary><div class="ans"><p>A run passes when its final submission meets the task’s pass criteria on every workload. The criteria are set from the reference’s own measurements. For SVG-EAR, its latency must be at most 0.96 of the reference’s, with PSNR, SSIM and LPIPS within fixed bands.</p></div></details>
       <details id="q-score"><summary>How are scores computed?</summary><div class="ans"><p>The leaderboard’s main number is pass rate, the share of runs that pass by the criteria above. Each task’s evaluator also scores the final submission on the hidden suite, from 0 to 100, and a run that times out scores 0. The mean score chart averages these scores. FrontierCS ECI is a capabilities index fitted with Epoch AI’s own ECI code. It fits one logistic curve per task to every model’s score and to the human reference, the authors’ own code, then scales the result so Human is 60 and Kimi K2.7 Code is 0. Kimi K2.7 Code takes part in the fit as this 0 point but is not on the leaderboard. Above 60 means above the authors’ code on each task’s own scale. FrontierCS ECI’s bars are 90% intervals from Epoch’s bootstrap, which resamples each model’s task results. Costs are estimates; “How is cost estimated?” below gives the method. The results are preliminary: <span data-fill="summary">263 runs on 42 tasks by 7 models</span>.</p></div></details>
-      <details id="q-scaling"><summary>How is test-time scaling computed?</summary><div class="ans"><p>The agent submits many times during a run, and each submission is scored on the task’s development workloads. To find FrontierCS ECI at a cost budget, we stop every run at that budget and take its latest submission, or a score of 0 if it has none yet. Development scores run higher than hidden-suite scores, so we shift them by each task’s average gap between the final submission’s development and hidden scores. This leaves an error of 5.4 points per run, against 8.6 without the shift. Past a run’s end, its hidden final score counts, so every curve ends at the model’s leaderboard value. The budget is the estimated cost, as the next answer explains.</p></div></details>
+      <details id="q-scaling"><summary>How is test-time scaling computed?</summary><div class="ans"><p>The agent submits many times during a run, and each submission is scored on the task’s development workloads. At a cost budget, a run counts its latest valid submission within that budget, the latest whose development score is above 0, or a score of 0 if it has none yet. One submission in ten scores 0, mostly from a failed build, validation or correctness gate, and agents usually recover from it; counting such a failure as the run’s result would score an experiment instead of the agent’s working code. Taking the best submission so far instead would choose with hindsight, and agents keep their best development submission as the final one in only 72% of runs. Development scores run above hidden-suite scores, so we shift them by each task’s average gap between the final submission’s development and hidden scores. This leaves an error of 5.5 points per run, against 8.9 without the shift. Once the budget covers a whole run, its hidden final score counts, so every curve ends at the model’s leaderboard value. The budget is the estimated cost, as the next answer explains.</p></div></details>
       <details id="q-cost"><summary>How is cost estimated?</summary><div class="ans"><p>The results record tokens, not dollars. We price a run’s output tokens at the model’s output price and every token it used at the cache-read price, as if all input were a cache hit; Muse Spark 1.3 lists no cache price, so its input price stands in. Prices are list prices in US$ per million tokens, found on October 9, 2026, output and then cache read: GPT-6 Astra 50 and 1.00, GPT-6.1 Sol 10 and 0.10, Kimi K3 15 and 0.30, Qwen 3.8 Max 6 and 0.25, DeepSeek V4.1 Flash 0.60 and 0.003 (off-peak), GLM 5.3 4.40 and 0.26, Muse Spark 1.3 4.25 and 1.25 (input). Each agent tool counts tokens its own way, so costs compare orders of magnitude better than small gaps.</p></div></details>
       <details id="q-run"><summary>Can I run it?</summary><div class="ans"><p>We will release the tasks, evaluators and judge as one evaluation environment.</p></div></details>
     </div>
