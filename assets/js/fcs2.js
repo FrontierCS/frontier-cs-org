@@ -30,6 +30,9 @@ const MODELS = [
   {id:'glm', name:'GLM 5.3', short:'GLM 5.3', h:'ZCode', lab:'Z.ai'},
 ];
 const UPDATED = 'October 8, 2026';
+// ECI per model: [point, 90% low, 90% high, tasks]; Human (the authors' reference) is 100 and Kimi K2.7 Code is 20 (300 task resamples).
+const ECI = {"astra": [129.3, 115.1, 174.3, 30], "sol": [125.5, 105.8, 164.0, 40], "muse": [95.0, 85.9, 124.1, 40], "k3": [95.2, 87.1, 132.2, 40], "k27": [20.0, 20.0, 20.0, 34], "qwen": [93.6, 80.2, 127.3, 19], "ds": [100.4, 99.8, 137.1, 30], "glm": [101.5, 87.5, 130.9, 40]};
+const ECI_LOW = 'k27', ECI_REF_TASKS = 38;
 const RAN = new Set(RUNS.map(r => r.t));
 const mean = a => a.reduce((x, y) => x + y, 0) / a.length;
 const f1 = x => x.toFixed(1);
@@ -111,9 +114,8 @@ const sv = (tag, a = {}, text) => { const e = document.createElementNS(NS, tag);
   for (const k in a) if (a[k] != null) { if (tag === 'text' && /^(fill|font-size|font-weight)$/.test(k)) e.style.setProperty(k, k === 'font-size' ? a[k] + 'px' : a[k]); else e.setAttribute(k, a[k]); }
   if (text != null) e.textContent = text; return e; };
 const MCOL = Object.fromEntries(MODELS.map(m => [m.id, `var(--m-${m.id})`]));
-// Models ranked by mean final score over all their runs; each model ran its own set of tasks.
-const MEAN_OF = Object.fromEntries(MODELS.map(m => [m.id, mean(RUNS.filter(r => r.m === m.id).map(r => r.s))]));
-const RANKED = [...MODELS].sort((a, b) => MEAN_OF[b.id] - MEAN_OF[a.id]);
+// Models ranked by ECI, the leaderboard's main number (bin/fcs2_runs_from_db.py fits it).
+const RANKED = [...MODELS].sort((a, b) => ECI[b.id][0] - ECI[a.id][0]);
 const NTASK = rs => new Set(rs.map(r => r.t)).size;
 /* numbers in the page text come from the data, so they cannot drift from the chart */
 document.querySelectorAll('[data-fill]').forEach(el => { el.textContent = {updated:`Last updated: ${UPDATED}`, runs:String(RUNS.length),
@@ -134,17 +136,68 @@ const spy = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersectin
 ['overview','leaderboard','cases','tasks','questions'].forEach(id => spy.observe(document.getElementById(id)));
 
 /* ---------- leaderboard chart ---------- */
-let group = 'model', dom = 'All', showRuns = true;
+let metric = 'eci', group = 'model', dom = 'All', showRuns = true;
 const DOMS_WITH_RUNS = DOMAINS.filter(d => RUNS.some(r => r.d === d));
 $('#domradios').innerHTML = ['All', ...DOMS_WITH_RUNS].map(d => `<label><input type="radio" name="dom" value="${esc(d)}" ${d === 'All' ? 'checked' : ''}>${d === 'All' ? 'All domains' : esc(d)}<span class="n num">${RUNS.filter(r => d === 'All' || r.d === d).length}</span></label>`).join('');
 $('#domradios').addEventListener('change', e => { dom = e.target.value; drawLB(); });
 $('#groupby').addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return; group = b.dataset.g;
   [...$('#groupby').children].forEach(c => c.setAttribute('aria-pressed', String(c === b))); drawLB(); });
+$('#metric').addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return; metric = b.dataset.k;
+  [...$('#metric').children].forEach(c => c.setAttribute('aria-pressed', String(c === b))); $('#scoreopts').hidden = metric !== 'score'; drawLB(); });
 $('#showruns').addEventListener('change', e => { showRuns = e.target.checked; drawLB(); });
 $('#custom').addEventListener('click', () => { const s = $('#settings'); const o = !s.classList.contains('open'); s.classList.toggle('open', o); $('#custom').setAttribute('aria-expanded', String(o)); });
 $('#lblegend').innerHTML = RANKED.map(m => `<span><i style="background:${MCOL[m.id]}"></i>${esc(m.name)}</span>`).join('');
 
+/* ECI view: one row per model, the 90% interval as a bar, Human (the authors' reference code) as a dashed line at 100 */
+function drawECI() {
+  $('#ylab').textContent = 'ECI, FrontierCS 2 capabilities index';
+  $('#lbnote').textContent = 'Preliminary · Human = 100 (the authors’ reference code), Kimi K2.7 Code = 20 · bars are 90% intervals';
+  $('#nres').textContent = `${RUNS.length} runs`;
+  const svg = $('#lbsvg'), box = $('#lbplot'), W = Math.max(300, box.clientWidth), narrow = W < 560;
+  const L = narrow ? 112 : 190, R = 34, T = 26, B = 46, lane = narrow ? 56 : 64;
+  const xmax = Math.ceil(Math.max(...MODELS.map(m => ECI[m.id][2])) / 20) * 20, step = narrow && xmax > 120 ? 40 : 20;
+  const H = T + RANKED.length * lane + B;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
+  const X = v => L + v / xmax * (W - L - R);
+  for (let v = 0; v <= xmax; v += step) {
+    svg.append(sv('line', {x1:X(v), x2:X(v), y1:T, y2:H - B + 6, stroke:'var(--grid)', 'stroke-width':1}));
+    svg.append(sv('text', {x:X(v), y:H - B + 22, 'text-anchor':'middle'}, v));
+  }
+  svg.append(sv('line', {x1:X(100), x2:X(100), y1:T - 6, y2:H - B + 6, stroke:'var(--ink-2)', 'stroke-width':1.2, 'stroke-dasharray':'4 4'}));
+  svg.append(sv('text', {class:'an', x:X(100) + (narrow ? -6 : 6), y:T - 12, 'text-anchor': narrow ? 'end' : 'start', 'font-size':12.5}, 'Human = 100'));
+  svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'ECI'));
+  const pts = [];
+  RANKED.forEach((m, i) => {
+    const [e, lo, hi, nt] = ECI[m.id], y0 = T + i * lane, yc = y0 + lane / 2, anchor = m.id === ECI_LOW;
+    if (i) svg.append(sv('line', {x1:0, x2:W - R, y1:y0, y2:y0, stroke:'var(--line)', 'stroke-width':1}));
+    const name = narrow ? m.short : m.name;
+    svg.append(sv('text', {class:'lab', x:0, y:yc + (m.h ? -3 : 4)}, name));
+    if (m.h) svg.append(sv('text', {x:0, y:yc + 14, 'font-size':12}, m.h));
+    if (!anchor) {
+      svg.append(sv('line', {x1:X(lo), x2:X(hi), y1:yc, y2:yc, stroke:MCOL[m.id], 'stroke-width':6, 'stroke-linecap':'round', opacity:.25}));
+    }
+    svg.append(sv('circle', {cx:X(e), cy:yc, r:7, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':2}));
+    svg.append(sv('text', {class:'val halo', x:X(e), y:yc - 13, fill:MCOL[m.id], 'text-anchor':'middle'}, Math.round(e)));
+    const nr = RUNS.filter(r => r.m === m.id).length;
+    pts.push({x:X(e), y:yc, mean:true, html:`<b>${esc(m.name)}</b><br>ECI <b>${f1(e)}</b>${anchor ? ` (anchor, fixed at ${ECI[m.id][0]})` : `<br>90% interval ${Math.round(lo)}–${Math.round(hi)}`}<br>${nr} runs on ${NTASK(RUNS.filter(r => r.m === m.id))} tasks`});
+  });
+  attachTip(svg, W, H, pts);
+}
+function attachTip(svg, W, H, pts) {
+  const tip = $('#lbtip');
+  const near = ev => { const rc = svg.getBoundingClientRect(), px = (ev.clientX - rc.left) * W / rc.width, py = (ev.clientY - rc.top) * H / rc.height;
+    let best = null, bd = 1e9; pts.forEach(p => { const d = Math.hypot(p.x - px, p.y - py) - (p.mean ? 4 : 0); if (d < bd) { bd = d; best = p; } });
+    return bd < 28 ? {p:best, rc} : null; };
+  svg.onpointermove = ev => { const n = near(ev); if (!n) { tip.hidden = true; return; }
+    tip.innerHTML = n.p.html; tip.hidden = false; tip.style.left = (n.p.x / W * n.rc.width) + 'px'; tip.style.top = (n.p.y / H * n.rc.height) + 'px'; };
+  svg.onpointerdown = svg.onpointermove;
+  svg.onpointerleave = () => { if (!isTouch) tip.hidden = true; };
+}
+
 function drawLB() {
+  if (metric === 'eci') return drawECI();
+  $('#ylab').textContent = 'Final score, mean over runs';
+  $('#lbnote').textContent = 'Preliminary · scores on each task’s own 0–100 scale · each model ran its own set of tasks';
   const runs = RUNS.filter(r => dom === 'All' || r.d === dom);
   $('#nres').textContent = `${runs.length} run${runs.length === 1 ? '' : 's'}`;
   let rows;
@@ -209,14 +262,7 @@ function drawLB() {
     });
     y0 += h;
   });
-  const tip = $('#lbtip');
-  const near = ev => { const rc = svg.getBoundingClientRect(), px = (ev.clientX - rc.left) * W / rc.width, py = (ev.clientY - rc.top) * H / rc.height;
-    let best = null, bd = 1e9; pts.forEach(p => { const d = Math.hypot(p.x - px, p.y - py) - (p.mean ? 4 : 0); if (d < bd) { bd = d; best = p; } });
-    return bd < 28 ? {p:best, rc} : null; };
-  svg.onpointermove = ev => { const n = near(ev); if (!n) { tip.hidden = true; return; }
-    tip.innerHTML = n.p.html; tip.hidden = false; tip.style.left = (n.p.x / W * n.rc.width) + 'px'; tip.style.top = (n.p.y / H * n.rc.height) + 'px'; };
-  svg.onpointerdown = svg.onpointermove;
-  svg.onpointerleave = () => { if (!isTouch) tip.hidden = true; };
+  attachTip(svg, W, H, pts);
 }
 
 /* ---------- results by domain ---------- */

@@ -66,6 +66,8 @@ h2{font-weight:600; font-size:clamp(25px,2.4vw,30px); line-height:1.2; margin:0}
 .settings{border:1px solid var(--line); border-radius:6px; padding:20px 20px 24px}
 .settings h3{font-size:20px; font-weight:600; margin:0 0 14px; padding-bottom:14px; border-bottom:1px solid var(--line)}
 .settings h4{font-size:14px; font-weight:600; margin:18px 0 10px}
+.settings h4.first{margin-top:0}
+#scoreopts .toggle{margin-top:20px}
 .chips{display:flex; flex-wrap:wrap; gap:8px}
 .chip{border:1px solid #bdc1c6; background:#fff; border-radius:100px; padding:5px 11px; font-size:14px; color:var(--ink-2)}
 .chip[aria-pressed="true"]{background:var(--ink-2); border-color:var(--ink-2); color:#fff}
