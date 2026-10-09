@@ -1508,13 +1508,9 @@ a.tm-n:hover { color: var(--accent-hover); text-decoration-color: currentColor; 
 .team-note { font-size: 14px; color: var(--ink-3); margin: 18px 0 0; }
 .contact-grid { margin-top: 6px; }
 .team-join { max-width: 640px; margin: 28px 0 14px; color: var(--ink-2); }
-.logo-wall { list-style: none; margin: 20px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(136px, 1fr)); gap: 36px 24px; }
-.logo-wall li { display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
-.logo-wall li { min-height: 76px; justify-content: flex-end; }
-.logo-wall img { height: 28px; width: auto; max-width: 116px; object-fit: contain; filter: grayscale(1); opacity: .72; mix-blend-mode: multiply; }
-.logo-wall img.mark { height: 42px; }
-.logo-wall b { flex: 1; display: grid; place-items: center; font-size: 16px; font-weight: 700; line-height: 1.1; color: #6b6f73; }
-.logo-wall span { font-size: 13px; color: var(--ink-3); }
+.logo-wall { list-style: none; margin: 24px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)); gap: 40px 28px; align-items: center; }
+.logo-wall li { display: flex; justify-content: center; align-items: center; height: 52px; }
+.logo-wall img { height: var(--h, 36px); width: auto; max-width: 100%; opacity: .78; }
 .sponsor-row { list-style: none; margin: 20px 0 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 28px 64px; }
 .sponsor-row img { width: auto; display: block; }
 .sponsor-row img.laude { height: 44px; }
@@ -1526,11 +1522,9 @@ a.tm-n:hover { color: var(--accent-hover); text-decoration-color: currentColor; 
   .contact-grid { grid-template-columns: 1fr; }
     .tm-n { font-size: 15px; }
   .tm-a { font-size: 13px; }
-  .logo-wall { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px 12px; }
-  .logo-wall li { min-height: 64px; }
-  .logo-wall img { height: 22px; max-width: 100%; }
-  .logo-wall img.mark { height: 34px; }
-  .logo-wall b { font-size: 14px; }
+  .logo-wall { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 16px; }
+  .logo-wall li { height: 40px; }
+  .logo-wall img { height: calc(var(--h, 36px) * .75); }
   .sponsor-row img.laude { height: 38px; }
   .sponsor-row img.modal { height: 26px; }
 }

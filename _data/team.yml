@@ -6,20 +6,21 @@
 #   affil is empty for authors added after arXiv v1 until their affiliation is confirmed.
 #   Homepages come from blog post front matter or the advisors' own sites.
 
+# logo: trimmed wordmark PNG, 160 px tall; h: display height in px, so every logo covers about the same area.
 institutions:
-  - {name: UC Berkeley, logo: berkeley.svg}
-  - {name: Princeton, logo: princeton.svg, mark: true}
-  - {name: UCSD, logo: ucsd.svg}
-  - {name: X-camp Academy}
-  - {name: Georgia Tech, logo: gatech.svg, mark: true}
-  - {name: NYU, logo: nyu.svg}
-  - {name: Stanford, logo: stanford.svg}
-  - {name: UW, logo: washington.png}
-  - {name: NTU, logo: ntu.svg, mark: true}
-  - {name: Toronto, logo: toronto.svg, mark: true}
-  - {name: UIUC, logo: uiuc.png, mark: true}
-  - {name: Michigan, logo: michigan.svg}
-  - {name: MIT, logo: mit.svg}
+  - {name: UC Berkeley, logo: berkeley.png, h: 40}
+  - {name: Princeton, logo: princeton.png, h: 36}
+  - {name: UCSD, logo: ucsd.png, h: 31}
+  - {name: X-camp Academy, logo: xcamp.png, h: 40}
+  - {name: Georgia Tech, logo: gatech.png, h: 44}
+  - {name: NYU, logo: nyu.png, h: 42}
+  - {name: Stanford, logo: stanford.png, h: 33}
+  - {name: UW, logo: washington.png, h: 33}
+  - {name: NTU, logo: ntu.png, h: 43}
+  - {name: Toronto, logo: toronto.png, h: 35}
+  - {name: UIUC, logo: uiuc.png, h: 37}
+  - {name: Michigan, logo: michigan.png, h: 32}
+  - {name: MIT, logo: mit.png, h: 38}
 
 fcs1:
   title: "FrontierCS: Evolving Challenges for Evolving Intelligence"

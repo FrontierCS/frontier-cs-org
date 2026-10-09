@@ -45,7 +45,7 @@ permalink: /team/
   </div></div>
   <ul class="logo-wall">
     {%- for i in site.data.team.institutions %}
-    <li>{% if i.logo %}<img{% if i.mark %} class="mark"{% endif %} src="{{ 'assets/img/institutions/' | append: i.logo | relative_url }}" alt="{{ i.name }} logo"><span>{{ i.name }}</span>{% else %}<b>{{ i.name }}</b>{% endif %}</li>
+    <li><img src="{{ 'assets/img/institutions/wordmarks/' | append: i.logo | relative_url }}" alt="{{ i.name }}" style="--h:{{ i.h }}px"></li>
     {%- endfor %}
   </ul>
 </div>
