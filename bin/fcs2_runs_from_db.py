@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Rewrite the FrontierCS 2 leaderboard data in assets/js/fcs2.js from a preview-result sqlite.db.
 
-usage: python3 bin/fcs2_runs_from_db.py path/to/sqlite.db
+usage: python3 bin/fcs2_runs_from_db.py path/to/sqlite.db   (needs numpy, scipy, pandas, tqdm)
 
 The database lists one run per (model, task version) in `cells`. A run's score is `display_score`:
 the verifier's final score, with timeouts shown as 0. Runs without a score are left out.
@@ -9,13 +9,16 @@ Tasks are matched to the paper's task list by display name (TASK below): the dom
 task's folder under tasks/frontier-cs-2.0-demo/problems/ in FrontierCS-2.0-Preview, and the
 short name is the paper's name for the task, or the database name when the paper list has none.
 
-FrontierCS ECI, the leaderboard's main number, follows Epoch's Capabilities Index: every task is one benchmark with
-score/100 = sigmoid(a_t * (theta_m - b_t)), fitted by least squares over all (respondent, task) pairs
-with an L2 penalty of 0.01 on theta, b and log a (weaker penalties did not converge to one answer across seeds).
+FrontierCS ECI, the leaderboard's main number, is fitted with Epoch AI's own ECI code (bin/eci_fitting.py, vendored
+from epoch-research/eci-public): every task is one benchmark with score/100 = sigmoid(slope_t * (capability_m - difficulty_t)),
+fitted by bounded least squares with Epoch's defaults (L2 penalty 0.1 over the parameter count, scores clipped to [0.001, 0.999]).
+Epoch pins one benchmark's slope to 1; here that is the task with the most observations (ties: first by name).
 Respondents are the models (mean score over their runs on a task) and the authors' reference
 (median reference_score over the task's runs; references of 0 mean the task has none and are left out).
-theta is mapped linearly so that Human (the authors' reference) is HUMAN_VALUE and LOW_ANCHOR is LOW_VALUE. The 90% interval comes from
-resampling tasks with replacement (300 draws, fixed seeds), so the output is reproducible.
+Capabilities are mapped linearly so that Human (the authors' reference) is HUMAN_VALUE and LOW_ANCHOR is LOW_VALUE.
+The 90% interval follows Epoch's bootstrap: each respondent's task results are resampled with replacement and the fit
+is redone from the central solution (BOOT draws, seeds 0..BOOT-1). Epoch's code raises when a draw puts the anchors in the
+wrong order; those draws are left out and counted.
 
 Pass rate is the share of scored runs whose verdict is PASS: the final submission meets the task's
 beat-the-reference criteria on every workload. It is a plain count, so it has no interval.
@@ -23,6 +26,11 @@ beat-the-reference criteria on every workload. It is a plain count, so it has no
 import json, re, sqlite3, sys
 from collections import Counter, defaultdict
 import numpy as np
+import pandas as pd
+import os
+os.environ.setdefault('TQDM_DISABLE', '1')   # Epoch's bootstrap bar, once per draw here
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from eci_fitting import fit_eci_model
 from datetime import datetime
 
 # database display name -> (domain folder, paper short name or None)
@@ -91,46 +99,39 @@ for a in sys.argv[2:]:   # optional: --low='Model name=value' to try another anc
     if a.startswith('--low='): LOW_ANCHOR, LOW_VALUE = a[6:].rsplit('=', 1)[0], float(a[6:].rsplit('=', 1)[1])
 
 
-def irt_fit(I, J, Y, nR, nT, steps=6000, lam=1e-2, seed=0):
-    """Least-squares logistic IRT with Adam; returns abilities theta (one per respondent)."""
-    rng = np.random.default_rng(seed)
-    th, b, al = rng.normal(0, .1, nR), rng.normal(0, .1, nT), np.zeros(nT)
-    P = [th, b, al]; m1 = [np.zeros_like(x) for x in P]; m2 = [np.zeros_like(x) for x in P]
-    for k in range(1, steps + 1):
-        a = np.exp(al); z = a[J] * (th[I] - b[J]); p = 1 / (1 + np.exp(-z))
-        g = 2 * (p - Y) * p * (1 - p)
-        grads = [np.bincount(I, g * a[J], nR) + 2 * lam * th, -np.bincount(J, g * a[J], nT) + 2 * lam * b,
-                 np.bincount(J, g * z, nT) + 2 * lam * al]
-        for x, gx, u, v in zip(P, grads, m1, m2):
-            u *= .9; u += .1 * gx; v *= .999; v += .001 * gx * gx
-            x -= .03 * (u / (1 - .9 ** k)) / (np.sqrt(v / (1 - .999 ** k)) + 1e-8)
-    return th
+BOOT = 500
 
 
 def eci(rows):
+    """Per respondent: (ECI, 90% low, 90% high, tasks); plus the number of bootstrap draws kept and dropped."""
     sc, ref = defaultdict(list), defaultdict(list)
     for cand, task, score, fj in rows:
         if score is not None: sc[(cand, task)].append(score)
         f = json.loads(fj) if fj else {}
         if f.get('reference_score') is not None: ref[task].append(f['reference_score'])
-    obs = {k: np.mean(v) / 100 for k, v in sc.items()}
-    for t, v in ref.items():
-        if np.median(v) > 0: obs[('reference', t)] = float(np.median(v)) / 100
-    resp = sorted({m for m, _ in obs}); tasks = sorted({t for _, t in obs})
-    R = {m: i for i, m in enumerate(resp)}; T = {t: j for j, t in enumerate(tasks)}
-    I = np.array([R[m] for m, _ in obs]); J = np.array([T[t] for _, t in obs]); Y = np.array(list(obs.values()))
-    scale = lambda th: LOW_VALUE + (HUMAN_VALUE - LOW_VALUE) * (th - th[R[LOW_ANCHOR]]) / (th[R['reference']] - th[R[LOW_ANCHOR]])
-    point = scale(irt_fit(I, J, Y, len(resp), len(tasks)))
-    rng, boot = np.random.default_rng(1), []
-    for it in range(300):
-        pick = rng.integers(0, len(tasks), len(tasks))
-        idx = np.concatenate([np.flatnonzero(J == j) for j in pick])
-        newJ = np.concatenate([np.full((J == j).sum(), n) for n, j in enumerate(pick)])
-        if {R['reference'], R[LOW_ANCHOR]} <= set(I[idx]):
-            boot.append(scale(irt_fit(I[idx], newJ, Y[idx], len(resp), len(pick), steps=4000, seed=it)))
-    lo, hi = np.percentile(np.array(boot), [5, 95], axis=0)
-    ntask = Counter(m for m, _ in obs)
-    return {m: (round(float(point[R[m]]), 1), round(float(lo[R[m]]), 1), round(float(hi[R[m]]), 1), ntask[m]) for m in resp}, len(boot)
+    recs = [(m, t, float(np.mean(v)) / 100) for (m, t), v in sc.items()]
+    recs += [('reference', t, float(np.median(v)) / 100) for t, v in ref.items() if np.median(v) > 0]
+    df = pd.DataFrame(recs, columns=['Model', 'benchmark', 'performance'])
+    df['model_id'], df['benchmark_id'] = df['Model'], df['benchmark']
+    counts = df['benchmark'].value_counts()
+    pinned = sorted(counts.index, key=lambda t: (-counts[t], t))[0]
+    kw = dict(anchor_benchmark=pinned, anchor_model_low=LOW_ANCHOR, anchor_eci_low=float(LOW_VALUE),
+              anchor_model_high='reference', anchor_eci_high=float(HUMAN_VALUE))
+    central, _, _ = fit_eci_model(df, bootstrap_samples=0, **kw)
+    point = dict(zip(central['Model'], central['eci']))
+    draws, dropped = [], 0
+    for seed in range(BOOT):
+        try:
+            _, _, d = fit_eci_model(df, bootstrap_samples=1, bootstrap_seed=seed, **kw)
+            draws.append(dict(zip(d['model_names'], d['eci'][0])))
+        except ValueError:
+            dropped += 1
+    ntask = Counter(df['Model'])
+    out = {}
+    for m in point:
+        lo, hi = np.percentile([d[m] for d in draws], [5, 95])
+        out[m] = (round(float(point[m]), 1), round(float(lo), 1), round(float(hi), 1), int(ntask[m]))
+    return out, len(draws), dropped, pinned
 
 
 db = sqlite3.connect(sys.argv[1])
@@ -162,7 +163,7 @@ js_path = 'assets/js/fcs2.js'
 js = open(js_path, encoding='utf-8').read()
 when = datetime.fromisoformat(generated[:19])
 models = [MODEL[c] for c in MODEL if c not in HIDDEN]
-E, nboot = eci(db.execute('''select c.name, t.name, r.display_score, r.feedback_json from cells ce
+E, nboot, nbad, pinned = eci(db.execute('''select c.name, t.name, r.display_score, r.feedback_json from cells ce
   join runs r on r.id = ce.run_id join candidates c on c.id = ce.candidate_id join tasks t on t.id = ce.task_id''').fetchall())
 eci_js = {MODEL[c][0]: list(E[c]) for c in MODEL if c not in HIDDEN}
 block = (f'// One entry per scored run in the preview results database of {when:%Y-%m-%d} (bin/fcs2_runs_from_db.py):\n'
@@ -170,7 +171,7 @@ block = (f'// One entry per scored run in the preview results database of {when:
          f'const RUNS = {json.dumps(runs, ensure_ascii=False)}.map(([m, d, t, s, p]) => ({{m, d, t, s, p}}));\n'
          'const MODELS = [\n' + ''.join(f"  {{id:'{i}', name:'{n}', short:'{s}', h:'{h}', lab:'{l}'}},\n" for i, n, s, h, l in models) + '];\n'
          f"const UPDATED = '{when:%B} {when.day}, {when.year}';\n"
-         f"// FrontierCS ECI per model: [point, 90% low, 90% high, tasks]; Human (the authors' reference) is {HUMAN_VALUE:g} and {LOW_ANCHOR} is {LOW_VALUE:g} ({nboot} task resamples).\n"
+         f"// FrontierCS ECI per model: [point, 90% low, 90% high, tasks]; Human (the authors' reference) is {HUMAN_VALUE:g} and {LOW_ANCHOR} is {LOW_VALUE:g} ({nboot} bootstrap draws kept, {nbad} dropped with the anchors inverted; pinned slope: {pinned}).\n"
          f"// Pass rate per model: [percent, runs that pass, runs].\nconst PASS = {json.dumps(pass_rate(runs))};\n"
          f"const ECI = {json.dumps(eci_js)};\nconst ECI_HUMAN = {HUMAN_VALUE:g}, ECI_LOW = '{MODEL[LOW_ANCHOR][0]}', ECI_LOW_NAME = '{MODEL[LOW_ANCHOR][1]}', ECI_LOW_VALUE = {LOW_VALUE:g}, ECI_REF_TASKS = {E['reference'][3]};\n")
 js, n = re.subn(r'// One entry per .*?\nconst MODELS = \[\n.*?\];\n(const UPDATED = .*?\n)?(// (FrontierCS )?ECI per model.*?\n(// Pass rate.*?\nconst PASS = .*?\n)?const ECI = .*?\nconst (ECI_HUMAN = .*?, )?ECI_LOW = .*?\n)?', lambda m: block, js, flags=re.S)

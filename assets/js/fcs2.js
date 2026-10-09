@@ -29,10 +29,10 @@ const MODELS = [
   {id:'glm', name:'GLM 5.3', short:'GLM 5.3', h:'ZCode', lab:'Z.ai'},
 ];
 const UPDATED = 'October 8, 2026';
-// FrontierCS ECI per model: [point, 90% low, 90% high, tasks]; Human (the authors' reference) is 25 and Kimi K2.7 Code is 0 (300 task resamples).
+// FrontierCS ECI per model: [point, 90% low, 90% high, tasks]; Human (the authors' reference) is 25 and Kimi K2.7 Code is 0 (494 bootstrap draws kept, 6 dropped with the anchors inverted; pinned slope: Adaptive Robustness Evaluation for Prompt-Injection Defense).
 // Pass rate per model: [percent, runs that pass, runs].
 const PASS = {"astra": [66.7, 20, 30], "ds": [46.7, 14, 30], "glm": [35.0, 14, 40], "k3": [35.0, 14, 40], "muse": [37.5, 15, 40], "qwen": [36.8, 7, 19], "sol": [46.9, 30, 64]};
-const ECI = {"astra": [34.2, 29.7, 48.2, 30], "sol": [33.0, 26.8, 45.0, 40], "muse": [23.4, 20.6, 32.5, 40], "k3": [23.5, 21.0, 35.1, 40], "qwen": [23.0, 18.8, 33.5, 19], "ds": [25.1, 24.9, 36.6, 30], "glm": [25.5, 21.1, 34.7, 40]};
+const ECI = {"astra": [35.1, 30.4, 62.0, 30], "sol": [33.6, 27.6, 55.6, 40], "muse": [22.4, 18.3, 38.1, 40], "k3": [22.7, 19.4, 40.3, 40], "qwen": [21.4, 15.2, 37.1, 19], "ds": [25.8, 22.2, 44.8, 30], "glm": [26.2, 19.1, 43.7, 40]};
 const ECI_HUMAN = 25, ECI_LOW = 'k27', ECI_LOW_NAME = 'Kimi K2.7 Code', ECI_LOW_VALUE = 0, ECI_REF_TASKS = 38;
 const RAN = new Set(RUNS.map(r => r.t));
 const mean = a => a.reduce((x, y) => x + y, 0) / a.length;
