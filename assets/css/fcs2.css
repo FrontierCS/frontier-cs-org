@@ -86,6 +86,9 @@ h2{font-weight:600; font-size:clamp(25px,2.4vw,30px); line-height:1.2; margin:0}
 /* domain table */
 .tbl-wrap{margin-top:56px}
 .tbl-wrap h3{font-size:22px; font-weight:600; margin:0 0 14px}
+.res-scroll{overflow-x:auto; -webkit-overflow-scrolling:touch}
+.res th{white-space:nowrap}
+#lbsvg .halo{paint-order:stroke; stroke:#fff; stroke-width:4px; stroke-linejoin:round}
 table.res{width:100%; border-collapse:collapse; font-size:15px}
 .res th{text-align:right; font-weight:600; font-size:13px; color:var(--ink-2); padding:10px 12px; border-bottom:1px solid var(--ink-2); vertical-align:bottom}
 .res th:first-child,.res td:first-child{text-align:left; padding-left:0}

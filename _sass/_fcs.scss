@@ -36,7 +36,9 @@
   --bg: #ffffff; --muted: #5f6368; --muted-2: #5f6368; --faint: #9aa0a6;
   --line: #dadce0; --line-2: #dadce0; --grid: #eceff1; --soft: #f1f3f4; --mint: #d3e3fd; --mint-2: #c2d7fb;
   --teal: #0b57d0; --teal-d: #0842a0; --brand-ink: #1f1f1f; --deep: #202124; --deep-ink: #e8eaed; --deep-muted: #9aa0a6;
-  --m-astra: #1f1f1f; --m-sol: #1f1f1f; --m-kimi: #047afe;   /* Artificial Analysis creator colours: OpenAI, Kimi */
+  /* model colours: lab hue from the Artificial Analysis creator colours (OpenAI #1f1f1f, Kimi #047afe), GM2 for the other labs;
+     the second model of a lab takes a lighter tone */
+  --m-astra: #1f1f1f; --m-sol: #9aa0a6; --m-k3: #047afe; --m-k27: #8ab4f8; --m-muse: #a142f4; --m-qwen: #e8710a; --m-ds: #d93025; --m-glm: #1e8e3e;
   --fail: #bdc1c6;
   --sans: 'Hanken Grotesk', 'Helvetica Neue', Arial, sans-serif;
 }
@@ -1482,7 +1484,7 @@ section.journal#hero { padding: clamp(56px, 6vw, 72px) 0 clamp(32px, 4vw, 48px);
 .sec-head { border-bottom: 0; padding-bottom: 0; margin-bottom: 22px; }
 .post-row .post-thumb.placeholder, .tile-thumb.placeholder { background: var(--paper-2); }
 
-/* navigation: Workshop and Team sit in the site nav, and move into the menu on phones */
+/* navigation: Papers, Workshop and Team sit in the site nav, and move into the menu on phones */
 .nav-aux .narrow-only { display: none; }
 @media (max-width: 700px) {
   .nav-main .wide-only { display: none; }

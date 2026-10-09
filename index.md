@@ -12,7 +12,7 @@ page_css: fcs2
 
 <div class="col" id="main" tabindex="-1">
 <section class="intro" id="overview">
-  <p class="upd"><i></i>Preliminary results, Oct. 2026</p>
+  <p class="upd"><i></i><span data-fill="updated">Last updated: October 8, 2026</span></p>
   <h1>FrontierCS 2: A benchmark for agentic computer-science R&amp;D</h1>
   <p class="lead">Each task deletes a published paper’s contribution from the repository its authors released. The agent writes it back, and the authors’ own code is the reference it must beat.</p>
 
@@ -21,8 +21,8 @@ page_css: fcs2
       <p>90 start from a published paper. Structured LWE and Gigatoken have none.</p><a class="pill" href="#tasks">Browse tasks</a></article>
     <article class="stat"><h3>Domains</h3><div class="big"><b class="num">13</b><span>areas of computer science</span></div>
       <p>The largest are Machine Learning, with 22 tasks, and MLSys, with 17.</p><a class="pill" href="#domains">Results by domain</a></article>
-    <article class="stat"><h3>Runs</h3><div class="big"><b class="num">31</b><span>on 18 tasks</span></div>
-      <p>GPT-6 Astra, GPT-5.6 Sol and Kimi K2.7 have run so far.</p><a class="pill" href="#leaderboard">Go to leaderboard</a></article>
+    <article class="stat"><h3>Runs</h3><div class="big"><b class="num" data-fill="runs">297</b><span data-fill="runtasks">on 42 tasks</span></div>
+      <p data-fill="models">8 models from 6 labs have run so far.</p><a class="pill" href="#leaderboard">Go to leaderboard</a></article>
   </div>
 </section>
 
@@ -30,7 +30,7 @@ page_css: fcs2
   <h2>Leaderboard</h2>
   <div class="cgrid">
     <figure class="chart" style="margin:0">
-      <div class="chead"><span id="ylab">Final score, mean over runs</span><span class="r" id="nres">31 runs</span></div>
+      <div class="chead"><span id="ylab">Final score, mean over runs</span><span class="r" id="nres">297 runs</span></div>
       <div class="plot" id="lbplot"><svg id="lbsvg" role="img" aria-label="Leaderboard chart"></svg><div class="tip" id="lbtip" hidden></div></div>
       <div class="legend" id="lblegend"></div>
       <button class="pill lg custom" id="custom" type="button" aria-expanded="false" aria-controls="settings">
@@ -50,8 +50,8 @@ page_css: fcs2
 
   <div class="tbl-wrap" id="domains">
     <h3>Results by domain</h3>
-    <table class="res num" id="restbl"></table>
-    <p class="cfoot" style="border-top:0; margin-top:10px; padding-top:0">Mean final score over each model’s runs. A dash means no run yet. Bold marks the best score in a row.</p>
+    <div class="res-scroll"><table class="res num" id="restbl"></table></div>
+    <p class="cfoot" style="border-top:0; margin-top:10px; padding-top:0">Mean final score over each model’s runs. Each model ran its own set of tasks. A dash means no run yet. Bold marks the best score in a row.</p>
   </div>
 </section>
 
@@ -104,7 +104,7 @@ page_css: fcs2
       <details id="q-built"><summary>How is a task built?</summary><div class="ans"><p>We delete a paper’s contribution from its own repository. The agent writes it back and is scored against the authors’ code.</p></div></details>
       <details id="q-see"><summary>What does the agent see?</summary><div class="ans"><p>It sees its repository and, for each patch, a development score and one message. The evaluator, the hidden suite and the reference stay with the judge.</p></div></details>
       <details id="q-bar"><summary>What counts as beating the reference?</summary><div class="ans"><p>The agent must meet criteria set from the reference’s own measurements, on every workload. For SVG-EAR, its latency must be at most 0.96 of the reference’s, with PSNR, SSIM and LPIPS within fixed bands.</p></div></details>
-      <details id="q-score"><summary>How are scores computed?</summary><div class="ans"><p>Each task’s evaluator scores the final submission on the hidden suite, from 0 to 100. The leaderboard averages these scores over runs. The results are preliminary: 31 runs on 18 tasks.</p></div></details>
+      <details id="q-score"><summary>How are scores computed?</summary><div class="ans"><p>Each task’s evaluator scores the final submission on the hidden suite, from 0 to 100. The leaderboard averages these scores over runs, and a run that times out scores 0. The results are preliminary: <span data-fill="summary">297 runs on 42 tasks by 8 models</span>.</p></div></details>
       <details id="q-run"><summary>Can I run it?</summary><div class="ans"><p>We will release the tasks, evaluators and judge as one evaluation environment.</p></div></details>
     </div>
   </div>

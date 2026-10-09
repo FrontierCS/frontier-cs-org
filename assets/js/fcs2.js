@@ -16,25 +16,20 @@ const AREA_OF = Object.fromEntries(AREAS.flatMap(a => a.d.map(d => [d, a])));
 const TASKS = TASKS_RAW.map(([d, s, t, p, r]) => ({d: SHOWN[d] || d, s, t: t === s ? '' : t, p, r: /^https?:/.test(r) && !/arxiv\.org/.test(r) ? r : ''}));
 const N_IN = d => TASKS.filter(t => t.d === d).length;
 
-// One entry per completed run in Table 1: model, domain, task, final score (0-100, the task's own scale).
-const RUNS = [
-  ['astra','Programming Languages','BABBLE',19.28],['astra','Network','MetaOpt',51.54],['astra','Network','Shockwave',47.25],
-  ['astra','MLSys','SVG-EAR',29.94],['astra','MLSys','dbscan kernel',69.34],['astra','MLSys','dbscan kernel',63.98],
-  ['astra','MLSys','ivf_pq kernel',73.71],['astra','MLSys','kmeans kernel',51.78],['astra','MLSys','kmeans kernel',48.06],
-  ['astra','MLSys','kmeans kernel',48.15],['astra','MLSys','knn kernel',45.52],['astra','Cryptography','Structured LWE',82.0],
-  ['astra','Machine Learning','Polar Express',71.7],['astra','Database','Yannakakis',11.38],['astra','HPC','RegionsSort',48.51],
-  ['astra','HPC','Parallel DBSCAN',45.59],['astra','HPC','Parallel DBSCAN',70.56],['astra','HPC','Hygra',48.74],
-  ['kimi','MLSys','SVG-EAR',28.4],['kimi','MLSys','SVG-EAR',27.5],['kimi','Architecture','KAMI',0.0],
-  ['kimi','Machine Learning','DyT',48.2],['kimi','Database','Yannakakis',16.9],['kimi','Database','Yannakakis',2.0],
-  ['kimi','Database','Yannakakis',18.2],
-  ['sol','Database','Seer',81.2],['sol','Database','Seer',81.4],['sol','Database','Seer',81.2],
-  ['sol','Database','Spectrum',33.8],['sol','Database','Spectrum',21.9],['sol','Database','Spectrum',37.6],
-].map(([m, d, t, s]) => ({m, d, t, s}));
+// One entry per scored run in the preview results database of 2026-10-08 (bin/fcs2_runs_from_db.py):
+// model, domain, task, final score (0-100, the task's own scale). Timeouts score 0; 23 unscored runs are left out.
+const RUNS = [["sol", "Database", "Yannakakis", 11.41], ["sol", "Machine Learning", "Differentiable Population Statistics", 4.39], ["sol", "HPC", "RegionsSort", 51.23], ["sol", "Security", "Progent", 93.16], ["sol", "Robotics", "MuJoCo Playground", 37.97], ["sol", "HPC", "RegionsSort", 51.31], ["sol", "HPC", "Hygra", 45.42], ["sol", "Machine Learning", "Polar Express", 60.79], ["sol", "Machine Learning", "DyT", 61.11], ["sol", "HPC", "ParButterfly", 56.41], ["sol", "Robotics", "Diffusion Policy", 57.55], ["sol", "Architecture", "KAMI", 16.34], ["sol", "Database", "Approximate-MIPS Query Stopping", 81.55], ["sol", "Machine Learning", "Robust Image Tokenizer", 70.76], ["sol", "MLSys", "dbscan kernel", 69.79], ["sol", "MLSys", "knn kernel", 39.97], ["sol", "Database", "Persistent Treap Update Engine", 35.6], ["sol", "Security", "Spectre", 81.4], ["sol", "HPC", "ParButterfly", 53.41], ["sol", "Cryptography", "Structured LWE", 79.5], ["sol", "Programming Languages", "egg", 59.92], ["sol", "Database", "Residual State Advancement", 46.23], ["sol", "Network", "MetaOpt", 0.0], ["sol", "Machine Learning", "Nano World Model", 79.84], ["sol", "Database", "FARGO paper-aligned query core", 52.1], ["sol", "MLSys", "SVG-EAR", 33.74], ["sol", "Database", "Spectrum", 81.24], ["sol", "MLSys", "ivf_pq kernel", 77.34], ["sol", "Robotics", "MuJoCo Playground", 37.97], ["sol", "Security", "Opal", 99.17], ["sol", "Programming Languages", "BABBLE", 17.32], ["sol", "Machine Learning", "RAGEN", 98.92], ["sol", "Machine Learning", "Nano World Model", 81.21], ["sol", "HPC", "Parallel DBSCAN", 76.57], ["sol", "Security", "Adaptive attacks", 75.87], ["sol", "HPC", "Hygra", 59.52], ["sol", "MLSys", "knn kernel", 44.45], ["sol", "Programming Languages", "egg", 60.89], ["sol", "HPC", "Parallel DBSCAN", 76.96], ["sol", "Machine Learning", "DyT", 66.28], ["sol", "Security", "Adaptive attacks", 82.24], ["sol", "Database", "Yannakakis", 12.2], ["sol", "MLSys", "kmeans kernel", 44.72], ["sol", "Database", "Approximate-MIPS Query Stopping", 69.23], ["sol", "Programming Languages", "Polygon", 92.13], ["sol", "Machine Learning", "Polar Express", 71.71], ["sol", "Network", "Shockwave", 40.46], ["sol", "Architecture", "Clusterwise SpGEMM", 91.13], ["sol", "Database", "Spectrum", 82.84], ["sol", "Network", "BBQ", 71.77], ["sol", "MLSys", "SVG-EAR", 50.94], ["sol", "Database", "SCOPE", 66.52], ["sol", "Network", "BBQ", 66.09], ["sol", "Database", "Persistent Treap Update Engine", 24.36], ["sol", "Database", "ScaleGPM", 65.12], ["sol", "Network", "Shockwave", 45.76], ["sol", "Security", "Opal", 99.17], ["sol", "Database", "Residual State Advancement", 0.06], ["sol", "Machine Learning", "Robust Image Tokenizer", 73.22], ["sol", "MLSys", "ivf_pq kernel", 78.01], ["sol", "MLSys", "kmeans kernel", 45.77], ["sol", "Machine Learning", "LeJEPA", 99.57], ["sol", "MLSys", "dbscan kernel", 67.46], ["sol", "Database", "Seer", 81.14], ["muse", "Robotics", "Diffusion Policy", 54.98], ["muse", "Database", "Yannakakis", 9.78], ["muse", "HPC", "RegionsSort", 51.14], ["muse", "Security", "Progent", 93.54], ["muse", "Robotics", "MuJoCo Playground", 33.33], ["muse", "HPC", "Hygra", 59.22], ["muse", "HPC", "ParButterfly", 39.12], ["muse", "Architecture", "KAMI", 7.85], ["muse", "Machine Learning", "Robust Image Tokenizer", 70.53], ["muse", "Database", "Persistent Treap Update Engine", 43.29], ["muse", "Security", "Spectre", 80.5], ["muse", "Cryptography", "Structured LWE", 56.0], ["muse", "Programming Languages", "egg", 59.82], ["muse", "Database", "Residual State Advancement", 4.29], ["muse", "Network", "MetaOpt", 0.0], ["muse", "Machine Learning", "Nano World Model", 78.78], ["muse", "Database", "FARGO paper-aligned query core", 52.09], ["muse", "Security", "Opal", 98.33], ["muse", "Programming Languages", "BABBLE", 18.39], ["muse", "Machine Learning", "RAGEN", 11.69], ["muse", "Security", "Adaptive attacks", 81.27], ["muse", "MLSys", "knn kernel", 23.36], ["muse", "HPC", "Parallel DBSCAN", 78.53], ["muse", "Machine Learning", "DyT", 50.95], ["muse", "Database", "Approximate-MIPS Query Stopping", 82.17], ["muse", "Programming Languages", "Polygon", 92.13], ["muse", "Machine Learning", "Polar Express", 53.23], ["muse", "Architecture", "Clusterwise SpGEMM", 80.89], ["muse", "Database", "Spectrum", 2.26], ["muse", "Security", "Hacking Blind", 100.0], ["muse", "Network", "BBQ", 53.64], ["muse", "MLSys", "SVG-EAR", 26.19], ["muse", "Database", "SCOPE", 4.51], ["muse", "Database", "ScaleGPM", 79.07], ["muse", "Network", "Shockwave", 45.27], ["muse", "MLSys", "ivf_pq kernel", 72.79], ["muse", "MLSys", "kmeans kernel", 47.96], ["muse", "Machine Learning", "LeJEPA", 82.01], ["muse", "MLSys", "dbscan kernel", 39.8], ["muse", "Database", "Seer", 81.14], ["k3", "Security", "Adaptive attacks", 80.74], ["k3", "Database", "Residual State Advancement", 17.17], ["k3", "Machine Learning", "Differentiable Population Statistics", 3.42], ["k3", "Security", "Progent", 93.5], ["k3", "Database", "Spectrum", 0.21], ["k3", "HPC", "Parallel DBSCAN", 76.17], ["k3", "HPC", "ParButterfly", 48.45], ["k3", "Machine Learning", "DyT", 51.47], ["k3", "Machine Learning", "Polar Express", 65.23], ["k3", "Robotics", "Diffusion Policy", 52.11], ["k3", "Architecture", "KAMI", 18.45], ["k3", "Machine Learning", "Nano World Model", 79.44], ["k3", "Database", "Yannakakis", 11.82], ["k3", "Security", "Spectre", 81.14], ["k3", "Database", "Approximate-MIPS Query Stopping", 86.98], ["k3", "Cryptography", "Structured LWE", 55.0], ["k3", "MLSys", "kmeans kernel", 47.98], ["k3", "Network", "MetaOpt", 52.01], ["k3", "Database", "FARGO paper-aligned query core", 52.23], ["k3", "HPC", "Hygra", 58.74], ["k3", "MLSys", "knn kernel", 40.12], ["k3", "Programming Languages", "egg", 59.38], ["k3", "Machine Learning", "RAGEN", 10.62], ["k3", "Database", "ScaleGPM", 83.05], ["k3", "Robotics", "MuJoCo Playground", 37.97], ["k3", "Machine Learning", "OCR Distillation Trajectory Sampling", 65.18], ["k3", "MLSys", "dbscan kernel", 61.37], ["k3", "Database", "Seer", 81.15], ["k3", "Network", "BBQ", 66.09], ["k3", "Security", "Opal", 99.17], ["k3", "Programming Languages", "Polygon", 92.13], ["k3", "HPC", "RegionsSort", 51.25], ["k3", "MLSys", "ivf_pq kernel", 77.51], ["k3", "Security", "Hacking Blind", 90.91], ["k3", "Database", "Persistent Treap Update Engine", 20.77], ["k3", "Database", "SCOPE", 13.94], ["k3", "Programming Languages", "BABBLE", 18.89], ["k3", "Machine Learning", "Robust Image Tokenizer", 71.32], ["k3", "MLSys", "SVG-EAR", 27.79], ["k3", "Network", "Shockwave", 46.29], ["k27", "Machine Learning", "Differentiable Population Statistics", 4.17], ["k27", "Database", "Residual State Advancement", 4.21], ["k27", "HPC", "RegionsSort", 51.55], ["k27", "Network", "Shockwave", 38.9], ["k27", "Machine Learning", "Polar Express", 0.0], ["k27", "Machine Learning", "DyT", 50.55], ["k27", "Database", "Approximate-MIPS Query Stopping", 75.42], ["k27", "MLSys", "dbscan kernel", 55.1], ["k27", "MLSys", "knn kernel", 18.8], ["k27", "Database", "ScaleGPM", 76.48], ["k27", "Security", "Spectre", 79.08], ["k27", "HPC", "ParButterfly", 36.86], ["k27", "Database", "Seer", 81.13], ["k27", "Cryptography", "Structured LWE", 0.0], ["k27", "Network", "MetaOpt", 0.0], ["k27", "Machine Learning", "Nano World Model", 0.0], ["k27", "MLSys", "SVG-EAR", 0.0], ["k27", "Robotics", "MuJoCo Playground", 33.26], ["k27", "Machine Learning", "RAGEN", 0.0], ["k27", "HPC", "Parallel DBSCAN", 65.29], ["k27", "HPC", "Hygra", 55.63], ["k27", "Security", "Hacking Blind", 100.0], ["k27", "Programming Languages", "BABBLE", 18.87], ["k27", "Programming Languages", "egg", 0.0], ["k27", "Security", "Adaptive attacks", 80.74], ["k27", "Database", "Yannakakis", 10.71], ["k27", "MLSys", "kmeans kernel", 43.21], ["k27", "MLSys", "ivf_pq kernel", 0.0], ["k27", "Database", "SCOPE", 8.52], ["k27", "Network", "BBQ", 0.0], ["k27", "Database", "Persistent Treap Update Engine", 24.1], ["k27", "Security", "Opal", 70.0], ["k27", "Database", "Spectrum", 0.0], ["k27", "Machine Learning", "Robust Image Tokenizer", 71.87], ["qwen", "Security", "Adaptive attacks", 80.74], ["qwen", "Database", "Spectrum", 1.1], ["qwen", "HPC", "Parallel DBSCAN", 71.88], ["qwen", "HPC", "ParButterfly", 51.81], ["qwen", "MLSys", "SVG-EAR", 7.72], ["qwen", "Machine Learning", "Polar Express", 58.87], ["qwen", "Database", "Yannakakis", 13.02], ["qwen", "Cryptography", "Structured LWE", 58.0], ["qwen", "HPC", "Hygra", 60.04], ["qwen", "Programming Languages", "egg", 59.71], ["qwen", "Database", "ScaleGPM", 79.99], ["qwen", "Security", "Hacking Blind", 100.0], ["qwen", "Robotics", "MuJoCo Playground", 33.33], ["qwen", "Database", "Seer", 81.33], ["qwen", "Security", "Opal", 99.17], ["qwen", "HPC", "RegionsSort", 50.81], ["qwen", "Database", "SCOPE", 21.02], ["qwen", "Programming Languages", "BABBLE", 18.09], ["qwen", "Network", "Shockwave", 45.93], ["astra", "Security", "Adaptive attacks", 79.26], ["astra", "HPC", "Parallel DBSCAN", 77.11], ["astra", "HPC", "ParButterfly", 56.19], ["astra", "Machine Learning", "Polar Express", 71.71], ["astra", "Architecture", "KAMI", 22.04], ["astra", "Machine Learning", "Nano World Model", 80.85], ["astra", "Database", "Yannakakis", 12.68], ["astra", "Security", "Spectre", 81.82], ["astra", "Database", "Approximate-MIPS Query Stopping", 84.77], ["astra", "Cryptography", "Structured LWE", 85.5], ["astra", "MLSys", "kmeans kernel", 47.4], ["astra", "Network", "MetaOpt", 0.0], ["astra", "Database", "FARGO paper-aligned query core", 52.37], ["astra", "HPC", "Hygra", 58.84], ["astra", "MLSys", "knn kernel", 43.2], ["astra", "Programming Languages", "egg", 61.31], ["astra", "Machine Learning", "RAGEN", 98.92], ["astra", "Database", "ScaleGPM", 90.31], ["astra", "Robotics", "MuJoCo Playground", 100.0], ["astra", "Database", "Seer", 81.27], ["astra", "Network", "BBQ", 71.77], ["astra", "Security", "Opal", 99.17], ["astra", "Programming Languages", "Polygon", 92.13], ["astra", "HPC", "RegionsSort", 51.26], ["astra", "MLSys", "ivf_pq kernel", 78.45], ["astra", "Database", "Persistent Treap Update Engine", 41.68], ["astra", "Database", "SCOPE", 67.92], ["astra", "Programming Languages", "BABBLE", 18.45], ["astra", "Robotics", "Diffusion Policy", 57.01], ["astra", "Network", "Shockwave", 47.03], ["ds", "Security", "Adaptive attacks", 80.74], ["ds", "Database", "Spectrum", 60.08], ["ds", "HPC", "ParButterfly", 52.9], ["ds", "Machine Learning", "DyT", 49.32], ["ds", "Machine Learning", "Polar Express", 64.91], ["ds", "Machine Learning", "Nano World Model", 80.55], ["ds", "Database", "Yannakakis", 10.38], ["ds", "Database", "Approximate-MIPS Query Stopping", 86.79], ["ds", "Cryptography", "Structured LWE", 72.0], ["ds", "MLSys", "kmeans kernel", 51.04], ["ds", "Database", "FARGO paper-aligned query core", 52.21], ["ds", "HPC", "Hygra", 58.72], ["ds", "MLSys", "knn kernel", 7.85], ["ds", "Programming Languages", "egg", 60.33], ["ds", "Machine Learning", "RAGEN", 17.48], ["ds", "Database", "ScaleGPM", 90.44], ["ds", "Robotics", "MuJoCo Playground", 37.95], ["ds", "MLSys", "dbscan kernel", 66.68], ["ds", "Database", "Seer", 81.47], ["ds", "Network", "BBQ", 66.09], ["ds", "Security", "Opal", 99.17], ["ds", "Programming Languages", "Polygon", 92.13], ["ds", "HPC", "RegionsSort", 51.13], ["ds", "MLSys", "ivf_pq kernel", 77.5], ["ds", "Database", "Persistent Treap Update Engine", 36.7], ["ds", "Database", "SCOPE", 26.81], ["ds", "Programming Languages", "BABBLE", 17.47], ["ds", "Machine Learning", "Robust Image Tokenizer", 73.12], ["ds", "MLSys", "SVG-EAR", 30.64], ["ds", "Network", "Shockwave", 44.32], ["glm", "Security", "Adaptive attacks", 80.74], ["glm", "Database", "Residual State Advancement", 9.33], ["glm", "Machine Learning", "Differentiable Population Statistics", 4.51], ["glm", "Security", "Progent", 92.99], ["glm", "Database", "Spectrum", 78.62], ["glm", "HPC", "Parallel DBSCAN", 76.49], ["glm", "HPC", "ParButterfly", 54.81], ["glm", "Machine Learning", "DyT", 48.82], ["glm", "Machine Learning", "Polar Express", 61.32], ["glm", "Robotics", "Diffusion Policy", 41.61], ["glm", "Architecture", "KAMI", 20.51], ["glm", "Machine Learning", "Nano World Model", 80.43], ["glm", "Database", "Yannakakis", 10.03], ["glm", "Security", "Spectre", 81.27], ["glm", "Database", "Approximate-MIPS Query Stopping", 84.85], ["glm", "Cryptography", "Structured LWE", 58.0], ["glm", "MLSys", "kmeans kernel", 49.91], ["glm", "Network", "MetaOpt", 0.0], ["glm", "Database", "FARGO paper-aligned query core", 52.15], ["glm", "HPC", "Hygra", 57.51], ["glm", "MLSys", "knn kernel", 23.84], ["glm", "Programming Languages", "egg", 61.4], ["glm", "Machine Learning", "RAGEN", 32.75], ["glm", "Database", "ScaleGPM", 87.97], ["glm", "Robotics", "MuJoCo Playground", 33.33], ["glm", "MLSys", "dbscan kernel", 59.96], ["glm", "Database", "Seer", 81.21], ["glm", "Network", "BBQ", 45.45], ["glm", "Security", "Opal", 99.17], ["glm", "Programming Languages", "Polygon", 92.13], ["glm", "Architecture", "Clusterwise SpGEMM", 0.0], ["glm", "HPC", "RegionsSort", 48.87], ["glm", "MLSys", "ivf_pq kernel", 77.25], ["glm", "Security", "Hacking Blind", 100.0], ["glm", "Database", "Persistent Treap Update Engine", 10.39], ["glm", "Database", "SCOPE", 31.17], ["glm", "Programming Languages", "BABBLE", 18.34], ["glm", "Machine Learning", "Robust Image Tokenizer", 72.1], ["glm", "MLSys", "SVG-EAR", 0.0], ["glm", "Network", "Shockwave", 46.54]].map(([m, d, t, s]) => ({m, d, t, s}));
 const MODELS = [
-  {id:'astra', name:'GPT-6 Astra', short:'Astra', h:'Codex CLI', lab:'OpenAI'},
-  {id:'sol',   name:'GPT-5.6 Sol', short:'Sol',   h:'Codex CLI', lab:'OpenAI'},
-  {id:'kimi',  name:'Kimi K2.7',   short:'Kimi',  h:'Kimi CLI', lab:'Kimi'},
+  {id:'astra', name:'GPT-6 Astra', short:'GPT-6 Astra', h:'Codex CLI', lab:'OpenAI'},
+  {id:'sol', name:'GPT-6.1 Sol', short:'GPT-6.1 Sol', h:'Codex CLI', lab:'OpenAI'},
+  {id:'muse', name:'Muse Spark 1.3', short:'Muse Spark', h:'Muse Code', lab:'Meta'},
+  {id:'k3', name:'Kimi K3', short:'Kimi K3', h:'Kimi Code', lab:'Kimi'},
+  {id:'k27', name:'Kimi K2.7 Code', short:'Kimi K2.7', h:'Kimi CLI', lab:'Kimi'},
+  {id:'qwen', name:'Qwen 3.8 Max Code', short:'Qwen 3.8 Max', h:'', lab:'Qwen'},
+  {id:'ds', name:'DeepSeek V4.1 Flash', short:'DeepSeek V4.1', h:'DSH', lab:'DeepSeek'},
+  {id:'glm', name:'GLM 5.3', short:'GLM 5.3', h:'ZCode', lab:'Z.ai'},
 ];
+const UPDATED = 'October 8, 2026';
 const RAN = new Set(RUNS.map(r => r.t));
 const mean = a => a.reduce((x, y) => x + y, 0) / a.length;
 const f1 = x => x.toFixed(1);
@@ -115,7 +110,15 @@ const NS = 'http://www.w3.org/2000/svg';
 const sv = (tag, a = {}, text) => { const e = document.createElementNS(NS, tag);
   for (const k in a) if (a[k] != null) { if (tag === 'text' && /^(fill|font-size|font-weight)$/.test(k)) e.style.setProperty(k, k === 'font-size' ? a[k] + 'px' : a[k]); else e.setAttribute(k, a[k]); }
   if (text != null) e.textContent = text; return e; };
-const MCOL = {astra:'var(--m-astra)', sol:'var(--m-sol)', kimi:'var(--m-kimi)'};
+const MCOL = Object.fromEntries(MODELS.map(m => [m.id, `var(--m-${m.id})`]));
+// Models ranked by mean final score over all their runs; each model ran its own set of tasks.
+const MEAN_OF = Object.fromEntries(MODELS.map(m => [m.id, mean(RUNS.filter(r => r.m === m.id).map(r => r.s))]));
+const RANKED = [...MODELS].sort((a, b) => MEAN_OF[b.id] - MEAN_OF[a.id]);
+const NTASK = rs => new Set(rs.map(r => r.t)).size;
+/* numbers in the page text come from the data, so they cannot drift from the chart */
+document.querySelectorAll('[data-fill]').forEach(el => { el.textContent = {updated:`Last updated: ${UPDATED}`, runs:String(RUNS.length),
+  runtasks:`on ${NTASK(RUNS)} tasks`, models:`${MODELS.length} models from ${new Set(MODELS.map(m => m.lab)).size} labs have run so far.`,
+  summary:`${RUNS.length} runs on ${NTASK(RUNS)} tasks by ${MODELS.length} models`}[el.dataset.fill]; });
 const MNAME = Object.fromEntries(MODELS.map(m => [m.id, m.name]));
 const isTouch = matchMedia('(hover: none)').matches;
 // Bring a tab into view inside its own horizontal strip only. scrollIntoView would also scroll the page,
@@ -139,24 +142,26 @@ $('#groupby').addEventListener('click', e => { const b = e.target.closest('.chip
   [...$('#groupby').children].forEach(c => c.setAttribute('aria-pressed', String(c === b))); drawLB(); });
 $('#showruns').addEventListener('change', e => { showRuns = e.target.checked; drawLB(); });
 $('#custom').addEventListener('click', () => { const s = $('#settings'); const o = !s.classList.contains('open'); s.classList.toggle('open', o); $('#custom').setAttribute('aria-expanded', String(o)); });
-$('#lblegend').innerHTML = [...new Set(MODELS.map(m => m.lab))].map(l => { const ms = MODELS.filter(m => m.lab === l);
-  return `<span><i style="background:${MCOL[ms[0].id]}"></i>${l} <span style="color:var(--faint)">${ms.map(m => m.name).join(', ')}</span></span>`; }).join('');
+$('#lblegend').innerHTML = RANKED.map(m => `<span><i style="background:${MCOL[m.id]}"></i>${esc(m.name)}</span>`).join('');
 
 function drawLB() {
   const runs = RUNS.filter(r => dom === 'All' || r.d === dom);
   $('#nres').textContent = `${runs.length} run${runs.length === 1 ? '' : 's'}`;
   let rows;
-  if (group === 'model') rows = MODELS.map(m => ({label:m.name, sub:m.h, items:[{m:m.id, runs:runs.filter(r => r.m === m.id)}]})).filter(r => r.items[0].runs.length);
-  else {
+  if (group === 'model') {
+    rows = MODELS.map(m => ({label:m.name, short:m.short, sub:m.h, items:[{m:m.id, runs:runs.filter(r => r.m === m.id)}]})).filter(r => r.items[0].runs.length);
+    rows.forEach(r => r.best = mean(r.items[0].runs.map(x => x.s)));
+  } else {
+    // one line per task, one dot per model: the model's mean over its runs on that task
     const ts = [...new Set(runs.map(r => r.t))];
     rows = ts.map(t => ({label:t, sub:runs.find(r => r.t === t).d, items:MODELS.map(m => ({m:m.id, runs:runs.filter(r => r.t === t && r.m === m.id)})).filter(i => i.runs.length)}));
     rows.forEach(r => r.best = Math.max(...r.items.map(i => mean(i.runs.map(x => x.s)))));
-    rows.sort((a, b) => b.best - a.best);
   }
+  rows.sort((a, b) => b.best - a.best);
   const svg = $('#lbsvg'), box = $('#lbplot'), W = Math.max(300, box.clientWidth), narrow = W < 560;
   const L = narrow ? 112 : 190, R = 34, T = 8, B = 46;
-  const lane = group === 'model' ? (narrow ? 64 : 76) : 22 * 1;
-  const rowH = r => group === 'model' ? lane : Math.max(30, r.items.length * 18 + 12);
+  const lane = group === 'model' ? (narrow ? 64 : 76) : 30;
+  const rowH = () => lane;
   const H = T + rows.reduce((a, r) => a + rowH(r), 0) + B;
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
   const X = v => L + v / 100 * (W - L - R);
@@ -170,22 +175,37 @@ function drawLB() {
   rows.forEach((r, ri) => {
     const h = rowH(r);
     if (ri) svg.append(sv('line', {x1:0, x2:W - R, y1:y0, y2:y0, stroke:'var(--line)', 'stroke-width':1}));
-    const lab = sv('text', {class:'lab', x:0, y:y0 + h / 2 + (group === 'model' ? -3 : 4)}, r.label);
+    const two = group === 'model' && r.sub;
+    const name = narrow && r.short ? r.short : r.label, maxc = Math.floor((L - 14) / 7.4);
+    const short = name.length > maxc ? name.slice(0, maxc - 1).trimEnd() + '…' : name;
+    const lab = sv('text', {class:'lab', x:0, y:y0 + h / 2 + (two ? -3 : 4)}, short);
+    if (short !== r.label) lab.append(sv('title', {}, r.label));
     svg.append(lab);
-    if (group === 'model') svg.append(sv('text', {x:0, y:y0 + h / 2 + 14, 'font-size':12}, r.sub));
+    if (two) svg.append(sv('text', {x:0, y:y0 + h / 2 + 14, 'font-size':12}, r.sub));
+    if (group === 'task') {
+      const ms = r.items.map(i => mean(i.runs.map(x => x.s))), yc = y0 + h / 2;
+      if (ms.length > 1) svg.append(sv('line', {x1:X(Math.min(...ms)), x2:X(Math.max(...ms)), y1:yc, y2:yc, stroke:'var(--line)', 'stroke-width':2}));
+      r.items.forEach((it, k) => {
+        svg.append(sv('circle', {cx:X(ms[k]), cy:yc, r:5.5, fill:MCOL[it.m], stroke:'#fff', 'stroke-width':1.5}));
+        pts.push({x:X(ms[k]), y:yc, html:`<b>${esc(MNAME[it.m])}</b><br>${esc(r.label)} · ${esc(r.sub)}<br>${it.runs.length > 1 ? `Mean <b>${f1(ms[k])}</b> over ${it.runs.length} runs` : `Final score <b>${f1(ms[k])}</b>`}`, mean:true});
+      });
+      const edge = X(Math.max(...ms)) + 10, right = edge + 34 > W;
+      svg.append(sv('text', {class:'val', x: right ? X(Math.min(...ms)) - 10 : edge, y:yc + 4.5, fill:'var(--ink-2)', 'text-anchor': right ? 'end' : 'start'}, f1(Math.max(...ms))));
+      y0 += h; return;
+    }
     r.items.forEach((it, k) => {
-      const yc = group === 'model' ? y0 + h / 2 : y0 + 6 + 9 + k * 18 + (h - 12 - r.items.length * 18) / 2;
+      const yc = y0 + h / 2;
       const ss = it.runs.map(x => x.s), mu = mean(ss);
       if (ss.length > 1) svg.append(sv('line', {x1:X(Math.min(...ss)), x2:X(Math.max(...ss)), y1:yc, y2:yc, stroke:MCOL[it.m], 'stroke-width':2, opacity:.35}));
       if (showRuns) it.runs.forEach((x, j) => {
-        const jy = group === 'model' ? ((j * 37) % 17 - 8) * (narrow ? .9 : 1.2) : 0;
-        const c = sv('circle', {cx:X(x.s), cy:yc + jy, r: group === 'model' ? 4.5 : 3.6, fill:MCOL[it.m], opacity:.45});
+        const jy = ((j * 37) % 17 - 8) * (narrow ? .9 : 1.2);
+        const c = sv('circle', {cx:X(x.s), cy:yc + jy, r:4.5, fill:MCOL[it.m], opacity:.4});
         svg.append(c); pts.push({x:X(x.s), y:yc + jy, html:`<b>${esc(MNAME[it.m])}</b><br>${esc(x.t)} · ${esc(x.d)}<br>Final score <b>${f1(x.s)}</b>`});
       });
-      svg.append(sv('circle', {cx:X(mu), cy:yc, r: group === 'model' ? 8 : 5.5, fill:MCOL[it.m], stroke:'#fff', 'stroke-width':2}));
-      pts.push({x:X(mu), y:yc, html:`<b>${esc(MNAME[it.m])}</b>${group === 'task' ? '<br>' + esc(r.label) : ''}<br>Mean <b>${f1(mu)}</b> over ${ss.length} run${ss.length > 1 ? 's' : ''}`, mean:true});
-      const edge = X(showRuns ? Math.max(mu, ...ss) : mu), tx = edge + (group === 'model' ? 13 : 9), right = tx + 40 > W;
-      svg.append(sv('text', {class:'val', x: right ? X(Math.min(mu, ...ss)) - 13 : tx, y:yc + 4.5, fill:MCOL[it.m], 'text-anchor': right ? 'end' : 'start'}, f1(mu)));
+      svg.append(sv('circle', {cx:X(mu), cy:yc, r:8, fill:MCOL[it.m], stroke:'#fff', 'stroke-width':2}));
+      pts.push({x:X(mu), y:yc, html:`<b>${esc(MNAME[it.m])}</b><br>Mean <b>${f1(mu)}</b> over ${ss.length} run${ss.length > 1 ? 's' : ''} on ${NTASK(it.runs)} task${NTASK(it.runs) > 1 ? 's' : ''}`, mean:true});
+      // the mean sits above its own dot, with a white halo over the run dots
+      svg.append(sv('text', {class:'val halo', x:X(mu), y:yc - 15, fill:MCOL[it.m], 'text-anchor':'middle'}, f1(mu)));
     });
     y0 += h;
   });
@@ -201,14 +221,14 @@ function drawLB() {
 
 /* ---------- results by domain ---------- */
 function drawTable() {
-  const head = `<tr><th>Domain</th><th class="tk">Tasks</th>${MODELS.map(m => `<th><span class="mn" style="background:${MCOL[m.id]}"></span><span class="full">${m.name}</span><span class="short">${m.short}</span></th>`).join('')}</tr>`;
+  const head = `<tr><th>Domain</th><th class="tk">Tasks run</th>${RANKED.map(m => `<th><span class="mn" style="background:${MCOL[m.id]}"></span><span class="full">${m.name}</span><span class="short">${m.short}</span></th>`).join('')}</tr>`;
   const line = (d, cls) => {
-    const vals = MODELS.map(m => { const s = RUNS.filter(r => r.m === m.id && (d === 'All' || r.d === d)).map(r => r.s); return s.length ? mean(s) : null; });
+    const vals = RANKED.map(m => { const s = RUNS.filter(r => r.m === m.id && (d === 'All' || r.d === d)).map(r => r.s); return s.length ? mean(s) : null; });
     const best = Math.max(...vals.filter(v => v != null));
-    const n = d === 'All' ? TASKS.length : N_IN(d);
+    const n = NTASK(RUNS.filter(r => d === 'All' || r.d === d));
     return `<tr class="${cls || ''}"><td>${d === 'All' ? 'All tasks' : esc(d)}</td><td class="tk">${n}</td>${vals.map(v => v == null ? '<td class="e">–</td>' : `<td class="${v === best && vals.filter(x => x != null).length > 1 ? 'best' : ''}">${f1(v)}</td>`).join('')}</tr>`;
   };
-  $('#restbl').innerHTML = head + DOMAINS.map(d => line(d)).join('') + line('All', 'all');
+  $('#restbl').innerHTML = head + DOMS_WITH_RUNS.map(d => line(d)).join('') + line('All', 'all');
 }
 
 /* ---------- case studies: one chart per run, in the grammar of Epoch's data insights ---------- */
