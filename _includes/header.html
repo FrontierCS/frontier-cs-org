@@ -12,7 +12,7 @@
 
         <nav class="nav nav-main" aria-label="Site">
           <a href="{{ '/' | relative_url }}"{% if is_v2 %} class="active" aria-current="page"{% endif %}>FrontierCS 2</a>
-          <a href="{{ '/v1/' | relative_url }}"{% if is_v1 %} class="active" aria-current="page"{% endif %}>FrontierCS 1</a>
+          <a href="{{ '/v1/' | relative_url }}"{% if is_v1 %} class="active" aria-current="page"{% endif %}>FrontierCS</a>
           <a href="{{ '/blog/' | relative_url }}"{% if is_blog %} class="active" aria-current="page"{% endif %}>Blog</a>
           <a class="wide-only{% if page.url contains '/workshop/' %} active{% endif %}" href="{{ '/workshop/' | relative_url }}"{% if page.url contains '/workshop/' %} aria-current="page"{% endif %}>Workshop</a>
           <a class="wide-only{% if page.url contains '/team/' %} active{% endif %}" href="{{ '/team/' | relative_url }}"{% if page.url contains '/team/' %} aria-current="page"{% endif %}>Team</a>

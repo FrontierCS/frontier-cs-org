@@ -270,10 +270,10 @@ _styles: >
 ### Toward feedback-driven, repo-level open-ended tasks
 
 <div class="thesis-box">
-  <p><strong>TL;DR:</strong> FrontierCS 1 rethought <strong>problem</strong> and <strong>score</strong>, moving benchmarks from closed-ended exam tasks toward open-ended research tasks, or <em>what to solve</em>; FrontierCS 2 rethinks <strong>environment</strong> and <strong>scope</strong>, or <em>how to solve</em>.</p>
+  <p><strong>TL;DR:</strong> FrontierCS rethought <strong>problem</strong> and <strong>score</strong>, moving benchmarks from closed-ended exam tasks toward open-ended research tasks, or <em>what to solve</em>; FrontierCS 2 rethinks <strong>environment</strong> and <strong>scope</strong>, or <em>how to solve</em>.</p>
 </div>
 
-FrontierCS 1 made two bets: open-ended problems and continuous scoring. Those bets still look right. Frontier models are strong on exam-style tasks, but open-ended research and engineering tasks still expose a different failure mode: agents often know many local moves, but struggle to keep improving.
+FrontierCS made two bets: open-ended problems and continuous scoring. Those bets still look right. Frontier models are strong on exam-style tasks, but open-ended research and engineering tasks still expose a different failure mode: agents often know many local moves, but struggle to keep improving.
 
 FrontierCS 2 makes the next two bets: feedback-driven environments and repo-level scope.
 
@@ -284,11 +284,11 @@ This FrontierCS 2 update includes four changes.
 <div class="update-grid">
   <div class="update-item">
     <h3>Agent-native tasks</h3>
-    <p>FrontierCS 1 algorithmic tasks now run as containerized Harbor-compatible tasks.</p>
+    <p>FrontierCS algorithmic tasks now run as containerized Harbor-compatible tasks.</p>
   </div>
   <div class="update-item">
     <h3>Released private tests</h3>
-    <p>We are releasing the private test cases for FrontierCS 1 algorithmic tasks.</p>
+    <p>We are releasing the private test cases for FrontierCS algorithmic tasks.</p>
   </div>
   <div class="update-item">
     <h3>Controlled feedback</h3>
@@ -416,7 +416,7 @@ If you build agents, use these tasks to test more than final success. Look at ho
 
 If you build benchmarks, we think this is the important interface: agents should get enough feedback to make progress, but not enough access to corrupt the evaluator.
 
-Open-ended evaluation was the right direction for FrontierCS 1. FrontierCS 2 keeps that bet, and moves it into the environment.
+Open-ended evaluation was the right direction for FrontierCS. FrontierCS 2 keeps that bet, and moves it into the environment.
 
 <div class="callout">
   <strong>FrontierCS 2 in one line:</strong> more room for agents to search, build, and iterate; still hard to cheat.

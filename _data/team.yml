@@ -8,16 +8,16 @@
 
 institutions:
   - {name: UC Berkeley, logo: berkeley.svg}
-  - {name: Princeton, logo: princeton.svg}
+  - {name: Princeton, logo: princeton.svg, mark: true}
   - {name: UCSD, logo: ucsd.svg}
   - {name: X-camp Academy}
-  - {name: Georgia Tech, logo: gatech.svg}
+  - {name: Georgia Tech, logo: gatech.svg, mark: true}
   - {name: NYU, logo: nyu.svg}
   - {name: Stanford, logo: stanford.svg}
   - {name: UW, logo: washington.png}
-  - {name: NTU, logo: ntu.svg}
-  - {name: Toronto, logo: toronto.svg}
-  - {name: UIUC, logo: uiuc.png}
+  - {name: NTU, logo: ntu.svg, mark: true}
+  - {name: Toronto, logo: toronto.svg, mark: true}
+  - {name: UIUC, logo: uiuc.png, mark: true}
   - {name: Michigan, logo: michigan.svg}
   - {name: MIT, logo: mit.svg}
 

@@ -18,10 +18,12 @@
     {%- else -%}
         {%- capture title -%}{{ site.title }}{%- endcapture -%}
     {%- endif -%}
-    {% if page.url == '/blog/index.html' or page.url == '/blog/' or page.url == '/' or page.url == '/index.html' %}
+    {% if page.url == '/blog/index.html' or page.url == '/blog/' %}
         {{ title }}
-    {%- elsif page.title != "blank" and page.url != "/" -%}
-        {%- if page.title == nil or page.title == "" -%}
+    {%- elsif page.title != "blank" -%}
+        {%- if page.title contains title -%}
+            {{ page.title }}
+        {%- elsif page.title == nil or page.title == "" -%}
             {{ page.date | date: "%Y" }} | {{ title }}
         {%- else -%}
             {{ page.title }} | {{ title }}

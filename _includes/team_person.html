@@ -1,7 +1,5 @@
 {%- assign p = include.p -%}
-{%- assign w = p.name | split: ' ' -%}
 <li class="tm">
-  <span class="tm-av" aria-hidden="true">{{ w.first | slice: 0 }}{{ w.last | slice: 0 }}</span>
   <span class="tm-tx">
     <span class="tm-l">{% if p.url %}<a class="tm-n" href="{{ p.url }}" target="_blank" rel="noopener noreferrer">{{ p.name }}</a>{% else %}<span class="tm-n">{{ p.name }}</span>{% endif %}{% if p.eq %}<sup class="tm-eq" title="{{ include.eq }}">*</sup>{% endif %}</span>
     {% if p.affil.size > 0 %}<span class="tm-a">{{ p.affil | join: ' · ' }}</span>{% endif %}
