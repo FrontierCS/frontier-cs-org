@@ -285,6 +285,7 @@ function drawTable() {
     return `<tr class="${cls || ''}"><td>${d === 'All' ? 'All tasks' : esc(d)}</td><td class="tk">${n}</td>${vals.map(v => v == null ? '<td class="e">–</td>' : `<td class="${v === best && vals.filter(x => x != null).length > 1 ? 'best' : ''}">${metric === 'score' ? f1(v) : Math.round(v) + '%'}</td>`).join('')}</tr>`;
   };
   $('#restbl').innerHTML = head + DOMS_WITH_RUNS.map(d => line(d)).join('') + line('All', 'all');
+  $('#tbltitle').textContent = metric === 'score' ? 'Mean score by domain' : 'Pass rate by domain';
   $('#tblnote').textContent = (metric === 'score' ? 'Mean final score over each model’s runs.' : 'Share of each model’s runs that beat the authors’ code.')
     + ' A dash means no run yet. Bold marks the best in a row.';
 }

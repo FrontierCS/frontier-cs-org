@@ -50,7 +50,7 @@ page_css: fcs2
   </div>
 
   <div class="tbl-wrap" id="domains">
-    <h3>Results by domain</h3>
+    <h3 id="tbltitle">Pass rate by domain</h3>
     <div class="res-scroll"><table class="res num" id="restbl"></table></div>
     <p class="cfoot" style="border-top:0; margin-top:10px; padding-top:0" id="tblnote">Share of each model’s runs that beat the authors’ code. A dash means no run yet. Bold marks the best in a row.</p>
   </div>
