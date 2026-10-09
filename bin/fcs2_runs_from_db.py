@@ -20,12 +20,22 @@ The 90% interval follows Epoch's bootstrap: each respondent's task results are r
 is redone from the central solution (BOOT draws, seeds 0..BOOT-1). Epoch's code raises when a draw puts the anchors in the
 wrong order; those draws are left out and counted.
 
+Test-time scaling (SCALE) uses development scores, the score each submission gets on the task's development
+workloads while the agent runs. At a budget B of US$ (usd() below), a run's submission is its latest
+dev-scored submission before B, or nothing (score 0) if it has none yet; once B passes the run's end, its hidden final
+score. Dev scores are calibrated to the hidden suite per task: hidden - dev of the final patch, averaged over the
+task's runs with 1 pseudo-run of the global average (leave-one-out RMSE 5.4 points, against 8.6 uncalibrated).
+ECI(model, B) keeps every task's curve from the leaderboard fit and solves one capability per (model, budget) by
+least squares, so it is on the FrontierCS ECI scale and equals the leaderboard value at full budget. Its 90% interval
+resamples the model's tasks (SCALE_BOOT draws, task curves held fixed).
+
 Pass rate is the share of scored runs whose verdict is PASS: the final submission meets the task's
 beat-the-reference criteria on every workload. It is a plain count, so it has no interval.
 """
 import json, re, sqlite3, sys
 from collections import Counter, defaultdict
 import numpy as np
+from scipy.optimize import minimize_scalar
 import pandas as pd
 import os
 os.environ.setdefault('TQDM_DISABLE', '1')   # Epoch's bootstrap bar, once per draw here
@@ -92,7 +102,7 @@ MODEL = {
     'GLM 5.3 (ZCode)': ('glm', 'GLM 5.3', 'GLM 5.3', 'ZCode', 'Z.ai'),
 }
 
-HUMAN_VALUE = 25                               # owner's choice, 2026-10-09 (was 100, then 60; K2.7 was 20)
+HUMAN_VALUE = 60                               # owner's choice, 2026-10-09 (tried 100 and 25; K2.7 was 20)
 HIDDEN = {'Kimi K2.7 Code'}                    # owner's call, 2026-10-09: off the leaderboard, kept in the ECI fit as its 0 point
 LOW_ANCHOR, LOW_VALUE = 'Kimi K2.7 Code', 0   # Kimi K3 = 20 is degenerate on the 2026-10-08 data: K3 scores level with the reference
 for a in sys.argv[2:]:   # optional: --low='Model name=value' to try another anchor
@@ -117,7 +127,7 @@ def eci(rows):
     pinned = sorted(counts.index, key=lambda t: (-counts[t], t))[0]
     kw = dict(anchor_benchmark=pinned, anchor_model_low=LOW_ANCHOR, anchor_eci_low=float(LOW_VALUE),
               anchor_model_high='reference', anchor_eci_high=float(HUMAN_VALUE))
-    central, _, _ = fit_eci_model(df, bootstrap_samples=0, **kw)
+    central, curves, _ = fit_eci_model(df, bootstrap_samples=0, **kw)
     point = dict(zip(central['Model'], central['eci']))
     draws, dropped = [], 0
     for seed in range(BOOT):
@@ -131,7 +141,78 @@ def eci(rows):
     for m in point:
         lo, hi = np.percentile([d[m] for d in draws], [5, 95])
         out[m] = (round(float(point[m]), 1), round(float(lo), 1), round(float(hi), 1), int(ntask[m]))
-    return out, len(draws), dropped, pinned
+    return out, len(draws), dropped, pinned, curves
+
+
+SCALE_BOOT, SCALE_POINTS = 100, 32
+
+# US$ per million tokens, list prices found 2026-10-09: (output, cache read; the input price where no cache price is listed).
+# DeepSeek is its off-peak rate (peak hours double it). Sources: eesel.ai and yottalabs.ai (GPT-6 Astra, GPT-6.1 Sol, Kimi K3,
+# DeepSeek), anotherwrapper.com and QwenCloud (Qwen implicit cache), pricepertoken.com (GLM), anotherwrapper.com (Muse, no cache price).
+PRICE = {'astra': (50.00, 1.00), 'sol': (10.00, 0.10), 'k3': (15.00, 0.30), 'qwen': (6.00, 0.25),
+         'ds': (0.60, 0.003), 'glm': (4.40, 0.26), 'muse': (4.25, 1.25)}
+
+
+def usd(m, total, output):
+    """Owner's approximation (2026-10-09): output tokens at the output price plus every token at the cache-read price,
+    as if all input were a cache hit. Tool-reported total tokens count cached input differently per tool, so they enter
+    only here, never as an axis."""
+    po, pc = PRICE[m]
+    return (output * po + total * pc) / 1e6
+
+
+def cost(db):
+    """Per model: [mean US$ per scored run, runs with token counts]; a run's tokens are its last cumulative values."""
+    end = {r: (t, o) for r, t, o in db.execute('select run_id, max(total_tokens), max(output_tokens) from score_points group by run_id')}
+    by = defaultdict(list)
+    for r, c, s in db.execute('''select r.id, cd.name, r.display_score from cells ce join runs r on r.id = ce.run_id
+        join candidates cd on cd.id = ce.candidate_id'''):
+        if s is not None and c not in HIDDEN and end.get(r) and end[r][0]: by[MODEL[c][0]].append(usd(MODEL[c][0], *end[r]))
+    return {m: [round(float(np.mean(v)), 4), len(v)] for m, v in sorted(by.items())}
+
+
+def scaling(db, curves):
+    """{model id: [[US$ budget, ECI, 90% low, 90% high, share of runs still going], ...]}; spend from usd()."""
+    EDI = dict(zip(curves['benchmark'], curves['edi'])); SL = dict(zip(curves['benchmark'], curves['discriminability_scaled']))
+    info = {r: (c, t, s) for r, c, t, s in db.execute('''select r.id, cd.name, t.name, r.display_score from cells ce join runs r on r.id = ce.run_id
+        join candidates cd on cd.id = ce.candidate_id join tasks t on t.id = ce.task_id''') if s is not None and c not in HIDDEN}
+    pts = {(r, sid): (sc, tt, ot) for r, sid, sc, tt, ot in db.execute('select run_id, submission_id, score, total_tokens, output_tokens from score_points')}
+    subs = defaultdict(list)
+    for r, sid, kind, ph in db.execute('select run_id, id, kind, patch_sha256 from submissions order by run_id, ordinal'): subs[r].append((sid, kind, ph))
+    # calibration pairs: dev score of the final patch, hidden final score
+    gaps = defaultdict(list)
+    for r, (c, t, hidden) in info.items():
+        dev = {ph: pts[(r, sid)][0] for sid, kind, ph in subs[r] if kind == 'train' and (r, sid) in pts}
+        fin = [ph for sid, kind, ph in subs[r] if kind == 'final']
+        if fin and fin[0] in dev: gaps[t].append(hidden - dev[fin[0]])
+    g = np.mean([x for v in gaps.values() for x in v]); off = {t: (sum(v) + g) / (len(v) + 1) for t, v in gaps.items()}
+
+    def cap(ys):
+        t = list(ys); y = np.clip(np.array([ys[k] for k in t]) / 100, 1e-3, 1 - 1e-3)
+        e = np.array([EDI[k] for k in t]); sl = np.array([SL[k] for k in t])
+        return minimize_scalar(lambda x: np.sum((1 / (1 + np.exp(-sl * (x - e))) - y) ** 2), bounds=(-400, 400), method='bounded').x
+
+    out = {}
+    for axis in ('usd',):
+        traj = {}
+        for r, (c, t, hidden) in info.items():
+            seq, end = [], 0
+            for sid, kind, ph in subs[r]:
+                if (r, sid) not in pts: continue
+                p = pts[(r, sid)]; end = usd(MODEL[c][0], p[1], p[2])
+                if kind == 'train': seq.append((end, float(np.clip(p[0] + off.get(t, g), 0, 100))))
+            traj[r] = (seq, end, hidden)
+        at = lambda r, B: traj[r][2] if B >= traj[r][1] else next((d for tok, d in reversed(traj[r][0]) if tok <= B), 0.0)
+        out[axis] = {}
+        for c in sorted({v[0] for v in info.values()}, key=lambda c: MODEL[c][0]):
+            runs = [r for r in info if info[r][0] == c]; tasks = sorted({info[r][1] for r in runs}); ends = [traj[r][1] for r in runs]
+            rng, curve = np.random.default_rng(3), []
+            for B in np.geomspace(1e-3, max(ends), SCALE_POINTS):
+                ys = {t: float(np.mean([at(r, B) for r in runs if info[r][1] == t])) for t in tasks}
+                lo, hi = np.percentile([cap({t: ys[t] for t in rng.choice(tasks, len(tasks))}) for _ in range(SCALE_BOOT)], [5, 95])
+                curve.append([round(float(B), 5), round(float(cap(ys)), 1), round(float(lo), 1), round(float(hi), 1), round(float(np.mean([e > B for e in ends])), 2)])
+            out[axis][MODEL[c][0]] = curve
+    return out['usd']
 
 
 db = sqlite3.connect(sys.argv[1])
@@ -160,10 +241,9 @@ def pass_rate(runs):
     return out
 
 js_path = 'assets/js/fcs2.js'
-js = open(js_path, encoding='utf-8').read()
 when = datetime.fromisoformat(generated[:19])
 models = [MODEL[c] for c in MODEL if c not in HIDDEN]
-E, nboot, nbad, pinned = eci(db.execute('''select c.name, t.name, r.display_score, r.feedback_json from cells ce
+E, nboot, nbad, pinned, curves = eci(db.execute('''select c.name, t.name, r.display_score, r.feedback_json from cells ce
   join runs r on r.id = ce.run_id join candidates c on c.id = ce.candidate_id join tasks t on t.id = ce.task_id''').fetchall())
 eci_js = {MODEL[c][0]: list(E[c]) for c in MODEL if c not in HIDDEN}
 block = (f'// One entry per scored run in the preview results database of {when:%Y-%m-%d} (bin/fcs2_runs_from_db.py):\n'
@@ -173,8 +253,11 @@ block = (f'// One entry per scored run in the preview results database of {when:
          f"const UPDATED = '{when:%B} {when.day}, {when.year}';\n"
          f"// FrontierCS ECI per model: [point, 90% low, 90% high, tasks]; Human (the authors' reference) is {HUMAN_VALUE:g} and {LOW_ANCHOR} is {LOW_VALUE:g} ({nboot} bootstrap draws kept, {nbad} dropped with the anchors inverted; pinned slope: {pinned}).\n"
          f"// Pass rate per model: [percent, runs that pass, runs].\nconst PASS = {json.dumps(pass_rate(runs))};\n"
-         f"const ECI = {json.dumps(eci_js)};\nconst ECI_HUMAN = {HUMAN_VALUE:g}, ECI_LOW = '{MODEL[LOW_ANCHOR][0]}', ECI_LOW_NAME = '{MODEL[LOW_ANCHOR][1]}', ECI_LOW_VALUE = {LOW_VALUE:g}, ECI_REF_TASKS = {E['reference'][3]};\n")
-js, n = re.subn(r'// One entry per .*?\nconst MODELS = \[\n.*?\];\n(const UPDATED = .*?\n)?(// (FrontierCS )?ECI per model.*?\n(// Pass rate.*?\nconst PASS = .*?\n)?const ECI = .*?\nconst (ECI_HUMAN = .*?, )?ECI_LOW = .*?\n)?', lambda m: block, js, flags=re.S)
+         f"const ECI = {json.dumps(eci_js)};\nconst ECI_HUMAN = {HUMAN_VALUE:g}, ECI_LOW = '{MODEL[LOW_ANCHOR][0]}', ECI_LOW_NAME = '{MODEL[LOW_ANCHOR][1]}', ECI_LOW_VALUE = {LOW_VALUE:g}, ECI_REF_TASKS = {E['reference'][3]};\n"
+         f"// Test-time scaling per model: [US$ budget per run, ECI, 90% low, 90% high, share of runs still going] (see the converter's docstring).\nconst SCALE = {json.dumps(scaling(db, curves), separators=(',', ':'))};\n"
+         f"// Cost per model: [mean US$ per scored run, runs]; output tokens x output price + every token x cache-read price (PRICE above).\nconst COST = {json.dumps(cost(db))};\nconst PRICE = {json.dumps(PRICE)};\n")
+js = open(js_path, encoding='utf-8').read()   # read late: the fits above take minutes
+js, n = re.subn(r'// One entry per .*?\nconst MODELS = \[\n.*?\];\n(const UPDATED = .*?\n)?(// (FrontierCS )?ECI per model.*?\n(// Pass rate.*?\nconst PASS = .*?\n)?const ECI = .*?\nconst (ECI_HUMAN = .*?, )?ECI_LOW = .*?\n(// Test-time scaling.*?\nconst SCALE = .*?\n((// Tokens|// Cost) per model.*?\nconst (TOK|COST) = .*?\n(const PRICE = .*?\n)?)?)?)?', lambda m: block, js, flags=re.S)
 assert n == 1, 'RUNS block not found'
 open(js_path, 'w', encoding='utf-8').write(js)
 print('PASS', pass_rate(runs))

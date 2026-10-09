@@ -29,11 +29,16 @@ const MODELS = [
   {id:'glm', name:'GLM 5.3', short:'GLM 5.3', h:'ZCode', lab:'Z.ai'},
 ];
 const UPDATED = 'October 8, 2026';
-// FrontierCS ECI per model: [point, 90% low, 90% high, tasks]; Human (the authors' reference) is 25 and Kimi K2.7 Code is 0 (494 bootstrap draws kept, 6 dropped with the anchors inverted; pinned slope: Adaptive Robustness Evaluation for Prompt-Injection Defense).
+// FrontierCS ECI per model: [point, 90% low, 90% high, tasks]; Human (the authors' reference) is 60 and Kimi K2.7 Code is 0 (494 bootstrap draws kept, 6 dropped with the anchors inverted; pinned slope: Adaptive Robustness Evaluation for Prompt-Injection Defense).
 // Pass rate per model: [percent, runs that pass, runs].
 const PASS = {"astra": [66.7, 20, 30], "ds": [46.7, 14, 30], "glm": [35.0, 14, 40], "k3": [35.0, 14, 40], "muse": [37.5, 15, 40], "qwen": [36.8, 7, 19], "sol": [46.9, 30, 64]};
-const ECI = {"astra": [35.1, 30.4, 62.0, 30], "sol": [33.6, 27.6, 55.6, 40], "muse": [22.4, 18.3, 38.1, 40], "k3": [22.7, 19.4, 40.3, 40], "qwen": [21.4, 15.2, 37.1, 19], "ds": [25.8, 22.2, 44.8, 30], "glm": [26.2, 19.1, 43.7, 40]};
-const ECI_HUMAN = 25, ECI_LOW = 'k27', ECI_LOW_NAME = 'Kimi K2.7 Code', ECI_LOW_VALUE = 0, ECI_REF_TASKS = 38;
+const ECI = {"astra": [84.3, 73.0, 148.9, 30], "sol": [80.5, 66.2, 133.5, 40], "muse": [53.7, 44.0, 91.4, 40], "k3": [54.5, 46.5, 96.6, 40], "qwen": [51.4, 36.4, 89.1, 19], "ds": [62.0, 53.2, 107.6, 30], "glm": [62.8, 45.8, 105.0, 40]};
+const ECI_HUMAN = 60, ECI_LOW = 'k27', ECI_LOW_NAME = 'Kimi K2.7 Code', ECI_LOW_VALUE = 0, ECI_REF_TASKS = 38;
+// Test-time scaling per model: [US$ budget per run, ECI, 90% low, 90% high, share of runs still going] (see the converter's docstring).
+const SCALE = {"astra":[[0.001,-400.0,-400.0,-400.0,1.0],[0.00142,-400.0,-400.0,-400.0,1.0],[0.00201,-400.0,-400.0,-400.0,1.0],[0.00284,-400.0,-400.0,-400.0,1.0],[0.00402,-400.0,-400.0,-400.0,1.0],[0.0057,-400.0,-400.0,-400.0,1.0],[0.00807,-400.0,-400.0,-400.0,1.0],[0.01143,-400.0,-400.0,-400.0,1.0],[0.01618,-400.0,-400.0,-400.0,1.0],[0.02292,-400.0,-400.0,-400.0,1.0],[0.03245,-400.0,-400.0,-400.0,1.0],[0.04596,-400.0,-400.0,-400.0,1.0],[0.06509,-400.0,-400.0,-400.0,1.0],[0.09218,-400.0,-400.0,-400.0,1.0],[0.13054,-400.0,-400.0,-400.0,1.0],[0.18487,-400.0,-400.0,-400.0,1.0],[0.26182,-400.0,-400.0,-400.0,1.0],[0.37079,-400.0,-400.0,-400.0,1.0],[0.52511,-400.0,-400.0,-354.9,1.0],[0.74366,-26.7,-309.0,-2.0,1.0],[1.05317,-5.4,-44.7,13.3,1.0],[1.4915,17.9,2.3,39.1,0.97],[2.11227,23.5,14.0,39.6,0.97],[2.99139,41.9,23.5,51.0,0.83],[4.23641,58.8,45.2,73.4,0.73],[5.99961,75.0,54.6,79.6,0.6],[8.49666,81.4,78.3,85.6,0.33],[12.03298,82.9,73.6,86.4,0.13],[17.04111,83.6,78.1,87.6,0.13],[24.13364,84.1,79.0,88.2,0.07],[34.17809,84.2,80.3,89.8,0.03],[48.40305,84.3,80.3,89.1,0.0]],"ds":[[0.001,-400.0,-400.0,-400.0,1.0],[0.00122,-400.0,-400.0,-400.0,1.0],[0.0015,-400.0,-400.0,-400.0,1.0],[0.00183,-400.0,-400.0,-400.0,1.0],[0.00225,-400.0,-400.0,-400.0,1.0],[0.00275,-400.0,-400.0,-400.0,1.0],[0.00337,-400.0,-400.0,-400.0,1.0],[0.00412,-400.0,-400.0,-400.0,1.0],[0.00504,-400.0,-400.0,-400.0,1.0],[0.00617,-400.0,-400.0,-400.0,1.0],[0.00756,-400.0,-400.0,-400.0,1.0],[0.00925,-400.0,-400.0,-400.0,1.0],[0.01132,-400.0,-400.0,-400.0,1.0],[0.01386,-400.0,-400.0,-400.0,1.0],[0.01697,-400.0,-400.0,-400.0,1.0],[0.02077,-400.0,-400.0,-400.0,1.0],[0.02543,-400.0,-400.0,-400.0,1.0],[0.03113,-400.0,-400.0,-400.0,1.0],[0.0381,-400.0,-400.0,-152.5,1.0],[0.04664,-400.0,-400.0,-46.4,1.0],[0.0571,-41.5,-400.0,-13.4,1.0],[0.0699,-35.9,-400.0,-10.3,0.97],[0.08556,-13.6,-400.0,-1.5,0.97],[0.10474,3.3,-285.1,21.1,0.97],[0.12822,13.8,-10.7,31.8,0.93],[0.15695,28.9,14.4,47.0,0.83],[0.19213,37.8,23.4,47.1,0.67],[0.2352,46.9,31.8,57.3,0.67],[0.28792,60.4,56.0,61.4,0.43],[0.35245,62.1,60.5,63.1,0.27],[0.43145,62.3,60.5,64.0,0.2],[0.52815,62.0,60.8,63.5,0.0]],"glm":[[0.001,-400.0,-400.0,-400.0,1.0],[0.00138,-400.0,-400.0,-400.0,1.0],[0.00191,-400.0,-400.0,-400.0,1.0],[0.00263,-400.0,-400.0,-400.0,1.0],[0.00364,-400.0,-400.0,-400.0,1.0],[0.00502,-400.0,-400.0,-400.0,1.0],[0.00694,-400.0,-400.0,-400.0,1.0],[0.00958,-400.0,-400.0,-400.0,1.0],[0.01323,-400.0,-400.0,-400.0,1.0],[0.01828,-400.0,-400.0,-400.0,1.0],[0.02524,-400.0,-400.0,-400.0,1.0],[0.03486,-400.0,-400.0,-400.0,1.0],[0.04814,-400.0,-400.0,-400.0,1.0],[0.06648,-400.0,-400.0,-400.0,1.0],[0.09181,-400.0,-400.0,-400.0,1.0],[0.1268,-400.0,-400.0,-400.0,1.0],[0.17511,-400.0,-400.0,-400.0,1.0],[0.24183,-400.0,-400.0,-400.0,1.0],[0.33398,-400.0,-400.0,-400.0,1.0],[0.46125,-400.0,-400.0,-400.0,1.0],[0.637,-400.0,-400.0,-400.0,1.0],[0.87972,-400.0,-400.0,-281.9,1.0],[1.21494,-400.0,-400.0,-228.8,1.0],[1.67788,-400.0,-400.0,-225.0,1.0],[2.31722,-400.0,-400.0,-251.5,0.95],[3.20018,-129.1,-400.0,-40.1,0.93],[4.41958,-5.7,-94.9,26.5,0.8],[6.10363,25.8,7.0,61.8,0.62],[8.42937,61.2,37.8,63.6,0.47],[11.64132,62.2,48.2,64.4,0.4],[16.07715,62.8,53.9,64.2,0.2],[22.20323,62.8,51.5,64.4,0.0]],"k3":[[0.001,-400.0,-400.0,-400.0,1.0],[0.00141,-400.0,-400.0,-400.0,1.0],[0.00199,-400.0,-400.0,-400.0,1.0],[0.00281,-400.0,-400.0,-400.0,1.0],[0.00396,-400.0,-400.0,-400.0,1.0],[0.00558,-400.0,-400.0,-400.0,1.0],[0.00787,-400.0,-400.0,-400.0,1.0],[0.01111,-400.0,-400.0,-400.0,1.0],[0.01567,-400.0,-400.0,-400.0,1.0],[0.0221,-400.0,-400.0,-400.0,1.0],[0.03117,-400.0,-400.0,-400.0,1.0],[0.04396,-400.0,-400.0,-400.0,1.0],[0.062,-400.0,-400.0,-400.0,1.0],[0.08746,-400.0,-400.0,-400.0,1.0],[0.12336,-400.0,-400.0,-400.0,1.0],[0.17399,-400.0,-400.0,-400.0,1.0],[0.24541,-400.0,-400.0,-400.0,1.0],[0.34615,-400.0,-400.0,-400.0,1.0],[0.48824,-400.0,-400.0,-281.1,1.0],[0.68865,-225.3,-400.0,-136.6,1.0],[0.97133,-51.2,-129.5,-25.8,1.0],[1.37005,-50.1,-108.5,-19.7,0.93],[1.93244,-32.1,-58.0,14.5,0.88],[2.72567,27.2,11.0,38.3,0.75],[3.84452,40.6,27.1,52.0,0.65],[5.42264,51.6,46.3,57.6,0.47],[7.64855,52.4,49.2,58.2,0.38],[10.78816,53.4,51.0,60.1,0.25],[15.21653,54.5,52.9,61.1,0.17],[21.46269,54.7,53.0,63.4,0.07],[30.27279,54.5,52.5,62.0,0.03],[42.69932,54.5,52.5,60.8,0.0]],"muse":[[0.001,-400.0,-400.0,-400.0,1.0],[0.00146,-400.0,-400.0,-400.0,1.0],[0.00213,-400.0,-400.0,-400.0,1.0],[0.00312,-400.0,-400.0,-400.0,1.0],[0.00455,-400.0,-400.0,-400.0,1.0],[0.00665,-400.0,-400.0,-400.0,1.0],[0.00971,-400.0,-400.0,-400.0,1.0],[0.01418,-400.0,-400.0,-400.0,1.0],[0.02072,-400.0,-400.0,-400.0,1.0],[0.03026,-400.0,-400.0,-400.0,1.0],[0.0442,-400.0,-400.0,-400.0,1.0],[0.06456,-400.0,-400.0,-400.0,1.0],[0.09429,-400.0,-400.0,-400.0,1.0],[0.13773,-400.0,-400.0,-400.0,1.0],[0.20117,-400.0,-400.0,-400.0,1.0],[0.29383,-400.0,-400.0,-400.0,1.0],[0.42918,-400.0,-400.0,-400.0,1.0],[0.62687,-400.0,-400.0,-400.0,1.0],[0.91562,-400.0,-400.0,-400.0,1.0],[1.33738,-400.0,-400.0,-285.8,1.0],[1.95341,-288.9,-400.0,-93.8,1.0],[2.85321,-108.8,-400.0,-76.9,0.97],[4.16748,-44.8,-93.9,14.0,0.95],[6.08713,11.5,-22.8,24.9,0.88],[8.89104,29.7,18.4,43.5,0.75],[12.9865,41.6,32.0,51.6,0.6],[18.96845,47.1,38.9,53.4,0.42],[27.70585,47.4,38.2,54.0,0.4],[40.46795,48.2,39.1,54.1,0.25],[59.10863,53.8,51.9,61.1,0.15],[86.33574,53.9,51.8,60.1,0.05],[126.10441,53.7,51.5,59.7,0.0]],"qwen":[[0.001,-400.0,-400.0,-400.0,1.0],[0.00137,-400.0,-400.0,-400.0,1.0],[0.00188,-400.0,-400.0,-400.0,1.0],[0.00258,-400.0,-400.0,-400.0,1.0],[0.00353,-400.0,-400.0,-400.0,1.0],[0.00484,-400.0,-400.0,-400.0,1.0],[0.00664,-400.0,-400.0,-400.0,1.0],[0.0091,-400.0,-400.0,-400.0,1.0],[0.01248,-400.0,-400.0,-400.0,1.0],[0.01711,-400.0,-400.0,-400.0,1.0],[0.02346,-400.0,-400.0,-400.0,1.0],[0.03216,-400.0,-400.0,-400.0,1.0],[0.04409,-400.0,-400.0,-400.0,1.0],[0.06044,-400.0,-400.0,-400.0,1.0],[0.08286,-400.0,-400.0,-400.0,1.0],[0.1136,-400.0,-400.0,-400.0,1.0],[0.15574,-400.0,-400.0,-400.0,1.0],[0.21352,-400.0,-400.0,-400.0,1.0],[0.29272,-400.0,-400.0,-400.0,1.0],[0.40131,-400.0,-400.0,-400.0,1.0],[0.55018,-400.0,-400.0,-400.0,1.0],[0.75428,-400.0,-400.0,-400.0,1.0],[1.03409,-400.0,-400.0,-400.0,1.0],[1.4177,-64.5,-400.0,-15.4,1.0],[1.94361,-59.7,-129.6,-8.4,0.95],[2.66462,-2.3,-39.8,12.9,0.95],[3.65309,37.9,25.6,44.7,0.84],[5.00824,43.6,39.1,47.9,0.74],[6.86611,45.6,37.9,51.8,0.63],[9.41318,51.1,47.5,57.0,0.42],[12.90511,51.3,48.5,57.3,0.16],[17.69241,51.4,47.6,58.2,0.0]],"sol":[[0.001,-400.0,-400.0,-400.0,1.0],[0.00133,-400.0,-400.0,-400.0,1.0],[0.00176,-400.0,-400.0,-400.0,1.0],[0.00234,-400.0,-400.0,-400.0,1.0],[0.00311,-400.0,-400.0,-400.0,1.0],[0.00414,-400.0,-400.0,-400.0,1.0],[0.00549,-400.0,-400.0,-400.0,1.0],[0.0073,-400.0,-400.0,-400.0,1.0],[0.0097,-400.0,-400.0,-400.0,1.0],[0.01288,-400.0,-400.0,-400.0,1.0],[0.01711,-400.0,-400.0,-400.0,1.0],[0.02273,-400.0,-400.0,-400.0,1.0],[0.03019,-400.0,-400.0,-400.0,1.0],[0.04011,-400.0,-400.0,-400.0,1.0],[0.05328,-400.0,-400.0,-400.0,1.0],[0.07078,-400.0,-400.0,-281.4,1.0],[0.09402,-202.2,-382.4,-121.5,1.0],[0.1249,-128.4,-207.6,-92.5,1.0],[0.16591,-93.8,-180.6,-59.6,1.0],[0.2204,8.9,-28.9,21.4,1.0],[0.29277,19.8,6.0,28.7,0.98],[0.38892,34.3,24.1,46.0,0.89],[0.51663,41.2,28.7,49.5,0.81],[0.68629,55.3,48.4,72.8,0.72],[0.91166,67.7,58.5,77.7,0.58],[1.21105,68.8,58.9,78.5,0.48],[1.60874,60.4,54.7,81.5,0.34],[2.13704,71.4,60.1,80.8,0.22],[2.83883,72.6,63.2,81.4,0.12],[3.77108,73.9,65.8,82.7,0.06],[5.00948,73.8,64.7,82.3,0.05],[6.65456,80.5,71.8,83.0,0.0]]};
+// Cost per model: [mean US$ per scored run, runs]; output tokens x output price + every token x cache-read price (PRICE above).
+const COST = {"astra": [9.3052, 30], "ds": [0.2829, 30], "glm": [9.8448, 40], "k3": [8.7123, 40], "muse": [29.5909, 40], "qwen": [8.523, 19], "sol": [1.5532, 64]};
+const PRICE = {"astra": [50.0, 1.0], "sol": [10.0, 0.1], "k3": [15.0, 0.3], "qwen": [6.0, 0.25], "ds": [0.6, 0.003], "glm": [4.4, 0.26], "muse": [4.25, 1.25]};
 const RAN = new Set(RUNS.map(r => r.t));
 const mean = a => a.reduce((x, y) => x + y, 0) / a.length;
 const f1 = x => x.toFixed(1);
@@ -121,7 +126,7 @@ const NTASK = rs => new Set(rs.map(r => r.t)).size;
 /* numbers in the page text come from the data, so they cannot drift from the chart */
 document.querySelectorAll('[data-fill]').forEach(el => { el.textContent = {updated:`Last updated: ${UPDATED}`, runs:String(RUNS.length),
   runtasks:`on ${NTASK(RUNS)} tasks`, models:`${MODELS.length} models from ${new Set(MODELS.map(m => m.lab)).size} labs have run so far.`,
-  summary:`${RUNS.length} runs on ${NTASK(RUNS)} tasks by ${MODELS.length} models`}[el.dataset.fill]; });
+  summary:`${RUNS.length} runs on ${NTASK(RUNS)} tasks by ${MODELS.length} models`, nruns:`${RUNS.length} runs`}[el.dataset.fill]; });
 const MNAME = Object.fromEntries(MODELS.map(m => [m.id, m.name]));
 const isTouch = matchMedia('(hover: none)').matches;
 // Bring a tab into view inside its own horizontal strip only. scrollIntoView would also scroll the page,
@@ -137,36 +142,64 @@ const spy = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersectin
 ['overview','leaderboard','cases','tasks','questions'].forEach(id => spy.observe(document.getElementById(id)));
 
 /* ---------- leaderboard chart ---------- */
-let metric = 'eci', group = 'model', dom = 'All', showRuns = true;
+let group = 'model', dom = 'All', showRuns = true;
 const DOMS_WITH_RUNS = DOMAINS.filter(d => RUNS.some(r => r.d === d));
 $('#domradios').innerHTML = ['All', ...DOMS_WITH_RUNS].map(d => `<label><input type="radio" name="dom" value="${esc(d)}" ${d === 'All' ? 'checked' : ''}>${d === 'All' ? 'All domains' : esc(d)}<span class="n num">${RUNS.filter(r => d === 'All' || r.d === d).length}</span></label>`).join('');
 $('#domradios').addEventListener('change', e => { dom = e.target.value; drawLB(); });
 $('#groupby').addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return; group = b.dataset.g;
   [...$('#groupby').children].forEach(c => c.setAttribute('aria-pressed', String(c === b))); drawLB(); });
-$('#metric').addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return; metric = b.dataset.k;
-  [...$('#metric').children].forEach(c => c.setAttribute('aria-pressed', String(c === b)));
-  // the settings panel only serves the mean-score view; the other views take the full width
-  $('.cgrid').classList.toggle('one', metric !== 'score'); $('#custom').hidden = metric !== 'score';
-  drawLB(); drawTable(); });
 $('#showruns').addEventListener('change', e => { showRuns = e.target.checked; drawLB(); });
 $('#custom').addEventListener('click', () => { const s = $('#settings'); const o = !s.classList.contains('open'); s.classList.toggle('open', o); $('#custom').setAttribute('aria-expanded', String(o)); });
 $('#lblegend').innerHTML = RANKED.map(m => `<span><i style="background:${MCOL[m.id]}"></i>${esc(m.name)}</span>`).join('');
 
-/* FrontierCS ECI and pass-rate views: one row per model ranked by the metric.
-   ECI also draws its 90% interval as a bar. */
-const RANKVIEW = {
-  eci:  {data:ECI, title:'FrontierCS ECI, a capabilities index', axis:'FrontierCS ECI', fmt:v => String(Math.round(v)),
-         note:`Preliminary · Human = ${ECI_HUMAN} (the authors’ reference code), ${ECI_LOW_NAME} = ${ECI_LOW_VALUE} (in the fit, not shown) · bars are 90% intervals`},
-  pass: {data:PASS, title:'Pass rate, share of runs that pass', axis:'Pass rate (%)', fmt:v => Math.round(v) + '%', max:100,
-         note:'Preliminary · a run passes when its final submission meets the task’s pass criteria on every workload'},
-};
-function drawRanked(kind) {
-  const V = RANKVIEW[kind], D = V.data;
-  $('#ylab').textContent = V.title; $('#lbnote').textContent = V.note; $('#nres').textContent = `${RUNS.length} runs`;
-  const order = [...MODELS].sort((a, b) => D[b.id][0] - D[a.id][0]);
-  const svg = $('#lbsvg'), box = $('#lbplot'), W = Math.max(300, box.clientWidth), narrow = W < 560;
-  const L = narrow ? 112 : 190, R = 34, T = 26, B = 46, lane = narrow ? 56 : 64;
-  const xmax = V.max || Math.ceil(Math.max(...MODELS.map(m => D[m.id][2])) / 20) * 20, step = narrow && xmax > 120 ? 40 : 20;
+/* Main chart: pass rate against mean cost per run in US$, one dot per model (PASS, COST). Each label takes the first
+   spot right, left, above or below its dot that clears every dot, every placed label and the edges; a dot with no free
+   spot keeps no label (the legend and the tooltip still name it). */
+function drawPassCost() {
+  const svg = $('#pcsvg'), W = Math.max(300, $('#pcplot').clientWidth), narrow = W < 560;
+  const L = 44, R = narrow ? 12 : 24, T = 14, B = 46, H = narrow ? 320 : 400;
+  const ms = MODELS.filter(m => COST[m.id]), tx = ms.map(m => COST[m.id][0]);
+  const x0 = Math.floor(Math.log10(Math.min(...tx)) * 2) / 2, x1 = Math.ceil(Math.log10(Math.max(...tx)) * 2) / 2;
+  const ymax = Math.min(100, Math.ceil((Math.max(...ms.map(m => PASS[m.id][0])) + 5) / 20) * 20);
+  const X = v => L + (Math.log10(v) - x0) / (x1 - x0) * (W - L - R), Y = v => T + (1 - v / ymax) * (H - T - B);
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
+  for (let v = 0; v <= ymax; v += 20) {
+    svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1}));
+    svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, v + '%'));
+  }
+  // ticks at 1, 2 and 5 times each power of ten; a range under one decade still gets several
+  for (let k = Math.floor(x0); k <= Math.ceil(x1); k++) [1, 2, 5].forEach(f => { const v = f * 10 ** k, lv = Math.log10(v);
+    if (lv < x0 - 1e-9 || lv > x1 + 1e-9 || (narrow && f === 2 && x1 - x0 > 1.5)) return;
+    svg.append(sv('line', {x1:X(v), x2:X(v), y1:T, y2:H - B, stroke:'var(--grid)', 'stroke-width':1}));
+    svg.append(sv('text', {x:X(v), y:H - B + 20, 'text-anchor':'middle'}, usdfmt(v))); });
+  svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'Cost per run in US$, mean, log scale'));
+  const pts = [], order = [...ms].sort((a, b) => PASS[b.id][0] - PASS[a.id][0]);
+  const at = m => [X(COST[m.id][0]), Y(PASS[m.id][0])];
+  const boxes = order.map(m => { const [cx, cy] = at(m); return {x:cx - 9, y:cy - 9, w:18, h:18}; });
+  order.forEach(m => {
+    const [cx, cy] = at(m), name = narrow ? m.short : m.name;
+    svg.append(sv('circle', {cx, cy, r:7, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':2, 'data-m':m.id}));
+    const lab = sv('text', {class:'lab halo', x:cx, y:cy}, name); svg.append(lab);
+    const w = lab.getComputedTextLength() + 2;
+    const spots = [[cx + 12, cy + 4.5, 'start'], [cx - 12, cy + 4.5, 'end'], [cx, cy - 13, 'middle'], [cx, cy + 22, 'middle']];
+    const box = ([x, y, an]) => ({x:an === 'start' ? x : an === 'end' ? x - w : x - w / 2, y:y - 12, w, h:16});
+    const hit = q => boxes.some(o => q.x < o.x + o.w && o.x < q.x + q.w && q.y < o.y + o.h && o.y < q.y + q.h) || q.x < L || q.x + q.w > W || q.y < 0;
+    const spot = spots.find(sp => !hit(box(sp)));
+    if (spot) { boxes.push(box(spot)); lab.setAttribute('x', spot[0]); lab.setAttribute('y', spot[1]); lab.setAttribute('text-anchor', spot[2]); }
+    else lab.remove();
+    const [pct, np, n] = PASS[m.id];
+    pts.push({x:cx, y:cy, mean:true, html:`<b>${esc(m.name)}</b><br>Pass rate <b>${f1(pct)}%</b>, ${np} of ${n} runs pass<br>${usdfmt(COST[m.id][0])} per run, mean of ${COST[m.id][1]} runs`});
+  });
+  attachTip(svg, W, H, pts, $('#pctip'));
+}
+$('#pclegend').innerHTML = [...MODELS].sort((a, b) => PASS[b.id][0] - PASS[a.id][0]).map(m => `<span><i style="background:${MCOL[m.id]}"></i>${esc(m.name)}</span>`).join('');
+
+/* FrontierCS ECI: one row per model ranked by ECI, its 90% interval as a bar. */
+function drawECI() {
+  const order = [...MODELS].sort((a, b) => ECI[b.id][0] - ECI[a.id][0]);
+  const svg = $('#ecisvg'), W = Math.max(300, $('#eciplot').clientWidth), narrow = W < 560;
+  const L = narrow ? 112 : 190, R = 34, T = 14, B = 46, lane = narrow ? 56 : 64;
+  const xmax = Math.ceil(Math.max(...MODELS.map(m => ECI[m.id][2])) / 20) * 20, step = narrow && xmax > 120 ? 40 : 20;
   const H = T + order.length * lane + B;
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
   const X = v => L + v / xmax * (W - L - R);
@@ -174,26 +207,22 @@ function drawRanked(kind) {
     svg.append(sv('line', {x1:X(v), x2:X(v), y1:T, y2:H - B + 6, stroke:'var(--grid)', 'stroke-width':1}));
     svg.append(sv('text', {x:X(v), y:H - B + 22, 'text-anchor':'middle'}, v));
   }
-  svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, V.axis));
+  svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'FrontierCS ECI'));
   const pts = [];
   order.forEach((m, i) => {
-    const [e, lo, hi] = D[m.id], y0 = T + i * lane, yc = y0 + lane / 2, anchor = kind === 'eci' && m.id === ECI_LOW;
+    const [e, lo, hi] = ECI[m.id], y0 = T + i * lane, yc = y0 + lane / 2;
     if (i) svg.append(sv('line', {x1:0, x2:W - R, y1:y0, y2:y0, stroke:'var(--line)', 'stroke-width':1}));
     svg.append(sv('text', {class:'lab', x:0, y:yc + (m.h ? -3 : 4)}, narrow ? m.short : m.name));
     if (m.h) svg.append(sv('text', {x:0, y:yc + 14, 'font-size':12}, m.h));
-    if (kind === 'eci' && !anchor) svg.append(sv('line', {x1:X(lo), x2:X(hi), y1:yc, y2:yc, stroke:MCOL[m.id], 'stroke-width':6, 'stroke-linecap':'round', opacity:.25}));
+    svg.append(sv('line', {x1:X(lo), x2:X(hi), y1:yc, y2:yc, stroke:MCOL[m.id], 'stroke-width':6, 'stroke-linecap':'round', opacity:.25}));
     svg.append(sv('circle', {cx:X(e), cy:yc, r:7, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':2}));
-    svg.append(sv('text', {class:'val halo', x:X(e), y:yc - 13, fill:MCOL[m.id], 'text-anchor':'middle'}, V.fmt(e)));
-    const mine = RUNS.filter(r => r.m === m.id), np = mine.filter(r => r.p).length;
-    const body = kind === 'eci'
-      ? `FrontierCS ECI <b>${f1(e)}</b>${anchor ? ` (anchor, fixed at ${e})` : `<br>90% interval ${Math.round(lo)}–${Math.round(hi)}`}`
-      : `Pass rate <b>${f1(e)}%</b>, ${np} of ${mine.length} runs pass`;
-    pts.push({x:X(e), y:yc, mean:true, html:`<b>${esc(m.name)}</b><br>${body}<br>${mine.length} runs on ${NTASK(mine)} tasks`});
+    svg.append(sv('text', {class:'val halo', x:X(e), y:yc - 13, fill:MCOL[m.id], 'text-anchor':'middle'}, String(Math.round(e))));
+    const mine = RUNS.filter(r => r.m === m.id);
+    pts.push({x:X(e), y:yc, mean:true, html:`<b>${esc(m.name)}</b><br>FrontierCS ECI <b>${f1(e)}</b><br>90% interval ${Math.round(lo)}–${Math.round(hi)}<br>${mine.length} runs on ${NTASK(mine)} tasks`});
   });
-  attachTip(svg, W, H, pts);
+  attachTip(svg, W, H, pts, $('#ecitip'));
 }
-function attachTip(svg, W, H, pts) {
-  const tip = $('#lbtip');
+function attachTip(svg, W, H, pts, tip = $('#lbtip')) {
   const near = ev => { const rc = svg.getBoundingClientRect(), px = (ev.clientX - rc.left) * W / rc.width, py = (ev.clientY - rc.top) * H / rc.height;
     let best = null, bd = 1e9; pts.forEach(p => { const d = Math.hypot(p.x - px, p.y - py) - (p.mean ? 4 : 0); if (d < bd) { bd = d; best = p; } });
     return bd < 28 ? {p:best, rc} : null; };
@@ -203,10 +232,46 @@ function attachTip(svg, W, H, pts) {
   svg.onpointerleave = () => { if (!isTouch) tip.hidden = true; };
 }
 
+/* Test-time scaling: FrontierCS ECI when every run stops at a US$ budget (SCALE, from bin/fcs2_runs_from_db.py).
+   Values below 0 leave the plot through its bottom edge. */
+const usdfmt = v => v >= 1 ? `$${+v.toPrecision(2)}` : `$${+v.toPrecision(1)}`;
+function drawTTS() {
+  const svg = $('#ttssvg'), W = Math.max(300, $('#ttsplot').clientWidth), narrow = W < 560;
+  const L = 34, R = narrow ? 12 : 24, T = 12, B = 46, H = narrow ? 300 : 380;
+  const all = Object.values(SCALE).flat();
+  // the axis starts half a decade before the first budget at which any model rises above 0
+  const x0 = Math.log10(Math.min(...all.filter(p => p[1] >= 0).map(p => p[0]))) - 0.5, x1 = Math.log10(Math.max(...all.map(p => p[0])));
+  const ymax = Math.ceil(Math.max(...all.map(p => p[3])) / 20) * 20;
+  const X = v => L + (Math.log10(v) - x0) / (x1 - x0) * (W - L - R), Y = v => T + (1 - v / ymax) * (H - T - B);
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
+  const clip = sv('clipPath', {id:'ttsclip'}); clip.append(sv('rect', {x:L, y:T - 4, width:W - L - R + 8, height:H - T - B + 4})); svg.append(clip);
+  for (let v = 0; v <= ymax; v += 20) {
+    svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1}));
+    svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, v));
+  }
+  for (let k = Math.ceil(x0); k <= Math.floor(x1); k++) {
+    svg.append(sv('line', {x1:X(10 ** k), x2:X(10 ** k), y1:H - B, y2:H - B + 5, stroke:'var(--ink-2)', 'stroke-width':1}));
+    svg.append(sv('text', {x:X(10 ** k), y:H - B + 20, 'text-anchor':'middle'}, usdfmt(10 ** k)));
+  }
+  svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'Cost budget per run in US$, log scale'));
+  const g = sv('g', {'clip-path':'url(#ttsclip)'}); svg.append(g);
+  const pts = [];
+  [...RANKED].reverse().forEach(m => {
+    const c = SCALE[m.id], path = c.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join('');
+    const band = c.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[3]).toFixed(1)}`).join('')
+      + [...c].reverse().map(p => `L${X(p[0]).toFixed(1)},${Y(p[2]).toFixed(1)}`).join('') + 'Z';
+    g.append(sv('path', {d:band, fill:MCOL[m.id], opacity:.12}));
+    g.append(sv('path', {d:path, fill:'none', stroke:MCOL[m.id], 'stroke-width':2.2, 'stroke-linejoin':'round'}));
+    const e = c[c.length - 1];
+    g.append(sv('circle', {cx:X(e[0]), cy:Y(e[1]), r:4.5, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':1.5}));
+    c.forEach(p => { if (p[1] >= 0) pts.push({x:X(p[0]), y:Y(p[1]), html:`<b>${esc(m.name)}</b><br>FrontierCS ECI <b>${f1(p[1])}</b> at ${usdfmt(p[0])} per run`
+      + `<br>90% interval ${Math.round(Math.max(p[2], 0))}–${Math.round(p[3])}<br>${Math.round(p[4] * 100)}% of runs still going`}); });
+  });
+  attachTip(svg, W, H, pts, $('#ttstip'));
+}
+$('#ttslegend').innerHTML = RANKED.map(m => `<span><i style="background:${MCOL[m.id]}"></i>${esc(m.name)}</span>`).join('');
+
 function drawLB() {
-  if (metric !== 'score') return drawRanked(metric);
-  $('#ylab').textContent = 'Final score, mean over runs';
-  $('#lbnote').textContent = 'Preliminary · scores on each task’s own 0–100 scale';
   const runs = RUNS.filter(r => dom === 'All' || r.d === dom);
   $('#nres').textContent = `${runs.length} run${runs.length === 1 ? '' : 's'}`;
   let rows;
@@ -278,16 +343,12 @@ function drawLB() {
 function drawTable() {
   const head = `<tr><th>Domain</th><th class="tk">Tasks run</th>${RANKED.map(m => `<th><span class="mn" style="background:${MCOL[m.id]}"></span><span class="full">${m.name}</span><span class="short">${m.short}</span></th>`).join('')}</tr>`;
   const line = (d, cls) => {
-    const key = metric === 'score' ? 's' : 'p', k = key === 'p' ? 100 : 1;
-    const vals = RANKED.map(m => { const s = RUNS.filter(r => r.m === m.id && (d === 'All' || r.d === d)).map(r => r[key] * k); return s.length ? mean(s) : null; });
+    const vals = RANKED.map(m => { const s = RUNS.filter(r => r.m === m.id && (d === 'All' || r.d === d)).map(r => r.p * 100); return s.length ? mean(s) : null; });
     const best = Math.max(...vals.filter(v => v != null));
     const n = NTASK(RUNS.filter(r => d === 'All' || r.d === d));
-    return `<tr class="${cls || ''}"><td>${d === 'All' ? 'All tasks' : esc(d)}</td><td class="tk">${n}</td>${vals.map(v => v == null ? '<td class="e">–</td>' : `<td class="${v === best && vals.filter(x => x != null).length > 1 ? 'best' : ''}">${metric === 'score' ? f1(v) : Math.round(v) + '%'}</td>`).join('')}</tr>`;
+    return `<tr class="${cls || ''}"><td>${d === 'All' ? 'All tasks' : esc(d)}</td><td class="tk">${n}</td>${vals.map(v => v == null ? '<td class="e">–</td>' : `<td class="${v === best && vals.filter(x => x != null).length > 1 ? 'best' : ''}">${Math.round(v)}%</td>`).join('')}</tr>`;
   };
   $('#restbl').innerHTML = head + DOMS_WITH_RUNS.map(d => line(d)).join('') + line('All', 'all');
-  $('#tbltitle').textContent = metric === 'score' ? 'Mean score by domain' : 'Pass rate by domain';
-  $('#tblnote').textContent = (metric === 'score' ? 'Mean final score over each model’s runs.' : 'Share of each model’s runs that pass.')
-    + ' A dash means no run yet. Bold marks the best in a row.';
 }
 
 /* ---------- case studies: one chart per run, in the grammar of Epoch's data insights ---------- */
@@ -529,5 +590,5 @@ function drawRows() {
   $('#showmore').textContent = `Show more (${h.length - limit} left)`;
 }
 
-drawLB(); drawTable(); drawRows();
-let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { drawLB(); drawMap(); redraws.forEach(f => f()); }, 120); });
+drawPassCost(); drawTable(); drawLB(); drawECI(); drawTTS(); drawRows();
+let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { drawPassCost(); drawLB(); drawECI(); drawTTS(); drawMap(); redraws.forEach(f => f()); }, 120); });

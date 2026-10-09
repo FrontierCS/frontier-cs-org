@@ -28,16 +28,30 @@ page_css: fcs2
 
 <section class="sec" id="leaderboard">
   <h2>Leaderboard</h2>
-  <div class="chips mtabs" id="metric" role="group" aria-label="Metric"><button class="chip" type="button" data-k="eci" aria-pressed="true">FrontierCS ECI</button><button class="chip" type="button" data-k="pass" aria-pressed="false">Pass rate</button><button class="chip" type="button" data-k="score" aria-pressed="false">Mean score</button></div>
-  <div class="cgrid one">
+  <figure class="chart" style="margin:0">
+    <div class="chead"><span>Pass rate against cost per run</span><span class="r" data-fill="nruns">263 runs</span></div>
+    <div class="plot" id="pcplot"><svg id="pcsvg" role="img" aria-label="Pass rate against cost per run"></svg><div class="tip" id="pctip" hidden></div></div>
+    <div class="legend" id="pclegend"></div>
+    <div class="cfoot"><b>FRONTIERCS 2</b><span>Preliminary · a run passes when its final submission meets the task’s pass criteria on every workload · cost is estimated from tokens and list prices</span></div>
+  </figure>
+
+  <div class="tbl-wrap" id="domains">
+    <h3>Pass rate by domain</h3>
+    <div class="res-scroll"><table class="res num" id="restbl"></table></div>
+    <p class="cfoot" style="border-top:0; margin-top:10px; padding-top:0">Share of each model’s runs that pass. A dash means no run yet. Bold marks the best in a row.</p>
+  </div>
+
+  <div class="tbl-wrap" id="meanscore">
+    <h3>Mean score</h3>
+  <div class="cgrid">
     <figure class="chart" style="margin:0">
-      <div class="chead"><span id="ylab">FrontierCS ECI, a capabilities index</span><span class="r" id="nres">263 runs</span></div>
+      <div class="chead"><span id="ylab">Final score, mean over runs</span><span class="r" id="nres">263 runs</span></div>
       <div class="plot" id="lbplot"><svg id="lbsvg" role="img" aria-label="Leaderboard chart"></svg><div class="tip" id="lbtip" hidden></div></div>
       <div class="legend" id="lblegend"></div>
-      <button class="pill lg custom" id="custom" type="button" aria-expanded="false" aria-controls="settings" hidden>
+      <button class="pill lg custom" id="custom" type="button" aria-expanded="false" aria-controls="settings">
         <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3M5.5 5.5l2.1 2.1M16.4 16.4l2.1 2.1M5.5 18.5l2.1-2.1M16.4 7.6l2.1-2.1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
         Customize graph</button>
-      <div class="cfoot"><b>FRONTIERCS 2</b><span id="lbnote">Preliminary · Human = 25 (the authors’ reference code), Kimi K2.7 Code = 0 (in the fit, not shown) · bars are 90% intervals</span></div>
+      <div class="cfoot"><b>FRONTIERCS 2</b><span id="lbnote">Preliminary · scores on each task’s own 0–100 scale</span></div>
     </figure>
     <aside class="settings" id="settings" aria-label="Graph settings">
       <h3>Settings</h3>
@@ -48,11 +62,21 @@ page_css: fcs2
       <div class="radios" id="domradios"></div>
     </aside>
   </div>
+  </div>
 
-  <div class="tbl-wrap" id="domains">
-    <h3 id="tbltitle">Pass rate by domain</h3>
-    <div class="res-scroll"><table class="res num" id="restbl"></table></div>
-    <p class="cfoot" style="border-top:0; margin-top:10px; padding-top:0" id="tblnote">Share of each model’s runs that pass. A dash means no run yet. Bold marks the best in a row.</p>
+  <div class="tbl-wrap" id="eci">
+    <h3>FrontierCS ECI</h3>
+    <figure class="chart" style="margin:0">
+      <div class="chead"><span>FrontierCS ECI, a capabilities index</span></div>
+      <div class="plot" id="eciplot"><svg id="ecisvg" role="img" aria-label="FrontierCS ECI chart"></svg><div class="tip" id="ecitip" hidden></div></div>
+      <div class="cfoot"><b>FRONTIERCS 2</b><span id="ecinote">Preliminary · Human = 60 (the authors’ reference code), Kimi K2.7 Code = 0 (in the fit, not shown) · bars are 90% intervals</span></div>
+    </figure>
+    <figure class="chart" style="margin:40px 0 0" id="scaling">
+      <div class="chead"><span>FrontierCS ECI when every run stops at a cost budget</span></div>
+      <div class="plot" id="ttsplot"><svg id="ttssvg" role="img" aria-label="Test-time scaling chart"></svg><div class="tip" id="ttstip" hidden></div></div>
+      <div class="legend" id="ttslegend"></div>
+      <div class="cfoot"><b>FRONTIERCS 2</b><span>Preliminary · before a run ends, its latest submission is scored on the development workloads and calibrated to the hidden suite · bands are 90% intervals</span></div>
+    </figure>
   </div>
 </section>
 
@@ -105,7 +129,9 @@ page_css: fcs2
       <details id="q-built"><summary>How is a task built?</summary><div class="ans"><p>We delete a paper’s contribution from its own repository. The agent writes it back and is scored against the authors’ code.</p></div></details>
       <details id="q-see"><summary>What does the agent see?</summary><div class="ans"><p>It sees its repository and, for each patch, a development score and one message. The evaluator, the hidden suite and the reference stay with the judge.</p></div></details>
       <details id="q-bar"><summary>What counts as a pass?</summary><div class="ans"><p>A run passes when its final submission meets the task’s pass criteria on every workload. The criteria are set from the reference’s own measurements. For SVG-EAR, its latency must be at most 0.96 of the reference’s, with PSNR, SSIM and LPIPS within fixed bands.</p></div></details>
-      <details id="q-score"><summary>How are scores computed?</summary><div class="ans"><p>Each task’s evaluator scores the final submission on the hidden suite, from 0 to 100, and a run that times out scores 0. The leaderboard’s main number is FrontierCS ECI, a capabilities index fitted with Epoch AI’s own ECI code. It fits one logistic curve per task to every model’s score and to the human reference, the authors’ own code, then scales the result so Human is 25 and Kimi K2.7 Code is 0. Kimi K2.7 Code takes part in the fit as this 0 point but is not on the leaderboard. Above 25 means above the authors’ code on each task’s own scale. FrontierCS ECI’s bars are 90% intervals from Epoch’s bootstrap, which resamples each model’s task results. Pass rate is the share of runs that pass, by the criteria above. The results are preliminary: <span data-fill="summary">263 runs on 42 tasks by 7 models</span>.</p></div></details>
+      <details id="q-score"><summary>How are scores computed?</summary><div class="ans"><p>The leaderboard’s main number is pass rate, the share of runs that pass by the criteria above. Each task’s evaluator also scores the final submission on the hidden suite, from 0 to 100, and a run that times out scores 0. The mean score chart averages these scores. FrontierCS ECI is a capabilities index fitted with Epoch AI’s own ECI code. It fits one logistic curve per task to every model’s score and to the human reference, the authors’ own code, then scales the result so Human is 60 and Kimi K2.7 Code is 0. Kimi K2.7 Code takes part in the fit as this 0 point but is not on the leaderboard. Above 60 means above the authors’ code on each task’s own scale. FrontierCS ECI’s bars are 90% intervals from Epoch’s bootstrap, which resamples each model’s task results. Costs are estimates; “How is cost estimated?” below gives the method. The results are preliminary: <span data-fill="summary">263 runs on 42 tasks by 7 models</span>.</p></div></details>
+      <details id="q-scaling"><summary>How is test-time scaling computed?</summary><div class="ans"><p>The agent submits many times during a run, and each submission is scored on the task’s development workloads. To find FrontierCS ECI at a cost budget, we stop every run at that budget and take its latest submission, or a score of 0 if it has none yet. Development scores run higher than hidden-suite scores, so we shift them by each task’s average gap between the final submission’s development and hidden scores. This leaves an error of 5.4 points per run, against 8.6 without the shift. Past a run’s end, its hidden final score counts, so every curve ends at the model’s leaderboard value. The budget is the estimated cost, as the next answer explains.</p></div></details>
+      <details id="q-cost"><summary>How is cost estimated?</summary><div class="ans"><p>The results record tokens, not dollars. We price a run’s output tokens at the model’s output price and every token it used at the cache-read price, as if all input were a cache hit; Muse Spark 1.3 lists no cache price, so its input price stands in. Prices are list prices in US$ per million tokens, found on October 9, 2026, output and then cache read: GPT-6 Astra 50 and 1.00, GPT-6.1 Sol 10 and 0.10, Kimi K3 15 and 0.30, Qwen 3.8 Max 6 and 0.25, DeepSeek V4.1 Flash 0.60 and 0.003 (off-peak), GLM 5.3 4.40 and 0.26, Muse Spark 1.3 4.25 and 1.25 (input). Each agent tool counts tokens its own way, so costs compare orders of magnitude better than small gaps.</p></div></details>
       <details id="q-run"><summary>Can I run it?</summary><div class="ans"><p>We will release the tasks, evaluators and judge as one evaluation environment.</p></div></details>
     </div>
   </div>
