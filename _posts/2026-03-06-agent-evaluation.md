@@ -1,7 +1,7 @@
 ---
 layout: distill
-title: Evaluating Evolving Agent Systems at Scale with Frontier-CS
-description: "Evolving agent systems are advancing fast, but evaluation hasn't kept up. We show how Frontier-CS enables comprehensive, large-scale benchmarking of evolving agents—moving beyond small case studies for comparison at scale."
+title: Evaluating Evolving Agent Systems at Scale with FrontierCS
+description: "Evolving agent systems are advancing fast, but evaluation hasn't kept up. We show how FrontierCS enables comprehensive, large-scale benchmarking of evolving agents—moving beyond small case studies for comparison at scale."
 
 date: 2026-03-10
 date_display: "Mar 10, 2026"
@@ -34,14 +34,14 @@ authors:
     affiliations:
       name: Stanford University
   - name: Jingzhuo Hu
-  - name: Frontier-CS team
+  - name: FrontierCS team
     url: "https://frontier-cs.org"
 
 toc:
   - name: Evolving Agents Are the Next Frontier for LLMs
   - name: A Promising Direction, Bottlenecked by Evaluation
   - name: Why Current Evaluation Fails?
-  - name: Frontier-CS as the Standard Benchmark for Evolving Agents
+  - name: FrontierCS as the Standard Benchmark for Evolving Agents
   - name: From Small Case Studies to Comprehensive Evaluation
   - name: "Use Case 1: Online Evolution"
   - name: "Use Case 2: Offline Learning"
@@ -60,7 +60,7 @@ _styles: >
   }
 ---
 <div style="text-align: center;">
-  <img src="https://raw.githubusercontent.com/FrontierCS/Frontier-CS/main/assets/logo.png" style="width: 80%; border-radius: 6px;" alt="Frontier-CS Logo">
+  <img src="https://raw.githubusercontent.com/FrontierCS/Frontier-CS/main/assets/logo.png" style="width: 80%; border-radius: 6px;" alt="FrontierCS Logo">
 </div>
 
 ## Evolving Agents Are the Next Frontier for LLMs
@@ -91,13 +91,13 @@ Circle packing is a representative case: the core solution is typically just a *
   </figure>
 </div>
 
-## Frontier-CS as the Standard Benchmark for Evolving Agents
+## FrontierCS as the Standard Benchmark for Evolving Agents
 
-Frontier-CS is built to solve exactly the failures of current evaluation. It includes **172 algorithmic tasks** and **68 research tasks**, all **expert-designed** by **ICPC World Finalists** and **CS PhDs**. That gives it both the **scale** and the **quality consistency** missing from small, community-maintained benchmark sets.
+FrontierCS is built to solve exactly the failures of current evaluation. It includes **172 algorithmic tasks** and **68 research tasks**, all **expert-designed** by **ICPC World Finalists** and **CS PhDs**. That gives it both the **scale** and the **quality consistency** missing from small, community-maintained benchmark sets.
 
-Each Frontier-CS task is a distinct, open-ended problem with its own environment, yet still admits **deterministic scoring**. As a result, Frontier-CS can evaluate evolving agents **comprehensively**, **at scale**, and on tasks that are difficult enough to meaningfully measure continued progress.
+Each FrontierCS task is a distinct, open-ended problem with its own environment, yet still admits **deterministic scoring**. As a result, FrontierCS can evaluate evolving agents **comprehensively**, **at scale**, and on tasks that are difficult enough to meaningfully measure continued progress.
 
-**[Permutation](https://github.com/FrontierCS/Frontier-CS/blob/main/algorithmic/problems/2/statement.txt)** is a good example of the kind of task Frontier-CS is built around. In this interactive problem, the agent must recover a hidden permutation of length <d-math>n</d-math>. In each round, it may propose any length-<d-math>n</d-math> sequence over <d-math>\{1,\dots,n\}</d-math>, and receives only a single number: how many positions match the hidden target. The objective is to identify the full permutation using as few queries as possible.
+**[Permutation](https://github.com/FrontierCS/Frontier-CS/blob/main/algorithmic/problems/2/statement.txt)** is a good example of the kind of task FrontierCS is built around. In this interactive problem, the agent must recover a hidden permutation of length <d-math>n</d-math>. In each round, it may propose any length-<d-math>n</d-math> sequence over <d-math>\{1,\dots,n\}</d-math>, and receives only a single number: how many positions match the hidden target. The objective is to identify the full permutation using as few queries as possible.
 
 <div style="text-align: center; margin-bottom: 0;">
   <figure style="margin-bottom: 0;">
@@ -109,16 +109,16 @@ What makes this task valuable is not just its combinatorial scale, but the form 
 
 ### From Small Case Studies to Comprehensive Evaluation
 
-Frontier-CS is already helping push the field toward real large-scale evaluation. [SkyDiscover](https://skydiscover-ai.github.io/blog.html) uses it in a **200+ task** benchmark suite, including **172 Frontier-CS programming problems**, to compare methods under the same framework, models, and budgets. That is a sharp contrast to earlier evaluations built around only a small handful of tasks. With Frontier-CS, evolving-agent systems can finally be compared **comprehensively, fairly, and at scale**. 
+FrontierCS is already helping push the field toward real large-scale evaluation. [SkyDiscover](https://skydiscover-ai.github.io/blog.html) uses it in a **200+ task** benchmark suite, including **172 FrontierCS programming problems**, to compare methods under the same framework, models, and budgets. That is a sharp contrast to earlier evaluations built around only a small handful of tasks. With FrontierCS, evolving-agent systems can finally be compared **comprehensively, fairly, and at scale**. 
 
 <div style="display: flex; justify-content: center; align-items: center; gap: 2rem; flex-wrap: wrap;">
   <figure style="text-align: center; margin: 0; flex: 1; max-width: 45%;">
     <img src="{{ 'assets/img/2026-03-06-agent-evaluation/baby-giant.png' | relative_url }}" style="width: 100%; border-radius: 6px;" alt="Baby-Giant" data-zoomable>
-    <figcaption style="margin-top: 0.5rem; font-size: 0.85em; font-weight: bold;">Frontier-CS enables large-scale evolving agent benchmarking.</figcaption>
+    <figcaption style="margin-top: 0.5rem; font-size: 0.85em; font-weight: bold;">FrontierCS enables large-scale evolving agent benchmarking.</figcaption>
   </figure>
   <figure style="text-align: center; margin: 0; flex: 1; max-width: 45%;">
     <img src="{{ 'assets/img/2026-03-06-agent-evaluation/result.png' | relative_url }}" style="width: 100%; border-radius: 6px;" alt="Result" data-zoomable>
-    <figcaption style="margin-top: 0.5rem; font-size: 0.85em; font-weight: bold;">New evolving frameworks clearly outperform prior method on Frontier-CS.</figcaption>
+    <figcaption style="margin-top: 0.5rem; font-size: 0.85em; font-weight: bold;">New evolving frameworks clearly outperform prior method on FrontierCS.</figcaption>
   </figure>
 </div>
 
@@ -135,9 +135,9 @@ This motivates **adaptive evolutionary algorithms** that modify their own search
 - **AdaEvolve** adjusts search intensity and resource allocation based on real-time progress signals.
 - **EvoX** goes further—letting the LLM evolve the strategy itself that governs how past experiences are selected and reused.
 
-Across the full Frontier-CS benchmark, **adaptive evolution consistently outperforms fixed-strategy methods** such as OpenEvolve, GEPA, and ShinkaEvolve. The results highlight that adaptive search becomes increasingly important when evaluating evolving agents **at scale**, where task diversity and difficulty expose the brittleness of static strategies.
+Across the full FrontierCS benchmark, **adaptive evolution consistently outperforms fixed-strategy methods** such as OpenEvolve, GEPA, and ShinkaEvolve. The results highlight that adaptive search becomes increasingly important when evaluating evolving agents **at scale**, where task diversity and difficulty expose the brittleness of static strategies.
 
-A concrete example illustrates this well. On a **polyomino packing** task from Frontier-CS, the adaptive algorithm starts from a simple baseline and gradually discovers improved placement strategies—better ordering, symmetry handling, and local compaction—leading to progressively denser layouts over time:
+A concrete example illustrates this well. On a **polyomino packing** task from FrontierCS, the adaptive algorithm starts from a simple baseline and gradually discovers improved placement strategies—better ordering, symmetry handling, and local compaction—leading to progressively denser layouts over time:
 
 <div style="text-align: center; margin-bottom: 0;">
   <figure style="margin-bottom: 0;">
@@ -147,7 +147,7 @@ A concrete example illustrates this well. On a **polyomino packing** task from F
 </div>
 
 <div style="background: #f0f4fa; border-left: 4px solid #4a90d9; padding: 1rem 1.2rem; border-radius: 6px; margin: 1.5rem 0; color: #1a1a1a;">
-📢 This task is far from saturated. A human expert achieves a packing score of <strong>92</strong>, while the best current evolving agent reaches only the low 80s—leaving substantial room for improvement. This stands in sharp contrast to benchmarks like circle packing, where all major methods have already converged to the same ceiling. Frontier-CS tasks are designed with deep search spaces and high expert-level ceilings, ensuring they remain meaningful as methods improve. We encourage the community to develop <strong>stronger online evolution strategies</strong> and push toward—and beyond—the human expert frontier.
+📢 This task is far from saturated. A human expert achieves a packing score of <strong>92</strong>, while the best current evolving agent reaches only the low 80s—leaving substantial room for improvement. This stands in sharp contrast to benchmarks like circle packing, where all major methods have already converged to the same ceiling. FrontierCS tasks are designed with deep search spaces and high expert-level ceilings, ensuring they remain meaningful as methods improve. We encourage the community to develop <strong>stronger online evolution strategies</strong> and push toward—and beyond—the human expert frontier.
 </div>
 
 ### Use Case 2: Offline Learning
@@ -194,7 +194,7 @@ Second, as the playbook grows, performance does not necessarily improve. In our 
 
 Finally, a key limitation is **weak credit assignment**. Because the model outputs only code, it is difficult to determine which playbook entries actually contributed to a solution. Future systems may benefit from better attribution or retrieval mechanisms that track which strategies are used and activate only the most relevant knowledge for each task.
 
-This experiment highlights that Frontier-CS can serve as a useful feedback platform for evolving agents to measure their performance and continuously improve the design to achieve better quality in the future.
+This experiment highlights that FrontierCS can serve as a useful feedback platform for evolving agents to measure their performance and continuously improve the design to achieve better quality in the future.
 
 <div style="background: #f0f4fa; border-left: 4px solid #4a90d9; padding: 1rem 1.2rem; border-radius: 6px; margin: 1.5rem 0; color: #1a1a1a;">
 📢 Overall, these results suggest that the next generation of evolving-agent systems may depend less on building larger playbooks and more on learning how to construct <strong>more structured, reusable, and selectively activated knowledge</strong>.

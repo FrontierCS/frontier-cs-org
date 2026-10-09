@@ -233,7 +233,7 @@ permalink: /workshop/
     <div class="ws-person">
       <h3 class="ws-person-name"><a href="https://joyemang33.github.io/" target="_blank" rel="noopener noreferrer">Qiuyang Mang</a></h3>
       <p class="ws-person-affil">UC Berkeley</p>
-      <p class="ws-person-bio">Ph.D. student in the Sky Computing Lab at UC Berkeley advised by Alvin Cheung. Leads Frontier-CS and FrontierSmith, which study open-ended, verifiable computer-science challenges and data synthesis for LLM-driven algorithm evolution.</p>
+      <p class="ws-person-bio">Ph.D. student in the Sky Computing Lab at UC Berkeley advised by Alvin Cheung. Leads FrontierCS and FrontierSmith, which study open-ended, verifiable computer-science challenges and data synthesis for LLM-driven algorithm evolution.</p>
     </div>
     <div class="ws-person">
       <h3 class="ws-person-name"><a href="https://hanchenli.github.io/" target="_blank" rel="noopener noreferrer">Hanchen Li</a></h3>

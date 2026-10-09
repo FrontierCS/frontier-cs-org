@@ -1,7 +1,7 @@
 ---
 layout: distill
 title: LLM Defeated in Open-ended Problems
-description: "Modern LLMs claim superhuman algorithmic abilities, but what happens when there is no strict verifier? We analyze how multi-turn 'optimization' in Frontier-CS exposes the cognitive ceiling and catastrophic failures of AI in open-ended problem solving."
+description: "Modern LLMs claim superhuman algorithmic abilities, but what happens when there is no strict verifier? We analyze how multi-turn 'optimization' in FrontierCS exposes the cognitive ceiling and catastrophic failures of AI in open-ended problem solving."
 thumbnail: assets/img/2026-02-14-negative-optimization/preview.png
 og_image: assets/img/2026-02-14-negative-optimization/preview.png
 
@@ -18,7 +18,7 @@ authors:
     url: "https://scholar.google.com/citations?user=_0dEBNAAAAAJ"
     affiliations:
       name: University of California, San Diego
-  - name: Frontier-CS team
+  - name: FrontierCS team
     url: "https://frontier-cs.org"
 
 toc:
@@ -115,8 +115,8 @@ When faced with a difficult optimization task lacking a strict, immediate verifi
 
 <img src="{{ site.baseurl }}/assets/img/2026-02-14-negative-optimization/image6.jpg" alt="Performance Contrast: Algorithm vs. Heuristic" class="hero">
 
-This is why continuous scoring in benchmarks like Frontier-CS is critical. In a binary pass/fail system, this regression might be masked. 
+This is why continuous scoring in benchmarks like FrontierCS is critical. In a binary pass/fail system, this regression might be masked. 
 
-More importantly, the open-ended problems in Frontier-CS reveals the realities of actual software engineering. Production codebases and complex system architectures do not have a absolute, formal verifier. If we trust LLMs to autonomously optimize systems without strict bounds, they are highly intended to introducing fragile, edge-case-blind logic that works in theory but causes systemic collapse in practice. 
+More importantly, the open-ended problems in FrontierCS reveals the realities of actual software engineering. Production codebases and complex system architectures do not have a absolute, formal verifier. If we trust LLMs to autonomously optimize systems without strict bounds, they are highly intended to introducing fragile, edge-case-blind logic that works in theory but causes systemic collapse in practice. 
 
 While LLMs undoubtedly possess elite capabilities for isolated, well-defined algorithms, their performance in open-ended reasoning remains fundamentally unreliable. Treating them as omnipotent architects rather than powerful, specialized tools is a trap we cannot afford to fall into.

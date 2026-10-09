@@ -1,7 +1,7 @@
 ---
 layout: distill
-title: "Roadmap to FrontierCS 2.0"
-description: "FrontierCS 2.0 extends open-ended evaluation from static sandboxed tasks to Harbor-based feedback loops and repo-level environments."
+title: "Roadmap to FrontierCS 2"
+description: "FrontierCS 2 extends open-ended evaluation from static sandboxed tasks to Harbor-based feedback loops and repo-level environments."
 image: assets/img/2026-06-11-frontiercs-2-roadmap/benchmark-environment-evolution.jpg
 thumbnail: assets/img/2026-06-11-frontiercs-2-roadmap/benchmark-environment-evolution.jpg
 og_image: assets/img/2026-06-11-frontiercs-2-roadmap/benchmark-environment-evolution.jpg
@@ -17,7 +17,7 @@ authors:
       name: FrontierCS
 
 toc:
-  - name: "What's New in FrontierCS 2.0"
+  - name: "What's New in FrontierCS 2"
   - name: "The Feedback Loop in Three Settings"
   - name: "Why This Direction"
   - name: "From Static Harbor to Feedback"
@@ -270,25 +270,25 @@ _styles: >
 ### Toward feedback-driven, repo-level open-ended tasks
 
 <div class="thesis-box">
-  <p><strong>TL;DR:</strong> FrontierCS 1.0 rethought <strong>problem</strong> and <strong>score</strong>, moving benchmarks from closed-ended exam tasks toward open-ended research tasks, or <em>what to solve</em>; FrontierCS 2.0 rethinks <strong>environment</strong> and <strong>scope</strong>, or <em>how to solve</em>.</p>
+  <p><strong>TL;DR:</strong> FrontierCS 1 rethought <strong>problem</strong> and <strong>score</strong>, moving benchmarks from closed-ended exam tasks toward open-ended research tasks, or <em>what to solve</em>; FrontierCS 2 rethinks <strong>environment</strong> and <strong>scope</strong>, or <em>how to solve</em>.</p>
 </div>
 
-FrontierCS 1.0 made two bets: open-ended problems and continuous scoring. Those bets still look right. Frontier models are strong on exam-style tasks, but open-ended research and engineering tasks still expose a different failure mode: agents often know many local moves, but struggle to keep improving.
+FrontierCS 1 made two bets: open-ended problems and continuous scoring. Those bets still look right. Frontier models are strong on exam-style tasks, but open-ended research and engineering tasks still expose a different failure mode: agents often know many local moves, but struggle to keep improving.
 
-FrontierCS 2.0 makes the next two bets: feedback-driven environments and repo-level scope.
+FrontierCS 2 makes the next two bets: feedback-driven environments and repo-level scope.
 
-## What's New in FrontierCS 2.0
+## What's New in FrontierCS 2
 
-This FrontierCS 2.0 update includes four changes.
+This FrontierCS 2 update includes four changes.
 
 <div class="update-grid">
   <div class="update-item">
     <h3>Agent-native tasks</h3>
-    <p>FrontierCS 1.0 algorithmic tasks now run as containerized Harbor-compatible tasks.</p>
+    <p>FrontierCS 1 algorithmic tasks now run as containerized Harbor-compatible tasks.</p>
   </div>
   <div class="update-item">
     <h3>Released private tests</h3>
-    <p>We are releasing the private test cases for FrontierCS 1.0 algorithmic tasks.</p>
+    <p>We are releasing the private test cases for FrontierCS 1 algorithmic tasks.</p>
   </div>
   <div class="update-item">
     <h3>Controlled feedback</h3>
@@ -300,7 +300,7 @@ This FrontierCS 2.0 update includes four changes.
   </div>
 </div>
 
-The short version is simple: open-ended evaluation remains the core idea. FrontierCS 2.0 changes the environment around it.
+The short version is simple: open-ended evaluation remains the core idea. FrontierCS 2 changes the environment around it.
 
 ## The Feedback Loop in Three Settings
 
@@ -337,7 +337,7 @@ This is becoming more visible in frontier research. [OpenAI's recent Erdős unit
 
 The exact maximum remains open. That is the important part. Progress in these settings is not a one-shot answer. It comes from search, construction, verification, and refinement.
 
-That is the type of behavior FrontierCS 2.0 is built to study.
+That is the type of behavior FrontierCS 2 is built to study.
 
 ## From Static Harbor to Feedback
 
@@ -345,12 +345,12 @@ Our first step was to make the original FrontierCS algorithmic tasks work as Har
 
 Static Harbor is already a large step beyond single-turn prompting. The agent can act inside an environment. But the evaluator still sits outside the run. The agent works, submits, and only then gets scored.
 
-FrontierCS 2.0 builds on Harbor and changes this interface. For open-ended tasks, final-only scoring is often too weak. The agent needs feedback while it is still searching.
+FrontierCS 2 builds on Harbor and changes this interface. For open-ended tasks, final-only scoring is often too weak. The agent needs feedback while it is still searching.
 
 The key is control. We do not expose the evaluator directly. We do not leak hidden answers. We do not want agents to optimize against quirks of the scoring script. We want a safe feedback channel: enough signal for iteration, enough isolation to preserve benchmark integrity.
 
 ![The evolution of benchmark environments]({{ 'assets/img/2026-06-11-frontiercs-2-roadmap/benchmark-environment-evolution.jpg' | relative_url }}){: .diagram}
-<div class="caption">FrontierCS 2.0 builds on the sandbox idea: agents get more room to iterate, while evaluators stay isolated.</div>
+<div class="caption">FrontierCS 2 builds on the sandbox idea: agents get more room to iterate, while evaluators stay isolated.</div>
 
 ## What We Mean by Repo-Level
 
@@ -395,7 +395,7 @@ The objective is not just to make vLLM faster. The patched server must speed up 
 
 We also control where the agent can patch. The intended writable surface is online serving efficiency: request scheduling, batching, prefix or prompt-cache reuse, KV-cache management, preemption, admission control, and nearby scheduler/execution wiring. The evaluator rejects changes to CUDA/C++, build systems, packaging, tests, benchmark files, secrets, model implementations, distributed internals, and benchmark-specific shortcuts.
 
-That is the target shape for FrontierCS 2.0: real systems work, controlled patch surfaces, and feedback loops that reward genuine improvement.
+That is the target shape for FrontierCS 2: real systems work, controlled patch surfaces, and feedback loops that reward genuine improvement.
 
 ## Serverless GPUs as an Evaluation Boundary
 
@@ -410,14 +410,14 @@ Each submitted patch is baked into a Modal image. vLLM precompiled CUDA kernels 
 
 ## What We Want Researchers to Try
 
-FrontierCS 2.0 is aimed at frontier labs and agent researchers who care about long-horizon evaluation.
+FrontierCS 2 is aimed at frontier labs and agent researchers who care about long-horizon evaluation.
 
 If you build agents, use these tasks to test more than final success. Look at how your agent uses feedback. Does it recover from bad submissions? Does it overfit public signals? Does it keep a useful search state? Does it improve the artifact, or only learn to game the harness?
 
 If you build benchmarks, we think this is the important interface: agents should get enough feedback to make progress, but not enough access to corrupt the evaluator.
 
-Open-ended evaluation was the right direction for FrontierCS 1.0. FrontierCS 2.0 keeps that bet, and moves it into the environment.
+Open-ended evaluation was the right direction for FrontierCS 1. FrontierCS 2 keeps that bet, and moves it into the environment.
 
 <div class="callout">
-  <strong>FrontierCS 2.0 in one line:</strong> more room for agents to search, build, and iterate; still hard to cheat.
+  <strong>FrontierCS 2 in one line:</strong> more room for agents to search, build, and iterate; still hard to cheat.
 </div>

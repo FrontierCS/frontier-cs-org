@@ -1,21 +1,21 @@
 ---
 layout: null
 permalink: /results2/
-title: Evaluation Results | Frontier-CS 2.0
+title: Evaluation Results | FrontierCS 2
 sitemap: false
 ---
 <!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex, nofollow"><meta name="theme-color" content="#16242c">
-<title>Evaluation Results | Frontier-CS 2.0</title>
+<title>Evaluation Results | FrontierCS 2</title>
 <link rel="icon" href="{{ '/assets/img/frontier-favicon.png' | relative_url }}">
 <link rel="stylesheet" href="{{ '/assets/css/results2.css' | relative_url }}">
 <script defer src="{{ '/assets/js/results2.js' | relative_url }}"></script>
 </head>
 <body>
 <a class="skip" href="#results">Skip to results</a>
-<header class="topbar"><a href="{{ '/' | relative_url }}" class="brand">Frontier-CS <span>2.0</span></a><span class="breadcrumb">/ Preview / <strong>Evaluation results</strong></span><span id="updated" class="updated">Loading snapshot</span><button id="refresh" type="button">Refresh</button></header>
+<header class="topbar"><a href="{{ '/' | relative_url }}" class="brand">FrontierCS <span>2</span></a><span class="breadcrumb">/ Preview / <strong>Evaluation results</strong></span><span id="updated" class="updated">Loading snapshot</span><button id="refresh" type="button">Refresh</button></header>
 <div class="workspace">
 <aside class="sidebar"><div class="nav-title">WORKSPACE</div><a class="active-nav" href="#results">▦ Results</a><a href="#analysis">◫ Task analysis</a><div class="sidebar-section"><fieldset id="model-filter"><legend>MODELS</legend></fieldset></div><div id="models"></div><details class="help"><summary>Metric definitions</summary><p><b>Final score</b>: accepted final evaluation. Pass/fail is an independent scientific criterion.</p><p><b>Best train</b>: maximum verified training score. Never substitutes for the final score.</p><p><b>Run elapsed</b>: wall time from run start, including startup, judging and cleanup. Curve time stops at each score event.</p><p><b>Tokens</b>: provider-reported input + output across calls, including cached inputs where reported. Unknown usage stays unavailable.</p><p><b>Train / final</b>: distinct train verification requests (including failed requests) / scored final evaluations. Curves contain only valid measured scores.</p><p>Public snapshot of verified formal results. Unpublished tasks are excluded from means and failure counts. Refresh checks the published snapshot.</p></details></aside>
 <main id="results" data-source="{{ '/assets/data/results2.json' | relative_url }}">

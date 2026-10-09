@@ -1,4 +1,4 @@
-# Frontier-CS 2.0 evaluation results
+# FrontierCS 2 evaluation results
 
 `/results2/` is an unlisted public page, excluded from the sitemap and marked
 `noindex, nofollow`. It is not an authenticated page. It never connects a visitor

@@ -1,7 +1,7 @@
 ---
 layout: distill
 title: Evaluating the Hardest CS Problems in the Age of LLMs
-description: "Frontier-CS scores solutions on a continuous scale across heterogeneous hardware. This post explains the evaluation architecture behind the leaderboard: hash-based resume, resource-grouped clusters, pinned environments, and the challenges ahead for agentic submissions."
+description: "FrontierCS scores solutions on a continuous scale across heterogeneous hardware. This post explains the evaluation architecture behind the leaderboard: hash-based resume, resource-grouped clusters, pinned environments, and the challenges ahead for agentic submissions."
 thumbnail: assets/img/2026-02-10-evaluation/preview.png
 og_image: assets/img/2026-02-10-evaluation/preview.png
 
@@ -26,7 +26,7 @@ authors:
     url: "https://wenhaochai.com/"
     affiliations:
       name: Princeton University
-  - name: Frontier-CS team
+  - name: FrontierCS team
     url: "https://frontier-cs.org"
 
 toc:
@@ -56,7 +56,7 @@ _styles: >
 
 ## What is FrontierCS?
 
-[Frontier-CS](https://frontier-cs.org) is an open-source benchmark of 240 open-ended CS problems with continuous scoring.
+[FrontierCS](https://frontier-cs.org) is an open-source benchmark of 240 open-ended CS problems with continuous scoring.
 
 ## Evaluating the Hardest CS Problems in the Age of LLMs
 
@@ -65,7 +65,7 @@ _styles: >
 <!-- PLACEHOLDER: hero image — a stylized diagram showing diverse problem
      types (CUDA kernel, algorithm, data structure) funneling into a unified
      evaluation pipeline, with cluster icons and score outputs on the right.
-     Style: clean, minimal, matching the Frontier-CS brand. -->
+     Style: clean, minimal, matching the FrontierCS brand. -->
 
 Our [1.0 release](https://frontier-cs.org/blog/feb-release/) introduced
 **240 open-ended problems** spanning algorithmic competition and systems
@@ -86,7 +86,7 @@ Verified checking if a GitHub issue got fixed, or Terminal-Bench checking
 if a DevOps task completed. The evaluation is binary, and it doesn't
 depend on what hardware you run it on.
 
-Frontier-CS doesn't work that way. Our problems are **open-ended and
+FrontierCS doesn't work that way. Our problems are **open-ended and
 continuous-scored**. Optimize a CUDA kernel to be as fast as possible.
 Design a cache eviction policy that minimizes miss rate. Implement a
 parallel sort that scales across cores. There is no single correct answer,
@@ -99,11 +99,11 @@ scoring harness, and collecting results. Now multiply that by 7 models, 240
 problems, and 5 runs each. That's 8,400 evaluations per cycle, and a new
 cycle starts every time a model provider ships an update.
 
-<img src="{{ site.baseurl }}/assets/img/2026-02-10-evaluation/image2.png" alt="Traditional vs Frontier-CS evaluation">
+<img src="{{ site.baseurl }}/assets/img/2026-02-10-evaluation/image2.png" alt="Traditional vs FrontierCS evaluation">
 
 <!-- PLACEHOLDER: side-by-side comparison diagram.
      Left: "Traditional benchmark" — code → test → pass/fail.
-     Right: "Frontier-CS" — code → provision hardware → install deps →
+     Right: "FrontierCS" — code → provision hardware → install deps →
      run scoring harness → continuous score.
      Emphasize the difference in complexity. -->
 
@@ -156,7 +156,7 @@ are specific to evaluating LLMs on open-ended tasks.
 
 ### 1. Continuous evaluation, not one-shot
 
-Academic benchmarks are typically evaluated once for a paper. Frontier-CS is
+Academic benchmarks are typically evaluated once for a paper. FrontierCS is
 a **living leaderboard**. Just in the past few months: Gemini 3.0 Pro, GPT
 5.2 Thinking, Grok 4, DeepSeek 3.2. And the pace is accelerating, not
 slowing down. As we write this, OpenAI has just released GPT-5.3-codex and Anthropic has
@@ -209,7 +209,7 @@ leaderboard changes.
 
 This makes our evaluation environments far more complex than even the most
 sophisticated agentic benchmarks. SWE-bench Verified's environment is a
-git repo and a test suite. A Frontier-CS research problem might require a specific GPU, a
+git repo and a test suite. A FrontierCS research problem might require a specific GPU, a
 pinned CUDA version, custom Python packages, and a large dataset
 pre-loaded into memory. Setting up a single problem's environment can be
 more involved than SWE-bench's entire evaluation pipeline.
@@ -272,7 +272,7 @@ The clean separation above also forces us to confront a question the
 community is only starting to grapple with: **what happens when the
 submission is an agent, not a file?**
 
-Today, a submission to Frontier-CS is a source file. But the frontier is
+Today, a submission to FrontierCS is a source file. But the frontier is
 moving toward agentic workflows where the model reads the problem, writes
 code, runs it, inspects the output, and iterates. The generation process
 itself has side effects: it reads the environment, runs tests, modifies
@@ -380,4 +380,4 @@ in the repo.
 
 We are always looking for more problems to add for our next release and evaluating on [more models and agents](https://github.com/FrontierCS/Frontier-CS/blob/main/SUBMIT.md). We love to hear about your comments and feedback! Join us on [discord](https://discord.com/invite/k4hd2nU4UE) or [email us](mailto:frontiercs@berkeley.edu)!
 
-And if you find Frontier-CS useful, please consider <a href="https://github.com/FrontierCS/Frontier-CS">giving us a star on GitHub</a>!
+And if you find FrontierCS useful, please consider <a href="https://github.com/FrontierCS/Frontier-CS">giving us a star on GitHub</a>!

@@ -1,70 +1,89 @@
-source: Frontier-CS README, Citing Us (mang2026frontiercs, ICML 2026); homepages from blog post front matter
-authors:
-- name: Qiuyang Mang
-  url: https://joyemang33.github.io
-- name: Wenhao Chai
-  url: https://wenhaochai.com/
-- name: Zhifei Li
-  url: https://andylizf.github.io/
-- name: Huanzhi Mao
-- name: Shang Zhou
-  url: https://scholar.google.com/citations?user=_0dEBNAAAAAJ
-- name: Alexander Du
-- name: Hanchen Li
-  url: https://hanchenli.github.io/
-- name: Shu Liu
-  url: https://shulynnliu.com/
-- name: Edwin Chen
-- name: Yichuan Wang
-- name: Xieting Chu
-- name: Zerui Cheng
-- name: Yuan Xu
-- name: Tian Xia
-- name: Zirui Wang
-- name: Tianneng Shi
-- name: Jianzhu Yao
-- name: Yilong Zhao
-- name: Qizheng Zhang
-  url: https://alex-q-z.github.io/
-- name: Charlie F. Ruan
-- name: Zeyu Shen
-- name: Kaiyuan Liu
-- name: Zhaoyang Hong
-- name: Alex Gu
-- name: Ziyi Zhang
-- name: Runyuan He
-- name: Dong Xing
-- name: Zerui Li
-- name: Zirong Zeng
-- name: Yige Jiang
-- name: Lufeng Cheng
-- name: Ziyi Zhao
-- name: Youran Sun
-- name: Suyang Zhong
-- name: Junpeng Wang
-- name: Donglin Li
-- name: Wenyuan Huang
-  url: https://whuang369.com/
-- name: Jialiang Gu
-- name: Wesley Kai Zheng
-- name: Wangmeiyu Zhang
-- name: Ruyi Ji
-- name: Xuechang Tu
-- name: Zihan Zheng
-- name: Zhaozi Wang
-- name: Zexing Chen
-- name: Jingbang Chen
-- name: Jialu Zhang
-- name: Aleksandra Korolova
-- name: Peter Henderson
-- name: Pramod Viswanath
-- name: Vijay Ganesh
-- name: Saining Xie
-- name: Zhuang Liu
-- name: Dawn Song
-- name: Sewon Min
-- name: Ion Stoica
-- name: Joseph E. Gonzalez
-- name: Jingbo Shang
-- name: Alvin Cheung
-  url: https://people.eecs.berkeley.edu/~akcheung/
+# People shown on /team/.
+# fcs1: authors of "FrontierCS: Evolving Challenges for Evolving Intelligence".
+#   Names and order follow the ICML 2026 BibTeX in the FrontierCS README (mang2026frontiercs).
+#   Affiliations, equal-contribution marks and the contributor/advisor split follow arXiv 2512.15699v1.
+#   Kangyang Zhou is on arXiv v1 but not in the ICML BibTeX; he stays at his arXiv position.
+#   affil is empty for authors added after arXiv v1 until their affiliation is confirmed.
+#   Homepages come from blog post front matter or the advisors' own sites.
+
+institutions:
+  - {name: UC Berkeley, logo: berkeley.svg}
+  - {name: Princeton, logo: princeton.svg}
+  - {name: UCSD, logo: ucsd.svg}
+  - {name: X-camp Academy}
+  - {name: Georgia Tech, logo: gatech.svg}
+  - {name: NYU, logo: nyu.svg}
+  - {name: Stanford, logo: stanford.svg}
+  - {name: UW, logo: washington.png}
+  - {name: NTU, logo: ntu.svg}
+  - {name: Toronto, logo: toronto.svg}
+  - {name: UIUC, logo: uiuc.png}
+  - {name: Michigan, logo: michigan.svg}
+  - {name: MIT, logo: mit.svg}
+
+fcs1:
+  title: "FrontierCS: Evolving Challenges for Evolving Intelligence"
+  url: https://arxiv.org/abs/2512.15699
+  venue: ICML 2026
+  contributors:
+    - {name: Qiuyang Mang, affil: [UC Berkeley], eq: true, url: "https://joyemang33.github.io"}
+    - {name: Wenhao Chai, affil: [Princeton], eq: true, url: "https://wenhaochai.com/"}
+    - {name: Zhifei Li, affil: [UC Berkeley], eq: true, url: "https://andylizf.github.io/"}
+    - {name: Huanzhi Mao, affil: [UC Berkeley], eq: true}
+    - {name: Shang Zhou, affil: [UCSD], eq: true, url: "https://scholar.google.com/citations?user=_0dEBNAAAAAJ"}
+    - {name: Alexander Du, affil: [UC Berkeley, X-camp Academy], eq: true}
+    - {name: Hanchen Li, affil: [UC Berkeley], eq: true, url: "https://hanchenli.github.io/"}
+    - {name: Shu Liu, affil: [UC Berkeley], eq: true, url: "https://shulynnliu.com/"}
+    - {name: Edwin Chen, affil: [Independent]}
+    - {name: Yichuan Wang, affil: [UC Berkeley]}
+    - {name: Xieting Chu, affil: [Georgia Tech]}
+    - {name: Zerui Cheng, affil: [Princeton]}
+    - {name: Yuan Xu, affil: [X-camp Academy]}
+    - {name: Tian Xia, affil: [UC Berkeley]}
+    - {name: Zirui Wang, affil: [UC Berkeley]}
+    - {name: Tianneng Shi, affil: [UC Berkeley]}
+    - {name: Jianzhu Yao, affil: [Princeton]}
+    - {name: Yilong Zhao, affil: [UC Berkeley]}
+    - {name: Qizheng Zhang, affil: [Stanford], url: "https://alex-q-z.github.io/"}
+    - {name: Charlie F. Ruan, affil: [UC Berkeley]}
+    - {name: Zeyu Shen, affil: [Princeton]}
+    - {name: Kaiyuan Liu, affil: [UW]}
+    - {name: Zhaoyang Hong, affil: []}
+    - {name: Alex Gu, affil: []}
+    - {name: Ziyi Zhang, affil: []}
+    - {name: Runyuan He, affil: [UC Berkeley]}
+    - {name: Dong Xing, affil: [X-camp Academy]}
+    - {name: Zerui Li, affil: [X-camp Academy]}
+    - {name: Zirong Zeng, affil: [UC Berkeley]}
+    - {name: Yige Jiang, affil: [NTU]}
+    - {name: Lufeng Cheng, affil: [Toronto]}
+    - {name: Ziyi Zhao, affil: [UIUC]}
+    - {name: Youran Sun, affil: [UC Berkeley]}
+    - {name: Suyang Zhong, affil: []}
+    - {name: Junpeng Wang, affil: []}
+    - {name: Donglin Li, affil: []}
+    - {name: Wenyuan Huang, affil: [], url: "https://whuang369.com/"}
+    - {name: Jialiang Gu, affil: []}
+    - {name: Wesley Kai Zheng, affil: [UC Berkeley]}
+    - {name: Wangmeiyu Zhang, affil: [Independent]}
+    - {name: Ruyi Ji, affil: [Michigan]}
+    - {name: Xuechang Tu, affil: [Georgia Tech]}
+    - {name: Zihan Zheng, affil: [NYU]}
+    - {name: Zhaozi Wang, affil: [NYU]}
+    - {name: Zexing Chen, affil: [UCSD]}
+    - {name: Kangyang Zhou, affil: [MIT]}
+    - {name: Jingbang Chen, affil: [Independent]}
+    - {name: Jialu Zhang, affil: []}
+  advisors:
+    - {name: Aleksandra Korolova, affil: [Princeton], url: "https://www.korolova.com/"}
+    - {name: Peter Henderson, affil: [Princeton], url: "https://www.peterhenderson.co/"}
+    - {name: Pramod Viswanath, affil: [Princeton]}
+    - {name: Vijay Ganesh, affil: [Georgia Tech], url: "https://vganesh1.github.io/"}
+    - {name: Saining Xie, affil: [NYU], url: "https://www.sainingxie.com/"}
+    - {name: Zhuang Liu, affil: [Princeton], url: "https://liuzhuang13.github.io/"}
+    - {name: Dawn Song, affil: [UC Berkeley]}
+    - {name: Sewon Min, affil: [UC Berkeley], url: "https://www.sewonmin.com/"}
+    - {name: Ion Stoica, affil: [UC Berkeley]}
+    - {name: Joseph E. Gonzalez, affil: [UC Berkeley], eq: true, url: "https://people.eecs.berkeley.edu/~jegonzal/"}
+    - {name: Jingbo Shang, affil: [UCSD], eq: true, url: "https://shangjingbo1226.github.io/"}
+    - {name: Alvin Cheung, affil: [UC Berkeley], eq: true, url: "https://people.eecs.berkeley.edu/~akcheung/"}

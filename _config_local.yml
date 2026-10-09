@@ -2,13 +2,13 @@
 # Site settings
 # -----------------------------------------------------------------------------
 
-title: Frontier-CS Blog Posts
-first_name: Frontier-CS
+title: FrontierCS Blog Posts
+first_name: FrontierCS
 middle_name: 
 last_name: Blog
 email: 
 description: > # the ">" symbol means to ignore newlines until "footer_text:"
-  Home to Frontier-CS blog posts
+  Home to FrontierCS blog posts
 footer_text: >
   Powered by <a href="https://jekyllrb.com/" target="_blank">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio">al-folio</a> theme.
   Hosted by <a href="https://pages.github.com/" target="_blank">GitHub Pages</a>.
@@ -110,9 +110,9 @@ bing_site_verification:  # out your bing-site-verification ID (Bing Webmaster)
 # Blog
 # -----------------------------------------------------------------------------
 
-blog_name: Frontier-CS blog posts
+blog_name: FrontierCS blog posts
 blog_nav_title: blog
-blog_description: Frontier-CS blog posts
+blog_description: FrontierCS blog posts
 permalink: /blog/:title/
 
 # Pagination

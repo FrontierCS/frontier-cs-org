@@ -1,4 +1,4 @@
-// Frontier-CS — shared page behaviour (ported from wenhaochai.com site.js).
+// FrontierCS — shared page behaviour (ported from wenhaochai.com site.js).
 // Topbar shadow, mobile nav, article contents scrollspy,
 // heading ids for the contents links, and small shims for distill.pub tags.
 (function () {
