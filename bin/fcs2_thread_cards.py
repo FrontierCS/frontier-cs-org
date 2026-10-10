@@ -227,8 +227,20 @@ OVERVIEW = {
         PRE);
       fit(v, 'tts', 30); v.append(document.getElementById('ttsplot'), document.getElementById('ttslegend')); drawTTS();
     }""",
+    # the private set (owner, 2026-10-10: a separate set of unreleased tasks; no count on the card): task illustrations
+    # blurred past recognition, each under a white lock, in the closing card's grid
+    '07-private': """() => {
+      const v = card('side', 'Plus a private set.', 'Tasks we don’t release.', '');
+      const all = AREAS.flatMap(a => TASKS.filter(t => a.d.includes(t.d)).map(t => [t, a.k])), pick = Array.from({length:12}, (_, i) => all[Math.floor((i + .5) * all.length / 12)]);
+      const cols = 3, gw = 470, gap = 6, tw = (gw - gap * (cols - 1)) / cols, th = tw / 1.5;
+      const lock = `<svg viewBox="0 0 24 24" width="18" height="18"><rect x="5" y="10.5" width="14" height="10" rx="2.2" fill="#3c4043"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="#3c4043" stroke-width="2.2" stroke-linecap="round"/></svg>`;
+      v.style.display = 'grid'; v.style.gridTemplateColumns = `repeat(${cols}, ${tw}px)`; v.style.gap = `${gap}px`; v.style.alignContent = 'center';
+      v.innerHTML = pick.map(([t, k]) => `<div style="position:relative; width:${tw}px; height:${th}px; border-radius:8px; overflow:hidden; background:${ART_FIELD[k]}">
+          <div style="position:absolute; inset:-12%; filter:blur(9px) saturate(1.1)">${taskArt(t.s, k).replace('<svg class="art"', `<svg width="100%" height="100%" preserveAspectRatio="xMidYMid slice"`)}</div>
+          <div style="position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:38px; height:38px; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center; box-shadow:0 1px 4px rgba(32,33,36,.2)">${lock}</div></div>`).join('');
+    }""",
     # where to look: a sample of task illustrations
-    '07-explore': """() => {
+    '08-explore': """() => {
       const v = card('side', `Explore all ${TASKS.length} tasks`,
         'Each with its paper and every model’s runs.', '');
       const pick = AREAS.flatMap(a => TASKS.filter(t => a.d.includes(t.d)).slice(0, 2).map(t => [t, a.k])).slice(0, 12);
