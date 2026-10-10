@@ -93,15 +93,13 @@ OVERVIEW = {
     # a teaser before the release, built on the paper card (owner: the paper wall suits a teaser): the wall large and
     # a teaser before the release: the paper card's layout unchanged (owner: the paper card suits a teaser), teaser
     # a teaser before the release (owner: only the picture and "FrontierCS 2, coming soon"): the paper card's wall on the
-    # right, the name with the brand mark and "Coming soon" on the left; no top bar, no other text
+    # a teaser before the release (owner: only the picture and "FrontierCS 2, coming soon"; the logo and the address in
+    # their usual places): the top bar as on every card, the paper card's wall on the right, the name and "Coming soon"
     '00-teaser': """() => {
-      const v = card('side', '', '', ''), c = v.closest('.tcard');
-      c.querySelector('.tc-top').remove();
-      c.querySelector('.tc-hd').style.width = '410px';
-      c.querySelector('.tc-hd').innerHTML = `<div style="display:flex; align-items:center; gap:16px">
-          <svg viewBox="49 47 81 100" style="width:34px; height:42px; color:#0b57d0"><path d="M59.78 135.86 L75.94 71.24 A17.5 17.5 0 0 1 92.89 58 L118.5 58" fill="none" stroke="currentColor" stroke-width="21" stroke-linecap="round"/><circle cx="109" cy="97" r="10.5" fill="currentColor"/></svg>
-          <div style="font-size:56px; font-weight:600; letter-spacing:-.02em; line-height:1; white-space:nowrap">FrontierCS 2</div></div>
-        <div style="font-size:24px; font-weight:500; color:#0b57d0; margin:18px 0 0 50px">Coming soon</div>`;
+      const v = card('side', '', '', ''), hd = v.closest('.tcard').querySelector('.tc-hd');
+      hd.style.width = '410px';
+      hd.innerHTML = `<div style="font-size:56px; font-weight:600; letter-spacing:-.02em; line-height:1; white-space:nowrap">FrontierCS 2</div>
+        <div style="font-size:24px; font-weight:500; color:#0b57d0; margin-top:16px">Coming soon</div>`;
       v.append(document.getElementById('papers')); drawPapers();
     }""",
     # research is a loop: on one task, each model's longest run as its best development score so far (a step line) with
