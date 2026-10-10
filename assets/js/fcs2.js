@@ -29,7 +29,7 @@ $('#lblegend').innerHTML = RANKED.map(m => `<span><i style="background:${MCOL[m.
 
 /* Main chart: pass rate against mean cost per run in US$, one dot per model (PASS, COST). Each label takes the first
    spot right, left, above or below its dot that clears every dot, every placed label and the edges; a dot with no free
-   spot keeps no label (the legend and the tooltip still name it). */
+   spot keeps no label (the tooltip still names it). No legend: the labels name the dots. */
 function drawPassCost() {
   const svg = $('#pcsvg'), W = Math.max(300, $('#pcplot').clientWidth), narrow = W < 560;
   const L = 44, R = narrow ? 12 : 24, T = 14, B = 46, H = narrow ? 320 : 400;
@@ -57,9 +57,10 @@ function drawPassCost() {
     svg.append(sv('circle', {cx, cy, r:7, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':2, 'data-m':m.id}));
     const lab = sv('text', {class:'lab halo', x:cx, y:cy}, name); svg.append(lab);
     const w = lab.getComputedTextLength() + 2;
-    // right, left, above, below, then the four diagonals; the first spot clear of every dot and placed label wins
+    // right, left, above, below, the four diagonals, then the same a line further out; the first spot clear of every dot and placed label wins
     const spots = [[cx + 12, cy + 4.5, 'start'], [cx - 12, cy + 4.5, 'end'], [cx, cy - 13, 'middle'], [cx, cy + 22, 'middle'],
-      [cx + 8, cy - 11, 'start'], [cx - 8, cy - 11, 'end'], [cx + 8, cy + 20, 'start'], [cx - 8, cy + 20, 'end']];
+      [cx + 8, cy - 11, 'start'], [cx - 8, cy - 11, 'end'], [cx + 8, cy + 20, 'start'], [cx - 8, cy + 20, 'end'],
+      [cx, cy - 29, 'middle'], [cx, cy + 38, 'middle'], [cx + 6, cy - 27, 'start'], [cx - 6, cy - 27, 'end'], [cx + 6, cy + 36, 'start'], [cx - 6, cy + 36, 'end']];
     const box = ([x, y, an]) => ({x:an === 'start' ? x : an === 'end' ? x - w : x - w / 2, y:y - 12, w, h:16});
     const hit = q => boxes.some(o => q.x < o.x + o.w && o.x < q.x + q.w && q.y < o.y + o.h && o.y < q.y + q.h) || q.x < L || q.x + q.w > W || q.y < 0;
     const spot = spots.find(sp => !hit(box(sp)));
@@ -70,7 +71,6 @@ function drawPassCost() {
   });
   attachTip(svg, W, H, pts, $('#pctip'));
 }
-$('#pclegend').innerHTML = [...MODELS].sort((a, b) => PASS[b.id][0] - PASS[a.id][0]).map(m => `<span><i style="background:${MCOL[m.id]}"></i>${esc(m.name)}</span>`).join('');
 
 /* FECI: one row per model ranked by ECI, its 90% interval as a bar. */
 function drawECI() {
@@ -144,6 +144,8 @@ const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function drawLB() {
   const runs = RUNS.filter(r => dom === 'All' || r.d === dom);
+  // grouped by model, the row labels name the models; grouped by task, the dots need the legend
+  $('#lblegend').hidden = group === 'model';
   $('#nres').textContent = `${runs.length} run${runs.length === 1 ? '' : 's'}`;
   let rows;
   if (group === 'model') {
@@ -368,7 +370,7 @@ $('#mapsvg').addEventListener('keydown', e => { const g = e.target.closest('.blk
 
 function drawRows() {
   drawMap();
-  $('#tzhint').textContent = picked.size ? `${[...picked].join(', ')} selected. Select again to clear.` : 'Select a domain to filter the list';
+  $('#tzhint').textContent = picked.size ? `${[...picked].join(', ')} selected. Select again to clear.` : '';
   const h = hits(); $('#cnt').textContent = `${h.length} task${h.length === 1 ? '' : 's'}`; $('#fcount').textContent = picked.size ? `(${picked.size})` : '';
   $('#rows').innerHTML = h.slice(0, limit).map(t => `<article class="row" data-s="${esc(t.s)}"><div class="meta"><span class="tag">${esc(t.d)}</span>${RAN.has(t.s) ? '<span class="ran"><i></i>Has runs</span>' : ''}</div>
     <h3><a class="stretch" href="${esc(taskHref(t.s))}">${esc(t.s)}</a></h3>${t.t ? `<p>${esc(t.t)}</p>` : ''}<div class="lk">${t.p ? `<a href="${esc(t.p)}" target="_blank" rel="noopener">Paper</a>` : '<span>No paper link</span>'}${t.r ? `<a href="${esc(t.r)}" target="_blank" rel="noopener">Code</a>` : ''}</div></article>`).join('')
