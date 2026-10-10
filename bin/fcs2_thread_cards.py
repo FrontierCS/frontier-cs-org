@@ -92,16 +92,16 @@ window.audit = () => {
 OVERVIEW = {
     # a teaser before the release, built on the paper card (owner: the paper wall suits a teaser): the wall large and
     # a teaser before the release: the paper card's layout unchanged (owner: the paper card suits a teaser), teaser
-    # wording; no results, no date
+    # a teaser before the release (owner: only the picture and "FrontierCS 2, coming soon"): the paper card's wall on the
+    # right, the name with the brand mark and "Coming soon" on the left; no top bar, no other text
     '00-teaser': """() => {
-      const v = card('side', 'Rebuild the paper. Beat its authors.',
-        `FrontierCS 2: ${TASKS.length} research tasks from published papers, each judged against the authors’ own code. Coming soon.`, '');
-      v.append(document.getElementById('papers')); drawPapers();
-    }""",
-    # where tasks come from: the wall of paper first pages
-    '02-papers': """() => {
-      const v = card('side', 'Rebuild the paper. Beat its authors.',
-        'Most tasks delete a published paper’s contribution from its own repository. The agent writes it back; the authors’ code is the bar.', '');
+      const v = card('side', '', '', ''), c = v.closest('.tcard');
+      c.querySelector('.tc-top').remove();
+      c.querySelector('.tc-hd').style.width = '410px';
+      c.querySelector('.tc-hd').innerHTML = `<div style="display:flex; align-items:center; gap:16px">
+          <svg viewBox="49 47 81 100" style="width:34px; height:42px; color:#0b57d0"><path d="M59.78 135.86 L75.94 71.24 A17.5 17.5 0 0 1 92.89 58 L118.5 58" fill="none" stroke="currentColor" stroke-width="21" stroke-linecap="round"/><circle cx="109" cy="97" r="10.5" fill="currentColor"/></svg>
+          <div style="font-size:56px; font-weight:600; letter-spacing:-.02em; line-height:1; white-space:nowrap">FrontierCS 2</div></div>
+        <div style="font-size:24px; font-weight:500; color:#0b57d0; margin:18px 0 0 50px">Coming soon</div>`;
       v.append(document.getElementById('papers')); drawPapers();
     }""",
     # research is a loop: on one task, each model's longest run as its best development score so far (a step line) with
@@ -111,7 +111,7 @@ OVERVIEW = {
     # model's colour, a dot at every valid submission, over spend in US$ (log, shared). The illustration sits under a light
     # white veil so the colours read. The task: most models with a run of 15+ valid submissions, then the most valid
     # submissions in those runs (owner: one good task, many models, as many points as possible)
-    '03-run': """() => {
+    '02-run': """() => {
       const valid = r => r[6].filter(q => q[1] > 0);
       const longest = t => MODELS.map(m => TRAJ.filter(r => r[1] === t.s && r[0] === m.id).sort((a, b) => valid(b).length - valid(a).length)[0]).filter(r => r && valid(r).length >= 15);
       const score = t => { const rs = longest(t); return rs.length * 1e4 + rs.reduce((a, r) => a + valid(r).length, 0); };
@@ -135,7 +135,7 @@ OVERVIEW = {
         <div class="legend">${runs.map(r => `<span><i style="background:${col(r[0])}; border-radius:50%"></i>${esc(MNAME[r[0]])}</span>`).join('')}</div>`;
     }""",
     # pass rate against cost: the overview's chart
-    '04-pass-cost': """() => {
+    '03-pass-cost': """() => {
       const top = RANKED.reduce((a, b) => PASS[a.id][0] >= PASS[b.id][0] ? a : b), ratio = COST.ds[0] / COST.sol[0];
       console.assert(top.id === 'astra' && Math.abs(PASS.ds[0] - PASS.sol[0]) < 1 && ratio > .15 && ratio < .25, 'pass/cost wording');
       const v = card('stack', 'Spending more doesn’t buy a pass',
@@ -144,7 +144,7 @@ OVERVIEW = {
       fit(v, 'pc'); v.append(document.getElementById('pcplot')); drawPassCost();
     }""",
     # mean final score: the overview's chart, grouped by model
-    '05-mean-score': """() => {
+    '04-mean-score': """() => {
       const sc = m => RUNS.filter(r => r.m === m.id).map(r => r.s), mu = m => mean(sc(m)), top = [...MODELS].sort((a, b) => mu(b) - mu(a));
       const hi = Math.floor(Math.min(...MODELS.map(m => Math.max(...sc(m))))), lo = Math.ceil(Math.max(...MODELS.map(m => Math.min(...sc(m)))));
       console.assert(hi >= 95 && lo <= 10, 'mean-score wording', hi, lo);
@@ -154,7 +154,7 @@ OVERVIEW = {
       CHART_H.lbLane = Math.floor((v.clientHeight - 54) / MODELS.length); v.append(document.getElementById('lbplot')); drawLB(); oneLine(document.getElementById('lbsvg'));
     }""",
     # FECI: the overview's chart; the headline names the models whose whole 90% interval is above Human
-    '06-feci': """() => {
+    '05-feci': """() => {
       const above = RANKED.filter(m => ECI[m.id][1] > ECI_HUMAN).map(m => m.name);
       console.assert(above.length === 2, 'FECI wording', above);
       const v = card('stack', 'Only two models clear the authors’ bar',
@@ -163,7 +163,7 @@ OVERVIEW = {
       CHART_H.eciLane = Math.floor((v.clientHeight - 60) / MODELS.length); v.append(document.getElementById('eciplot')); drawECI(); oneLine(document.getElementById('ecisvg'));
     }""",
     # test-time scaling: the overview's chart; budgets where two models come within 1 point of their final FECI
-    '07-scaling': """() => {
+    '06-scaling': """() => {
       const reach = id => { const c = SCALE[id], f = c.at(-1)[1]; return c.find(p => p[1] >= f - 1)[0]; };
       const ds = reach('ds'), astra = reach('astra'); console.assert(ds < 1 && astra > 5, 'scaling wording', ds, astra);
       const v = card('stack', 'Cheap models plateau early. GPT-6 Astra keeps climbing.',
@@ -172,7 +172,7 @@ OVERVIEW = {
       fit(v, 'tts', 30); v.append(document.getElementById('ttsplot'), document.getElementById('ttslegend')); drawTTS();
     }""",
     # where to look: a sample of task illustrations
-    '08-explore': """() => {
+    '07-explore': """() => {
       const v = card('side', `${TASKS.length} tasks. Pick one.`,
         'Each has its own page: the paper, the description, and every model’s runs and scores.', '');
       const pick = AREAS.flatMap(a => TASKS.filter(t => a.d.includes(t.d)).slice(0, 2).map(t => [t, a.k])).slice(0, 12);
