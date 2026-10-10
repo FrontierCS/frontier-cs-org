@@ -61,7 +61,7 @@ window.card = (layout, h, sub, note) => {
 };
 // the visual's free height; charts are drawn to it (fcs2.js and fcs2-task.js read window.CHART_H at draw time)
 window.fit = (v, key, minus = 0) => { CHART_H[key] = Math.floor(v.clientHeight - minus); };
-window.PRE = 'Preliminary results from the FrontierCS 2 preview';
+window.PRE = 'Preliminary results';
 // row charts (mean score, FECI): drop the harness line under each model name and centre the name on its row
 window.oneLine = svg => svg.querySelectorAll('text.lab').forEach(l => { const n = l.nextElementSibling;
   if (n && n.tagName === 'text' && /12px/.test(n.getAttribute('style') || '')) { l.setAttribute('y', +l.getAttribute('y') + 7); n.remove(); } });
@@ -127,7 +127,7 @@ OVERVIEW = {
       const t = TASKS.filter(t => longest(t).length >= 4).sort((a, b) => better(b) - better(a) || subs(b) - subs(a))[0], runs = longest(t), n = runs.reduce((a, r) => a + r[6].length, 0), k = AREA_OF[t.d].k;
       console.assert(runs.length >= 4, 'run card: too few models', t.s, runs.length);
       const v = card('side', 'Research is a loop, not a single shot',
-        `The agent submits, measures, and tries again. ${runs.length} models on ${esc(t.s)}: ${n} submissions, each a dot on its model’s best score so far.`, '');
+        `${runs.length} models, ${n} submissions.`, '');
       const W = 470, H = 360, svgNS = 'http://www.w3.org/2000/svg', col = id => getComputedStyle(document.documentElement).getPropertyValue(`--m-${id}`).trim();
       v.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="display:block; font-family:'Hanken Grotesk'"></svg>`;
       const svg = v.querySelector('svg');
@@ -165,8 +165,8 @@ OVERVIEW = {
       const top = RANKED.reduce((a, b) => PASS[a.id][0] >= PASS[b.id][0] ? a : b), ratio = COST.ds[0] / COST.sol[0];
       console.assert(top.id === 'astra' && Math.abs(PASS.ds[0] - PASS.sol[0]) < 1 && ratio > .15 && ratio < .25, 'pass/cost wording');
       const v = card('stack', 'Spending more doesn’t buy a pass',
-        `DeepSeek V4.1 Flash passes as often as GPT-6.1 Sol (${Math.round(PASS.ds[0])}%) at a fifth of the cost. GPT-6 Astra leads at ${Math.round(PASS.astra[0])}%.`,
-        `${PRE} · a run passes when its final submission meets the task’s criteria on every hidden workload · cost from tokens and list prices`);
+        `DeepSeek V4.1 Flash matches GPT-6.1 Sol at a fifth of the cost.`,
+        `${PRE} · a pass beats the authors’ code on every hidden workload`);
       fit(v, 'pc'); v.append(document.getElementById('pcplot')); drawPassCost();
     }""",
     # mean final score: the overview's chart, grouped by model
@@ -175,8 +175,8 @@ OVERVIEW = {
       const hi = Math.floor(Math.min(...MODELS.map(m => Math.max(...sc(m))))), lo = Math.ceil(Math.max(...MODELS.map(m => Math.min(...sc(m)))));
       console.assert(hi >= 95 && lo <= 10, 'mean-score wording', hi, lo);
       const v = card('stack', 'The run matters more than the model',
-        `Every model has a run above ${hi} and one below ${lo}, yet the means differ by only ${(mu(top[0]) - mu(top.at(-1))).toFixed(0)} points (${mu(top.at(-1)).toFixed(1)}–${mu(top[0]).toFixed(1)}). One dot per run; the large dot is the mean.`,
-        `${PRE} · scores on each task’s own 0–100 scale; a run that times out scores 0`);
+        `Every model has runs above ${hi} and below ${lo}. The means differ by ${(mu(top[0]) - mu(top.at(-1))).toFixed(0)} points.`,
+        `${PRE} · one dot per run, the large dot is the mean`);
       CHART_H.lbLane = Math.floor((v.clientHeight - 54) / MODELS.length); v.append(document.getElementById('lbplot')); drawLB(); oneLine(document.getElementById('lbsvg'));
     }""",
     # FECI: the overview's chart; the headline names the models whose whole 90% interval is above Human
@@ -184,8 +184,8 @@ OVERVIEW = {
       const above = RANKED.filter(m => ECI[m.id][1] > ECI_HUMAN).map(m => m.name);
       console.assert(above.length === 2, 'FECI wording', above);
       const v = card('stack', 'Only two models clear the authors’ bar',
-        `On FECI the authors’ code sits at ${ECI_HUMAN}. ${above.join(' and ')} are the only models whose 90% interval lies entirely above it.`,
-        `${PRE} · FECI, the FrontierCS Epoch Capabilities Index, fitted with Epoch AI’s ECI code · bars are 90% intervals`);
+        `The authors’ code scores ${ECI_HUMAN}. Only ${above.join(' and ')} have their whole 90% interval above it.`,
+        `${PRE} · FECI, fitted with Epoch AI’s ECI code`);
       CHART_H.eciLane = Math.floor((v.clientHeight - 60) / MODELS.length); v.append(document.getElementById('eciplot')); drawECI(); oneLine(document.getElementById('ecisvg'));
     }""",
     # test-time scaling: the overview's chart; budgets where two models come within 1 point of their final FECI
@@ -193,14 +193,14 @@ OVERVIEW = {
       const reach = id => { const c = SCALE[id], f = c.at(-1)[1]; return c.find(p => p[1] >= f - 1)[0]; };
       const ds = reach('ds'), astra = reach('astra'); console.assert(ds < 1 && astra > 5, 'scaling wording', ds, astra);
       const v = card('stack', 'Cheap models plateau early. GPT-6 Astra keeps climbing.',
-        `FECI at each budget per run: DeepSeek V4.1 Flash is within a point of its final score by ${usdfmt(ds)}; GPT-6 Astra keeps improving until about ${usdfmt(astra)}.`,
-        `${PRE} · development scores calibrated to the hidden suite · bands are 90% intervals`);
+        `DeepSeek V4.1 Flash levels off by ${usdfmt(ds)} per run. GPT-6 Astra gains until about ${usdfmt(astra)}.`,
+        `${PRE} · FECI at each budget per run`);
       fit(v, 'tts', 30); v.append(document.getElementById('ttsplot'), document.getElementById('ttslegend')); drawTTS();
     }""",
     # where to look: a sample of task illustrations
     '07-explore': """() => {
       const v = card('side', `${TASKS.length} tasks. Pick one.`,
-        'Each has its own page: the paper, the description, and every model’s runs and scores.', '');
+        'Each with its paper and every model’s runs.', '');
       const pick = AREAS.flatMap(a => TASKS.filter(t => a.d.includes(t.d)).slice(0, 2).map(t => [t, a.k])).slice(0, 12);
       const cols = 3, gw = 470, gap = 6, tw = (gw - gap * (cols - 1)) / cols, th = tw / 1.5;
       v.style.display = 'grid'; v.style.gridTemplateColumns = `repeat(${cols}, ${tw}px)`; v.style.gap = `${gap}px`; v.style.alignContent = 'center';
