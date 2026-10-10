@@ -37,9 +37,10 @@
   --line: #dadce0; --line-2: #dadce0; --grid: #eceff1; --soft: #f1f3f4; --mint: #d3e3fd; --mint-2: #c2d7fb;
   --teal: #0b57d0; --teal-d: #0842a0; --brand-ink: #1f1f1f; --deep: #202124; --deep-ink: #e8eaed; --deep-muted: #9aa0a6;
   /* model colours: Artificial Analysis creator colours (owner, 2026-10-10), read from artificialanalysis.ai: OpenAI #1f1f1f,
-     Kimi #047AFE, Meta #0089f4, Alibaba #ff7018, DeepSeek #2243e6, Z AI #1c7ff8. AA gives both OpenAI models #1f1f1f;
-     GPT-6.1 Sol takes the light grey of that family so the two stay apart. */
-  --m-astra: #1f1f1f; --m-sol: #9aa0a6; --m-k3: #047afe; --m-muse: #0089f4; --m-qwen: #ff7018; --m-ds: #2243e6; --m-glm: #1c7ff8;
+     Meta #0089f4, Alibaba #ff7018, DeepSeek #2243e6. AA gives both OpenAI models #1f1f1f; GPT-6.1 Sol takes the light grey
+     of that family so the two stay apart. AA's Kimi (#047AFE) and Z AI (#1c7ff8) are blues beside Meta's and DeepSeek's, and
+     their brands are blue too, so the owner gave them two unused colours: Kimi Google red 600, GLM Google pink 600. */
+  --m-astra: #1f1f1f; --m-sol: #9aa0a6; --m-k3: #d93025; --m-muse: #0089f4; --m-qwen: #ff7018; --m-ds: #2243e6; --m-glm: #e52592;
   --fail: #bdc1c6;
   --sans: 'Hanken Grotesk', 'Helvetica Neue', Arial, sans-serif;
 }
