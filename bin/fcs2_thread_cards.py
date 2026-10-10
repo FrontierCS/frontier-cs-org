@@ -43,7 +43,6 @@ CSS = """
 .tcard.side .tc-note{position:absolute; left:48px; right:48px; bottom:20px; margin:0}
 .tcard .plot text{font-size:14px}
 .tcard .plot .lab{font-size:15px}
-.tcard #ecisvg text[style*="12px"], .tcard #lbsvg text[style*="12px"]{display:none}
 .tcard .tip{display:none}
 .tcard .legend{font-size:14px; margin-top:6px}
 .tcard .papers{height:100%; width:100%}
@@ -63,19 +62,41 @@ window.card = (layout, h, sub, note) => {
 // the visual's free height; charts are drawn to it (fcs2.js and fcs2-task.js read window.CHART_H at draw time)
 window.fit = (v, key, minus = 0) => { CHART_H[key] = Math.floor(v.clientHeight - minus); };
 window.PRE = 'Preliminary results from the FrontierCS 2 preview';
+// row charts (mean score, FECI): drop the harness line under each model name and centre the name on its row
+window.oneLine = svg => svg.querySelectorAll('text.lab').forEach(l => { const n = l.nextElementSibling;
+  if (n && n.tagName === 'text' && /12px/.test(n.getAttribute('style') || '')) { l.setAttribute('y', +l.getAttribute('y') + 7); n.remove(); } });
+// layout audit, run on every card: visible text boxes must not overlap each other, must stay inside the card, and in a
+// row chart each model name must sit level with its row's mean dot
+window.audit = () => {
+  const c = document.querySelector('.tcard'), cb = c.getBoundingClientRect(), bad = [];
+  const texts = [...c.querySelectorAll('text, .tc-h, .tc-sub, .tc-note, .tc-cap, .tc-brand, .tc-url, .legend span, td, th, span')]
+    .filter(e => (e.tagName === 'text' || [...e.childNodes].some(n => n.nodeType === 3 && n.textContent.trim())) && e.getClientRects().length)
+    .filter(e => !e.closest('svg.tile, svg.art, .papers'));
+  const box = e => { const r = e.getBoundingClientRect(); return {l:r.left, r:r.right, t:r.top, b:r.bottom, e}; };
+  const bs = texts.map(box).filter(b => b.r - b.l > 1 && b.b - b.t > 1);
+  bs.forEach(b => { if (b.l < cb.left - 1 || b.r > cb.right + 1 || b.t < cb.top - 1 || b.b > cb.bottom + 1) bad.push('outside: ' + b.e.textContent.slice(0, 30)); });
+  for (let i = 0; i < bs.length; i++) for (let j = i + 1; j < bs.length; j++) { const a = bs[i], b = bs[j];
+    if (a.e.contains(b.e) || b.e.contains(a.e)) continue;
+    const ox = Math.min(a.r, b.r) - Math.max(a.l, b.l), oy = Math.min(a.b, b.b) - Math.max(a.t, b.t);
+    if (ox > 1 && oy > 2) bad.push(`overlap: "${a.e.textContent.slice(0, 24)}" / "${b.e.textContent.slice(0, 24)}"`); }
+  c.querySelectorAll('#lbsvg, #ecisvg').forEach(svg => {
+    const dots = [...svg.querySelectorAll('circle')].map(d => d.getBoundingClientRect()).filter(r => r.width >= 11);
+    svg.querySelectorAll('text.lab').forEach(l => { const r = l.getBoundingClientRect(), cy = (r.top + r.bottom) / 2;
+      const near = Math.min(...dots.map(d => Math.abs((d.top + d.bottom) / 2 - cy)));
+      if (near > 4) bad.push(`label off its row by ${near.toFixed(1)}px: ${l.textContent}`); }); });
+  return bad;
+};
+0;   // end on a value: Playwright calls a string's result when it is a function
 """
 
 OVERVIEW = {
-    # a teaser before the release: a question, no results and no date; the task map peeks in from the right edge
+    # a teaser before the release, built on the paper card (owner: the paper wall suits a teaser): the wall large and
+    # a teaser before the release: the paper card's layout unchanged (owner: the paper card suits a teaser), teaser
+    # wording; no results, no date
     '00-teaser': """() => {
-      const v = card('side', 'Can an agent rebuild a paper and beat its authors?',
-        `FrontierCS 2: ${TASKS.length} research tasks from published papers, each judged against the authors’ own code.`, '');
-      const hd = v.parentElement.querySelector('.tc-hd');
-      hd.insertAdjacentHTML('afterbegin', '<div style="width:fit-content; background:#0b57d0; color:#fff; font-size:15px; font-weight:600; letter-spacing:.02em; border-radius:99px; padding:5px 14px; margin-bottom:18px">Coming soon</div>');
-      hd.style.width = '400px';
-      const m = document.getElementById('map'), c = v.closest('.tcard');
-      c.append(m); Object.assign(m.style, {position:'absolute', left:'470px', top:'128px', width:'864px', maskImage:'linear-gradient(90deg, transparent, #000 30%)', webkitMaskImage:'linear-gradient(90deg, transparent, #000 30%)'});
-      drawMap();
+      const v = card('side', 'Rebuild the paper. Beat its authors.',
+        `FrontierCS 2: ${TASKS.length} research tasks from published papers, each judged against the authors’ own code. Coming soon.`, '');
+      v.append(document.getElementById('papers')); drawPapers();
     }""",
     # where tasks come from: the wall of paper first pages
     '02-papers': """() => {
@@ -83,25 +104,35 @@ OVERVIEW = {
         'Most tasks delete a published paper’s contribution from its own repository. The agent writes it back; the authors’ code is the bar.', '');
       v.append(document.getElementById('papers')); drawPapers();
     }""",
-    # one real run's best development score over its spend, on its task's illustration (the task map's hover card)
+    # research is a loop: on one task, each model's longest run as its best development score so far (a step line) with
+    # every valid submission as a dot, over spend in US$ (log). The task: most models with a run of 15+ valid
+    # research is a loop: the task map's evolution card (the task's illustration, best-so-far step lines, no axes) with
+    # several models on one task. Each model's longest run: its best development score so far as a step line in the
+    # model's colour, a dot at every valid submission, over spend in US$ (log, shared). The illustration sits under a light
+    # white veil so the colours read. The task: most models with a run of 15+ valid submissions, then the most valid
+    # submissions in those runs (owner: one good task, many models, as many points as possible)
     '03-run': """() => {
-      const best = r => { let m = -1; return r[6].map(q => (m = Math.max(m, q[1]))); };
-      const steps = r => new Set(best(r)).size, gain = r => best(r).at(-1) - best(r)[0];
-      const runs = TRAJ.filter(r => r[6].length >= 8 && steps(r) >= 6 && r[3] === 1).sort((a, b) => gain(b) - gain(a));
-      console.assert(runs.length, 'no rising run');
-      const [m, t, , , end, , seq] = runs[0], k = AREA_OF[TASKS.find(q => q.s === t).d].k;
+      const valid = r => r[6].filter(q => q[1] > 0);
+      const longest = t => MODELS.map(m => TRAJ.filter(r => r[1] === t.s && r[0] === m.id).sort((a, b) => valid(b).length - valid(a).length)[0]).filter(r => r && valid(r).length >= 15);
+      const score = t => { const rs = longest(t); return rs.length * 1e4 + rs.reduce((a, r) => a + valid(r).length, 0); };
+      const t = [...TASKS].sort((a, b) => score(b) - score(a))[0], runs = longest(t), n = runs.reduce((a, r) => a + valid(r).length, 0), k = AREA_OF[t.d].k;
+      console.assert(runs.length >= 4, 'run card: too few models', t.s, runs.length);
       const v = card('side', 'Research is a loop, not a single shot',
-        `The agent submits whenever it likes, measures, and tries again. Here: ${MNAME[m]} on ${esc(t)}, ${seq.length} submissions.`, '');
-      const W = 470, H = 340, PL = 30, PR = 30, PT = 56, PB = 52, x0 = seq[0][0], x1 = Math.max(end, ...seq.map(q => q[0]));
-      const X = u => PL + (u - x0) / (x1 - x0 || 1) * (W - PL - PR), Y = s => PT + (1 - s / 100) * (H - PT - PB);
-      let b = -1, d = ''; seq.forEach(([u, s], i) => { b = Math.max(b, s); d += i ? `H${X(u).toFixed(1)}V${Y(b).toFixed(1)}` : `M${X(u).toFixed(1)},${Y(b).toFixed(1)}`; }); d += `H${X(x1).toFixed(1)}`;
+        `The agent submits, measures, and tries again. ${runs.length} models on ${esc(t.s)}: ${n} submissions, each a dot on its model’s best score so far.`, '');
+      const W = 470, H = 330, PL = 26, PR = 26, PT = 56, PB = 28;
+      const us = runs.flatMap(r => valid(r).map(q => q[0])), x0 = Math.log10(Math.min(...us)), x1 = Math.log10(Math.max(...us));
+      const X = u => PL + (Math.log10(u) - x0) / (x1 - x0) * (W - PL - PR), Y = s => PT + (1 - s / 100) * (H - PT - PB);
+      const col = id => getComputedStyle(document.documentElement).getPropertyValue(`--m-${id}`).trim();
+      let g = '';
+      runs.forEach(r => { const c = col(r[0]), q = valid(r); let b = -1, d = '', dots = '';
+        q.forEach(([u, s], i) => { b = Math.max(b, s); d += i ? `H${X(u).toFixed(1)}V${Y(b).toFixed(1)}` : `M${X(u).toFixed(1)},${Y(b).toFixed(1)}`;
+          dots += `<circle cx="${X(u).toFixed(1)}" cy="${Y(b).toFixed(1)}" r="3.4" fill="${c}" stroke="#fff" stroke-width="1.2"/>`; });
+        g += `<path d="${d}" fill="none" stroke="${c}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>` + dots; });
       v.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="display:block"><defs><clipPath id="rc"><rect width="${W}" height="${H}" rx="12"/></clipPath></defs>
-        <g clip-path="url(#rc)">${taskArt(t, k).replace('<svg class="art"', `<svg width="${W}" height="${H}" preserveAspectRatio="xMidYMid slice"`)}
-        <rect width="${W}" height="${H}" fill="${ART_FIELD[k]}" opacity=".7"/></g>
-        <path d="${d}" fill="none" stroke="#fff" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="${X(x1)}" cy="${Y(b)}" r="7.5" fill="#fff"/>
-        <text x="20" y="34" fill="#fff" font-size="19" font-weight="600" font-family="Hanken Grotesk">${esc(t)}</text>
-        <text x="${W - 20}" y="${H - 20}" fill="#fff" font-size="16" font-weight="600" text-anchor="end" font-family="Hanken Grotesk">${esc(MNAME[m])}</text></svg>
-        <div class="tc-cap">Best development score so far, one step each time a submission beats it, over the run’s spend in US$.</div>`;
+        <g clip-path="url(#rc)">${taskArt(t.s, k).replace('<svg class="art"', `<svg width="${W}" height="${H}" preserveAspectRatio="xMidYMid slice"`)}
+        <rect width="${W}" height="${H}" fill="#fff" opacity=".84"/></g>${g}
+        <text x="20" y="34" fill="${AINK[k]}" font-size="19" font-weight="600" font-family="Hanken Grotesk">${esc(t.s)}</text></svg>
+        <div class="legend">${runs.map(r => `<span><i style="background:${col(r[0])}; border-radius:50%"></i>${esc(MNAME[r[0]])}</span>`).join('')}</div>`;
     }""",
     # pass rate against cost: the overview's chart
     '04-pass-cost': """() => {
@@ -112,39 +143,27 @@ OVERVIEW = {
         `${PRE} · a run passes when its final submission meets the task’s criteria on every hidden workload · cost from tokens and list prices`);
       fit(v, 'pc'); v.append(document.getElementById('pcplot')); drawPassCost();
     }""",
-    # a pass needs every workload: share of the runs that beat the authors' code on the overall score yet do not pass
-    '05-every-workload': """() => {
-      const beat = RUNS.filter(r => REF[r.t] > 0 && r.s > REF[r.t]), miss = beat.filter(r => !r.p), pct = Math.round(miss.length / beat.length * 100);
-      const v = card('side', 'Better on average is not good enough',
-        `A pass means beating the authors’ code on every workload. ${pct} of every 100 runs that win on the overall score still miss one.`, PRE);
-      let sq = ''; for (let i = 0; i < 100; i++) { const x = (i % 10) * 30, y = Math.floor(i / 10) * 30;
-        sq += `<rect x="${x}" y="${y}" width="26" height="26" rx="4" fill="${i < 100 - pct ? '#0b57d0' : '#f6aea9'}"/>`; }
-      v.style.display = 'flex'; v.style.flexDirection = 'column'; v.style.justifyContent = 'center'; v.style.alignItems = 'flex-start';
-      v.innerHTML = `<svg viewBox="0 0 296 296" width="296" height="296" style="display:block">${sq}</svg>
-        <div class="legend" style="display:flex; gap:22px; margin-top:16px; font-size:15px"><span><i style="display:inline-block; width:12px; height:12px; border-radius:3px; background:#0b57d0; margin-right:7px"></i>Passed</span>
-        <span><i style="display:inline-block; width:12px; height:12px; border-radius:3px; background:#f6aea9; margin-right:7px"></i>Fell short on a workload</span></div>`;
-    }""",
     # mean final score: the overview's chart, grouped by model
-    '06-mean-score': """() => {
+    '05-mean-score': """() => {
       const sc = m => RUNS.filter(r => r.m === m.id).map(r => r.s), mu = m => mean(sc(m)), top = [...MODELS].sort((a, b) => mu(b) - mu(a));
       const hi = Math.floor(Math.min(...MODELS.map(m => Math.max(...sc(m))))), lo = Math.ceil(Math.max(...MODELS.map(m => Math.min(...sc(m)))));
       console.assert(hi >= 95 && lo <= 10, 'mean-score wording', hi, lo);
       const v = card('stack', 'The run matters more than the model',
         `Every model has a run above ${hi} and one below ${lo}, yet the means differ by only ${(mu(top[0]) - mu(top.at(-1))).toFixed(0)} points (${mu(top.at(-1)).toFixed(1)}–${mu(top[0]).toFixed(1)}). One dot per run; the large dot is the mean.`,
         `${PRE} · scores on each task’s own 0–100 scale; a run that times out scores 0`);
-      CHART_H.lbLane = Math.floor((v.clientHeight - 54) / MODELS.length); v.append(document.getElementById('lbplot')); drawLB();
+      CHART_H.lbLane = Math.floor((v.clientHeight - 54) / MODELS.length); v.append(document.getElementById('lbplot')); drawLB(); oneLine(document.getElementById('lbsvg'));
     }""",
     # FECI: the overview's chart; the headline names the models whose whole 90% interval is above Human
-    '07-feci': """() => {
+    '06-feci': """() => {
       const above = RANKED.filter(m => ECI[m.id][1] > ECI_HUMAN).map(m => m.name);
       console.assert(above.length === 2, 'FECI wording', above);
       const v = card('stack', 'Only two models clear the authors’ bar',
         `On FECI the authors’ code sits at ${ECI_HUMAN}. ${above.join(' and ')} are the only models whose 90% interval lies entirely above it.`,
         `${PRE} · FECI, the FrontierCS Epoch Capabilities Index, fitted with Epoch AI’s ECI code · bars are 90% intervals`);
-      CHART_H.eciLane = Math.floor((v.clientHeight - 60) / MODELS.length); v.append(document.getElementById('eciplot')); drawECI();
+      CHART_H.eciLane = Math.floor((v.clientHeight - 60) / MODELS.length); v.append(document.getElementById('eciplot')); drawECI(); oneLine(document.getElementById('ecisvg'));
     }""",
     # test-time scaling: the overview's chart; budgets where two models come within 1 point of their final FECI
-    '08-scaling': """() => {
+    '07-scaling': """() => {
       const reach = id => { const c = SCALE[id], f = c.at(-1)[1]; return c.find(p => p[1] >= f - 1)[0]; };
       const ds = reach('ds'), astra = reach('astra'); console.assert(ds < 1 && astra > 5, 'scaling wording', ds, astra);
       const v = card('stack', 'Cheap models plateau early. GPT-6 Astra keeps climbing.',
@@ -153,7 +172,7 @@ OVERVIEW = {
       fit(v, 'tts', 30); v.append(document.getElementById('ttsplot'), document.getElementById('ttslegend')); drawTTS();
     }""",
     # where to look: a sample of task illustrations
-    '09-explore': """() => {
+    '08-explore': """() => {
       const v = card('side', `${TASKS.length} tasks. Pick one.`,
         'Each has its own page: the paper, the description, and every model’s runs and scores.', '');
       const pick = AREAS.flatMap(a => TASKS.filter(t => a.d.includes(t.d)).slice(0, 2).map(t => [t, a.k])).slice(0, 12);
@@ -170,6 +189,7 @@ time.sleep(1)
 try:
     with sync_playwright() as p:
         b = p.chromium.launch()
+        failed = []
         for name, js in OVERVIEW.items():
             ctx = b.new_context(viewport={'width': CW, 'height': CH}, device_scale_factor=1600 / CW, reduced_motion='reduce')
             # an empty CHART_H the cards fill with the free height before drawing (fcs2.js and fcs2-task.js read it)
@@ -182,10 +202,13 @@ try:
             pg.add_style_tag(content=CSS); pg.evaluate(SHELL)
             pg.evaluate(js); pg.wait_for_timeout(700)
             assert not errs and not logs, (name, errs, logs)
+            bad = pg.evaluate('audit()')
+            if bad: print(name, 'LAYOUT', bad[:12]); failed.append(name)
             pg.locator('.tcard').screenshot(path=str(OUT / f'{name}.png'))
             print(name, 'ok')
             ctx.close()
         b.close()
+        assert not failed, f'layout audit failed: {failed}'
 finally:
     srv.kill()
 # the first card is the share card itself (owner: reuse it, 2026-10-10)
