@@ -5,10 +5,12 @@ the address top right, a headline and one line of context, one visual. 16:9, 960
 One card per chart worth sharing from the site and the paper; no flowcharts, tables or single-task case studies (owner,
 2026-10-10). Charts are drawn inside the built overview by the page's own code (assets/js/fcs2.js), so colours and label
 placement match the site, and every number in a headline is computed from the page's data (fcs2-data.js) when the card is
-drawn; console.assert stops the run if the data no longer support a headline's wording.
+drawn; console.assert stops the run if the data no longer support a headline's wording. The first card is the share
+card (assets/img/fcs2-card.png, 1200 x 630), copied as it is.
 usage (vis node, Playwright):  python bin/fcs2_thread_cards.py [built _site dir] [output dir]
 """
 import pathlib
+import shutil
 import socket
 import subprocess
 import sys
@@ -64,13 +66,6 @@ window.PRE = 'Preliminary results from the FrontierCS 2 preview';
 """
 
 OVERVIEW = {
-    # what it is: the name over the task map, drawn by the overview's drawMap()
-    '01-cover': """() => {
-      const v = card('stack', '', '', '');
-      v.parentElement.querySelector('.tc-hd').innerHTML = `<div style="font-size:54px; font-weight:600; letter-spacing:-.02em; line-height:1">FrontierCS 2</div>
-        <p class="tc-sub" style="margin-top:12px; font-size:19px">Can an AI agent do computer-science research? ${TASKS.length} tasks, each judged against its authors’ own code.</p>`;
-      v.append(document.getElementById('map')); document.getElementById('map').style.width = '864px'; drawMap();
-    }""",
     # where tasks come from: the wall of paper first pages
     '02-papers': """() => {
       const v = card('side', 'Rebuild the paper. Beat its authors.',
@@ -182,4 +177,6 @@ try:
         b.close()
 finally:
     srv.kill()
-print('cards in', OUT)
+# the first card is the share card itself (owner: reuse it, 2026-10-10)
+shutil.copy(pathlib.Path(__file__).resolve().parent.parent / 'assets' / 'img' / 'fcs2-card.png', OUT / '01-cover.png')
+print('01-cover copied from assets/img/fcs2-card.png; cards in', OUT)
