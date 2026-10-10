@@ -208,9 +208,6 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 .map .blk .tile{transition:opacity .2s}
 @media (hover:hover){ .map .blk:hover .tile{opacity:.88} .map .blk .tile:hover{opacity:1} }
 .map .tip{white-space:normal; width:max-content; max-width:min(280px,80vw)}
-.areas{display:flex; flex-wrap:wrap; gap:6px 18px; margin-top:12px; font-size:13.5px; color:var(--ink-2)}
-.areas span{display:inline-flex; align-items:center; gap:7px}
-.areas i{width:12px; height:12px; border-radius:3px; display:inline-block}
 
 /* questions */
 .faq{display:grid; grid-template-columns:300px minmax(0,1fr); gap:24px 40px; align-items:start}

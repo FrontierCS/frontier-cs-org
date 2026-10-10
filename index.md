@@ -28,7 +28,6 @@ page_css: fcs2
   <figure class="chart" id="teaser">
     <div class="chead"><span>Tasks</span></div>
     <div class="map" id="map"><svg id="mapsvg" aria-label="The 92 tasks by domain"></svg><div class="tip" id="maptip" hidden></div></div>
-    <div class="areas" id="areas"></div>
   </figure>
 </section>
 

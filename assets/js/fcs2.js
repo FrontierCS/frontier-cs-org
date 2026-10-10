@@ -268,7 +268,6 @@ function squarify(vals, x, y, w, h) {
   }
   return out;
 }
-$('#areas').innerHTML = AREAS.map(a => `<span><i style="background:${ART_FIELD[a.k]}"></i>${esc(a.name)}</span>`).join('');
 const nRan = d => TASKS.filter(t => t.d === d && RAN.has(t.s)).length;
 function drawMap() {
   stopPlay();
