@@ -22,6 +22,20 @@ SITE = sys.argv[1] if len(sys.argv) > 1 else '/scratch/gpfs/KARTHIKN/wc9403/tmp/
 OUT = pathlib.Path(sys.argv[2] if len(sys.argv) > 2 else '/scratch/gpfs/KARTHIKN/wc9403/tmp/fcsite/thread')
 OUT.mkdir(parents=True, exist_ok=True)
 CW, CH = 960, 540
+HI = pathlib.Path('/scratch/gpfs/KARTHIKN/wc9403/tmp/fcsite/papers/img-hi')   # papers/render_hi.py: 800 px first pages, colour.json
+
+
+def pages():
+    """The 800 px first pages as data URIs, most colourful first, duplicates (one paper behind several tasks) dropped."""
+    import base64, hashlib, json
+    colour, seen, out = json.load(open(HI / 'colour.json')), set(), []
+    for stem in sorted(colour, key=lambda k: -colour[k]):
+        b = (HI / f'{stem}.webp').read_bytes(); h = hashlib.md5(b).hexdigest()
+        if h in seen: continue
+        seen.add(h); out.append('data:image/webp;base64,' + base64.b64encode(b).decode())
+    return out
+
+
 
 
 CSS = """
@@ -47,6 +61,11 @@ CSS = """
 .tcard .legend{font-size:14px; margin-top:6px}
 .tcard .papers{height:100%; width:100%}
 .tcard .pcol{animation-play-state:paused !important}
+.tcard .twall{position:absolute; right:0; top:64px; bottom:0; width:500px; overflow:hidden; perspective:1500px; z-index:0;
+  -webkit-mask-image:linear-gradient(transparent,#000 14%,#000 86%,transparent),linear-gradient(90deg,transparent,#000 14%,#000 92%,transparent);
+  -webkit-mask-composite:source-in;
+  mask-image:linear-gradient(transparent,#000 14%,#000 86%,transparent),linear-gradient(90deg,transparent,#000 14%,#000 92%,transparent);
+  mask-composite:intersect}
 .tcard .tc-cap{font-size:13px; line-height:1.4; color:#80868b; margin-top:10px}
 """
 
@@ -94,13 +113,23 @@ OVERVIEW = {
     # a teaser before the release: the paper card's layout unchanged (owner: the paper card suits a teaser), teaser
     # a teaser before the release (owner: only the picture and "FrontierCS 2, coming soon"): the paper card's wall on the
     # a teaser before the release (owner: only the picture and "FrontierCS 2, coming soon"; the logo and the address in
-    # their usual places): the top bar as on every card, the paper card's wall on the right, the name and "Coming soon"
+    # a teaser before the release (owner: only the picture and "FrontierCS 2, coming soon"; the logo and the address in
+    # their usual places): the top bar as on every card, the name and "Coming soon" on the left, and on the right a wall of
+    # the tasks' paper first pages on the site's tilted plane, sharper (800 px renders) and larger than the site's, the most
+    # colourful pages (figures on the first page) nearest the centre
     '00-teaser': """() => {
-      const v = card('side', '', '', ''), hd = v.closest('.tcard').querySelector('.tc-hd');
+      const v = card('side', '', '', ''), c = v.closest('.tcard'), hd = c.querySelector('.tc-hd');
       hd.style.width = '410px';
       hd.innerHTML = `<div style="font-size:56px; font-weight:600; letter-spacing:-.02em; line-height:1; white-space:nowrap">FrontierCS 2</div>
         <div style="font-size:24px; font-weight:500; color:#0b57d0; margin-top:16px">Coming soon</div>`;
-      v.append(document.getElementById('papers')); drawPapers();
+      const cols = 5, rows = 5, pw = 168, ph = Math.round(pw * 1.294), gap = 16, cells = [];
+      for (let r = 0; r < rows; r++) for (let q = 0; q < cols; q++) cells.push([q, r, Math.hypot(q - (cols - 1) / 2, (r - (rows - 1) / 2) * 1.2)]);
+      cells.sort((a, b) => a[2] - b[2]);
+      const pages = cells.map(([q, r], i) => `<img src="${PAGES[i % PAGES.length]}" style="position:absolute; max-width:none; left:${(q - cols / 2) * (pw + gap)}px; top:${(r - rows / 2) * (ph + gap) + (q % 2) * ph * .35}px; width:${pw}px; height:${ph}px; border-radius:3px; box-shadow:0 2px 8px rgba(32,33,36,.18), 0 0 0 1px rgba(32,33,36,.08); background:#fff">`).join('');
+      const w = document.createElement('div');
+      w.className = 'twall';
+      w.innerHTML = `<div style="position:absolute; left:50%; top:50%; transform-style:preserve-3d; transform:rotateX(50deg) rotateZ(-32deg)">${pages}</div>`;
+      c.append(w); hd.parentElement.style.zIndex = 1;
     }""",
     # research is a loop: on one task, each model's longest run as its best development score so far (a step line) with
     # every valid submission as a dot, over spend in US$ (log). The task: most models with a run of 15+ valid
@@ -208,6 +237,7 @@ OVERVIEW = {
     }""",
 }
 
+PAGES = pages()
 s = socket.socket(); s.bind(('127.0.0.1', 0)); port = s.getsockname()[1]; s.close()
 srv = subprocess.Popen([sys.executable, '-m', 'http.server', str(port), '-d', SITE, '-b', '127.0.0.1'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 time.sleep(1)
@@ -225,7 +255,10 @@ try:
             pg.goto(f'http://127.0.0.1:{port}/', wait_until='networkidle')
             pg.evaluate('document.fonts.ready')
             pg.add_style_tag(content=CSS); pg.evaluate(SHELL)
+            pg.evaluate('p => { window.PAGES = p; }', PAGES)
             pg.evaluate(js); pg.wait_for_timeout(700)
+            # every image on the card decoded before the screenshot (data URIs decode asynchronously)
+            pg.wait_for_function("[...document.querySelectorAll('.tcard img')].every(i => i.complete && i.naturalWidth > 0)", timeout=20000)
             assert not errs and not logs, (name, errs, logs)
             bad = pg.evaluate('audit()')
             if bad: print(name, 'LAYOUT', bad[:12]); failed.append(name)
