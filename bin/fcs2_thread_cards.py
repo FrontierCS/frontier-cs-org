@@ -110,29 +110,55 @@ OVERVIEW = {
     # several models on one task. Each model's longest run: its best development score so far as a step line in the
     # model's colour, a dot at every valid submission, over spend in US$ (log, shared). The illustration sits under a light
     # white veil so the colours read. The task: most models with a run of 15+ valid submissions, then the most valid
-    # submissions in those runs (owner: one good task, many models, as many points as possible)
+    # research is a loop: the task map's evolution card (the task's illustration, best-so-far step lines, no axes) with
+    # several models on one task. Each model's longest run: its best development score so far as a step line in the
+    # model's colour against submission number (owner, 2026-10-10), from its first valid submission, the score axis spanning
+    # only the scores reached; a dot at every submission from there, failed ones included, and
+    # the model's name just above its line's end, right-aligned to it, instead of a legend (owner); the task name
+    # bottom right (owner). The illustration sits under a light white veil so
+    # the colours read. The task: among tasks with 4+ models that have a run of 15+ valid submissions, the most models whose
+    # best score rises 10+ points over their first valid submission, then the most submissions. The score range starts at
+    # the 10th percentile of the plotted points, so the climb and the plateau fill the tile.
     '02-run': """() => {
       const valid = r => r[6].filter(q => q[1] > 0);
       const longest = t => MODELS.map(m => TRAJ.filter(r => r[1] === t.s && r[0] === m.id).sort((a, b) => valid(b).length - valid(a).length)[0]).filter(r => r && valid(r).length >= 15);
-      const score = t => { const rs = longest(t); return rs.length * 1e4 + rs.reduce((a, r) => a + valid(r).length, 0); };
-      const t = [...TASKS].sort((a, b) => score(b) - score(a))[0], runs = longest(t), n = runs.reduce((a, r) => a + valid(r).length, 0), k = AREA_OF[t.d].k;
+      const gain = r => Math.max(...r[6].map(q => q[1])) - valid(r)[0][1], better = t => longest(t).filter(r => gain(r) >= 10).length;
+      const subs = t => longest(t).reduce((a, r) => a + r[6].length, 0);
+      const t = TASKS.filter(t => longest(t).length >= 4).sort((a, b) => better(b) - better(a) || subs(b) - subs(a))[0], runs = longest(t), n = runs.reduce((a, r) => a + r[6].length, 0), k = AREA_OF[t.d].k;
       console.assert(runs.length >= 4, 'run card: too few models', t.s, runs.length);
       const v = card('side', 'Research is a loop, not a single shot',
         `The agent submits, measures, and tries again. ${runs.length} models on ${esc(t.s)}: ${n} submissions, each a dot on its model’s best score so far.`, '');
-      const W = 470, H = 330, PL = 26, PR = 26, PT = 56, PB = 28;
-      const us = runs.flatMap(r => valid(r).map(q => q[0])), x0 = Math.log10(Math.min(...us)), x1 = Math.log10(Math.max(...us));
-      const X = u => PL + (Math.log10(u) - x0) / (x1 - x0) * (W - PL - PR), Y = s => PT + (1 - s / 100) * (H - PT - PB);
-      const col = id => getComputedStyle(document.documentElement).getPropertyValue(`--m-${id}`).trim();
-      let g = '';
-      runs.forEach(r => { const c = col(r[0]), q = valid(r); let b = -1, d = '', dots = '';
-        q.forEach(([u, s], i) => { b = Math.max(b, s); d += i ? `H${X(u).toFixed(1)}V${Y(b).toFixed(1)}` : `M${X(u).toFixed(1)},${Y(b).toFixed(1)}`;
-          dots += `<circle cx="${X(u).toFixed(1)}" cy="${Y(b).toFixed(1)}" r="3.4" fill="${c}" stroke="#fff" stroke-width="1.2"/>`; });
-        g += `<path d="${d}" fill="none" stroke="${c}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>` + dots; });
-      v.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="display:block"><defs><clipPath id="rc"><rect width="${W}" height="${H}" rx="12"/></clipPath></defs>
-        <g clip-path="url(#rc)">${taskArt(t.s, k).replace('<svg class="art"', `<svg width="${W}" height="${H}" preserveAspectRatio="xMidYMid slice"`)}
-        <rect width="${W}" height="${H}" fill="#fff" opacity=".84"/></g>${g}
-        <text x="20" y="34" fill="${AINK[k]}" font-size="19" font-weight="600" font-family="Hanken Grotesk">${esc(t.s)}</text></svg>
-        <div class="legend">${runs.map(r => `<span><i style="background:${col(r[0])}; border-radius:50%"></i>${esc(MNAME[r[0]])}</span>`).join('')}</div>`;
+      const W = 470, H = 360, svgNS = 'http://www.w3.org/2000/svg', col = id => getComputedStyle(document.documentElement).getPropertyValue(`--m-${id}`).trim();
+      v.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="display:block; font-family:'Hanken Grotesk'"></svg>`;
+      const svg = v.querySelector('svg');
+      // room on the right for the longest name
+      const meas = str => { const e = document.createElementNS(svgNS, 'text'); e.setAttribute('font-size', 14); e.setAttribute('font-weight', 600); e.textContent = str; svg.append(e); const w = e.getComputedTextLength(); e.remove(); return w; };
+      // a line starts at its run's first valid submission; the score range is the scores the lines reach, in tens
+      const first = r => r[6].findIndex(q => q[1] > 0), best = r => Math.max(...r[6].map(q => q[1]));
+      // score range: from the 10th percentile of all plotted points (lower starts leave through the bottom edge) to the top
+      const pts = runs.flatMap(r => { let m = -1; return r[6].slice(first(r)).map(q => (m = Math.max(m, q[1]))); }).sort((a, b) => a - b);
+      const lo = Math.floor(pts[Math.floor(pts.length * .1)] / 5) * 5, hi = Math.min(100, Math.ceil(Math.max(...runs.map(best)) / 5) * 5 + 2);
+      const PL = 24, PR = 24, PT = 34, PB = 52, N = Math.max(...runs.map(r => r[6].length));
+      const X = i => PL + (i - 1) / (N - 1) * (W - PL - PR), Y = s => PT + (1 - (s - lo) / (hi - lo)) * (H - PT - PB);
+      let g = `<defs><clipPath id="rc"><rect width="${W}" height="${H}" rx="12"/></clipPath><clipPath id="band"><rect x="0" y="0" width="${W}" height="${H - PB + 8}"/></clipPath></defs><g clip-path="url(#rc)">${taskArt(t.s, k).replace('<svg class="art"', `<svg width="${W}" height="${H}" preserveAspectRatio="xMidYMid slice"`)}
+        <rect width="${W}" height="${H}" fill="#fff" opacity=".84"/></g><text x="${W - 20}" y="${H - 18}" text-anchor="end" fill="${AINK[k]}" font-size="19" font-weight="600">${esc(t.s)}</text>`;
+      const ends = [];
+      runs.forEach(r => { const c = col(r[0]); let b = -1, d = '', dots = '';
+        r[6].forEach(([, s], i) => { if (i < first(r)) return; b = Math.max(b, s); const x = X(i + 1).toFixed(1), y = Y(b).toFixed(1);
+          d += i > first(r) ? `H${x}V${y}` : `M${x},${y}`; dots += `<circle cx="${x}" cy="${y}" r="3.2" fill="${c}" stroke="#fff" stroke-width="1.1"/>`; });
+        g += `<g clip-path="url(#band)"><path d="${d}" fill="none" stroke="${c}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>${dots}</g>`;
+        ends.push({m:r[0], c, x:X(r[6].length), y:Y(b) - 10}); });
+      // each name right-aligned to its line's end, just above it; a name that would touch another moves up (or down) in 2 px steps
+      const placed = [], hit = (a, b) => a.x - a.w - 8 < b.x + 8 && b.x - b.w - 8 < a.x + 8 && Math.abs(a.y - b.y) < 21;
+      ends.sort((a, b) => a.y - b.y).forEach(e => { e.w = meas(MNAME[e.m]);
+        for (let dy = 0; dy < 200; dy += 2) { const dn = {...e, y:e.y + dy}, up = {...e, y:e.y - dy};
+          if (!placed.some(p => hit(up, p)) && up.y > 18) { e.y = up.y; break; }
+          if (!placed.some(p => hit(dn, p)) && dn.y < H - 44) { e.y = dn.y; break; } }
+        placed.push(e);
+        // a white chip under the name, as on the task map, so lines and dots behind it do not show through
+        g += `<rect x="${(e.x - e.w - 7).toFixed(1)}" y="${(e.y - 14).toFixed(1)}" width="${(e.w + 14).toFixed(1)}" height="19" rx="9.5" fill="#fff" opacity=".94"/>`
+          + `<text x="${e.x.toFixed(1)}" y="${e.y.toFixed(1)}" text-anchor="end" font-size="14" font-weight="600" fill="${e.c}">${esc(MNAME[e.m])}</text>`; });
+      svg.innerHTML = g;
     }""",
     # pass rate against cost: the overview's chart
     '03-pass-cost': """() => {
