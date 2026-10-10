@@ -68,9 +68,9 @@ function drawPassCost() {
     // right, left, above, below, the four diagonals, then the same one and two lines further out; the first spot clear of every dot and placed label wins
     const spots = [[cx + 12, cy + 4.5, 'start'], [cx - 12, cy + 4.5, 'end'], [cx, cy - 13, 'middle'], [cx, cy + 22, 'middle'],
       [cx + 8, cy - 11, 'start'], [cx - 8, cy - 11, 'end'], [cx + 8, cy + 20, 'start'], [cx - 8, cy + 20, 'end'],
-      [cx, cy - 29, 'middle'], [cx, cy + 38, 'middle'], [cx + 6, cy - 27, 'start'], [cx - 6, cy - 27, 'end'], [cx + 6, cy + 36, 'start'], [cx - 6, cy + 36, 'end'],
-      [cx, cy - 45, 'middle'], [cx, cy + 54, 'middle'], [cx - 6, cy - 43, 'end'], [cx - 6, cy + 52, 'end']];
-    const box = ([x, y, an]) => ({x:an === 'start' ? x : an === 'end' ? x - w : x - w / 2, y:y - 12, w, h:16});
+      [cx, cy - 31, 'middle'], [cx, cy + 40, 'middle'], [cx + 6, cy - 29, 'start'], [cx - 6, cy - 29, 'end'], [cx + 6, cy + 38, 'start'], [cx - 6, cy + 38, 'end'],
+      [cx, cy - 49, 'middle'], [cx, cy + 58, 'middle'], [cx - 6, cy - 47, 'end'], [cx - 6, cy + 56, 'end']];
+    const box = ([x, y, an]) => ({x:an === 'start' ? x : an === 'end' ? x - w : x - w / 2, y:y - 13, w, h:18});   // the rendered text's height
     const hit = q => boxes.some(o => q.x < o.x + o.w && o.x < q.x + q.w && q.y < o.y + o.h && o.y < q.y + q.h) || q.x < L || q.x + q.w > W || q.y < 0;
     const spot = spots.find(sp => !hit(box(sp)));
     if (spot) { boxes.push(box(spot)); lab.setAttribute('x', spot[0]); lab.setAttribute('y', spot[1]); lab.setAttribute('text-anchor', spot[2]); }
