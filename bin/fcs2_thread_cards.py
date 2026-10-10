@@ -66,6 +66,17 @@ window.PRE = 'Preliminary results from the FrontierCS 2 preview';
 """
 
 OVERVIEW = {
+    # a teaser before the release: a question, no results and no date; the task map peeks in from the right edge
+    '00-teaser': """() => {
+      const v = card('side', 'Can an agent rebuild a paper and beat its authors?',
+        `FrontierCS 2: ${TASKS.length} research tasks from published papers, each judged against the authors’ own code.`, '');
+      const hd = v.parentElement.querySelector('.tc-hd');
+      hd.insertAdjacentHTML('afterbegin', '<div style="width:fit-content; background:#0b57d0; color:#fff; font-size:15px; font-weight:600; letter-spacing:.02em; border-radius:99px; padding:5px 14px; margin-bottom:18px">Coming soon</div>');
+      hd.style.width = '400px';
+      const m = document.getElementById('map'), c = v.closest('.tcard');
+      c.append(m); Object.assign(m.style, {position:'absolute', left:'470px', top:'128px', width:'864px', maskImage:'linear-gradient(90deg, transparent, #000 30%)', webkitMaskImage:'linear-gradient(90deg, transparent, #000 30%)'});
+      drawMap();
+    }""",
     # where tasks come from: the wall of paper first pages
     '02-papers': """() => {
       const v = card('side', 'Rebuild the paper. Beat its authors.',
