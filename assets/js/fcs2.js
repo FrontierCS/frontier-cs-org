@@ -23,6 +23,8 @@ const spy = () => { spyRaf = 0;
 addEventListener('scroll', () => { spyRaf ||= requestAnimationFrame(spy); }, {passive:true}); spy();
 
 /* ---------- leaderboard chart ---------- */
+// Chart heights the page can override (bin/fcs2_thread_cards.py sets them to fit its 16:9 cards); the page itself sets none.
+const CHART_H = window.CHART_H || {};
 let group = 'model', dom = 'All', showRuns = true;
 const DOMS_WITH_RUNS = DOMAINS.filter(d => RUNS.some(r => r.d === d));
 $('#domradios').innerHTML = ['All', ...DOMS_WITH_RUNS].map(d => `<label><input type="radio" name="dom" value="${esc(d)}" ${d === 'All' ? 'checked' : ''}>${d === 'All' ? 'All domains' : esc(d)}</label>`).join('');
@@ -38,7 +40,7 @@ $('#lblegend').innerHTML = RANKED.map(m => `<span><i style="background:${MCOL[m.
    spot keeps no label (the tooltip still names it). No legend: the labels name the dots. */
 function drawPassCost() {
   const svg = $('#pcsvg'), W = Math.max(300, $('#pcplot').clientWidth), narrow = W < 560;
-  const L = 44, R = narrow ? 12 : 24, T = 14, B = 46, H = narrow ? 320 : 400;
+  const L = 44, R = narrow ? 12 : 24, T = 14, B = 46, H = CHART_H.pc || (narrow ? 320 : 400);
   const ms = MODELS.filter(m => COST[m.id]), tx = ms.map(m => COST[m.id][0]);
   // the axis runs 0.15 decade past the outermost dots and no further (owner, 2026-10-10: half-decade rounding left
   // the range loose); an edge dot whose label has no room on its outer side takes another spot
@@ -88,7 +90,7 @@ const nameCol = svg => { svg.replaceChildren(); const w = Math.max(...MODELS.map
 function drawECI() {
   const order = [...MODELS].sort((a, b) => ECI[b.id][0] - ECI[a.id][0]);
   const svg = $('#ecisvg'), W = Math.max(300, $('#eciplot').clientWidth), narrow = W < 560;
-  const L = narrow ? nameCol(svg) : 190, R = 34, T = 14, B = 46, lane = narrow ? 56 : 64;
+  const L = narrow ? nameCol(svg) : 190, R = 34, T = 14, B = 46, lane = CHART_H.eciLane || (narrow ? 56 : 64);
   const xmax = Math.ceil(Math.max(...MODELS.map(m => ECI[m.id][2])) / 20) * 20, step = narrow && xmax > 120 ? 40 : 20;
   const H = T + order.length * lane + B;
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
@@ -116,7 +118,7 @@ function drawECI() {
    Values below 0 leave the plot through its bottom edge. */
 function drawTTS() {
   const svg = $('#ttssvg'), W = Math.max(300, $('#ttsplot').clientWidth), narrow = W < 560;
-  const L = 34, R = narrow ? 12 : 24, T = 12, B = 46, H = narrow ? 300 : 380;
+  const L = 34, R = narrow ? 12 : 24, T = 12, B = 46, H = CHART_H.tts || (narrow ? 300 : 380);
   const all = Object.values(SCALE).flat();
   // the axis starts half a decade before the first budget at which any model rises above 0
   const x0 = Math.log10(Math.min(...all.filter(p => p[1] >= 0).map(p => p[0]))) - 0.5, x1 = Math.log10(Math.max(...all.map(p => p[0])));
@@ -170,7 +172,7 @@ function drawLB() {
   rows.sort((a, b) => b.best - a.best);
   const svg = $('#lbsvg'), box = $('#lbplot'), W = Math.max(300, box.clientWidth), narrow = W < 560;
   const L = narrow ? (group === 'model' ? nameCol(svg) : 112) : 190, R = 34, T = 8, B = 46;
-  const lane = group === 'model' ? (narrow ? 64 : 76) : 30;
+  const lane = group === 'model' ? (CHART_H.lbLane || (narrow ? 64 : 76)) : 30;
   const rowH = () => lane;
   const H = T + rows.reduce((a, r) => a + rowH(r), 0) + B;
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
