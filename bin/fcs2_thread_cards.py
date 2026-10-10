@@ -126,8 +126,8 @@ OVERVIEW = {
       const subs = t => longest(t).reduce((a, r) => a + r[6].length, 0);
       const t = TASKS.filter(t => longest(t).length >= 4).sort((a, b) => better(b) - better(a) || subs(b) - subs(a))[0], runs = longest(t), n = runs.reduce((a, r) => a + r[6].length, 0), k = AREA_OF[t.d].k;
       console.assert(runs.length >= 4, 'run card: too few models', t.s, runs.length);
-      const v = card('side', 'Research is a loop, not a single shot',
-        `${runs.length} models, ${n} submissions.`, '');
+      const v = card('side', 'Agents don’t one-shot research.',
+        `${runs.length} models, ${n} submissions on ${esc(t.s)}. Every dot is a try.`, '');
       const W = 470, H = 360, svgNS = 'http://www.w3.org/2000/svg', col = id => getComputedStyle(document.documentElement).getPropertyValue(`--m-${id}`).trim();
       v.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="display:block; font-family:'Hanken Grotesk'"></svg>`;
       const svg = v.querySelector('svg');
@@ -164,8 +164,8 @@ OVERVIEW = {
     '03-pass-cost': """() => {
       const top = RANKED.reduce((a, b) => PASS[a.id][0] >= PASS[b.id][0] ? a : b), ratio = COST.ds[0] / COST.sol[0];
       console.assert(top.id === 'astra' && Math.abs(PASS.ds[0] - PASS.sol[0]) < 1 && ratio > .15 && ratio < .25, 'pass/cost wording');
-      const v = card('stack', 'Spending more doesn’t buy a pass',
-        `DeepSeek V4.1 Flash matches GPT-6.1 Sol at a fifth of the cost.`,
+      const v = card('stack', `A ${money(COST.ds[0])} run ties a ${money(COST.sol[0])} run.`,
+        `DeepSeek V4.1 Flash passes as often as GPT-6.1 Sol: ${Math.round(PASS.ds[0])}% of runs.`,
         `${PRE} · a pass beats the authors’ code on every hidden workload`);
       fit(v, 'pc'); v.append(document.getElementById('pcplot')); drawPassCost();
     }""",
@@ -174,17 +174,18 @@ OVERVIEW = {
       const sc = m => RUNS.filter(r => r.m === m.id).map(r => r.s), mu = m => mean(sc(m)), top = [...MODELS].sort((a, b) => mu(b) - mu(a));
       const hi = Math.floor(Math.min(...MODELS.map(m => Math.max(...sc(m))))), lo = Math.ceil(Math.max(...MODELS.map(m => Math.min(...sc(m)))));
       console.assert(hi >= 95 && lo <= 10, 'mean-score wording', hi, lo);
-      const v = card('stack', 'The run matters more than the model',
-        `Every model has runs above ${hi} and below ${lo}. The means differ by ${(mu(top[0]) - mu(top.at(-1))).toFixed(0)} points.`,
+      const v = card('stack', `Every model hits ${hi}. Every model also drops below ${lo}.`,
+        `Run to run, scores swing across the whole scale. The averages sit ${(mu(top[0]) - mu(top.at(-1))).toFixed(0)} points apart.`,
         `${PRE} · one dot per run, the large dot is the mean`);
       CHART_H.lbLane = Math.floor((v.clientHeight - 54) / MODELS.length); v.append(document.getElementById('lbplot')); drawLB(); oneLine(document.getElementById('lbsvg'));
     }""",
     # FECI: the overview's chart; the headline names the models whose whole 90% interval is above Human
     '05-feci': """() => {
       const above = RANKED.filter(m => ECI[m.id][1] > ECI_HUMAN).map(m => m.name);
-      console.assert(above.length === 2, 'FECI wording', above);
-      const v = card('stack', 'Only two models clear the authors’ bar',
-        `The authors’ code scores ${ECI_HUMAN}. Only ${above.join(' and ')} have their whole 90% interval above it.`,
+      const near = RANKED.filter(m => ECI[m.id][1] <= ECI_HUMAN && ECI[m.id][2] >= ECI_HUMAN).length;
+      console.assert(above.length === 2 && near === MODELS.length - 2, 'FECI wording', above, near);
+      const v = card('stack', 'Only 2 of 7 models reliably beat the authors.',
+        `${above.join(' and ')}. The other ${near} are within noise of the authors’ own code.`,
         `${PRE} · FECI, fitted with Epoch AI’s ECI code`);
       CHART_H.eciLane = Math.floor((v.clientHeight - 60) / MODELS.length); v.append(document.getElementById('eciplot')); drawECI(); oneLine(document.getElementById('ecisvg'));
     }""",
@@ -192,15 +193,15 @@ OVERVIEW = {
     '06-scaling': """() => {
       const reach = id => { const c = SCALE[id], f = c.at(-1)[1]; return c.find(p => p[1] >= f - 1)[0]; };
       const ds = reach('ds'), astra = reach('astra'); console.assert(ds < 1 && astra > 5, 'scaling wording', ds, astra);
-      const v = card('stack', 'Cheap models plateau early. GPT-6 Astra keeps climbing.',
-        `DeepSeek V4.1 Flash levels off by ${usdfmt(ds)} per run. GPT-6 Astra gains until about ${usdfmt(astra)}.`,
+      const v = card('stack', `DeepSeek tops out at $${ds.toFixed(2)}. Astra climbs to $${Math.round(astra)}.`,
+        'FECI as the budget per run grows.',
         `${PRE} · FECI at each budget per run`);
       fit(v, 'tts', 30); v.append(document.getElementById('ttsplot'), document.getElementById('ttslegend')); drawTTS();
     }""",
     # where to look: a sample of task illustrations
     '07-explore': """() => {
-      const v = card('side', `${TASKS.length} tasks. Pick one.`,
-        'Each with its paper and every model’s runs.', '');
+      const v = card('side', 'Think your agent can beat the authors?',
+        `${TASKS.length} tasks. The authors’ code is the bar.`, '');
       const pick = AREAS.flatMap(a => TASKS.filter(t => a.d.includes(t.d)).slice(0, 2).map(t => [t, a.k])).slice(0, 12);
       const cols = 3, gw = 470, gap = 6, tw = (gw - gap * (cols - 1)) / cols, th = tw / 1.5;
       v.style.display = 'grid'; v.style.gridTemplateColumns = `repeat(${cols}, ${tw}px)`; v.style.gap = `${gap}px`; v.style.alignContent = 'center';
