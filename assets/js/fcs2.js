@@ -1,4 +1,4 @@
-// FrontierCS 2 overview page (index.md): leaderboard charts, the rotating example run, the task map and task index.
+// FrontierCS 2 overview page (index.md): leaderboard charts, the task map (whose tiles play their runs on hover) and task index.
 // Data and shared helpers are in fcs2-data.js, loaded first; assets/css/fcs2.css holds the styles.
 /* numbers in the page text come from the data, so they cannot drift from the chart */
 document.querySelectorAll('[data-fill]').forEach(el => { el.textContent = {updated:`Last updated: ${UPDATED}`, runs:String(RUNS.length),
@@ -139,85 +139,8 @@ function drawTTS() {
 }
 $('#ttslegend').innerHTML = RANKED.map(m => `<span><i style="background:${MCOL[m.id]}"></i>${esc(m.name)}</span>`).join('');
 
-/* Overview: an example run, rotating. Left: the task's domain, name (a link to its page) and paper. Right, in Epoch's
-   data-insight grammar (owner, 2026-10-09: like Epoch AI): the legend row on top, the axis title above, a light grid,
-   the run's development score at each submission as a line with dots against what it had spent, the authors' code as
-   a dashed line, the final score as a ringed dot at the run's last dollar with an in-chart note and a curved arrow, and
-   the source note and wordmark below. Each new run draws itself from left to right; runs follow in order every 7 s,
-   the dots below jump to one, hovering or focusing pauses, and reduced motion shows the line at once. The pool keeps
-   clean, rising traces only (owner, 2026-10-09: no ugly traces): the task has a description; the run has at most 15
-   submissions, at least 4 valid ones (score above 0) and no failed one after its first valid one; its score rises by
-   15 points or more (from 0 if it opened with failed submissions, else from its first score), never drops by more
-   than 5, and ends within 5% of its best; its final score is at least the authors' code. */
-function cleanTrace([, task, fin, , , , seq]) {
-  const ys = seq.map(p => p[1]), k = ys.findIndex(v => v > 0);
-  if (k < 0 || ys.length > 15) return false;
-  const body = ys.slice(k), best = Math.max(...body);
-  return body.length >= 4 && !body.includes(0) && best - (k ? 0 : body[0]) >= 15
-    && body.every((v, i) => !i || body[i - 1] - v <= 5) && body[body.length - 1] >= .95 * best
-    && (REF[task] == null || fin >= REF[task]);
-}
-const RUNPOOL = TRAJ.filter(r => DESC[r[1]] && cleanTrace(r));
 const TASK_OF = Object.fromEntries(TASKS.map(t => [t.s, t]));
-let runIx = -1, runTimer = null, runHold = false, runAnim = 0;
 const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
-function runPick(k) {
-  runIx = k == null ? (runIx + 1) % RUNPOOL.length : k;
-  const box = $('#example');
-  if (calm) { drawExample(false); return; }
-  box.classList.add('fade'); setTimeout(() => { drawExample(true); box.classList.remove('fade'); }, 200);
-}
-function drawExample(animate) {
-  if (runIx < 0) return;
-  const [m, task] = RUNPOOL[runIx], t = TASK_OF[task];
-  $('#extag').textContent = t.d;
-  const a = $('#exname'); a.textContent = task; a.href = taskHref(task);
-  $('#expaper').textContent = t.t || '';
-  $('#exlegend').innerHTML = `<span><i style="background:${MCOL[m]}"></i>${esc(MNAME[m])}</span>`
-    + (REF[task] != null ? '<span><i class="dash"></i>Authors’ code</span>' : '');
-  $('#exdots').innerHTML = RUNPOOL.map((r, i) => `<button type="button" class="${i === runIx ? 'on' : ''}" data-i="${i}" aria-label="Example ${i + 1} of ${RUNPOOL.length}: ${esc(MNAME[r[0]])} on ${esc(r[1])}"${i === runIx ? ' aria-current="true"' : ''}></button>`).join('');
-  drawRun(animate);
-}
-function drawRun(animate) {
-  const [m, task, fin, , end, , seq] = RUNPOOL[runIx], ref = REF[task], col = MCOL[m];
-  const svg = $('#runsvg'), W = Math.max(280, $('#runplot').clientWidth), narrow = W < 520;
-  const H = narrow ? 260 : 340, L = 34, R = narrow ? 14 : 24, T = 10, B = 46, x1 = Math.max(end, ...seq.map(p => p[0]));
-  const X = v => L + v / x1 * (W - L - R), Y = v => T + (1 - v / 100) * (H - T - B);
-  svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
-  for (let v = 0; v <= 100; v += 20) {
-    svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:v ? 'var(--grid)' : 'var(--line-2)', 'stroke-width':1}));
-    svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, v));
-  }
-  // dollar ticks on a round step (1, 2 or 5 times a power of ten), about five across
-  const raw = x1 / (narrow ? 3 : 5), p10 = 10 ** Math.floor(Math.log10(raw)), stp = [1, 2, 5, 10].map(f => f * p10).find(v => v >= raw);
-  for (let v = 0; v <= x1 + 1e-9; v += stp) {
-    svg.append(sv('line', {x1:X(v), x2:X(v), y1:T, y2:H - B, stroke:'var(--grid)', 'stroke-width':1}));
-    svg.append(sv('text', {x:X(v), y:H - B + 20, 'text-anchor':'middle'}, usdfmt(v)));
-  }
-  svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'Spent so far in US$, estimated'));
-  if (ref != null) svg.append(sv('line', {x1:L, x2:W - R, y1:Y(ref), y2:Y(ref), stroke:'var(--ink-2)', 'stroke-width':1.5, 'stroke-dasharray':'6 4'}));
-  const clip = sv('clipPath', {id:'exclip'}), cr = sv('rect', {x:0, y:0, width:animate && !calm ? L : W, height:H});
-  clip.append(cr); const defs = sv('defs'); defs.append(clip); svg.append(defs);
-  const g = sv('g', {'clip-path':'url(#exclip)'}), pts = seq.map(([u, v]) => [X(u), Y(v)]);
-  g.append(sv('path', {d:pts.map((q, i) => `${i ? 'L' : 'M'}${q[0].toFixed(1)},${q[1].toFixed(1)}`).join(''), fill:'none', stroke:col, 'stroke-width':2.5, 'stroke-linejoin':'round'}));
-  pts.forEach(([x, y]) => g.append(sv('circle', {cx:x, cy:y, r:3.5, fill:col})));
-  svg.append(g);
-  // the final score: a ringed dot at the run's last dollar, an in-chart note and a curved arrow to it
-  const endg = sv('g', {class:'exend' + (animate && !calm ? '' : ' on')}), fx = X(end), fy = Y(fin);
-  const up = fin < 55, tx = fx - (narrow ? 34 : 64), ty = up ? fy - (narrow ? 58 : 72) : fy + (narrow ? 52 : 62);
-  endg.append(sv('path', {d:`M${tx + 4},${ty + (up ? 10 : -22)}Q${fx - 6},${ty + (up ? 10 : -22)} ${fx - 3},${fy + (up ? -11 : 11)}`, fill:'none', stroke:'var(--ink-2)', 'stroke-width':1.2}));
-  const ah = up ? [[fx - 3, fy - 9], [fx - 7.5, fy - 16], [fx + 1.5, fy - 15.5]] : [[fx - 3, fy + 9], [fx - 7.5, fy + 16], [fx + 1.5, fy + 15.5]];
-  endg.append(sv('path', {d:`M${ah[0]}L${ah[1]}L${ah[2]}Z`, fill:'var(--ink-2)'}));
-  endg.append(sv('circle', {cx:fx, cy:fy, r:6, fill:'#fff', stroke:col, 'stroke-width':2.5}));
-  endg.append(sv('text', {class:'exnote halo', x:tx, y:ty + (up ? 0 : -12), 'text-anchor':'end'}, `Final score ${Math.round(fin)}`));
-  svg.append(endg);
-  if (animate && !calm) {
-    const id = ++runAnim, t0 = performance.now(), dur = 1200, ease = u => u < .5 ? 4 * u * u * u : 1 - (-2 * u + 2) ** 3 / 2;
-    const step = now => { if (id !== runAnim) return; const u = Math.min(1, (now - t0) / dur);
-      cr.setAttribute('width', (L + (W - L) * ease(u)).toFixed(1)); if (u < 1) requestAnimationFrame(step); else endg.classList.add('on'); };
-    requestAnimationFrame(step);
-  }
-}
 
 function drawLB() {
   const runs = RUNS.filter(r => dom === 'All' || r.d === dom);
@@ -340,6 +263,7 @@ function squarify(vals, x, y, w, h) {
 $('#areas').innerHTML = AREAS.map(a => `<span><i style="background:${ART_FIELD[a.k]}"></i>${esc(a.name)}</span>`).join('');
 const nRan = d => TASKS.filter(t => t.d === d && RAN.has(t.s)).length;
 function drawMap() {
+  stopPlay();
   const svg = $('#mapsvg'), W = $('#map').clientWidth, narrow = W < 640, H = narrow ? Math.round(W * 1.15) : Math.round(W * 0.36);
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
   const byArea = AREAS.map(a => ({a, n:a.d.reduce((s, d) => s + N_IN(d), 0)})).sort((p, q) => q.n - p.n), G = narrow ? 4 : 6, tol = .5;
@@ -354,7 +278,7 @@ function drawMap() {
       let rows = 1, sc = 1e9; for (let r = 1; r <= n; r++) { const c = Math.ceil(n / r), v = Math.abs(Math.log((bw / c) / (bh / r) / 1.5)); if (v < sc) { sc = v; rows = r; } }
       let i = 0, tiles = '';
       for (let r = 0; r < rows; r++) { const cnt = Math.floor(n / rows) + (r < n % rows ? 1 : 0), th = (bh - gap * (rows - 1)) / rows, tw = (bw - gap * (cnt - 1)) / cnt;
-        for (let c = 0; c < cnt; c++, i++) tiles += taskArt(ts[i].s, a.k).replace('<svg class="art"', `<svg class="tile" x="${(x0 + c * (tw + gap)).toFixed(1)}" y="${(y0 + r * (th + gap)).toFixed(1)}" width="${tw.toFixed(1)}" height="${th.toFixed(1)}" preserveAspectRatio="xMidYMid slice"`); }
+        for (let c = 0; c < cnt; c++, i++) tiles += taskArt(ts[i].s, a.k).replace('<svg class="art"', `<svg class="tile" data-s="${esc(ts[i].s)}" data-k="${a.k}" x="${(x0 + c * (tw + gap)).toFixed(1)}" y="${(y0 + r * (th + gap)).toFixed(1)}" width="${tw.toFixed(1)}" height="${th.toFixed(1)}" preserveAspectRatio="xMidYMid slice"`); }
       g.insertAdjacentHTML('beforeend', `<clipPath id="${cid}"><rect x="${x0}" y="${y0}" width="${bw}" height="${bh}" rx="${narrow ? 6 : 8}"/></clipPath><g clip-path="url(#${cid})"><rect x="${x0}" y="${y0}" width="${bw}" height="${bh}" fill="#fff"/>${tiles}</g>`);
       svg.append(g);
       // a white chip at the top left: name and count, then the name alone, lying flat, then standing up along the left edge
@@ -373,14 +297,73 @@ function drawMap() {
     });
   });
 }
+/* Hovering a task's tile lifts it into a card and plays its runs (owner, 2026-10-10): the card grows from the tile to
+   1.7 times its size (at least 260 px wide, kept inside the map), its illustration goes under a 70% veil of the domain
+   hue while the rest of the map fades under a 60% white veil, and each run's best development score so far draws itself as a white step line from the first to the last
+   submission (spending on x, 0 to 100 on y), then holds; with several runs they follow in a
+   loop. White words only: the task's name at the top left, the model of the run on screen at the bottom right (owner,
+   2026-10-10). Clicking the card opens the task page. Mouse only; reduced motion shows the card and each line at once. */
 const mapTip = $('#maptip');
-$('#mapsvg').addEventListener('pointermove', e => { const g = e.target.closest('.blk'); if (!g || e.pointerType !== 'mouse') { mapTip.hidden = true; return; }
+let play = null;
+function stopPlay() { if (!play) return; clearTimeout(play.t); play.g.remove(); play = null; }
+function startPlay(tile) {
+  const s = tile.dataset.s, k = tile.dataset.k, runs = TRAJ.filter(r => r[1] === s && r[6].length), svg = $('#mapsvg');
+  const [tx, ty, tw, th] = ['x', 'y', 'width', 'height'].map(a => +tile.getAttribute(a)), [, , W, H] = svg.getAttribute('viewBox').split(' ').map(Number);
+  const w = Math.min(W - 8, Math.max(260, tw * 1.7)), h = w / 1.5, x = Math.min(W - w - 4, Math.max(4, tx + tw / 2 - w / 2)), y = Math.min(H - h - 4, Math.max(4, ty + th / 2 - h / 2));
+  const root = sv('g', {class:'play', style:'cursor:pointer'}), card = sv('g'), cid = 'playclip';
+  // the rest of the map fades behind the card; the veil lets the pointer through to the other tiles
+  const mute = sv('rect', {x:0, y:0, width:W, height:H, fill:'#fff', opacity:calm ? .6 : 0, 'pointer-events':'none'});
+  card.innerHTML = `<clipPath id="${cid}"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="10"/></clipPath>`
+    + `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="10" fill="#fff" filter="drop-shadow(0 6px 16px rgba(32,33,36,.35))"/>`
+    + `<g clip-path="url(#${cid})">${taskArt(s, k).replace('<svg class="art"', `<svg x="${x}" y="${y}" width="${w}" height="${h}" preserveAspectRatio="xMidYMid slice"`)}`
+    + `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${ART_FIELD[k]}" opacity="${runs.length ? .7 : .35}"/></g>`;
+  const who = sv('text', {x:x + w - 14, y:y + h - 14, 'text-anchor':'end', 'font-size':14, 'font-weight':600, fill:'#fff'});
+  card.append(sv('text', {x:x + 14, y:y + 26, 'font-size':14, 'font-weight':600, fill:'#fff'}, s), who);
+  root.append(mute, card); svg.append(root);
+  card.style.transformOrigin = `${x + w / 2}px ${y + h / 2}px`;
+  if (!calm) {
+    mute.animate([{opacity:0}, {opacity:.6}], {duration:220, fill:'forwards'});
+    card.animate([{transform:`translate(${tx + tw / 2 - x - w / 2}px,${ty + th / 2 - y - h / 2}px) scale(${tw / w})`, opacity:.6}, {transform:'none', opacity:1}],
+      {duration:220, easing:'cubic-bezier(.2,0,0,1)', fill:'forwards'});
+  }
+  play = {tile, g:root, card, who, runs, k:0, x, y, w, h};
+  if (runs.length) play.t = setTimeout(showRun, calm ? 0 : 200);
+}
+function showRun() {
+  const p = play, [m, , , , end, , seq] = p.runs[p.k], n = p.runs.length;
+  const PL = 24, PR = 24, PT = 44, PB = 44, sw = 4;
+  const x0 = seq[0][0], x1 = Math.max(end, ...seq.map(q => q[0]));
+  const X = v => p.x + PL + (v - x0) / (x1 - x0 || 1) * (p.w - PL - PR), Y = v => p.y + PT + (1 - v / 100) * (p.h - PT - PB);
+  let best = -1, d = '';
+  seq.forEach(([u, v], i) => { best = Math.max(best, v); d += i ? `H${X(u).toFixed(1)}V${Y(best).toFixed(1)}` : `M${X(u).toFixed(1)},${Y(best).toFixed(1)}`; });
+  d += `H${X(x1).toFixed(1)}`;
+  const line = sv('g', {class:'pline'}), path = sv('path', {d, pathLength:1, fill:'none', stroke:'#fff', 'stroke-width':sw, 'stroke-linejoin':'round', 'stroke-linecap':'round'});
+  const dot = sv('circle', {cx:X(x1), cy:Y(best), r:6.5, fill:'#fff', opacity:calm ? 1 : 0});
+  line.append(path, dot); p.card.querySelector('.pline')?.remove(); p.card.append(line);
+  p.who.textContent = MNAME[m];
+  const draw = calm ? 0 : 1100, hold = 1300;
+  if (!calm) {
+    path.setAttribute('stroke-dasharray', '1 1');
+    path.animate([{strokeDashoffset:1}, {strokeDashoffset:0}], {duration:draw, easing:'cubic-bezier(.6,0,.3,1)', fill:'forwards'});
+    dot.animate([{opacity:0}, {opacity:1}], {duration:200, delay:draw - 100, fill:'forwards'});
+  }
+  if (n > 1) p.t = setTimeout(() => {
+    const go = () => { if (play !== p) return; p.k = (p.k + 1) % n; showRun(); };
+    if (calm) go(); else line.animate([{opacity:1}, {opacity:0}], {duration:250, fill:'forwards'}).onfinish = go;
+  }, draw + hold);
+}
+$('#mapsvg').addEventListener('pointermove', e => {
+  if (e.pointerType !== 'mouse') { mapTip.hidden = true; return; }
+  if (play && e.target.closest('.play')) { mapTip.hidden = true; return; }   // the card stays while the pointer is on it
+  const g = e.target.closest('.blk'), tile = e.target.closest('svg.tile');
+  if (!play || play.tile !== tile) { stopPlay(); if (tile) startPlay(tile); }
+  if (!g || tile) { mapTip.hidden = true; return; }
   const d = g.dataset.d, r = $('#map').getBoundingClientRect();
   mapTip.innerHTML = `<b>${esc(d)}</b><br>${N_IN(d)} task${N_IN(d) > 1 ? 's' : ''}${nRan(d) ? ` · ${nRan(d)} with runs` : ''}`;
   mapTip.hidden = false; mapTip.style.left = (e.clientX - r.left) + 'px'; mapTip.style.top = (e.clientY - r.top) + 'px'; });
-$('#mapsvg').addEventListener('pointerleave', () => { mapTip.hidden = true; });
+$('#mapsvg').addEventListener('pointerleave', () => { mapTip.hidden = true; stopPlay(); });
 const pickDom = d => { picked.has(d) ? picked.delete(d) : picked.add(d); syncChecks(); limit = 5; drawRows(); };
-$('#mapsvg').addEventListener('click', e => { const g = e.target.closest('.blk'); if (g) pickDom(g.dataset.d); });
+$('#mapsvg').addEventListener('click', e => { if (play && e.target.closest('.play')) { location.href = taskHref(play.tile.dataset.s); return; } const g = e.target.closest('.blk'); if (g) pickDom(g.dataset.d); });
 $('#mapsvg').addEventListener('keydown', e => { const g = e.target.closest('.blk'); if (g && (e.key === 'Enter' || e.key === ' ')) { const d = g.dataset.d; pickDom(d); $(`#mapsvg .blk[data-d="${CSS.escape(d)}"]`).focus(); e.preventDefault(); } });
 
 function drawRows() {
@@ -394,11 +377,7 @@ function drawRows() {
   $('#showmore').textContent = `Show more (${h.length - limit} left)`;
 }
 
-drawPassCost(); drawTable(); drawLB(); drawECI(); drawTTS(); drawRows(); runPick(Math.floor(Math.random() * RUNPOOL.length));
+drawPassCost(); drawTable(); drawLB(); drawECI(); drawTTS(); drawRows();
 // labels are placed by measured text width, so draw again once the web font has loaded and the widths are final
-if (document.fonts) document.fonts.ready.then(() => { drawPassCost(); drawLB(); drawECI(); drawTTS(); drawMap(); drawExample(false); });
-const rotate = () => { clearInterval(runTimer); runTimer = calm ? null : setInterval(() => { if (!runHold && !document.hidden) runPick(); }, 7000); };
-$('#exdots').addEventListener('click', e => { const b = e.target.closest('button'); if (b) { runPick(+b.dataset.i); rotate(); } }); rotate();
-['pointerenter', 'focusin'].forEach(e => $('#example').addEventListener(e, () => runHold = true));
-['pointerleave', 'focusout'].forEach(e => $('#example').addEventListener(e, () => runHold = false));
-let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { drawPassCost(); drawLB(); drawECI(); drawTTS(); drawMap(); drawExample(false); redraws.forEach(f => f()); }, 120); });
+if (document.fonts) document.fonts.ready.then(() => { drawPassCost(); drawLB(); drawECI(); drawTTS(); drawMap(); });
+let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { drawPassCost(); drawLB(); drawECI(); drawTTS(); drawMap(); redraws.forEach(f => f()); }, 120); });

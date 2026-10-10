@@ -19,21 +19,6 @@ page_css: fcs2
   <div class="links"><a class="pill lg" id="paperlink" aria-disabled="true">Paper (coming soon)</a></div>
   <a id="taskbase" href="{{ '/task/' | relative_url }}" hidden></a>
 
-  <div class="example" id="example">
-    <div class="ex-task">
-      <span class="tag" id="extag"></span>
-      <h3 class="ex-name"><a id="exname" href="{{ '/task/' | relative_url }}"></a></h3>
-      <p class="ex-paper" id="expaper"></p>
-    </div>
-    <figure class="chart ex-run">
-      <div class="legend exlegend" id="exlegend"></div>
-      <div class="chead"><span>Score of each submission</span></div>
-      <div class="plot" id="runplot"><svg id="runsvg" role="img" aria-label="An example run: the score of each submission against what the run had spent"></svg></div>
-      <div class="cfoot"><b>FRONTIERCS 2</b><span>Preliminary · development score of each scored submission · cost estimated from tokens and list prices</span></div>
-      <div class="ex-dots" id="exdots" aria-label="Example runs"></div>
-    </figure>
-  </div>
-
   <figure class="chart" id="teaser">
     <div class="chead"><span>Tasks</span><span class="r" id="tzhint">Select a domain to filter the list</span></div>
     <div class="map" id="map"><svg id="mapsvg" aria-label="The 92 tasks by domain. Select a domain to filter the list."></svg><div class="tip" id="maptip" hidden></div></div>
