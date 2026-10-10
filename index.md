@@ -4,6 +4,7 @@ title: FrontierCS 2
 description: A benchmark of 92 open-ended computer-science R&D tasks built from published papers, where the authors’ own code is the reference to beat.
 permalink: /
 page_css: fcs2
+og_image: assets/img/fcs2-card.png   # share card for X and other link previews, drawn by bin/fcs2_card.py
 ---
 <div class="fcs2">
 <nav class="sub" aria-label="Sections"><div class="col" id="subnav">
