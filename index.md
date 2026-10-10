@@ -12,12 +12,18 @@ page_css: fcs2
 
 <div class="col" id="main" tabindex="-1">
 <section class="intro" id="overview">
+  <div class="hero">
+  <div class="hero-text">
   <p class="upd"><i></i><span data-fill="updated">Last updated: October 8, 2026</span></p>
   <h1>FrontierCS 2: A benchmark for agentic computer-science R&amp;D</h1>
   <p class="lead">Each task deletes a published paper’s contribution from the repository its authors released. The agent writes it back, and the authors’ own code is the reference it must beat.</p>
 
   <div class="links"><a class="pill lg" id="paperlink" aria-disabled="true">Paper (coming soon)</a></div>
   <a id="taskbase" href="{{ '/task/' | relative_url }}" hidden></a>
+  </div>
+  <div class="papers" id="papers" aria-hidden="true"><div class="pplane" id="pplane"></div></div>
+  <script>window.PAPER_DIR = "{{ '/assets/img/fcs2-papers/' | relative_url }}"; window.PAPER_IMGS = [{% for f in site.static_files %}{% if f.path contains '/assets/img/fcs2-papers/' %}"{{ f.basename }}",{% endif %}{% endfor %}];</script>
+  </div>
 
   <figure class="chart" id="teaser">
     <div class="chead"><span>Tasks</span><span class="r" id="tzhint">Select a domain to filter the list</span></div>

@@ -32,7 +32,22 @@ h2{font-weight:600; font-size:clamp(25px,2.4vw,30px); line-height:1.2; margin:0}
 .field svg{flex:none; color:var(--muted)}
 .links{display:flex; flex-wrap:wrap; gap:10px; margin-top:26px}
 .pill[aria-disabled="true"]{opacity:.6; cursor:default; pointer-events:none}
-/* overview: the task map */
+/* overview: the papers' first pages on a tilted, drifting wall, then the task map */
+.hero{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:24px 40px; align-items:center}
+@media (max-width:1000px){ .hero{grid-template-columns:1fr} }
+.papers{position:relative; height:460px; margin:0; overflow:hidden; perspective:1600px;
+  -webkit-mask-image:linear-gradient(transparent,#000 18%,#000 82%,transparent),linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent); -webkit-mask-composite:source-in;
+  mask-image:linear-gradient(transparent,#000 18%,#000 82%,transparent),linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent); mask-composite:intersect}
+.pplane{position:absolute; left:50%; top:50%; transform-style:preserve-3d; transform:rotateX(52deg) rotateZ(-32deg)}
+.pcol{position:absolute; display:flex; flex-direction:column; gap:18px; animation:pdrift 48s linear infinite; transform-style:preserve-3d}
+.pcol.dn{animation-direction:reverse}
+.papers:hover .pcol{animation-play-state:paused}
+@keyframes pdrift{from{transform:translateY(0)} to{transform:translateY(calc(-50% - 9px))}}
+.pg{flex:none; display:block; width:150px; height:194px; border-radius:4px; overflow:hidden; background:#fff; box-shadow:0 2px 6px rgba(32,33,36,.18),0 0 0 1px rgba(32,33,36,.08); transition:transform .25s, box-shadow .25s}
+.pg img{display:block; width:100%; height:100%; object-fit:cover; object-position:top}
+.pg:hover{transform:translateZ(24px); box-shadow:0 14px 28px rgba(32,33,36,.28),0 0 0 1px rgba(32,33,36,.08)}
+@media (max-width:640px){ .papers{height:300px} .pcol{gap:12px} .pg{width:110px; height:142px} @keyframes pdrift{to{transform:translateY(calc(-50% - 6px))}} }
+@media (prefers-reduced-motion:reduce){ .pcol{animation:none} }
 #teaser{margin:44px 0 0}
 .pill{display:inline-flex; align-items:center; align-self:flex-start; gap:8px; background:var(--mint); color:#041e49; border:0; border-radius:50px; font-weight:600; font-size:14px; padding:6px 11px; text-decoration:none; margin-top:auto}
 .pill:hover{background:var(--mint-2)}

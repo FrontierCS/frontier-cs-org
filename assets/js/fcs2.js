@@ -377,7 +377,26 @@ function drawRows() {
   $('#showmore').textContent = `Show more (${h.length - limit} left)`;
 }
 
+/* Beside the title (under it on narrow screens): the first pages of the tasks' papers laid on a tilted plane, in columns that drift up and down and
+   loop (owner, 2026-10-10: version A of five 3D sketches). Pages come from assets/img/fcs2-papers/<slug>.webp (first
+   page of the arXiv PDF, 320 px wide); a task without one is left out. Each page links to its task; hovering pauses the
+   wall and lifts the page; reduced motion keeps it still. The wall is decorative for assistive technology (the task
+   list below carries the same links). */
+function drawPapers() {
+  const have = new Set(window.PAPER_IMGS || []), ts = TASKS.filter(t => have.has(slug(t.s))), box = $('#papers');
+  if (!ts.length) { box.hidden = true; return; }
+  const narrow = box.clientWidth < 640, cols = box.clientWidth < 800 ? 7 : 11, pw = narrow ? 110 : 150, gap = narrow ? 12 : 18;
+  const card = t => `<a class="pg" href="${esc(taskHref(t.s))}" tabindex="-1"><img src="${PAPER_DIR}${slug(t.s)}.webp" alt="" decoding="async" width="150" height="194"></a>`;
+  let h = '';
+  for (let c = 0; c < cols; c++) {
+    let own = ts.filter((t, i) => i % cols === c); while (own.length < 8) own = own.concat(own);   // tall enough to cover the frame
+    const list = own.map(card).join('');
+    h += `<div class="pcol${c % 2 ? ' dn' : ''}" style="left:${(c - cols / 2) * (pw + gap)}px;top:${-(own.length * (pw * 1.3 + gap)) / 2 + (c % 3) * 40}px;animation-duration:${44 + (c % 4) * 7}s">${list}${list}</div>`;
+  }
+  $('#pplane').innerHTML = h;
+}
+drawPapers();
 drawPassCost(); drawTable(); drawLB(); drawECI(); drawTTS(); drawRows();
 // labels are placed by measured text width, so draw again once the web font has loaded and the widths are final
 if (document.fonts) document.fonts.ready.then(() => { drawPassCost(); drawLB(); drawECI(); drawTTS(); drawMap(); });
-let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { drawPassCost(); drawLB(); drawECI(); drawTTS(); drawMap(); redraws.forEach(f => f()); }, 120); });
+let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { drawPassCost(); drawLB(); drawECI(); drawTTS(); drawMap(); drawPapers(); redraws.forEach(f => f()); }, 120); });
