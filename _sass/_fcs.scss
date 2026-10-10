@@ -1509,7 +1509,6 @@ a.tm-n:hover { color: var(--accent-hover); text-decoration-color: currentColor; 
 .tm-mail:hover { color: var(--accent-hover); }
 .team-note { font-size: 14px; color: var(--ink-3); margin: 18px 0 0; }
 .contact-grid { margin-top: 6px; }
-.team-join { max-width: 640px; margin: 28px 0 14px; color: var(--ink-2); }
 .logo-wall { list-style: none; margin: 24px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)); gap: 40px 28px; align-items: center; }
 .logo-wall li { display: flex; justify-content: center; align-items: center; height: 52px; }
 .logo-wall img { height: var(--h, 36px); width: auto; max-width: 100%; opacity: .78; }

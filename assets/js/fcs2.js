@@ -139,16 +139,16 @@ function drawTTS() {
 }
 $('#ttslegend').innerHTML = RANKED.map(m => `<span><i style="background:${MCOL[m.id]}"></i>${esc(m.name)}</span>`).join('');
 
-/* Overview: an example run, rotating, drawn for a first glance rather than for reading values (owner, 2026-10-09:
-   visual emphasis, little text, thick lines). Left: the task's domain, name (a link to its page), paper and the model.
-   Right: one thick smoothed line of the run's development score against what it had spent, a soft fill under it, the
-   authors' code as a dashed line, and the final score as one large number; no grid and no score axis. Each new run
-   draws itself from left to right; runs follow in order every 7 s, the dots below jump to one, hovering or focusing
-   pauses, and reduced motion shows the line at once. The pool keeps clean, rising traces only (owner, 2026-10-09: no
-   ugly traces): the task has a description; the run has at most 15 submissions, at least 4 valid ones (score above 0)
-   and no failed one after its first valid one; its score rises by 15 points or more (from 0 if it opened with failed
-   submissions, else from its first score), never drops by more than 5, and ends within 5% of its best; its final
-   score is at least the authors' code. */
+/* Overview: an example run, rotating. Left: the task's domain, name (a link to its page) and paper. Right, in Epoch's
+   data-insight grammar (owner, 2026-10-09: like Epoch AI): the legend row on top, the axis title above, a light grid,
+   the run's development score at each submission as a line with dots against what it had spent, the authors' code as
+   a dashed line, the final score as a ringed dot at the run's last dollar with an in-chart note and a curved arrow, and
+   the source note and wordmark below. Each new run draws itself from left to right; runs follow in order every 7 s,
+   the dots below jump to one, hovering or focusing pauses, and reduced motion shows the line at once. The pool keeps
+   clean, rising traces only (owner, 2026-10-09: no ugly traces): the task has a description; the run has at most 15
+   submissions, at least 4 valid ones (score above 0) and no failed one after its first valid one; its score rises by
+   15 points or more (from 0 if it opened with failed submissions, else from its first score), never drops by more
+   than 5, and ends within 5% of its best; its final score is at least the authors' code. */
 function cleanTrace([, task, fin, , , , seq]) {
   const ys = seq.map(p => p[1]), k = ys.findIndex(v => v > 0);
   if (k < 0 || ys.length > 15) return false;
@@ -161,25 +161,6 @@ const RUNPOOL = TRAJ.filter(r => DESC[r[1]] && cleanTrace(r));
 const TASK_OF = Object.fromEntries(TASKS.map(t => [t.s, t]));
 let runIx = -1, runTimer = null, runHold = false, runAnim = 0;
 const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
-// A monotone cubic through the points (Fritsch and Carlson), so the line is smooth and never overshoots a submission.
-function smoothPath(pts) {
-  const P = pts.filter((p, i) => i === pts.length - 1 || pts[i + 1][0] > p[0] + .5), n = P.length;   // one point per x
-  if (n < 3) return P.map((p, i) => `${i ? 'L' : 'M'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join('');
-  const dx = [], m = [];
-  for (let i = 0; i < n - 1; i++) { dx[i] = P[i + 1][0] - P[i][0]; m[i] = (P[i + 1][1] - P[i][1]) / dx[i]; }
-  const t = [m[0]];
-  for (let i = 1; i < n - 1; i++) t[i] = m[i - 1] * m[i] <= 0 ? 0 : (m[i - 1] + m[i]) / 2;
-  t[n - 1] = m[n - 2];
-  for (let i = 0; i < n - 1; i++) {
-    if (m[i] === 0) { t[i] = t[i + 1] = 0; continue; }
-    const a = t[i] / m[i], b = t[i + 1] / m[i], h = a * a + b * b;
-    if (h > 9) { const k = 3 / Math.sqrt(h); t[i] = k * a * m[i]; t[i + 1] = k * b * m[i]; }
-  }
-  let d = `M${P[0][0].toFixed(1)},${P[0][1].toFixed(1)}`;
-  for (let i = 0; i < n - 1; i++) { const h = dx[i] / 3;
-    d += `C${(P[i][0] + h).toFixed(1)},${(P[i][1] + h * t[i]).toFixed(1)} ${(P[i + 1][0] - h).toFixed(1)},${(P[i + 1][1] - h * t[i + 1]).toFixed(1)} ${P[i + 1][0].toFixed(1)},${P[i + 1][1].toFixed(1)}`; }
-  return d;
-}
 function runPick(k) {
   runIx = k == null ? (runIx + 1) % RUNPOOL.length : k;
   const box = $('#example');
@@ -192,39 +173,48 @@ function drawExample(animate) {
   $('#extag').textContent = t.d;
   const a = $('#exname'); a.textContent = task; a.href = taskHref(task);
   $('#expaper').textContent = t.t || '';
-  $('#exdot').style.background = MCOL[m]; $('#exmodel').textContent = MNAME[m];
+  $('#exlegend').innerHTML = `<span><i style="background:${MCOL[m]}"></i>${esc(MNAME[m])}</span>`
+    + (REF[task] != null ? '<span><i class="dash"></i>Authors’ code</span>' : '');
   $('#exdots').innerHTML = RUNPOOL.map((r, i) => `<button type="button" class="${i === runIx ? 'on' : ''}" data-i="${i}" aria-label="Example ${i + 1} of ${RUNPOOL.length}: ${esc(MNAME[r[0]])} on ${esc(r[1])}"${i === runIx ? ' aria-current="true"' : ''}></button>`).join('');
   drawRun(animate);
 }
 function drawRun(animate) {
-  const [, task, fin, , end, , seq] = RUNPOOL[runIx], ref = REF[task];
+  const [m, task, fin, , end, , seq] = RUNPOOL[runIx], ref = REF[task], col = MCOL[m];
   const svg = $('#runsvg'), W = Math.max(280, $('#runplot').clientWidth), narrow = W < 520;
-  const H = narrow ? 230 : 320, L = 4, R = narrow ? 78 : 104, T = 18, B = 30, x1 = Math.max(end, ...seq.map(p => p[0]));
-  const X = v => L + v / x1 * (W - L - R), Y = v => T + (1 - v / 100) * (H - T - B), base = H - B;
-  const pts = seq.map(p => [X(p[0]), Y(p[1])]), line = smoothPath(pts), last = pts[pts.length - 1];
+  const H = narrow ? 260 : 340, L = 34, R = narrow ? 14 : 24, T = 10, B = 46, x1 = Math.max(end, ...seq.map(p => p[0]));
+  const X = v => L + v / x1 * (W - L - R), Y = v => T + (1 - v / 100) * (H - T - B);
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
-  const defs = sv('defs'), grad = sv('linearGradient', {id:'exfill', x1:0, y1:0, x2:0, y2:1});
-  grad.append(sv('stop', {offset:'0%', 'stop-color':'var(--teal)', 'stop-opacity':.22}), sv('stop', {offset:'100%', 'stop-color':'var(--teal)', 'stop-opacity':0}));
-  const clip = sv('clipPath', {id:'exclip'}), cr = sv('rect', {x:0, y:0, width:animate && !calm ? 0 : W, height:H});
-  clip.append(cr); defs.append(grad, clip); svg.append(defs);
-  svg.append(sv('line', {x1:L, x2:W - R, y1:base, y2:base, stroke:'var(--line)', 'stroke-width':1}));
-  svg.append(sv('text', {class:'exax', x:L, y:H - 8}, '$0'));
-  svg.append(sv('text', {class:'exax', x:W - R, y:H - 8, 'text-anchor':'end'}, `${money(end)} spent`));
-  if (ref != null) svg.append(sv('line', {x1:L, x2:W - R, y1:Y(ref), y2:Y(ref), stroke:'var(--ink-2)', 'stroke-width':1.5, 'stroke-dasharray':'5 5'}));
-  const g = sv('g', {'clip-path':'url(#exclip)'});
-  g.append(sv('path', {d:`${line}L${last[0].toFixed(1)},${base}L${pts[0][0].toFixed(1)},${base}Z`, fill:'url(#exfill)'}));
-  g.append(sv('path', {d:line, fill:'none', stroke:'var(--teal)', 'stroke-width':narrow ? 4.5 : 6, 'stroke-linecap':'round', 'stroke-linejoin':'round'}));
+  for (let v = 0; v <= 100; v += 20) {
+    svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:v ? 'var(--grid)' : 'var(--line-2)', 'stroke-width':1}));
+    svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, v));
+  }
+  // dollar ticks on a round step (1, 2 or 5 times a power of ten), about five across
+  const raw = x1 / (narrow ? 3 : 5), p10 = 10 ** Math.floor(Math.log10(raw)), stp = [1, 2, 5, 10].map(f => f * p10).find(v => v >= raw);
+  for (let v = 0; v <= x1 + 1e-9; v += stp) {
+    svg.append(sv('line', {x1:X(v), x2:X(v), y1:T, y2:H - B, stroke:'var(--grid)', 'stroke-width':1}));
+    svg.append(sv('text', {x:X(v), y:H - B + 20, 'text-anchor':'middle'}, usdfmt(v)));
+  }
+  svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'Spent so far in US$, estimated'));
+  if (ref != null) svg.append(sv('line', {x1:L, x2:W - R, y1:Y(ref), y2:Y(ref), stroke:'var(--ink-2)', 'stroke-width':1.5, 'stroke-dasharray':'6 4'}));
+  const clip = sv('clipPath', {id:'exclip'}), cr = sv('rect', {x:0, y:0, width:animate && !calm ? L : W, height:H});
+  clip.append(cr); const defs = sv('defs'); defs.append(clip); svg.append(defs);
+  const g = sv('g', {'clip-path':'url(#exclip)'}), pts = seq.map(([u, v]) => [X(u), Y(v)]);
+  g.append(sv('path', {d:pts.map((q, i) => `${i ? 'L' : 'M'}${q[0].toFixed(1)},${q[1].toFixed(1)}`).join(''), fill:'none', stroke:col, 'stroke-width':2.5, 'stroke-linejoin':'round'}));
+  pts.forEach(([x, y]) => g.append(sv('circle', {cx:x, cy:y, r:3.5, fill:col})));
   svg.append(g);
-  if (ref != null) svg.append(sv('text', {class:'exax exref', x:L, y:Y(ref) - 9}, 'Authors’ code'));   // over the line, haloed
-  const endg = sv('g', {class:'exend' + (animate && !calm ? '' : ' on')});
-  endg.append(sv('circle', {cx:last[0], cy:last[1], r:narrow ? 7 : 9, fill:'var(--teal)', stroke:'#fff', 'stroke-width':3}));
-  endg.append(sv('text', {class:'exbig', x:last[0] + (narrow ? 14 : 18), y:last[1] + (narrow ? 9 : 12)}, Math.round(fin)));
-  endg.append(sv('text', {class:'exax', x:last[0] + (narrow ? 15 : 20), y:last[1] + (narrow ? 27 : 34)}, 'final score'));
+  // the final score: a ringed dot at the run's last dollar, an in-chart note and a curved arrow to it
+  const endg = sv('g', {class:'exend' + (animate && !calm ? '' : ' on')}), fx = X(end), fy = Y(fin);
+  const up = fin < 55, tx = fx - (narrow ? 34 : 64), ty = up ? fy - (narrow ? 58 : 72) : fy + (narrow ? 52 : 62);
+  endg.append(sv('path', {d:`M${tx + 4},${ty + (up ? 10 : -22)}Q${fx - 6},${ty + (up ? 10 : -22)} ${fx - 3},${fy + (up ? -11 : 11)}`, fill:'none', stroke:'var(--ink-2)', 'stroke-width':1.2}));
+  const ah = up ? [[fx - 3, fy - 9], [fx - 7.5, fy - 16], [fx + 1.5, fy - 15.5]] : [[fx - 3, fy + 9], [fx - 7.5, fy + 16], [fx + 1.5, fy + 15.5]];
+  endg.append(sv('path', {d:`M${ah[0]}L${ah[1]}L${ah[2]}Z`, fill:'var(--ink-2)'}));
+  endg.append(sv('circle', {cx:fx, cy:fy, r:6, fill:'#fff', stroke:col, 'stroke-width':2.5}));
+  endg.append(sv('text', {class:'exnote halo', x:tx, y:ty + (up ? 0 : -12), 'text-anchor':'end'}, `Final score ${Math.round(fin)}`));
   svg.append(endg);
   if (animate && !calm) {
-    const id = ++runAnim, t0 = performance.now(), dur = 1500, ease = u => u < .5 ? 4 * u * u * u : 1 - (-2 * u + 2) ** 3 / 2;
+    const id = ++runAnim, t0 = performance.now(), dur = 1200, ease = u => u < .5 ? 4 * u * u * u : 1 - (-2 * u + 2) ** 3 / 2;
     const step = now => { if (id !== runAnim) return; const u = Math.min(1, (now - t0) / dur);
-      cr.setAttribute('width', (W * ease(u)).toFixed(1)); if (u < 1) requestAnimationFrame(step); else endg.classList.add('on'); };
+      cr.setAttribute('width', (L + (W - L) * ease(u)).toFixed(1)); if (u < 1) requestAnimationFrame(step); else endg.classList.add('on'); };
     requestAnimationFrame(step);
   }
 }

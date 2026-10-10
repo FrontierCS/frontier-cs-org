@@ -24,12 +24,14 @@ page_css: fcs2
       <span class="tag" id="extag"></span>
       <h3 class="ex-name"><a id="exname" href="{{ '/task/' | relative_url }}"></a></h3>
       <p class="ex-paper" id="expaper"></p>
-      <p class="ex-model"><i id="exdot"></i><span id="exmodel"></span></p>
     </div>
-    <div class="ex-run">
-      <div class="plot" id="runplot"><svg id="runsvg" role="img" aria-label="An example run: its score rising with what it spent"></svg></div>
+    <figure class="chart ex-run">
+      <div class="legend exlegend" id="exlegend"></div>
+      <div class="chead"><span>Score of each submission</span></div>
+      <div class="plot" id="runplot"><svg id="runsvg" role="img" aria-label="An example run: the score of each submission against what the run had spent"></svg></div>
+      <div class="cfoot"><b>FRONTIERCS 2</b><span>Preliminary · development score of each scored submission · cost estimated from tokens and list prices</span></div>
       <div class="ex-dots" id="exdots" aria-label="Example runs"></div>
-    </div>
+    </figure>
   </div>
 
   <figure class="chart" id="teaser">
