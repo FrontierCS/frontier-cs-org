@@ -61,7 +61,10 @@ function drawCharts() {
 function drawFinal() {
   const {t, runs} = cur, ref = REF[t.s], ms = RANKED.filter(m => runs.some(r => r[0] === m.id));
   const svg = $('#fssvg'), W = Math.max(300, $('#fsplot').clientWidth), narrow = W < 560, lane = 34;
-  const L = narrow ? 104 : 168, R = 16, T = 26, B = 40, H = T + ms.length * lane + B;
+  // on phones the name column fits the longest model name shown, so no name is cut
+  svg.replaceChildren();
+  const nw = narrow ? Math.max(...ms.map(m => { const q = sv('text', {class:'lab', x:-999, y:-999}, m.short); svg.append(q); return q.getComputedTextLength(); })) : 0;
+  const L = narrow ? Math.max(104, Math.ceil(nw) + 24) : 168, R = 16, T = 26, B = 40, H = T + ms.length * lane + B;
   const xmax = Math.max(100, ...runs.map(r => r[2])), X = v => L + v / xmax * (W - L - R);
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
   for (let v = 0; v <= xmax + 1e-9; v += 25) {

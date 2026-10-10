@@ -26,7 +26,7 @@ const MODELS = [
   {id:'muse', name:'Muse Spark 1.3', short:'Muse Spark', h:'Muse Code', lab:'Meta'},
   {id:'k3', name:'Kimi K3', short:'Kimi K3', h:'Kimi Code', lab:'Kimi'},
   {id:'qwen', name:'Qwen 3.8 Max', short:'Qwen 3.8 Max', h:'', lab:'Qwen'},
-  {id:'ds', name:'DeepSeek V4.1 Flash', short:'DeepSeek V4.1', h:'DSH', lab:'DeepSeek'},
+  {id:'ds', name:'DeepSeek V4.1 Flash', short:'DeepSeek V4.1 Flash', h:'DSH', lab:'DeepSeek'},
   {id:'glm', name:'GLM 5.3', short:'GLM 5.3', h:'ZCode', lab:'Z.ai'},
 ];
 const UPDATED = 'October 8, 2026';

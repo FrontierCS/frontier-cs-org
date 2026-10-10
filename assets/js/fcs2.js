@@ -3,7 +3,7 @@
 /* numbers in the page text come from the data, so they cannot drift from the chart */
 document.querySelectorAll('[data-fill]').forEach(el => { el.textContent = {updated:`Last updated: ${UPDATED}`, runs:String(RUNS.length),
   runtasks:`on ${NTASK(RUNS)} tasks`, models:`${MODELS.length} models from ${new Set(MODELS.map(m => m.lab)).size} labs have run so far.`,
-  summary:`${RUNS.length} runs on ${NTASK(RUNS)} tasks by ${MODELS.length} models`, nruns:`${RUNS.length} runs`}[el.dataset.fill]; });
+  summary:`${RUNS.length} runs on ${NTASK(RUNS)} tasks by ${MODELS.length} models`}[el.dataset.fill]; });
 // Bring a tab into view inside its own horizontal strip only. scrollIntoView would also scroll the page,
 // which fought the reader's scrolling whenever the section spy fired.
 const reveal = el => { const p = el.parentElement, pr = p.getBoundingClientRect(), er = el.getBoundingClientRect();
@@ -19,7 +19,7 @@ const spy = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersectin
 /* ---------- leaderboard chart ---------- */
 let group = 'model', dom = 'All', showRuns = true;
 const DOMS_WITH_RUNS = DOMAINS.filter(d => RUNS.some(r => r.d === d));
-$('#domradios').innerHTML = ['All', ...DOMS_WITH_RUNS].map(d => `<label><input type="radio" name="dom" value="${esc(d)}" ${d === 'All' ? 'checked' : ''}>${d === 'All' ? 'All domains' : esc(d)}<span class="n num">${RUNS.filter(r => d === 'All' || r.d === d).length}</span></label>`).join('');
+$('#domradios').innerHTML = ['All', ...DOMS_WITH_RUNS].map(d => `<label><input type="radio" name="dom" value="${esc(d)}" ${d === 'All' ? 'checked' : ''}>${d === 'All' ? 'All domains' : esc(d)}</label>`).join('');
 $('#domradios').addEventListener('change', e => { dom = e.target.value; drawLB(); });
 $('#groupby').addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return; group = b.dataset.g;
   [...$('#groupby').children].forEach(c => c.setAttribute('aria-pressed', String(c === b))); drawLB(); });
@@ -66,17 +66,20 @@ function drawPassCost() {
     const spot = spots.find(sp => !hit(box(sp)));
     if (spot) { boxes.push(box(spot)); lab.setAttribute('x', spot[0]); lab.setAttribute('y', spot[1]); lab.setAttribute('text-anchor', spot[2]); }
     else lab.remove();
-    const [pct, np, n] = PASS[m.id];
-    pts.push({x:cx, y:cy, mean:true, html:`<b>${esc(m.name)}</b><br>Pass rate <b>${f1(pct)}%</b>, ${np} of ${n} runs pass<br>${usdfmt(COST[m.id][0])} per run, mean of ${COST[m.id][1]} runs`});
+    const pct = PASS[m.id][0];
+    pts.push({x:cx, y:cy, mean:true, html:`<b>${esc(m.name)}</b><br>Pass rate <b>${f1(pct)}%</b><br>${usdfmt(COST[m.id][0])} per run, mean`});
   });
   attachTip(svg, W, H, pts, $('#pctip'));
 }
+
+/* On phones the model column is as wide as the longest model name, so every name shows in full (owner: "DeepSeek V4.1 Flash", not cut). */
+const nameCol = svg => { svg.replaceChildren(); const w = Math.max(...MODELS.map(m => { const t = sv('text', {class:'lab', x:-999, y:-999}, m.short); svg.append(t); return t.getComputedTextLength(); })); svg.replaceChildren(); return Math.max(112, Math.ceil(w) + 12); };
 
 /* FECI: one row per model ranked by ECI, its 90% interval as a bar. */
 function drawECI() {
   const order = [...MODELS].sort((a, b) => ECI[b.id][0] - ECI[a.id][0]);
   const svg = $('#ecisvg'), W = Math.max(300, $('#eciplot').clientWidth), narrow = W < 560;
-  const L = narrow ? 112 : 190, R = 34, T = 14, B = 46, lane = narrow ? 56 : 64;
+  const L = narrow ? nameCol(svg) : 190, R = 34, T = 14, B = 46, lane = narrow ? 56 : 64;
   const xmax = Math.ceil(Math.max(...MODELS.map(m => ECI[m.id][2])) / 20) * 20, step = narrow && xmax > 120 ? 40 : 20;
   const H = T + order.length * lane + B;
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
@@ -95,8 +98,7 @@ function drawECI() {
     svg.append(sv('line', {x1:X(lo), x2:X(hi), y1:yc, y2:yc, stroke:MCOL[m.id], 'stroke-width':6, 'stroke-linecap':'round', opacity:.25}));
     svg.append(sv('circle', {cx:X(e), cy:yc, r:7, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':2}));
     svg.append(sv('text', {class:'val halo', x:X(e), y:yc - 13, fill:MCOL[m.id], 'text-anchor':'middle'}, String(Math.round(e))));
-    const mine = RUNS.filter(r => r.m === m.id);
-    pts.push({x:X(e), y:yc, mean:true, html:`<b>${esc(m.name)}</b><br>FECI <b>${f1(e)}</b><br>90% interval ${Math.round(lo)}–${Math.round(hi)}<br>${mine.length} runs on ${NTASK(mine)} tasks`});
+    pts.push({x:X(e), y:yc, mean:true, html:`<b>${esc(m.name)}</b><br>FECI <b>${f1(e)}</b><br>90% interval ${Math.round(lo)}–${Math.round(hi)}`});
   });
   attachTip(svg, W, H, pts, $('#ecitip'));
 }
@@ -146,7 +148,6 @@ function drawLB() {
   const runs = RUNS.filter(r => dom === 'All' || r.d === dom);
   // grouped by model, the row labels name the models; grouped by task, the dots need the legend
   $('#lblegend').hidden = group === 'model';
-  $('#nres').textContent = `${runs.length} run${runs.length === 1 ? '' : 's'}`;
   let rows;
   if (group === 'model') {
     rows = MODELS.map(m => ({label:m.name, short:m.short, sub:m.h, items:[{m:m.id, runs:runs.filter(r => r.m === m.id)}]})).filter(r => r.items[0].runs.length);
@@ -159,7 +160,7 @@ function drawLB() {
   }
   rows.sort((a, b) => b.best - a.best);
   const svg = $('#lbsvg'), box = $('#lbplot'), W = Math.max(300, box.clientWidth), narrow = W < 560;
-  const L = narrow ? 112 : 190, R = 34, T = 8, B = 46;
+  const L = narrow ? (group === 'model' ? nameCol(svg) : 112) : 190, R = 34, T = 8, B = 46;
   const lane = group === 'model' ? (narrow ? 64 : 76) : 30;
   const rowH = () => lane;
   const H = T + rows.reduce((a, r) => a + rowH(r), 0) + B;
@@ -177,7 +178,7 @@ function drawLB() {
     if (ri) svg.append(sv('line', {x1:0, x2:W - R, y1:y0, y2:y0, stroke:'var(--line)', 'stroke-width':1}));
     const two = group === 'model' && r.sub;
     const name = narrow && r.short ? r.short : r.label, maxc = Math.floor((L - 14) / 7.4);
-    const short = name.length > maxc ? name.slice(0, maxc - 1).trimEnd() + '…' : name;
+    const short = group === 'task' && name.length > maxc ? name.slice(0, maxc - 1).trimEnd() + '…' : name;
     const lab = sv('text', {class:'lab', x:0, y:y0 + h / 2 + (two ? -3 : 4)}, short);
     if (short !== r.label) lab.append(sv('title', {}, r.label));
     svg.append(lab);
@@ -187,7 +188,7 @@ function drawLB() {
       if (ms.length > 1) svg.append(sv('line', {x1:X(Math.min(...ms)), x2:X(Math.max(...ms)), y1:yc, y2:yc, stroke:'var(--line)', 'stroke-width':2}));
       r.items.forEach((it, k) => {
         svg.append(sv('circle', {cx:X(ms[k]), cy:yc, r:5.5, fill:MCOL[it.m], stroke:'#fff', 'stroke-width':1.5}));
-        pts.push({x:X(ms[k]), y:yc, html:`<b>${esc(MNAME[it.m])}</b><br>${esc(r.label)} · ${esc(r.sub)}<br>${it.runs.length > 1 ? `Mean <b>${f1(ms[k])}</b> over ${it.runs.length} runs` : `Final score <b>${f1(ms[k])}</b>`}`, mean:true});
+        pts.push({x:X(ms[k]), y:yc, html:`<b>${esc(MNAME[it.m])}</b><br>${esc(r.label)} · ${esc(r.sub)}<br>${it.runs.length > 1 ? `Mean <b>${f1(ms[k])}</b>` : `Final score <b>${f1(ms[k])}</b>`}`, mean:true});
       });
       const edge = X(Math.max(...ms)) + 10, right = edge + 34 > W;
       svg.append(sv('text', {class:'val', x: right ? X(Math.min(...ms)) - 10 : edge, y:yc + 4.5, fill:'var(--ink-2)', 'text-anchor': right ? 'end' : 'start'}, f1(Math.max(...ms))));
@@ -203,7 +204,7 @@ function drawLB() {
         svg.append(c); pts.push({x:X(x.s), y:yc + jy, html:`<b>${esc(MNAME[it.m])}</b><br>${esc(x.t)} · ${esc(x.d)}<br>Final score <b>${f1(x.s)}</b>`});
       });
       svg.append(sv('circle', {cx:X(mu), cy:yc, r:8, fill:MCOL[it.m], stroke:'#fff', 'stroke-width':2}));
-      pts.push({x:X(mu), y:yc, html:`<b>${esc(MNAME[it.m])}</b><br>Mean <b>${f1(mu)}</b> over ${ss.length} run${ss.length > 1 ? 's' : ''} on ${NTASK(it.runs)} task${NTASK(it.runs) > 1 ? 's' : ''}`, mean:true});
+      pts.push({x:X(mu), y:yc, html:`<b>${esc(MNAME[it.m])}</b><br>Mean <b>${f1(mu)}</b>`, mean:true});
       // the mean sits above its own dot, with a white halo over the run dots
       svg.append(sv('text', {class:'val halo', x:X(mu), y:yc - 15, fill:MCOL[it.m], 'text-anchor':'middle'}, f1(mu)));
     });
@@ -239,7 +240,6 @@ $('#ftoggle').addEventListener('click', () => { const f = $('#filter'), o = !f.c
 $('#q').addEventListener('input', e => { q = e.target.value; limit = 5; drawRows(); });
 $('#sort').addEventListener('change', e => { sort = e.target.value; drawRows(); });
 $('#showmore').addEventListener('click', () => { limit += 20; drawRows(); });
-function syncChecks() { [...$('#checks').querySelectorAll('input')].forEach(i => i.checked = picked.has(i.value)); $('#fcount').textContent = picked.size ? `(${picked.size})` : ''; }
 function hits() {
   const w = q.toLowerCase().split(/\s+/).filter(Boolean);
   let h = TASKS.filter(t => (!picked.size || picked.has(t.d)) && w.every(x => (t.s + ' ' + t.t + ' ' + t.d).toLowerCase().includes(x)));
@@ -272,9 +272,9 @@ function drawMap() {
   squarify(byArea.map(x => x.n), 0, 0, W, H).forEach((ar, k) => {
     const a = byArea[k].a, doms = [...a.d].sort((p, q) => N_IN(q) - N_IN(p));
     squarify(doms.map(N_IN), ...ar).forEach(([x, y, w, h], j) => {
-      const d = doms[j], n = N_IN(d), on = picked.has(d);
+      const d = doms[j], n = N_IN(d);
       const x0 = x + (x > tol ? G / 2 : 0), y0 = y + (y > tol ? G / 2 : 0), x1 = x + w - (x + w < W - tol ? G / 2 : 0), y1 = y + h - (y + h < H - tol ? G / 2 : 0), bw = x1 - x0, bh = y1 - y0;
-      const g = sv('g', {class:'blk', tabindex:0, role:'button', 'aria-pressed':String(on), 'aria-label':`${d}, ${n} task${n > 1 ? 's' : ''}`, 'data-d':d, opacity: picked.size && !on ? .32 : 1});
+      const g = sv('g', {class:'blk', 'aria-label':`${d}, ${n} task${n > 1 ? 's' : ''}`, 'data-d':d});
       // the block holds one illustration per task (fcs2-art.js), in rows that keep each tile closest to 3:2, framed by thin white seams
       const ts = TASKS.filter(t => t.d === d), gap = 2, cid = `mapclip${k}_${j}`;
       let rows = 1, sc = 1e9; for (let r = 1; r <= n; r++) { const c = Math.ceil(n / r), v = Math.abs(Math.log((bw / c) / (bh / r) / 1.5)); if (v < sc) { sc = v; rows = r; } }
@@ -364,13 +364,9 @@ $('#mapsvg').addEventListener('pointermove', e => {
   mapTip.innerHTML = `<b>${esc(d)}</b><br>${N_IN(d)} task${N_IN(d) > 1 ? 's' : ''}${nRan(d) ? ` · ${nRan(d)} with runs` : ''}`;
   mapTip.hidden = false; mapTip.style.left = (e.clientX - r.left) + 'px'; mapTip.style.top = (e.clientY - r.top) + 'px'; });
 $('#mapsvg').addEventListener('pointerleave', () => { mapTip.hidden = true; stopPlay(); });
-const pickDom = d => { picked.has(d) ? picked.delete(d) : picked.add(d); syncChecks(); limit = 5; drawRows(); };
-$('#mapsvg').addEventListener('click', e => { if (play && e.target.closest('.play')) { location.href = taskHref(play.tile.dataset.s); return; } const g = e.target.closest('.blk'); if (g) pickDom(g.dataset.d); });
-$('#mapsvg').addEventListener('keydown', e => { const g = e.target.closest('.blk'); if (g && (e.key === 'Enter' || e.key === ' ')) { const d = g.dataset.d; pickDom(d); $(`#mapsvg .blk[data-d="${CSS.escape(d)}"]`).focus(); e.preventDefault(); } });
+$('#mapsvg').addEventListener('click', e => { if (play && e.target.closest('.play')) location.href = taskHref(play.tile.dataset.s); });
 
 function drawRows() {
-  drawMap();
-  $('#tzhint').textContent = picked.size ? `${[...picked].join(', ')} selected. Select again to clear.` : '';
   const h = hits(); $('#cnt').textContent = `${h.length} task${h.length === 1 ? '' : 's'}`; $('#fcount').textContent = picked.size ? `(${picked.size})` : '';
   $('#rows').innerHTML = h.slice(0, limit).map(t => `<article class="row" data-s="${esc(t.s)}"><div class="meta"><span class="tag">${esc(t.d)}</span>${RAN.has(t.s) ? '<span class="ran"><i></i>Has runs</span>' : ''}</div>
     <h3><a class="stretch" href="${esc(taskHref(t.s))}">${esc(t.s)}</a></h3>${t.t ? `<p>${esc(t.t)}</p>` : ''}<div class="lk">${t.p ? `<a href="${esc(t.p)}" target="_blank" rel="noopener">Paper</a>` : '<span>No paper link</span>'}${t.r ? `<a href="${esc(t.r)}" target="_blank" rel="noopener">Code</a>` : ''}</div></article>`).join('')
@@ -398,7 +394,7 @@ function drawPapers() {
   $('#pplane').innerHTML = h;
 }
 drawPapers();
-drawPassCost(); drawTable(); drawLB(); drawECI(); drawTTS(); drawRows();
+drawPassCost(); drawTable(); drawLB(); drawECI(); drawTTS(); drawMap(); drawRows();
 // labels are placed by measured text width, so draw again once the web font has loaded and the widths are final
 if (document.fonts) document.fonts.ready.then(() => { drawPassCost(); drawLB(); drawECI(); drawTTS(); drawMap(); });
 let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { drawPassCost(); drawLB(); drawECI(); drawTTS(); drawMap(); drawPapers(); redraws.forEach(f => f()); }, 120); });

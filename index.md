@@ -26,8 +26,8 @@ page_css: fcs2
   </div>
 
   <figure class="chart" id="teaser">
-    <div class="chead"><span>Tasks</span><span class="r" id="tzhint"></span></div>
-    <div class="map" id="map"><svg id="mapsvg" aria-label="The 92 tasks by domain. Select a domain to filter the list."></svg><div class="tip" id="maptip" hidden></div></div>
+    <div class="chead"><span>Tasks</span></div>
+    <div class="map" id="map"><svg id="mapsvg" aria-label="The 92 tasks by domain"></svg><div class="tip" id="maptip" hidden></div></div>
     <div class="areas" id="areas"></div>
   </figure>
 </section>
@@ -35,7 +35,7 @@ page_css: fcs2
 <section class="sec" id="leaderboard">
   <h2>Leaderboard</h2>
   <figure class="chart" style="margin:0">
-    <div class="chead"><span>Pass rate against cost per run</span><span class="r" data-fill="nruns">263 runs</span></div>
+    <div class="chead"><span>Pass rate against cost per run</span></div>
     <div class="plot" id="pcplot"><svg id="pcsvg" role="img" aria-label="Pass rate against cost per run"></svg><div class="tip" id="pctip" hidden></div></div>
     <div class="cfoot"><b>FRONTIERCS 2</b><span>Preliminary · a run passes when its final submission meets the task’s pass criteria on every workload · cost is estimated from tokens and list prices</span></div>
   </figure>
@@ -50,7 +50,7 @@ page_css: fcs2
     <h3>Mean score</h3>
   <div class="cgrid">
     <figure class="chart" style="margin:0">
-      <div class="chead"><span id="ylab">Final score, mean over runs</span><span class="r" id="nres">263 runs</span></div>
+      <div class="chead"><span id="ylab">Final score, mean over runs</span></div>
       <div class="plot" id="lbplot"><svg id="lbsvg" role="img" aria-label="Leaderboard chart"></svg><div class="tip" id="lbtip" hidden></div></div>
       <div class="legend" id="lblegend" hidden></div>
       <button class="pill lg custom" id="custom" type="button" aria-expanded="false" aria-controls="settings">
