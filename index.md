@@ -21,20 +21,15 @@ page_css: fcs2
 
   <div class="example" id="example">
     <div class="ex-task">
-      <div class="meta"><span class="tag" id="extag"></span><span class="exlab">Example run</span></div>
+      <span class="tag" id="extag"></span>
       <h3 class="ex-name"><a id="exname" href="{{ '/task/' | relative_url }}"></a></h3>
       <p class="ex-paper" id="expaper"></p>
-      <p class="ex-desc" id="exdesc"></p>
-      <figure class="chart ex-strip">
-        <div class="chead"><span>Final scores on this task</span><span class="r" id="exstriplab"></span></div>
-        <div class="plot" id="stripplot"><svg id="stripsvg" role="img" aria-label="Final score of every run on this task, and the authors’ code"></svg><div class="tip" id="striptip" hidden></div></div>
-      </figure>
+      <p class="ex-model"><i id="exdot"></i><span id="exmodel"></span></p>
     </div>
-    <figure class="chart ex-run" id="runcurve">
-      <div class="chead"><span id="runhead">Development score against cost</span></div>
-      <div class="plot" id="runplot"><svg id="runsvg" role="img" aria-label="Development score against cost for one run"></svg><div class="tip" id="runtip" hidden></div></div>
-      <div class="cfoot"><span id="runnote"></span><button class="pill" type="button" id="runnext">Another run</button></div>
-    </figure>
+    <div class="ex-run">
+      <div class="plot" id="runplot"><svg id="runsvg" role="img" aria-label="An example run: its score rising with what it spent"></svg></div>
+      <div class="ex-dots" id="exdots" aria-label="Example runs"></div>
+    </div>
   </div>
 
   <figure class="chart" id="teaser">
