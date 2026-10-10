@@ -164,8 +164,8 @@ OVERVIEW = {
     '03-pass-cost': """() => {
       const top = RANKED.reduce((a, b) => PASS[a.id][0] >= PASS[b.id][0] ? a : b), ratio = COST.ds[0] / COST.sol[0];
       console.assert(top.id === 'astra' && Math.abs(PASS.ds[0] - PASS.sol[0]) < 1 && ratio > .15 && ratio < .25, 'pass/cost wording');
-      const v = card('stack', `A ${money(COST.ds[0])} run ties a ${money(COST.sol[0])} run.`,
-        `DeepSeek V4.1 Flash passes as often as GPT-6.1 Sol: ${Math.round(PASS.ds[0])}% of runs.`,
+      const v = card('stack', 'Pass rate vs. price',
+        'One dot per model.',
         `${PRE} · a pass beats the authors’ code on every hidden workload`);
       fit(v, 'pc'); v.append(document.getElementById('pcplot')); drawPassCost();
     }""",
@@ -174,9 +174,9 @@ OVERVIEW = {
       const sc = m => RUNS.filter(r => r.m === m.id).map(r => r.s), mu = m => mean(sc(m)), top = [...MODELS].sort((a, b) => mu(b) - mu(a));
       const hi = Math.floor(Math.min(...MODELS.map(m => Math.max(...sc(m))))), lo = Math.ceil(Math.max(...MODELS.map(m => Math.min(...sc(m)))));
       console.assert(hi >= 95 && lo <= 10, 'mean-score wording', hi, lo);
-      const v = card('stack', `Every model hits ${hi}. Every model also drops below ${lo}.`,
-        `Run to run, scores swing across the whole scale. The averages sit ${(mu(top[0]) - mu(top.at(-1))).toFixed(0)} points apart.`,
-        `${PRE} · one dot per run, the large dot is the mean`);
+      const v = card('stack', 'Mean score by model',
+        'One dot per run.',
+        `${PRE} · the large dot is the model’s mean`);
       CHART_H.lbLane = Math.floor((v.clientHeight - 54) / MODELS.length); v.append(document.getElementById('lbplot')); drawLB(); oneLine(document.getElementById('lbsvg'));
     }""",
     # FECI: the overview's chart; the headline names the models whose whole 90% interval is above Human
@@ -184,8 +184,8 @@ OVERVIEW = {
       const above = RANKED.filter(m => ECI[m.id][1] > ECI_HUMAN).map(m => m.name);
       const near = RANKED.filter(m => ECI[m.id][1] <= ECI_HUMAN && ECI[m.id][2] >= ECI_HUMAN).length;
       console.assert(above.length === 2 && near === MODELS.length - 2, 'FECI wording', above, near);
-      const v = card('stack', 'Only 2 of 7 models reliably beat the authors.',
-        `${above.join(' and ')}. The other ${near} are within noise of the authors’ own code.`,
+      const v = card('stack', 'Two models beat the authors',
+        `${above.join(' and ')} clear the authors’ code. The rest are within noise.`,
         `${PRE} · FECI, fitted with Epoch AI’s ECI code`);
       CHART_H.eciLane = Math.floor((v.clientHeight - 60) / MODELS.length); v.append(document.getElementById('eciplot')); drawECI(); oneLine(document.getElementById('ecisvg'));
     }""",
@@ -193,15 +193,15 @@ OVERVIEW = {
     '06-scaling': """() => {
       const reach = id => { const c = SCALE[id], f = c.at(-1)[1]; return c.find(p => p[1] >= f - 1)[0]; };
       const ds = reach('ds'), astra = reach('astra'); console.assert(ds < 1 && astra > 5, 'scaling wording', ds, astra);
-      const v = card('stack', `DeepSeek tops out at $${ds.toFixed(2)}. Astra climbs to $${Math.round(astra)}.`,
-        'FECI as the budget per run grows.',
-        `${PRE} · FECI at each budget per run`);
+      const v = card('stack', 'FECI vs. budget per run',
+        'Each run counts its latest valid submission at the budget.',
+        PRE);
       fit(v, 'tts', 30); v.append(document.getElementById('ttsplot'), document.getElementById('ttslegend')); drawTTS();
     }""",
     # where to look: a sample of task illustrations
     '07-explore': """() => {
-      const v = card('side', 'Think your agent can beat the authors?',
-        `${TASKS.length} tasks. The authors’ code is the bar.`, '');
+      const v = card('side', `Explore all ${TASKS.length} tasks`,
+        'Each with its paper and every model’s runs.', '');
       const pick = AREAS.flatMap(a => TASKS.filter(t => a.d.includes(t.d)).slice(0, 2).map(t => [t, a.k])).slice(0, 12);
       const cols = 3, gw = 470, gap = 6, tw = (gw - gap * (cols - 1)) / cols, th = tw / 1.5;
       v.style.display = 'grid'; v.style.gridTemplateColumns = `repeat(${cols}, ${tw}px)`; v.style.gap = `${gap}px`; v.style.alignContent = 'center';
