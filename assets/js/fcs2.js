@@ -11,10 +11,16 @@ const reveal = el => { const p = el.parentElement, pr = p.getBoundingClientRect(
 
 /* ---------- sub-nav scrollspy ---------- */
 const subLinks = [...document.querySelectorAll('#subnav a')];
-const spy = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) {
-  subLinks.forEach(a => a.classList.toggle('on', a.getAttribute('href') === '#' + e.target.id));
-  const on = subLinks.find(a => a.classList.contains('on')); on && reveal(on); } }), {rootMargin:'-45% 0px -50% 0px'});
-['overview','leaderboard','cases','tasks','questions'].forEach(id => spy.observe(document.getElementById(id)));
+// The section on screen is the last one whose top has passed just under the sticky bar; at the page's end, the last section.
+// (A band in mid-screen picked the next section whenever a short one, like the case-studies placeholder, sat at the top.)
+const SECS = ['overview','leaderboard','tasks','cases','questions'].map(id => document.getElementById(id));
+let spyRaf = 0;
+const spy = () => { spyRaf = 0;
+  const bar = $('.sub').getBoundingClientRect().bottom + 24, end = innerHeight + scrollY >= document.documentElement.scrollHeight - 2;
+  const cur = end ? SECS[SECS.length - 1] : SECS.filter(e => e.getBoundingClientRect().top <= bar).pop() || SECS[0];
+  subLinks.forEach(a => a.classList.toggle('on', a.getAttribute('href') === '#' + cur.id));
+  const on = subLinks.find(a => a.classList.contains('on')); on && reveal(on); };
+addEventListener('scroll', () => { spyRaf ||= requestAnimationFrame(spy); }, {passive:true}); spy();
 
 /* ---------- leaderboard chart ---------- */
 let group = 'model', dom = 'All', showRuns = true;

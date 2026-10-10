@@ -7,7 +7,7 @@ page_css: fcs2
 ---
 <div class="fcs2">
 <nav class="sub" aria-label="Sections"><div class="col" id="subnav">
-  <a href="#overview" class="on">Overview</a><a href="#leaderboard">Leaderboard</a><a href="#cases">Case studies</a><a href="#tasks">Tasks</a><a href="#questions">Questions</a>
+  <a href="#overview" class="on">Overview</a><a href="#leaderboard">Leaderboard</a><a href="#tasks">Tasks</a><a href="#cases">Case studies</a><a href="#questions">Questions</a>
 </div></nav>
 
 <div class="col" id="main" tabindex="-1">
@@ -85,11 +85,6 @@ page_css: fcs2
   </div>
 </section>
 
-<section class="sec" id="cases">
-  <h2>Case studies</h2>
-  <p class="tbd">Case studies of single runs from the preview will appear here.</p>
-</section>
-
 <section class="sec" id="tasks">
   <h2>Tasks</h2>
   <div class="idx">
@@ -112,6 +107,11 @@ page_css: fcs2
       <button class="pill lg showmore" type="button" id="showmore">Show more</button>
     </div>
   </div>
+</section>
+
+<section class="sec" id="cases">
+  <h2>Case studies</h2>
+  <p class="tbd">Case studies of single runs from the preview will appear here.</p>
 </section>
 
 <section class="sec" id="questions">
