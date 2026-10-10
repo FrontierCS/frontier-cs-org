@@ -40,8 +40,10 @@ function drawPassCost() {
   const svg = $('#pcsvg'), W = Math.max(300, $('#pcplot').clientWidth), narrow = W < 560;
   const L = 44, R = narrow ? 12 : 24, T = 14, B = 46, H = narrow ? 320 : 400;
   const ms = MODELS.filter(m => COST[m.id]), tx = ms.map(m => COST[m.id][0]);
-  // the axis runs to the half decade past the outermost dot plus 0.15 decade, so an edge dot keeps room for its label
-  const x0 = Math.floor((Math.log10(Math.min(...tx)) - .15) * 2) / 2, x1 = Math.ceil((Math.log10(Math.max(...tx)) + .15) * 2) / 2;
+  // the axis runs 0.15 decade past the outermost dots and no further (owner, 2026-10-10: half-decade rounding left
+  // the range loose); an edge dot whose label has no room on its outer side takes another spot
+  // (on phones the right side keeps a little more, so the label of the right-most dot in the $9 cluster still fits)
+  const x0 = Math.log10(Math.min(...tx)) - .15, x1 = Math.log10(Math.max(...tx)) + (narrow ? .3 : .15);
   const ymax = Math.min(100, Math.ceil((Math.max(...ms.map(m => PASS[m.id][0])) + 5) / 20) * 20);
   const X = v => L + (Math.log10(v) - x0) / (x1 - x0) * (W - L - R), Y = v => T + (1 - v / ymax) * (H - T - B);
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
@@ -63,10 +65,11 @@ function drawPassCost() {
     svg.append(sv('circle', {cx, cy, r:7, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':2, 'data-m':m.id}));
     const lab = sv('text', {class:'lab halo', x:cx, y:cy}, name); svg.append(lab);
     const w = lab.getComputedTextLength() + 2;
-    // right, left, above, below, the four diagonals, then the same a line further out; the first spot clear of every dot and placed label wins
+    // right, left, above, below, the four diagonals, then the same one and two lines further out; the first spot clear of every dot and placed label wins
     const spots = [[cx + 12, cy + 4.5, 'start'], [cx - 12, cy + 4.5, 'end'], [cx, cy - 13, 'middle'], [cx, cy + 22, 'middle'],
       [cx + 8, cy - 11, 'start'], [cx - 8, cy - 11, 'end'], [cx + 8, cy + 20, 'start'], [cx - 8, cy + 20, 'end'],
-      [cx, cy - 29, 'middle'], [cx, cy + 38, 'middle'], [cx + 6, cy - 27, 'start'], [cx - 6, cy - 27, 'end'], [cx + 6, cy + 36, 'start'], [cx - 6, cy + 36, 'end']];
+      [cx, cy - 29, 'middle'], [cx, cy + 38, 'middle'], [cx + 6, cy - 27, 'start'], [cx - 6, cy - 27, 'end'], [cx + 6, cy + 36, 'start'], [cx - 6, cy + 36, 'end'],
+      [cx, cy - 45, 'middle'], [cx, cy + 54, 'middle'], [cx - 6, cy - 43, 'end'], [cx - 6, cy + 52, 'end']];
     const box = ([x, y, an]) => ({x:an === 'start' ? x : an === 'end' ? x - w : x - w / 2, y:y - 12, w, h:16});
     const hit = q => boxes.some(o => q.x < o.x + o.w && o.x < q.x + q.w && q.y < o.y + o.h && o.y < q.y + q.h) || q.x < L || q.x + q.w > W || q.y < 0;
     const spot = spots.find(sp => !hit(box(sp)));
