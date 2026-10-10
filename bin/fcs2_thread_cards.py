@@ -113,15 +113,17 @@ OVERVIEW = {
     # a teaser before the release: the paper card's layout unchanged (owner: the paper card suits a teaser), teaser
     # a teaser before the release (owner: only the picture and "FrontierCS 2, coming soon"): the paper card's wall on the
     # a teaser before the release (owner: only the picture and "FrontierCS 2, coming soon"; the logo and the address in
-    # a teaser before the release (owner: only the picture and "FrontierCS 2, coming soon"; the logo and the address in
-    # their usual places): the top bar as on every card, the name and "Coming soon" on the left, and on the right a wall of
+    # a teaser before the release (owner: the picture, "FrontierCS 2", a little context, "Coming soon"; the logo and the
+    # address in their usual places): the top bar as on every card, the name, "AI for Computer Science R&D" (the owner's
+    # words) and "Coming soon" on the left, and on the right a wall of
     # the tasks' paper first pages on the site's tilted plane, sharper (800 px renders) and larger than the site's, the most
     # colourful pages (figures on the first page) nearest the centre
     '00-teaser': """() => {
       const v = card('side', '', '', ''), c = v.closest('.tcard'), hd = c.querySelector('.tc-hd');
       hd.style.width = '410px';
       hd.innerHTML = `<div style="font-size:56px; font-weight:600; letter-spacing:-.02em; line-height:1; white-space:nowrap">FrontierCS 2</div>
-        <div style="font-size:24px; font-weight:500; color:#0b57d0; margin-top:16px">Coming soon</div>`;
+        <div style="font-size:24px; font-weight:500; color:#5f6368; margin-top:14px; white-space:nowrap">AI for Computer Science R&amp;D</div>
+        <div style="font-size:24px; font-weight:500; color:#0b57d0; margin-top:26px">Coming soon</div>`;
       const cols = 5, rows = 5, pw = 168, ph = Math.round(pw * 1.294), gap = 16, cells = [];
       for (let r = 0; r < rows; r++) for (let q = 0; q < cols; q++) cells.push([q, r, Math.hypot(q - (cols - 1) / 2, (r - (rows - 1) / 2) * 1.2)]);
       cells.sort((a, b) => a[2] - b[2]);
