@@ -231,6 +231,12 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
   .faq details[open]::details-content{block-size:auto}
 }
 .tbd{color:var(--ink-2); font-size:16px; margin:0}
+/* private set: blurred task illustrations under locks (the post card's picture) */
+.locked{display:grid; grid-template-columns:repeat(6, minmax(0,1fr)); gap:6px; margin-top:24px}
+.lk-tile{position:relative; aspect-ratio:3/2; border-radius:8px; overflow:hidden}
+.lk-art{position:absolute; inset:-12%; filter:blur(9px) saturate(1.1)}
+.lk-lock{position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:38px; height:38px; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center; box-shadow:0 1px 4px rgba(32,33,36,.2)}
+@media (max-width:640px){ .locked{grid-template-columns:repeat(3, minmax(0,1fr))} .lk-lock{width:32px; height:32px} }
 
 /* task pages (_pages/fcs2-task.md, assets/js/fcs2-task.js) */
 .taskpage .col{padding-bottom:100px}

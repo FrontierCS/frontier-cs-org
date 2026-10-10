@@ -8,7 +8,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
 ---
 <div class="fcs2">
 <nav class="sub" aria-label="Sections"><div class="col" id="subnav">
-  <a href="#overview" class="on">Overview</a><a href="#leaderboard">Leaderboard</a><a href="#tasks">Tasks</a><a href="#cases">Case studies</a><a href="#questions">Questions</a>
+  <a href="#overview" class="on">Overview</a><a href="#leaderboard">Leaderboard</a><a href="#tasks">Tasks</a><a href="#private">Private set</a><a href="#cases">Case studies</a><a href="#questions">Questions</a>
 </div></nav>
 
 <div class="col" id="main" tabindex="-1">
@@ -107,6 +107,12 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
       <button class="pill lg showmore" type="button" id="showmore">Show more</button>
     </div>
   </div>
+</section>
+
+<section class="sec" id="private">
+  <h2>Private set</h2>
+  <p class="tbd">Tasks we don’t release.</p>
+  <div class="locked" id="locked" aria-hidden="true"></div>
 </section>
 
 <section class="sec" id="cases">

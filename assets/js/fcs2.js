@@ -13,7 +13,7 @@ const reveal = el => { const p = el.parentElement, pr = p.getBoundingClientRect(
 const subLinks = [...document.querySelectorAll('#subnav a')];
 // The section on screen is the last one whose top has passed just under the sticky bar; at the page's end, the last section.
 // (A band in mid-screen picked the next section whenever a short one, like the case-studies placeholder, sat at the top.)
-const SECS = ['overview','leaderboard','tasks','cases','questions'].map(id => document.getElementById(id));
+const SECS = ['overview','leaderboard','tasks','private','cases','questions'].map(id => document.getElementById(id));
 let spyRaf = 0;
 const spy = () => { spyRaf = 0;
   const bar = $('.sub').getBoundingClientRect().bottom + 24, end = innerHeight + scrollY >= document.documentElement.scrollHeight - 2;
@@ -404,6 +404,13 @@ function drawPapers() {
   $('#pplane').innerHTML = h;
 }
 drawPapers();
+
+/* The private set (owner, 2026-10-10: a separate set of tasks that is not released; no count): task illustrations blurred
+   past recognition, each under a lock, the same picture as the private-set post card. Decorative for assistive technology. */
+(() => { const all = AREAS.flatMap(a => TASKS.filter(t => a.d.includes(t.d)).map(t => [t, a.k]));
+  const lock = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.2" fill="#3c4043"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="#3c4043" stroke-width="2.2" stroke-linecap="round"/></svg>';
+  $('#locked').innerHTML = Array.from({length:6}, (_, i) => all[Math.floor((i + .5) * all.length / 6)]).map(([t, k]) =>
+    `<div class="lk-tile" style="background:${ART_FIELD[k]}"><div class="lk-art">${taskArt(t.s, k).replace('<svg class="art"', '<svg width="100%" height="100%" preserveAspectRatio="xMidYMid slice"')}</div><span class="lk-lock">${lock}</span></div>`).join(''); })();
 drawPassCost(); drawTable(); drawLB(); drawECI(); drawTTS(); drawMap(); drawRows();
 // labels are placed by measured text width, so draw again once the web font has loaded and the widths are final
 if (document.fonts) document.fonts.ready.then(() => { drawPassCost(); drawLB(); drawECI(); drawTTS(); drawMap(); });
