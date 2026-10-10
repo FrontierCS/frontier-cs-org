@@ -141,4 +141,5 @@ page_css: fcs2
 </div>
 </div>
 <script defer src="{{ '/assets/js/fcs2-data.js' | relative_url }}"></script>
+<script defer src="{{ '/assets/js/fcs2-art.js' | relative_url }}"></script>
 <script defer src="{{ '/assets/js/fcs2.js' | relative_url }}"></script>

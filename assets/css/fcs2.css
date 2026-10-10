@@ -208,8 +208,9 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 .map svg{display:block; width:100%; -webkit-tap-highlight-color:transparent}
 .map .blk{cursor:pointer; transition:opacity .2s; outline:none}
 .map .blk text{font-family:var(--sans); pointer-events:none}
-.map .blk:focus-visible rect{stroke:var(--teal); stroke-width:2}
-@media (hover:hover){ .map .blk:hover rect{filter:brightness(.96)} }
+.map .blk .tile{transition:opacity .2s}
+.map .blk:focus-visible .tile{opacity:.8}
+@media (hover:hover){ .map .blk:hover .tile{opacity:.88} }
 .map .tip{white-space:normal; width:max-content; max-width:min(280px,80vw)}
 .areas{display:flex; flex-wrap:wrap; gap:6px 18px; margin-top:12px; font-size:13.5px; color:var(--ink-2)}
 .areas span{display:inline-flex; align-items:center; gap:7px}

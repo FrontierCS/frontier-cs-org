@@ -337,7 +337,7 @@ function squarify(vals, x, y, w, h) {
   }
   return out;
 }
-$('#areas').innerHTML = AREAS.map(a => `<span><i style="background:${AFILL[a.k]}"></i>${esc(a.name)}</span>`).join('');
+$('#areas').innerHTML = AREAS.map(a => `<span><i style="background:${ART_FIELD[a.k]}"></i>${esc(a.name)}</span>`).join('');
 const nRan = d => TASKS.filter(t => t.d === d && RAN.has(t.s)).length;
 function drawMap() {
   const svg = $('#mapsvg'), W = $('#map').clientWidth, narrow = W < 640, H = narrow ? Math.round(W * 1.15) : Math.round(W * 0.36);
@@ -349,25 +349,27 @@ function drawMap() {
       const d = doms[j], n = N_IN(d), on = picked.has(d);
       const x0 = x + (x > tol ? G / 2 : 0), y0 = y + (y > tol ? G / 2 : 0), x1 = x + w - (x + w < W - tol ? G / 2 : 0), y1 = y + h - (y + h < H - tol ? G / 2 : 0), bw = x1 - x0, bh = y1 - y0;
       const g = sv('g', {class:'blk', tabindex:0, role:'button', 'aria-pressed':String(on), 'aria-label':`${d}, ${n} task${n > 1 ? 's' : ''}`, 'data-d':d, opacity: picked.size && !on ? .32 : 1});
-      g.append(sv('rect', {x:x0, y:y0, width:bw, height:bh, rx:narrow ? 6 : 8, fill:AFILL[a.k]}));
+      // the block holds one illustration per task (fcs2-art.js), in rows that keep each tile closest to 3:2, framed by thin white seams
+      const ts = TASKS.filter(t => t.d === d), gap = 2, cid = `mapclip${k}_${j}`;
+      let rows = 1, sc = 1e9; for (let r = 1; r <= n; r++) { const c = Math.ceil(n / r), v = Math.abs(Math.log((bw / c) / (bh / r) / 1.5)); if (v < sc) { sc = v; rows = r; } }
+      let i = 0, tiles = '';
+      for (let r = 0; r < rows; r++) { const cnt = Math.floor(n / rows) + (r < n % rows ? 1 : 0), th = (bh - gap * (rows - 1)) / rows, tw = (bw - gap * (cnt - 1)) / cnt;
+        for (let c = 0; c < cnt; c++, i++) tiles += taskArt(ts[i].s, a.k).replace('<svg class="art"', `<svg class="tile" x="${(x0 + c * (tw + gap)).toFixed(1)}" y="${(y0 + r * (th + gap)).toFixed(1)}" width="${tw.toFixed(1)}" height="${th.toFixed(1)}" preserveAspectRatio="xMidYMid slice"`); }
+      g.insertAdjacentHTML('beforeend', `<clipPath id="${cid}"><rect x="${x0}" y="${y0}" width="${bw}" height="${bh}" rx="${narrow ? 6 : 8}"/></clipPath><g clip-path="url(#${cid})"><rect x="${x0}" y="${y0}" width="${bw}" height="${bh}" fill="#fff"/>${tiles}</g>`);
       svg.append(g);
-      // label: the largest size at which some layout fits. Layouts: name over count, name on two lines over count,
-      // name and count on one line, the same stood up along the left edge, the name alone stood up
-      const ink = AINK[a.k], words = d.split(' '), sizes = narrow ? [20, 16, 13, 11, 9.5] : [30, 24, 19, 15, 12, 10.5];
-      const meas = (str, fs, wt) => { const t = sv('text', {x:-999, y:-999, 'font-size':fs, 'font-weight':wt}, str); svg.append(t); const w = t.getComputedTextLength(); t.remove(); return w; };
-      const put = (str, x, y, fs, wt, rot) => g.append(sv('text', {x, y, 'font-size':fs, 'font-weight':wt, fill:ink, transform: rot ? `rotate(-90 ${x} ${y})` : null}, str));
-      let done = false;
-      for (const fs of sizes) {
-        const pad = fs < 13 ? 6 : narrow ? 10 : 14, lh = fs * 1.15, nameW = meas(d, fs, 600), both = meas(`${d}  ${n}`, fs, 600);
-        const lines = words.length > 1 ? [words.slice(0, -1).join(' '), words.at(-1)] : null;
-        const tx = x0 + pad, ty = y0 + pad + fs * .8;
-        if (nameW + 2 * pad <= bw && lh * 2 + pad * 1.4 <= bh) { put(d, tx, ty, fs, 600); put(n, tx, ty + lh, fs, 400); done = true; }
-        else if (lines && Math.max(...lines.map(l => meas(l, fs, 600))) + 2 * pad <= bw && lh * 3 + pad * 1.4 <= bh) { put(lines[0], tx, ty, fs, 600); put(lines[1], tx, ty + lh, fs, 600); put(n, tx, ty + 2 * lh, fs, 400); done = true; }
-        else if (both + 2 * pad <= bw && lh + pad * 1.4 <= bh) { put(`${d}  ${n}`, tx, ty, fs, 600); done = true; }
-        else if (both + 2 * pad <= bh && fs + 2 * pad <= bw) { put(`${d}  ${n}`, x0 + pad + fs * .8, y1 - pad, fs, 600, true); done = true; }
-        else if (fs === sizes.at(-1) && nameW + 8 <= bh && fs + 6 <= bw) { put(d, x0 + 3 + fs * .8, y1 - 4, fs, 600, true); done = true; }
-        if (done) break;
-      }
+      // a white chip at the top left: name and count, then the name alone, lying flat, then standing up along the left edge
+      const ink = AINK[a.k], meas = (str, fs) => { const t = sv('text', {x:-999, y:-999, 'font-size':fs, 'font-weight':600}, str); svg.append(t); const w = t.getComputedTextLength(); t.remove(); return w; };
+      for (const rot of [false, true]) { let done = false;
+        for (const cnt of [true, false]) { for (const fs of narrow ? [13, 11, 10] : [15, 13, 11]) {
+          const pw = meas(cnt ? `${d}  ${n}` : d, fs) + fs * 1.2, ph = fs * 1.75, m = fs < 13 ? 4 : 8, along = rot ? bh : bw, across = rot ? bw : bh;
+          if (pw + 2 * m > along || ph + 2 * m > across) continue;
+          const ox = x0 + m, oy = rot ? y0 + bh - m : y0 + m, chip = sv('g', {'pointer-events':'none', transform:rot ? `rotate(-90 ${ox} ${oy})` : null});
+          chip.append(sv('rect', {x:ox, y:oy, width:pw.toFixed(1), height:ph.toFixed(1), rx:(ph / 2).toFixed(1), fill:'#fff'}));
+          const t = sv('text', {x:(ox + fs * .6).toFixed(1), y:(oy + ph * .68).toFixed(1), 'font-size':fs, 'font-weight':600, fill:ink}, d);
+          if (cnt) t.append(sv('tspan', {'font-weight':400, dx:fs * .45}, n));
+          chip.append(t); g.append(chip); done = true; break; }
+          if (done) break; }
+        if (done) break; }
     });
   });
 }
