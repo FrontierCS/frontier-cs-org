@@ -1507,6 +1507,7 @@ footer.foot { margin-top: 120px; padding: 56px 0 28px; background: #202124; colo
 .fcs1 .prob .lk { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 14px; margin-top: 16px; }
 .fcs1 .prob .lk a { color: var(--ink-2); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--line-2); } .fcs1 .prob .lk a:hover { color: var(--teal); }
 .fcs1 .pnote { margin-top: 28px; }
+.fcs1 .ans pre { margin: 0 0 14px; padding: 12px 14px; background: var(--soft); border-radius: 6px; font-family: var(--font-code); font-size: 14px; line-height: 1.5; color: var(--ink); overflow-x: auto; white-space: pre; }
 .fcs1 .more { margin: 36px 0 0; }
 /* In research: papers that use the benchmark, grouped by what they use it for (a plain list, unlike the FrontierCS 2 paper wall) */
 .fcs1 #research .tbd { max-width: 40em; font-size: 17px; line-height: 1.5; }
