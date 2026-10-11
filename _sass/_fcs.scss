@@ -1644,6 +1644,15 @@ a.tm-n:hover { color: var(--accent-hover); text-decoration-color: currentColor; 
 .tm-a { font-size: 14px; color: var(--ink-3); margin-top: 2px; }
 .tm-mail { font-size: 14px; color: var(--ink-2); margin-top: 4px; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--rule); overflow-wrap: anywhere; }
 .tm-mail:hover { color: var(--accent-hover); }
+/* the author lists fold away; the heading with its count is the control (as the folded table on the FrontierCS 2 page) */
+.team-fold { border-top: 1px solid var(--rule); } .team-fold:last-of-type { border-bottom: 1px solid var(--rule); }
+.team-fold summary { list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 0; cursor: pointer; }
+.team-fold summary::-webkit-details-marker { display: none; }
+.team-fold summary .team-group { margin: 0; }
+.team-fold summary::after { content: ""; flex: none; width: 14px; height: 14px; background: linear-gradient(currentColor, currentColor) center / 14px 1.6px no-repeat, linear-gradient(currentColor, currentColor) center / 1.6px 14px no-repeat; transition: background-size .2s; }
+.team-fold[open] summary::after { background-size: 14px 1.6px, 1.6px 0; }
+.team-fold summary:hover .team-group { color: var(--accent-hover); }
+.team-fold .team-grid { padding: 4px 0 22px; }
 .team-note { font-size: 14px; color: var(--ink-3); margin: 18px 0 0; }
 .contact-grid { margin-top: 6px; }
 .logo-wall { list-style: none; margin: 24px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)); gap: 40px 28px; align-items: center; }

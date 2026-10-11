@@ -21,15 +21,19 @@ permalink: /team/
     <p class="sec-intro">The {{ everyone.size }} authors of <a href="{{ t.url }}" target="_blank" rel="noopener noreferrer">{{ t.title }}</a>, {{ t.venue }}, in paper order.</p>
   </div></div>
 
-  <h3 class="team-group">Contributors <span>{{ t.contributors.size }}</span></h3>
-  <ul class="team-grid">
-    {%- for p in t.contributors %}{% include team_person.html p=p eq="Equal contribution" %}{% endfor %}
-  </ul>
+  <details class="team-fold">
+    <summary><h3 class="team-group">Contributors <span>{{ t.contributors.size }}</span></h3></summary>
+    <ul class="team-grid">
+      {%- for p in t.contributors %}{% include team_person.html p=p eq="Equal contribution" %}{% endfor %}
+    </ul>
+  </details>
 
-  <h3 class="team-group">Advisors <span>{{ t.advisors.size }}</span></h3>
-  <ul class="team-grid">
-    {%- for p in t.advisors %}{% include team_person.html p=p eq="Equal advising" %}{% endfor %}
-  </ul>
+  <details class="team-fold">
+    <summary><h3 class="team-group">Advisors <span>{{ t.advisors.size }}</span></h3></summary>
+    <ul class="team-grid">
+      {%- for p in t.advisors %}{% include team_person.html p=p eq="Equal advising" %}{% endfor %}
+    </ul>
+  </details>
   <p class="team-note">* Equal contribution among contributors; equal advising among advisors.</p>
 </div>
 </section>
