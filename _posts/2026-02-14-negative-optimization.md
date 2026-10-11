@@ -43,21 +43,21 @@ _styles: >
   }
 ---
 
-<img src="{{ site.baseurl }}/assets/img/2026-02-14-negative-optimization/image2.png" alt="Performance Contrast: Algorithm vs. Heuristic" class="hero">
+<img src="{{ site.baseurl }}/assets/img/2026-02-14-negative-optimization/closed-vs-open.svg" alt="A closed-ended problem has one accepted answer; an open-ended problem has many valid answers with different scores (numbers illustrative)" class="hero">
 
 According to official technical reports, Deep Think's model achieves a Codeforces elo rating of 3455. Our independent evaluation estimates Deep Think's actual rating to be roughly 3299. However, during the open-ended AtCoder Heuristic Contest (AHC), the model only managed non-zero scores on under **50%** of the problems — a strong contrast to its performance on traditional algorithms. We conducted detailed cause analysis and case study based on the result.
 
 ## The Real-World Evaluation Gap
 
-In actual working environment, a consistent trend has been noticed widely: Modern LLMs' (etc. Deep Think) effectiveness in actual work environments isn't nearly as outstanding as their amazing performance on traditional algorithmic benchmarks shows.
+In actual working environment, a consistent trend has been noticed widely: the effectiveness of modern LLMs (e.g. Deep Think) in actual work environments isn't nearly as outstanding as their amazing performance on traditional algorithmic benchmarks shows.
 
 Unlike solving standard competitive programming problems with fixed boundaries, real-world work fundamentally tests a model's capacity for continual learning and adaptation. There is a significant mismatch between current model behaviors and what traditional algorithmic benchmarks actually measure. To truly evaluate a model's ability to handle complex, ambiguous scenarios, we must test it using open-ended problems.
 
 To illustrate this, we evaluated Deep Think on two entirely different tracks: 30 of the newest Codeforces problems with a high difficulty rating of 2500+ (representing traditional, strict-boundary algorithmic tasks), alongside all 33 short-format problems from the AtCoder Heuristic Contest (representing open-ended, heuristic challenges).
 
-<img src="{{ site.baseurl }}/assets/img/2026-02-14-negative-optimization/image1.png" alt="Performance Contrast: Algorithm vs. Heuristic" class="hero">
+<img src="{{ site.baseurl }}/assets/img/2026-02-14-negative-optimization/image1.png" alt="Result distributions: Codeforces problems on the left, AtCoder Heuristic Contest problems on the right" class="hero">
 
-The data reveals a suprising contrast. We found that the model produces a massive volume of failure cases when attempting open-ended heuristic problems, given it's near human. This high failure rate completely mismatches the model's supposedly superhuman, high-confidence performance in traditional algorithmic domains.
+The data reveals a surprising contrast. We found that the model produces a massive volume of failure cases when attempting open-ended heuristic problems, even though it is near human level. This high failure rate completely mismatches the model's supposedly superhuman, high-confidence performance in traditional algorithmic domains.
 
 To understand exactly why this breakdown occurs and how models fall into these optimization traps, we conducted a detailed case study.
 
@@ -93,13 +93,13 @@ The model attempted to split its query budget into stages, testing highly compos
 
 ## The Anatomy of the Trap
 
-<img src="{{ site.baseurl }}/assets/img/2026-02-14-negative-optimization/image5.jpg" alt="Performance Contrast: Algorithm vs. Heuristic" class="hero">
+<img src="{{ site.baseurl }}/assets/img/2026-02-14-negative-optimization/query-budget.svg" alt="Round 1 uses about 1,200 queries for about 20 points; round 2 spends 800 queries on staged guesses and then runs past the 2,500-query limit" class="hero">
 
 This looks like sophisticated engineering, but it is a catastrophic theoretical failure. 
 
 The LLM optimized purely for the **average case** (composite numbers) while entirely blinding itself to the **worst case** (prime numbers). If the cycle length S is a large prime like 999,983, it shares no factors with the model's composite guesses. The effective cycle length remains unchanged, and the "optimization" yields zero benefit. 
 
-Then as a result, the model fragmented its strict query budget. By the time it realized its heuristic trick was failing on prime numbers, it had wasted 800 queries. Starting the fallback random search with a massive 800-query debt pushed the total past the 2500 limit. 
+As a result, the model fragmented its strict query budget. By the time it realized its heuristic trick was failing on prime numbers, it had wasted 800 queries. Starting the fallback random search with a massive 800-query debt pushed the total past the 2500 limit. 
 
 **The result: A stable 20-point baseline was "optimized" into a 0-point failure.**
 
@@ -107,16 +107,16 @@ Then as a result, the model fragmented its strict query budget. By the time it r
 
 This behavior highlights a profound issue with modern LLMs. During post-training, AI institutions frequently optimize for state-of-the-art benchmark scores by artificially encouraging the model to take risks instead of stable choices. By generating multiple diverse rollouts and selecting only the highest-scoring one—a technique known as Best-of-N sampling—the training process disproportionately rewards high-variance, speculative logic over safe, incremental improvements. Consequently, the fully trained model naturally defaults to risky, "all-or-nothing" gambles rather than stable optimization methods.
 
-<img src="{{ site.baseurl }}/assets/img/2026-02-14-negative-optimization/image4.jpg" alt="Performance Contrast: Algorithm vs. Heuristic" class="hero">
+<img src="{{ site.baseurl }}/assets/img/2026-02-14-negative-optimization/best-of-n.svg" alt="Best-of-N keeps the top rollout, so a policy with a wide spread of scores is rewarded over a steady one (illustrative scores)" class="hero">
 
-When faced with a difficult optimization task lacking a strict, immediate verifier, the model resorts to a "lazy" strategy. Instead of doing the grueling work of designing a universally stable improvement, it speculates. It chooses unstable, point-cheating tricks that create the illusion of problem-solving but performs terribly under the pressure of strong, worst-case test data. The model effectively hit a cognitive ceiling, opting for giving an incorrect optimization rather than acknowledging the limits of its reasoning.
+When faced with a difficult optimization task lacking a strict, immediate verifier, the model resorts to a "lazy" strategy. Instead of doing the grueling work of designing a universally stable improvement, it speculates. It chooses unstable, point-cheating tricks that create the illusion of problem-solving but performs terribly under the pressure of strong, worst-case test data. The model effectively hit a cognitive ceiling, opting to give an incorrect optimization rather than acknowledging the limits of its reasoning.
 
 ## Real-World Implications
 
-<img src="{{ site.baseurl }}/assets/img/2026-02-14-negative-optimization/image6.jpg" alt="Performance Contrast: Algorithm vs. Heuristic" class="hero">
+<img src="{{ site.baseurl }}/assets/img/2026-02-14-negative-optimization/binary-vs-continuous.svg" alt="A pass or fail benchmark puts different systems in one bucket; a continuous score tells them apart" class="hero">
 
 This is why continuous scoring in benchmarks like FrontierCS is critical. In a binary pass/fail system, this regression might be masked. 
 
-More importantly, the open-ended problems in FrontierCS reveals the realities of actual software engineering. Production codebases and complex system architectures do not have a absolute, formal verifier. If we trust LLMs to autonomously optimize systems without strict bounds, they are highly intended to introducing fragile, edge-case-blind logic that works in theory but causes systemic collapse in practice. 
+More importantly, the open-ended problems in FrontierCS reveal the realities of actual software engineering. Production codebases and complex system architectures do not have an absolute, formal verifier. If we trust LLMs to autonomously optimize systems without strict bounds, they are highly likely to introduce fragile, edge-case-blind logic that works in theory but causes systemic collapse in practice. 
 
 While LLMs undoubtedly possess elite capabilities for isolated, well-defined algorithms, their performance in open-ended reasoning remains fundamentally unreliable. Treating them as omnipotent architects rather than powerful, specialized tools is a trap we cannot afford to fall into.
