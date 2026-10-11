@@ -145,7 +145,7 @@ function wmDiagonal(n, edges) {
 { const lf = document.querySelector('.lf'), lines = lf ? [...lf.querySelectorAll('[data-k]')] : [];
   if (lf && !reduced) { lf.classList.add('live'); const t0 = performance.now();
     const tick = () => { const t = ((performance.now() - t0) / 1000) % 30;
-      lines.forEach(l => l.classList.toggle('on', t >= (l.dataset.k - 1) * 6 + (l.classList.contains('tok') ? 4.6 : 3))); };
+      lines.forEach(l => l.classList.toggle('on', t >= (l.dataset.k - 1) * 6 + (l.classList.contains('tok') ? 4.8 : 3.4))); };
     tick(); setInterval(tick, 200); } }
 
 // leaderboard tabs
