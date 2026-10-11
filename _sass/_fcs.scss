@@ -1497,14 +1497,14 @@ footer.foot { margin-top: 120px; padding: 56px 0 28px; background: #202124; colo
 .fcs1 .loopfig svg { display: block; width: 100%; height: auto; }
 .fcs1 .loopfig figcaption, .fcs1 .pnote { font-size: 13.5px; line-height: 1.45; color: var(--muted-2); margin: 12px 0 0; text-wrap: balance; }
 .fcs1 .probs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 48px 32px; }
-.fcs1 .ptile { position: relative; margin: 0 0 22px; aspect-ratio: 4 / 3; }
+.fcs1 .ptile { position: relative; margin: 0 0 18px; aspect-ratio: 4 / 3; }
 .fcs1 .ptile canvas { display: block; width: 100%; height: 100%; }
 .fcs1 .ptile figcaption { position: absolute; left: 0; bottom: 6px; display: flex; flex-direction: column; gap: 1px; font-variant-numeric: tabular-nums; }
 .fcs1 .ptile figcaption b { font-size: 15px; font-weight: 600; color: var(--ink); } .fcs1 .ptile figcaption span { font-size: 12.5px; color: var(--muted); }
-.fcs1 .prob .meta { margin-bottom: 10px; }
+.fcs1 .prob .lk span { color: var(--muted-2); }
 .fcs1 .prob h3 { font-size: clamp(22px, 2.2vw, 28px); font-weight: 500; margin: 0 0 10px; }
 .fcs1 .prob p { margin: 0; color: var(--ink-2); font-size: 17px; line-height: 1.5; max-width: 36em; }
-.fcs1 .prob .lk { display: flex; flex-wrap: wrap; gap: 18px; font-size: 14px; margin-top: 16px; }
+.fcs1 .prob .lk { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 14px; margin-top: 16px; }
 .fcs1 .prob .lk a { color: var(--ink-2); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--line-2); } .fcs1 .prob .lk a:hover { color: var(--teal); }
 .fcs1 .pnote { margin-top: 28px; }
 .fcs1 .more { margin: 36px 0 0; }
