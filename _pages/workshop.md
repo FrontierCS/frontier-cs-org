@@ -19,7 +19,7 @@ page_css: fcs2
   <dl class="tstats">
     <div><dt>Format</dt><dd>Full day</dd><span>In person, non-archival</span></div>
     <div><dt>Submit by, tentative</dt><dd>Feb 1, 2027</dd><span>11:59 p.m. AoE</span></div>
-    <div><dt>Challenge, tentative</dt><dd>Feb 2&ndash;8, 2027</dd><span>Problem to be announced</span></div>
+    <div><dt>Challenge</dt><dd>To be announced</dd><span>Problem and dates</span></div>
     <div><dt>Decisions, tentative</dt><dd>Feb 26, 2027</dd><span>Posted on OpenReview</span></div>
   </dl>
 
@@ -44,36 +44,26 @@ page_css: fcs2
 
 <section class="sec" id="topics">
   <h2>Topics</h2>
-  <ul class="tp">
-    <li>Scaling at test time: harnesses, search, sampling, evolution</li>
-    <li>Multi-agent research: coordination, division of work, review</li>
-    <li>Training research agents: post-training, RL, synthetic data</li>
-    <li>Verification and trust: replication, falsification, self-made evidence</li>
-    <li>Failure modes: reward hacking, leakage, gains that do not transfer</li>
-    <li>Choosing questions: hypotheses, novelty, research taste</li>
-    <li>People and agents: collaborators, verifiers, sources of taste</li>
-    <li>Benchmarks and environments for open-ended CS tasks</li>
-    <li>Applied agents: systems, kernels, algorithm discovery</li>
-  </ul>
+  <div class="tpw"><ul class="tpr"><li style="--i:0; --h:#1a73e8; --l:#d2e3fc"><span class="tpi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V5M16 20v-8M22 20H2"/></svg></span><b>Scaling at test time</b><span>Harnesses, search, sampling, evolution</span></li><li style="--i:1; --h:#8e5bef; --l:#e6dcfd"><span class="tpi"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2.4"/><circle cx="5" cy="18" r="2.4"/><circle cx="19" cy="18" r="2.4"/><path d="M10.8 7.1 6.2 15.9M13.2 7.1l4.6 8.8M7.4 18h9.2"/></svg></span><b>Multi-agent research</b><span>Coordination, division of work, review</span></li><li style="--i:2; --h:#12a3a3; --l:#cdeeed"><span class="tpi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 0 1-14.3 4.9M4 12a8 8 0 0 1 14.3-4.9"/><path d="M18.5 3v4.2h-4.2M5.5 21v-4.2h4.2"/></svg></span><b>Training research agents</b><span>Post-training, RL, synthetic data</span></li><li style="--i:3; --h:#1a73e8; --l:#d2e3fc"><span class="tpi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5.5c0 4.3 2.9 7.6 7 9.5 4.1-1.9 7-5.2 7-9.5V6z"/><path d="m8.8 12 2.3 2.3 4.2-4.6"/></svg></span><b>Verification and trust</b><span>Replication, falsification, self-made evidence</span></li><li style="--i:4; --h:#8e5bef; --l:#e6dcfd"><span class="tpi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4 2.5 20h19z"/><path d="M12 10v4.5M12 17.2v.3"/></svg></span><b>Failure modes</b><span>Reward hacking, leakage, gains that do not transfer</span></li><li style="--i:5; --h:#12a3a3; --l:#cdeeed"><span class="tpi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M8.2 14.5A6 6 0 1 1 15.8 14.5c-.6.6-.8 1.2-.8 2H9c0-.8-.2-1.4-.8-2z"/></svg></span><b>Choosing questions</b><span>Hypotheses, novelty, research taste</span></li><li style="--i:6; --h:#1a73e8; --l:#d2e3fc"><span class="tpi"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M2.5 20c.4-3.4 2.6-5.5 5.5-5.5 1.2 0 2.3.4 3.2 1"/><rect x="13.5" y="11" width="8" height="7" rx="2"/><path d="M17.5 11V8.5M15.8 14.3v.4M19.2 14.3v.4"/></svg></span><b>People and agents</b><span>Collaborators, verifiers, sources of taste</span></li><li style="--i:7; --h:#8e5bef; --l:#e6dcfd"><span class="tpi"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".8"/></svg></span><b>Benchmarks and environments</b><span>Verifiable, open-ended CS tasks</span></li><li style="--i:8; --h:#12a3a3; --l:#cdeeed"><span class="tpi"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="6.5" width="11" height="11" rx="2"/><path d="M10 3v3.5M14 3v3.5M10 17.5V21M14 17.5V21M3 10h3.5M3 14h3.5M17.5 10H21M17.5 14H21"/></svg></span><b>Applied research agents</b><span>Systems, kernels, algorithm discovery</span></li><li style="--i:0; --h:#1a73e8; --l:#d2e3fc" aria-hidden="true"><span class="tpi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V5M16 20v-8M22 20H2"/></svg></span><b>Scaling at test time</b><span>Harnesses, search, sampling, evolution</span></li><li style="--i:1; --h:#8e5bef; --l:#e6dcfd" aria-hidden="true"><span class="tpi"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2.4"/><circle cx="5" cy="18" r="2.4"/><circle cx="19" cy="18" r="2.4"/><path d="M10.8 7.1 6.2 15.9M13.2 7.1l4.6 8.8M7.4 18h9.2"/></svg></span><b>Multi-agent research</b><span>Coordination, division of work, review</span></li><li style="--i:2; --h:#12a3a3; --l:#cdeeed" aria-hidden="true"><span class="tpi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 0 1-14.3 4.9M4 12a8 8 0 0 1 14.3-4.9"/><path d="M18.5 3v4.2h-4.2M5.5 21v-4.2h4.2"/></svg></span><b>Training research agents</b><span>Post-training, RL, synthetic data</span></li><li style="--i:3; --h:#1a73e8; --l:#d2e3fc" aria-hidden="true"><span class="tpi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5.5c0 4.3 2.9 7.6 7 9.5 4.1-1.9 7-5.2 7-9.5V6z"/><path d="m8.8 12 2.3 2.3 4.2-4.6"/></svg></span><b>Verification and trust</b><span>Replication, falsification, self-made evidence</span></li><li style="--i:4; --h:#8e5bef; --l:#e6dcfd" aria-hidden="true"><span class="tpi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4 2.5 20h19z"/><path d="M12 10v4.5M12 17.2v.3"/></svg></span><b>Failure modes</b><span>Reward hacking, leakage, gains that do not transfer</span></li><li style="--i:5; --h:#12a3a3; --l:#cdeeed" aria-hidden="true"><span class="tpi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M8.2 14.5A6 6 0 1 1 15.8 14.5c-.6.6-.8 1.2-.8 2H9c0-.8-.2-1.4-.8-2z"/></svg></span><b>Choosing questions</b><span>Hypotheses, novelty, research taste</span></li><li style="--i:6; --h:#1a73e8; --l:#d2e3fc" aria-hidden="true"><span class="tpi"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M2.5 20c.4-3.4 2.6-5.5 5.5-5.5 1.2 0 2.3.4 3.2 1"/><rect x="13.5" y="11" width="8" height="7" rx="2"/><path d="M17.5 11V8.5M15.8 14.3v.4M19.2 14.3v.4"/></svg></span><b>People and agents</b><span>Collaborators, verifiers, sources of taste</span></li><li style="--i:7; --h:#8e5bef; --l:#e6dcfd" aria-hidden="true"><span class="tpi"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".8"/></svg></span><b>Benchmarks and environments</b><span>Verifiable, open-ended CS tasks</span></li><li style="--i:8; --h:#12a3a3; --l:#cdeeed" aria-hidden="true"><span class="tpi"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="6.5" width="11" height="11" rx="2"/><path d="M10 3v3.5M14 3v3.5M10 17.5V21M14 17.5V21M3 10h3.5M3 14h3.5M17.5 10H21M17.5 14H21"/></svg></span><b>Applied research agents</b><span>Systems, kernels, algorithm discovery</span></li></ul></div>
 </section>
 
 <section class="sec" id="speakers">
   <h2>Invited speakers <span class="venue">Confirmed</span></h2>
   <ul class="spk">
     <li><img src="{{ '/assets/img/workshop/alex-dimakis.jpg' | relative_url }}" alt="" width="240" height="240" loading="lazy"><b>Alex Dimakis</b><span>UC Berkeley · Bespoke Labs</span></li>
+    <li><img src="{{ '/assets/img/workshop/azalia-mirhoseini.jpg' | relative_url }}" alt="" width="240" height="240" loading="lazy"><b>Azalia Mirhoseini</b><span>Stanford · Ricursive Intelligence</span></li>
     <li><img src="{{ '/assets/img/workshop/yuandong-tian.png' | relative_url }}" alt="" width="240" height="240" loading="lazy"><b>Yuandong Tian</b><span>Recursive Superintelligence</span></li>
     <li><img src="{{ '/assets/img/workshop/matei-zaharia.jpg' | relative_url }}" alt="" width="240" height="240" loading="lazy"><b>Matei Zaharia</b><span>UC Berkeley · Databricks</span></li>
-    <li><img src="{{ '/assets/img/workshop/azalia-mirhoseini.jpg' | relative_url }}" alt="" width="240" height="240" loading="lazy"><b>Azalia Mirhoseini</b><span>Stanford · Ricursive Intelligence</span></li>
   </ul>
 </section>
 
 <section class="sec" id="challenge">
   <div class="chb">
-    <p class="ws-st"><span class="venue hl">One-week challenge</span><span class="venue">Problem to be announced</span></p>
+    <p class="ws-st"><span class="venue hl">Challenge</span><span class="venue">Problem to be announced</span></p>
     <h2>An open-ended problem in AI for AI R&amp;D</h2>
-    <p>Every team gets the same problem and the same budget, and lets its research agents work on it for a week. The winners present at the workshop.</p>
+    <p>Every team gets the same problem and the same budget, and lets its research agents work on it. The winners present at the workshop.</p>
     <dl class="tstats">
-      <div><dt>Window, tentative</dt><dd>Feb 2&ndash;8, 2027</dd></div>
+      <div><dt>Dates</dt><dd>To be announced</dd></div>
       <div><dt>Budget</dt><dd>Equal for every team</dd></div>
       <div><dt>You submit</dt><dd>Code and a report</dd></div>
       <div><dt>We do</dt><dd>Rerun the top entries</dd></div>
@@ -109,7 +99,7 @@ page_css: fcs2
   <ul class="orgs">
     <li><img src="{{ '/assets/img/workshop/wenhao-chai.jpg' | relative_url }}" alt="" width="176" height="176" loading="lazy"><div><b><a href="https://wenhaochai.com/" target="_blank" rel="noopener noreferrer">Wenhao Chai</a></b><span>Princeton · Google DeepMind</span><i>General lead</i></div></li>
     <li><img src="{{ '/assets/img/workshop/melissa-pan.jpg' | relative_url }}" alt="" width="176" height="176" loading="lazy"><div><b><a href="https://melissa-pan.github.io/" target="_blank" rel="noopener noreferrer">Melissa Pan</a></b><span>UC Berkeley</span><i>Outreach and panel</i></div></li>
-    <li><em aria-hidden="true">XW</em><div><b><a href="https://peppaking8.github.io/" target="_blank" rel="noopener noreferrer">Xianbang Wang</a></b><span>MIT</span><i>Challenge</i></div></li>
+    <li><img src="{{ '/assets/img/workshop/xianbang-wang.jpg' | relative_url }}" alt="" width="176" height="176" loading="lazy"><div><b><a href="https://peppaking8.github.io/" target="_blank" rel="noopener noreferrer">Xianbang Wang</a></b><span>MIT</span><i>Challenge</i></div></li>
     <li><img src="{{ '/assets/img/workshop/qiuyang-mang.jpg' | relative_url }}" alt="" width="176" height="176" loading="lazy"><div><b><a href="https://joyemang33.github.io/" target="_blank" rel="noopener noreferrer">Qiuyang Mang</a></b><span>UC Berkeley</span><i>Challenge evaluation and review</i></div></li>
     <li><img src="{{ '/assets/img/workshop/dingning-cao.jpg' | relative_url }}" alt="" width="176" height="176" loading="lazy"><div><b><a href="https://diannedaian.github.io/" target="_blank" rel="noopener noreferrer">Dingning Cao</a></b><span>MIT</span><i>Student volunteer</i></div></li>
     <li><img src="{{ '/assets/img/workshop/joseph-gonzalez.jpg' | relative_url }}" alt="" width="176" height="176" loading="lazy"><div><b><a href="https://people.eecs.berkeley.edu/~jegonzal" target="_blank" rel="noopener noreferrer">Joseph E. Gonzalez</a></b><span>UC Berkeley</span><i>Senior advisor</i></div></li>
