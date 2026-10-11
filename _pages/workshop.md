@@ -7,7 +7,7 @@ page_css: fcs2
 ---
 <div class="fcs2 ws2">
 <nav class="sub" aria-label="Sections"><div class="col" id="subnav">
-  <a href="#overview" class="on">Overview</a><a href="#topics">Topics</a><a href="#schedule">Schedule</a><a href="#speakers">Speakers</a><a href="#challenge">Challenge</a><a href="#submit">Submit</a><a href="#organizers">Organizers</a>
+  <a href="#overview" class="on">Overview</a><a href="#topics">Topics</a><a href="#speakers">Speakers</a><a href="#challenge">Challenge</a><a href="#submit">Submit</a><a href="#organizers">Organizers</a>
 </div></nav>
 
 <div class="col" id="main" tabindex="-1">
@@ -15,7 +15,7 @@ page_css: fcs2
   <p class="ws-st"><span class="venue hl">Proposal</span><span class="venue">ICLR 2027 workshop</span></p>
   <h1>How Far Are AI Agents from Becoming Computer Scientists?</h1>
   <p class="lead">Agents make progress when a person specifies the task and supplies a check on every answer. Real research often gives neither. This workshop is about what an agent does then.</p>
-  <p class="ws-prop">This is a proposal. The dates, schedule and speakers below are tentative until ICLR decides on November 29, 2026.</p>
+  <p class="ws-prop">This is a proposal. The dates below are tentative until ICLR decides on November 29, 2026.</p>
   <dl class="tstats">
     <div><dt>Format</dt><dd>Full day</dd><span>In person, non-archival</span></div>
     <div><dt>Submit by, tentative</dt><dd>Feb 1, 2027</dd><span>11:59 p.m. AoE</span></div>
@@ -55,28 +55,6 @@ page_css: fcs2
     <li>Benchmarks and environments for open-ended CS tasks</li>
     <li>Applied agents: systems, kernels, algorithm discovery</li>
   </ul>
-</section>
-
-<section class="sec" id="schedule">
-  <h2>Tentative schedule</h2>
-  <div class="res-scroll"><table class="res num sch">
-    <tbody>
-        <tr><td class="t">08:30</td><td>Opening remarks</td><td class="w"></td></tr>
-        <tr><td class="t">08:40</td><td>Invited talk</td><td class="w">Alex Dimakis</td></tr>
-        <tr><td class="t">09:15</td><td>Invited talk</td><td class="w">Yuandong Tian</td></tr>
-        <tr><td class="t">09:50</td><td>Contributed orals</td><td class="w">Four 8-minute spotlights</td></tr>
-        <tr><td class="t">10:30</td><td>Posters and artifacts I</td><td class="w">With coffee</td></tr>
-        <tr><td class="t">11:45</td><td>Challenge orals</td><td class="w">Results and the winning teams</td></tr>
-        <tr><td class="t">12:30</td><td>Lunch</td><td class="w"></td></tr>
-        <tr><td class="t">13:30</td><td>Invited talk</td><td class="w">Matei Zaharia</td></tr>
-        <tr><td class="t">14:05</td><td>Invited talk</td><td class="w">Azalia Mirhoseini</td></tr>
-        <tr><td class="t">14:40</td><td>Coffee</td><td class="w"></td></tr>
-        <tr><td class="t">15:10</td><td>Panel</td><td class="w">Alex Dimakis, Matei Zaharia, Yuandong Tian, Azalia Mirhoseini</td></tr>
-        <tr><td class="t">16:00</td><td>Breakouts on open problems</td><td class="w"></td></tr>
-        <tr><td class="t">16:40</td><td>Posters and artifacts II</td><td class="w"></td></tr>
-        <tr><td class="t">17:20</td><td>Awards and closing</td><td class="w"></td></tr>
-    </tbody>
-  </table></div>
 </section>
 
 <section class="sec" id="speakers">
@@ -128,14 +106,14 @@ page_css: fcs2
 
 <section class="sec" id="organizers">
   <h2>Organizers</h2>
-  <ul class="ppl">
-    <li><b><a href="https://wenhaochai.com/" target="_blank" rel="noopener noreferrer">Wenhao Chai</a></b><span>Princeton · Google DeepMind</span><i>General lead</i></li>
-    <li><b><a href="https://melissa-pan.github.io/" target="_blank" rel="noopener noreferrer">Melissa Pan</a></b><span>UC Berkeley</span><i>Outreach and panel</i></li>
-    <li><b><a href="https://peppaking8.github.io/" target="_blank" rel="noopener noreferrer">Xianbang Wang</a></b><span>MIT</span><i>Challenge</i></li>
-    <li><b><a href="https://joyemang33.github.io/" target="_blank" rel="noopener noreferrer">Qiuyang Mang</a></b><span>UC Berkeley</span><i>Challenge evaluation and review</i></li>
-    <li><b><a href="https://diannedaian.github.io/" target="_blank" rel="noopener noreferrer">Dingning Cao</a></b><span>MIT</span><i>Student volunteer</i></li>
-    <li><b><a href="https://people.eecs.berkeley.edu/~jegonzal" target="_blank" rel="noopener noreferrer">Joseph E. Gonzalez</a></b><span>UC Berkeley</span><i>Senior advisor</i></li>
-    <li><b><a href="https://people.eecs.berkeley.edu/~akcheung" target="_blank" rel="noopener noreferrer">Alvin Cheung</a></b><span>UC Berkeley</span><i>Senior advisor</i></li>
+  <ul class="orgs">
+    <li><img src="{{ '/assets/img/workshop/wenhao-chai.jpg' | relative_url }}" alt="" width="176" height="176" loading="lazy"><div><b><a href="https://wenhaochai.com/" target="_blank" rel="noopener noreferrer">Wenhao Chai</a></b><span>Princeton · Google DeepMind</span><i>General lead</i></div></li>
+    <li><img src="{{ '/assets/img/workshop/melissa-pan.jpg' | relative_url }}" alt="" width="176" height="176" loading="lazy"><div><b><a href="https://melissa-pan.github.io/" target="_blank" rel="noopener noreferrer">Melissa Pan</a></b><span>UC Berkeley</span><i>Outreach and panel</i></div></li>
+    <li><em aria-hidden="true">XW</em><div><b><a href="https://peppaking8.github.io/" target="_blank" rel="noopener noreferrer">Xianbang Wang</a></b><span>MIT</span><i>Challenge</i></div></li>
+    <li><img src="{{ '/assets/img/workshop/qiuyang-mang.jpg' | relative_url }}" alt="" width="176" height="176" loading="lazy"><div><b><a href="https://joyemang33.github.io/" target="_blank" rel="noopener noreferrer">Qiuyang Mang</a></b><span>UC Berkeley</span><i>Challenge evaluation and review</i></div></li>
+    <li><img src="{{ '/assets/img/workshop/dingning-cao.jpg' | relative_url }}" alt="" width="176" height="176" loading="lazy"><div><b><a href="https://diannedaian.github.io/" target="_blank" rel="noopener noreferrer">Dingning Cao</a></b><span>MIT</span><i>Student volunteer</i></div></li>
+    <li><img src="{{ '/assets/img/workshop/joseph-gonzalez.jpg' | relative_url }}" alt="" width="176" height="176" loading="lazy"><div><b><a href="https://people.eecs.berkeley.edu/~jegonzal" target="_blank" rel="noopener noreferrer">Joseph E. Gonzalez</a></b><span>UC Berkeley</span><i>Senior advisor</i></div></li>
+    <li><img src="{{ '/assets/img/workshop/alvin-cheung.jpg' | relative_url }}" alt="" width="176" height="176" loading="lazy"><div><b><a href="https://people.eecs.berkeley.edu/~akcheung" target="_blank" rel="noopener noreferrer">Alvin Cheung</a></b><span>UC Berkeley</span><i>Senior advisor</i></div></li>
   </ul>
   <p class="tbd sb-n">Questions: <a href="mailto:wc9403@princeton.edu">wc9403@princeton.edu</a> or <a href="mailto:qmang@berkeley.edu">qmang@berkeley.edu</a>.</p>
 </section>

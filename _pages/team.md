@@ -37,10 +37,6 @@ permalink: /team/
 <section class="journal team-sec">
 <div class="page">
   <div class="sec-head"><div>
-    <h2 class="sec-title">Institutions</h2>
-    {%- assign ucb = everyone | where_exp: "p", "p.affil contains 'UC Berkeley'" %}
-    {%- assign pu = everyone | where_exp: "p", "p.affil contains 'Princeton'" %}
-    {%- assign ind = everyone | where_exp: "p", "p.affil contains 'Independent'" %}
     <p class="sec-intro">{{ ucb.size }} of the {{ everyone.size }} authors are at UC Berkeley and {{ pu.size }} at Princeton. {{ ind.size }} are independent researchers.</p>
   </div></div>
   <ul class="logo-wall">
