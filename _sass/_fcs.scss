@@ -1477,6 +1477,30 @@ footer.foot { margin-top: 120px; padding: 56px 0 28px; background: #202124; colo
 .fc-table-wrap th { font-size: 13px; font-weight: 600; color: var(--ink-2); border-bottom: 1px solid var(--ink-2); }
 .fc-table-wrap td { font-size: 15px; font-variant-numeric: tabular-nums; }
 .fc-terminal-card { background: var(--paper-2); box-shadow: none; border-radius: 8px; }
+/* numbers right-aligned under their headers, model marked by a square in its maker's colour (as table.res on the FrontierCS 2 page) */
+.fc-table-wrap th, .fc-table-wrap td { padding: 11px 12px; }
+.fc-table-wrap th:nth-child(n+3), .fc-table-wrap td:nth-child(n+3) { text-align: right; }
+.fc-table-wrap th:first-child, .fc-table-wrap td:first-child { padding-left: 0; width: 56px; }
+.fc-table-wrap td:first-child { font-size: 14px; color: var(--ink-3); }
+.fc-table-wrap td { border-bottom-color: var(--rule); }
+.fc-model-logo { width: 20px; height: 20px; border: 0; border-radius: 0; background: none; }
+/* the ranking metric: a bar on the 0-100 scale in the maker's colour, then the number */
+.fc-table-wrap th:nth-child(3) { text-align: left; }
+.fc-table-wrap td.fc-score { text-align: left; width: 38%; min-width: 150px; }
+.fc-bar { display: inline-block; vertical-align: middle; margin-right: 12px; width: calc(100% - 64px); height: 10px; background: var(--rule-2); }
+.fc-bar i { display: block; height: 100%; background: var(--ink-3); }
+.fc-score b { font-weight: 600; color: var(--ink); }
+.fc-bar-openai i { background: #1f1f1f; } .fc-bar-google i { background: #4285f4; } .fc-bar-anthropic i { background: #d97757; }
+.fc-bar-deepseek i { background: var(--m-ds); } .fc-bar-xai i { background: #5f6368; } .fc-bar-qwen i { background: #615ced; } .fc-bar-kimi i { background: #1783ff; }
+.fc-bar-human i { background: repeating-linear-gradient(135deg, var(--fail) 0 4px, var(--rule-2) 4px 8px); }
+.fc-model-logo-human { display: inline-block; width: 20px; height: 20px; border-radius: 50%; border: 1.5px dashed var(--ink-3); }
+.fc-human-row td { color: var(--ink-3); } .fc-human-row .fc-model-name { color: var(--ink-2); }
+.fc-human-reference { font-size: 13px; color: var(--muted-2); margin-top: 14px; }
+/* example tasks: the animations are portrait cards on #ebf2fa; show them whole instead of cropping to a band */
+.fc-task-visual { aspect-ratio: 4 / 3; background: #ebf2fa; border-radius: 6px; }
+.fc-task-visual img { width: auto; max-width: 100%; height: 100%; object-fit: contain; mix-blend-mode: normal; }
+.fc-task-card { border-bottom: 0; padding-bottom: 0; }
+@media (max-width: 720px) { .fc-task-grid { row-gap: 36px; } }
 
 /* sections separated by space, not full-width rules (Epoch) */
 section.journal { border-bottom: 0; padding: clamp(44px, 6vw, 72px) 0; }
