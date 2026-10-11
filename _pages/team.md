@@ -37,7 +37,7 @@ permalink: /team/
 <section class="journal team-sec">
 <div class="page">
   <div class="sec-head"><div>
-    <p class="sec-intro">{{ ucb.size }} of the {{ everyone.size }} authors are at UC Berkeley and {{ pu.size }} at Princeton. {{ ind.size }} are independent researchers.</p>
+    <h2 class="sec-title">Institutions</h2>
   </div></div>
   <ul class="logo-wall">
     {%- for i in site.data.team.institutions %}
