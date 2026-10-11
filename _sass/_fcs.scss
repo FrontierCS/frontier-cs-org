@@ -1501,11 +1501,11 @@ footer.foot { margin-top: 120px; padding: 56px 0 28px; background: #202124; colo
 .fcs1 .ptile canvas { display: block; width: 100%; height: 100%; }
 .fcs1 .ptile figcaption { position: absolute; left: 0; bottom: 6px; display: flex; flex-direction: column; gap: 1px; font-variant-numeric: tabular-nums; }
 .fcs1 .ptile figcaption b { font-size: 15px; font-weight: 600; color: var(--ink); } .fcs1 .ptile figcaption span { font-size: 12.5px; color: var(--muted); }
-.fcs1 .prob .lk span { color: var(--muted-2); }
+.fcs1 .prob .lk span, .fcs1 .prob .lk span a { color: var(--teal); font-weight: 500; } .fcs1 .prob .lk span a { text-decoration-color: var(--link-line); }
 .fcs1 .prob h3 { font-size: clamp(22px, 2.2vw, 28px); font-weight: 500; margin: 0 0 10px; }
 .fcs1 .prob p { margin: 0; color: var(--ink-2); font-size: 17px; line-height: 1.5; max-width: 36em; }
 .fcs1 .prob .lk { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 14px; margin-top: 16px; }
-.fcs1 .prob .lk a { color: var(--ink-2); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--line-2); } .fcs1 .prob .lk a:hover { color: var(--teal); }
+.fcs1 .prob .lk > a { color: var(--ink-2); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--line-2); } .fcs1 .prob .lk a:hover { color: var(--teal-d); }
 .fcs1 .pnote { margin-top: 28px; }
 .fcs1 .ans pre { margin: 0 0 14px; padding: 12px 14px; background: var(--soft); border-radius: 6px; font-family: var(--font-code); font-size: 14px; line-height: 1.5; color: var(--ink); overflow-x: auto; white-space: pre; }
 .fcs1 .more { margin: 36px 0 0; }
