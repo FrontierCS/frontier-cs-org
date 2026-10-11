@@ -1493,7 +1493,14 @@ footer.foot { margin-top: 120px; padding: 56px 0 28px; background: #202124; colo
 .fcs1 .res .hum td { color: var(--ink-2); }
 .fcs1 .res.runs td { padding-block: 8px; } .fcs1 .res.runs td:first-child { text-align: left; } .fcs1 .res.runs td.sc { width: 46%; }
 .fcs1 .cfoot a { text-decoration: underline; text-underline-offset: 3px; }
-.fcs1 .loopfig { margin: 0; justify-self: end; width: min(100%, 560px); }
+.fcs1 .hero { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); }
+.fcs1 .intro h1 { max-width: none; font-size: clamp(32px, 3.5vw, 44px); }
+@media (max-width: 1000px) { .fcs1 .hero { grid-template-columns: 1fr; } }
+.fcs1 .loopfig { margin: 0; justify-self: end; width: min(100%, 600px); }
+/* a dotted ground whose edges fade out, as the paper wall on the FrontierCS 2 page does */
+.fcs1 .lf { padding: 11% 10%; background: radial-gradient(#c3d3ee 1.2px, transparent 1.6px) 0 0 / 20px 20px, #f3f7fe;
+  -webkit-mask-image: linear-gradient(transparent, #000 20%, #000 80%, transparent), linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent); -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(transparent, #000 20%, #000 80%, transparent), linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent); mask-composite: intersect; }
 .fcs1 .loopfig svg { display: block; width: 100%; height: auto; }
 .fcs1 .loopfig figcaption, .fcs1 .pnote { font-size: 13.5px; line-height: 1.45; color: var(--muted-2); margin: 12px 0 0; text-wrap: balance; }
 .fcs1 .probs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 48px 32px; }
