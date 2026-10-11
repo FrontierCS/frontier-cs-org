@@ -1524,6 +1524,13 @@ footer.foot { margin-top: 120px; padding: 56px 0 28px; background: #202124; colo
 @media (max-width: 900px) { .fcs1 .uses { grid-template-columns: 1fr; } }
 @media (max-width: 640px) { .fcs1 .res.lb th:nth-child(n+4), .fcs1 .res.lb td:nth-child(n+4) { display: none; } .fcs1 .res .rk { width: 34px; } .fcs1 .res td.sc { width: 44%; min-width: 0; } .fcs1 .sbar { width: calc(100% - 58px); margin-right: 8px; } }
 
+/* Papers page: one row per paper, its first page on the left */
+.paper-list { display: flex; flex-direction: column; }
+.paper-row { display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: 16px 36px; align-items: start; padding: 28px 0; border-top: 1px solid var(--rule); }
+.paper-row:first-child { border-top: 0; padding-top: 0; }
+.paper-pg img { display: block; width: 132px; height: auto; aspect-ratio: 17 / 22; object-fit: cover; object-position: top; border-radius: 4px; background: #fff; box-shadow: 0 1px 4px rgba(32,33,36,.16), 0 0 0 1px rgba(32,33,36,.08); }
+@media (max-width: 640px) { .paper-row { grid-template-columns: 84px minmax(0, 1fr); gap: 12px 18px; } .paper-pg img { width: 84px; } }
+
 /* sections separated by space, not full-width rules (Epoch) */
 section.journal { border-bottom: 0; padding: clamp(44px, 6vw, 72px) 0; }
 section.journal#hero { padding: clamp(56px, 6vw, 72px) 0 clamp(32px, 4vw, 48px); }
