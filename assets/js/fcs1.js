@@ -141,11 +141,11 @@ function wmDiagonal(n, edges) {
     g.fillText('→ ' + s.ans, ax, y2 + cw * .4); g.globalAlpha = 1;                                                                            // the answer: how many positions match
     label.firstChild.textContent = `${k + 1} ${k ? 'queries' : 'query'}`; }); }
 
-// the hero terminal: one submission line per lap of the loop beside it (6 s a lap, five laps, then it starts over)
+// the hero terminal: one submission line per lap of the loop above it (3.5 s a lap)
 { const lf = document.querySelector('.lf'), lines = lf ? [...lf.querySelectorAll('[data-k]')] : [];
   if (lf && !reduced) { lf.classList.add('live'); const t0 = performance.now();
-    const tick = () => { const t = ((performance.now() - t0) / 1000) % 30;
-      lines.forEach(l => l.classList.toggle('on', t >= (l.dataset.k - 1) * 6 + (l.classList.contains('tok') ? 4.8 : 3.4))); };
+    const LAP = 3.5, tick = () => { const t = ((performance.now() - t0) / 1000) % (6 * LAP);   // five laps, then one lap's pause with every line shown
+      lines.forEach(l => l.classList.toggle('on', t >= (l.dataset.k - 1) * LAP + (l.classList.contains('tok') ? 2.8 : 2))); };
     tick(); setInterval(tick, 200); } }
 
 // leaderboard tabs

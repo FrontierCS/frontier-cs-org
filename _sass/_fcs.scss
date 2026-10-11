@@ -1493,7 +1493,10 @@ footer.foot { margin-top: 120px; padding: 56px 0 28px; background: #202124; colo
 .fcs1 .res .hum td { color: var(--ink-2); }
 .fcs1 .res.runs td { padding-block: 8px; } .fcs1 .res.runs td:first-child { text-align: left; } .fcs1 .res.runs td.sc { width: 46%; }
 .fcs1 .cfoot a { text-decoration: underline; text-underline-offset: 3px; }
+/* the opening sits where the FrontierCS 2 page's does: that page centres its text beside a 460px wall, which puts its status line 50px below the top */
 .fcs1 .hero { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); align-items: start; }
+.fcs1 .hero-text { padding-top: 50px; } .fcs1 .loopfig { align-self: center; }
+@media (max-width: 1000px) { .fcs1 .hero-text { padding-top: 0; } }
 .fcs1 .intro h1 { max-width: none; font-size: clamp(32px, 3.5vw, 44px); }
 @media (max-width: 1000px) { .fcs1 .hero { grid-template-columns: 1fr; } }
 .fcs1 .loopfig { margin: 0; justify-self: end; width: min(100%, 620px); }
