@@ -18,7 +18,7 @@
   {% endif %}
 {% endif %}
 
-{% assign thumb = card_post.image | default: card_post.thumbnail %}
+{% assign thumb = card_post.thumbnail | default: card_post.image %}
 {% if thumb == blank %}
   {% assign image_parts = card_post.content | split: "assets/img/" %}
   {% if image_parts.size > 1 %}

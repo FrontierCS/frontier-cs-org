@@ -20,7 +20,7 @@
           {% endif %}
         {% endif %}
 
-        {% assign thumb = post.image %}
+        {% assign thumb = post.thumbnail | default: post.image %}
         {% if thumb == blank %}
           {% assign image_parts = post.content | split: "assets/img/" %}
           {% if image_parts.size > 1 %}

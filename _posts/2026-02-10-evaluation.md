@@ -2,7 +2,7 @@
 layout: distill
 title: Evaluating the Hardest CS Problems in the Age of LLMs
 description: "FrontierCS scores solutions on a continuous scale across heterogeneous hardware. This post explains the evaluation architecture behind the leaderboard: hash-based resume, resource-grouped clusters, pinned environments, and the challenges ahead for agentic submissions."
-thumbnail: assets/img/2026-02-10-evaluation/preview.png
+thumbnail: assets/img/blog-thumbs/evaluation.svg
 og_image: assets/img/2026-02-10-evaluation/preview.png
 
 date: 2026-02-10

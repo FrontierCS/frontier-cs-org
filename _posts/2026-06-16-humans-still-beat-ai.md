@@ -3,7 +3,7 @@ layout: distill
 title: "Humans Still Beat AI in the Long Horizon: Revisiting Test-Time Scaling in the Agent Era"
 description: "Agents can spend test-time compute by trying, observing, and revising. We derive an Elo reference for repeated sampling, then show that in a 2022 two-week coding marathon, current agents plateau within 24 hours while top humans keep improving."
 image: assets/img/2026-06-16-humans-still-beat-ai/human-vs-agent-elo.png
-thumbnail: assets/img/2026-06-16-humans-still-beat-ai/human-vs-agent-elo.png
+thumbnail: assets/img/blog-thumbs/humans-still-beat-ai.svg
 og_image: assets/img/2026-06-16-humans-still-beat-ai/human-vs-agent-elo.png
 
 date: 2026-06-16

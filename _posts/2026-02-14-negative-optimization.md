@@ -2,7 +2,7 @@
 layout: distill
 title: LLM Defeated in Open-ended Problems
 description: "Modern LLMs claim superhuman algorithmic abilities, but what happens when there is no strict verifier? We analyze how multi-turn 'optimization' in FrontierCS exposes the cognitive ceiling and catastrophic failures of AI in open-ended problem solving."
-thumbnail: assets/img/2026-02-14-negative-optimization/preview.png
+thumbnail: assets/img/blog-thumbs/negative-optimization.svg
 og_image: assets/img/2026-02-14-negative-optimization/preview.png
 
 date: 2026-02-26

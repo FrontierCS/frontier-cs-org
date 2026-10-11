@@ -3,7 +3,7 @@ layout: distill
 title: "Roadmap to FrontierCS 2"
 description: "FrontierCS 2 extends open-ended evaluation from static sandboxed tasks to Harbor-based feedback loops and repo-level environments."
 image: assets/img/2026-06-11-frontiercs-2-roadmap/benchmark-environment-evolution.jpg
-thumbnail: assets/img/2026-06-11-frontiercs-2-roadmap/benchmark-environment-evolution.jpg
+thumbnail: assets/img/blog-thumbs/frontiercs-2-roadmap.svg
 og_image: assets/img/2026-06-11-frontiercs-2-roadmap/benchmark-environment-evolution.jpg
 
 date: 2026-06-11

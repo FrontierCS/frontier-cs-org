@@ -2,7 +2,7 @@
 layout: distill
 title: FrontierCS 1.0 Release
 description: We are releasing FrontierCS 1.0, a major update to our open-ended Computer Science benchmark. This release expands FrontierCS to 240 tasks across both the algorithmic and research tracks. We also introduce a new Elo-based leaderboard, along with full execution traces of model solutions to enable deeper analysis and reproducibility. 
-thumbnail: assets/img/2026-02-03-feb-release/preview.png
+thumbnail: assets/img/blog-thumbs/feb-release.svg
 og_image: assets/img/2026-02-03-feb-release/preview.png
 
 date: 2026-02-03
