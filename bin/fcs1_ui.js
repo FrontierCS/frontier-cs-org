@@ -1,8 +1,9 @@
 /* FrontierCS (v1) page: the two problem animations, leaderboard tabs and the sub-nav. */
 (() => {
-// three hues, each dark and light, on a soft ground
+// three hues, each [dark, light], on a soft ground
+const HUES = __HUES__;
 const FIELD = '#f1f3f4', DEEP = '#ffffff', INK = '#3c4043', dpr = () => window.devicePixelRatio || 1;
-const LABEL = 52;   // the strip at the foot of a tile that holds its label
+const LABEL = 64;   // the strip at the foot of a tile that holds its label
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 // a tile's canvas fills its figure; `paint(ctx, w, h, t)` draws one frame in CSS pixels, t in seconds (-1: the last frame, for reduced motion)
 function tile(id, paint) { const c = document.getElementById(id); if (!c) return;
@@ -18,7 +19,7 @@ function tile(id, paint) { const c = document.getElementById(id); if (!c) return
 // The pieces are regenerated here from the search's seed (bin/fcs1_search.js made the record).
 const PK = __DATA__;
 __GEN__
-{ const pieces = pkInstance(PK.n, pkRng(PK.seed)).pieces, TONES = ['#1a73e8', '#d2e3fc', '#1e8e3e', '#ceead6', '#f9ab00', '#feefc3'];
+{ const pieces = pkInstance(PK.n, pkRng(PK.seed)).pieces, TONES = HUES.flat();
   const snaps = PK.hist.map(([it, score, W, H, s]) => { const g = new Int16Array(W * H).fill(-1);
     pieces.forEach((os, id) => { const o = os[+s[5 * id]], x = parseInt(s.substr(5 * id + 1, 2), 36), y = parseInt(s.substr(5 * id + 3, 2), 36);
       for (const [cx, cy] of o.c) g[(y + cy) * W + x + cx] = id; });
@@ -76,7 +77,9 @@ function wmDiagonal(n, edges) {
   return wmRows(n, edges);
 }
 { const maps = [wmRows(WM.n, WM.e), wmDiagonal(WM.n, WM.e)], K0 = maps[0].length, label = document.getElementById('wmlabel');
-  const PAL = ['#174ea6', '#1a73e8', '#669df6', '#aecbfa', '#e8f0fe', '#0d652d', '#1e8e3e', '#5bb974', '#a8dab5', '#e6f4ea', '#e37400', '#f9ab00', '#fcc934', '#fde293', '#fef7e0'], tone = c => PAL[(c * 4) % 15];
+  // each hue in five steps from its dark to near white: fifteen colours for the fourteen countries
+  const mix = (a, b, t) => '#' + [1, 3, 5].map(k => Math.round(parseInt(a.substr(k, 2), 16) * (1 - t) + parseInt(b.substr(k, 2), 16) * t).toString(16).padStart(2, '0')).join('');
+  const PAL = HUES.flatMap(([d, l]) => [0, .3, .6, .85, 1.15].map(t => t <= 1 ? mix(d, l, t) : mix(l, '#ffffff', .5))), tone = c => PAL[(c * 4) % 15];
   const score = K => Math.max(0, Math.min(100, (6 - K / WM.n) / 4.5 * 100)), ease = v => v < 0 ? 0 : v > 1 ? 1 : v * v * (3 - 2 * v);
   const T = [3.5, 2.5, 3.5, 4.5], CY = T.reduce((a, b) => a + b);   // draw the first, hold, draw the second, hold
   tile('wmtile', (g, w, h, t) => { const u = t < 0 ? CY - .01 : t % CY, second = u >= T[0] + T[1], C = maps[second ? 1 : 0], K = C.length, pad = 28;
@@ -86,6 +89,32 @@ function wmDiagonal(n, edges) {
     for (let i = 0; i < K; i++) for (let j = 0; j < K; j++) { if ((second ? (i + j) / (2 * K - 2) : j / (K - 1)) > p) continue; g.fillStyle = tone(C[i][j]); g.fillRect(x0 + j * cell, y0 + i * cell, cell, cell); }
     g.strokeStyle = INK; g.lineWidth = 1.5; g.strokeRect(x0 - 1, y0 - 1, K * cell + 2, K * cell + 2);
     label.firstChild.textContent = 'Score ' + score(K).toFixed(1); label.lastChild.textContent = `K = ${K} for ${WM.n} countries`; }); }
+
+// ---- Permutation (problem 2): a hidden permutation, and queries answered only with the number of positions that match.
+// A simple strategy of ours on n = 8: one pass with two values finds where 1 and 2 sit; after that 1 is a filler that
+// can never match elsewhere, so each further value is found by halving the positions still unknown.
+{ const HID = [3, 7, 1, 8, 5, 2, 6, 4], n = HID.length, steps = [], known = {}, ask = q => q.filter((v, i) => v === HID[i]).length;
+  const push = (q, probe, v) => steps.push({q, probe, v, ans: ask(q), known: {...known}});
+  for (let i = 0; i < n && !(1 in known && 2 in known); i++) { const q = HID.map((_, j) => j === i ? 1 : 2), a = ask(q);
+    if (a === 2) known[1] = i; if (a === 0) known[2] = i; push(q, [i], 1); steps[steps.length - 1].known = {...known}; }
+  for (let v = 3; v <= n; v++) { let cand = HID.map((_, i) => i).filter(i => !Object.values(known).includes(i));
+    while (cand.length > 1) { const S = cand.slice(0, cand.length >> 1), q = HID.map((_, j) => S.includes(j) ? v : j === known[1] ? 2 : 1);
+      cand = ask(q) ? S : cand.filter(i => !S.includes(i)); if (cand.length === 1) known[v] = cand[0]; push(q, S, v); steps[steps.length - 1].known = {...known}; }
+    known[v] = cand[0]; if (v === n) steps[steps.length - 1].known = {...known}; }
+  const STEP = .55, HOLD = 3.5, label = document.getElementById('pmlabel');
+  const rr = (g, x, y, w, h, r) => { g.beginPath(); g.roundRect(x, y, w, h, r); };
+  tile('pmtile', (g, w, h, t) => { const k = t < 0 ? steps.length - 1 : Math.min(steps.length - 1, Math.floor((t % (steps.length * STEP + HOLD)) / STEP)), s = steps[k];
+    const hh = h - LABEL, gap = Math.max(4, Math.min(12, w / 60)), cw = Math.min(64, (w - 56 - (n - 1) * gap) / (n + 1.6)), x0 = (w - (n * cw + (n - 1) * gap) - cw * 1.6) / 2, y1 = hh / 2 - cw * 1.25, y2 = hh / 2 + cw * .45;
+    const at = Object.fromEntries(Object.entries(s.known).map(([v, i]) => [i, +v]));
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    for (let i = 0; i < n; i++) { const x = x0 + i * (cw + gap), v = at[i], hue = v && HUES[v % 3];
+      rr(g, x, y1, cw, cw * 1.25, 8); g.fillStyle = v ? hue[1] : '#fff'; g.fill(); g.strokeStyle = v ? hue[0] : '#bdc1c6'; g.lineWidth = 1.5; g.stroke();   // the hidden permutation
+      g.fillStyle = v ? INK : '#9aa0a6'; g.font = `600 ${Math.round(cw * .42)}px 'Hanken Grotesk', sans-serif`; g.fillText(v || '?', x + cw / 2, y1 + cw * .64);
+      const probe = s.probe.includes(i); rr(g, x + cw * .12, y2, cw * .76, cw * .76, 6); g.fillStyle = probe ? HUES[0][0] : '#e8eaed'; g.fill();                  // the query
+      g.fillStyle = probe ? '#fff' : '#5f6368'; g.font = `600 ${Math.round(cw * .34)}px 'Hanken Grotesk', sans-serif`; g.fillText(s.q[i], x + cw / 2, y2 + cw * .4); }
+    const ax = x0 + n * (cw + gap) + cw * .2; g.fillStyle = INK; g.font = `600 ${Math.round(cw * .34)}px 'Hanken Grotesk', sans-serif`; g.textAlign = 'left';
+    g.fillText('→ ' + s.ans, ax, y2 + cw * .4);                                                                                                                      // the answer: how many positions match
+    label.firstChild.textContent = `${k + 1} ${k ? 'queries' : 'query'}`; label.lastChild.textContent = `${Object.keys(s.known).length} of ${n} positions known`; }); }
 
 // leaderboard tabs
 const tabs = [...document.querySelectorAll('#lbtabs .chip')];
