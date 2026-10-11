@@ -239,6 +239,66 @@ function drawTable() {
 /* ---------- case studies: a placeholder until the preview runs have their own (owner, 2026-10-09) ---------- */
 const redraws = [];
 
+/* ---------- How FECI works: a fold under the FECI chart (owner, 2026-10-11) ----------
+   A: three tasks' fitted curves, expected score = 100 / (1 + exp(-k (FECI - d))) from TFIT, picked in code as the tasks
+   with a clear S (k >= 0.03) whose difficulty is nearest 20, 60 and 110, so the picture follows the data.
+   B: every task's difficulty (grey) and every model's FECI (its colour) on one FECI axis, Human at 60. */
+function drawHow() {
+  const box = $('#feci-how'); if (!box || !box.open) return;
+  const fits = Object.entries(TFIT), clear = fits.filter(([, [, k]]) => k >= .03);
+  const counts = RANKED.map(m => ECI[m.id][3]);
+  $('#how-ntasks').textContent = `${Math.min(...counts)} to ${Math.max(...counts)}`;
+  $('#how-nall').textContent = fits.length;
+  $('#how-dmax').textContent = Math.round(Math.max(...fits.map(([, [d]]) => d)));
+  const INKS = ['#8ab4f8', '#1a73e8', '#174ea6'];   // easy to hard: Google blue 300, 600, 900
+  // A
+  let svg = $('#howasvg'), W = Math.max(300, $('#howaplot').clientWidth), narrow = W < 560;
+  let L = 34, R = narrow ? 12 : 24, T = 12, B = 46, H = narrow ? 240 : 270;
+  const X = v => L + v / 160 * (W - L - R), Y = v => T + (1 - v / 100) * (H - T - B);
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
+  for (let v = 0; v <= 100; v += 25) { svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1})); svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, v)); }
+  for (let v = 0; v <= 160; v += 40) svg.append(sv('text', {x:X(v), y:H - B + 20, 'text-anchor':'middle'}, v));
+  svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'FECI'));
+  const picks = [20, 60, 110].map(t => clear.slice().sort((a, b) => Math.abs(a[1][0] - t) - Math.abs(b[1][0] - t))[0]);
+  const pts = [];
+  picks.forEach(([s, [d, k]], i) => {
+    const f = x => 100 / (1 + Math.exp(-k * (x - d)));
+    svg.append(sv('path', {d:Array.from({length:161}, (_, x) => `${x ? 'L' : 'M'}${X(x).toFixed(1)},${Y(f(x)).toFixed(1)}`).join(''), fill:'none', stroke:INKS[i], 'stroke-width':2.5}));
+    svg.append(sv('circle', {cx:X(d), cy:Y(50), r:5, fill:INKS[i], stroke:'#fff', 'stroke-width':2}));   // the difficulty: expected score 50
+    for (let x = 0; x <= 160; x += 4) pts.push({x:X(x), y:Y(f(x)), html:`<b>${esc(s)}</b><br>Difficulty ${f1(d)}, slope ${k.toFixed(3)}<br>At FECI ${x}: expected score <b>${f1(f(x))}</b>`});
+  });
+  attachTip(svg, W, H, pts, $('#howatip'));
+  $('#howalegend').innerHTML = picks.map(([s, [d]], i) => `<span><i style="background:${INKS[i]}"></i>${esc(s)}, difficulty ${Math.round(d)}</span>`).join('');
+  // B
+  svg = $('#howbsvg'); W = Math.max(300, $('#howbplot').clientWidth); narrow = W < 560;
+  const ds = fits.map(([s, [d]]) => ({s, d})).sort((a, b) => a.d - b.d);
+  const lo = Math.floor(ds[0].d / 50) * 50, hi = Math.ceil(ds[ds.length - 1].d / 50) * 50;
+  L = narrow ? 58 : 70; R = narrow ? 12 : 24; const rowT = 34, rowM = 34, gapR = 18, Bb = 46;
+  // tasks stack upward where their dots would touch
+  const XB = v => L + (v - lo) / (hi - lo) * (W - L - R), rr = narrow ? 3.5 : 4.5, lanes = [];
+  ds.forEach(t => { const x = XB(t.d); let j = 0; while (lanes[j] != null && x - lanes[j] < rr * 2 + 1) j++; lanes[j] = x; t.j = j; });
+  const nl = Math.max(1, lanes.length), tasksH = Math.max(rowT, nl * (rr * 2 + 1) + 12);
+  H = tasksH + gapR + rowM + Bb; const yT = tasksH - 8, yM = tasksH + gapR + rowM / 2;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
+  for (let v = lo; v <= hi; v += 50) { svg.append(sv('line', {x1:XB(v), x2:XB(v), y1:6, y2:H - Bb + 6, stroke:'var(--grid)', 'stroke-width':1})); svg.append(sv('text', {x:XB(v), y:H - Bb + 22, 'text-anchor':'middle'}, v)); }
+  svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'FECI'));
+  svg.append(sv('text', {class:'lab', x:0, y:yT + 4}, 'Tasks'));
+  svg.append(sv('text', {class:'lab', x:0, y:yM + 4}, 'Models'));
+  const ptsB = [];
+  ds.forEach(t => { const cy = yT - t.j * (rr * 2 + 1); svg.append(sv('circle', {cx:XB(t.d), cy, r:rr, fill:'var(--ink-2)', opacity:.45}));
+    ptsB.push({x:XB(t.d), y:cy, html:`<b>${esc(t.s)}</b><br>Difficulty ${f1(t.d)}`}); });
+  const es = RANKED.map(m => ECI[m.id][0]), rm = narrow ? 5 : 7;
+  [...RANKED].reverse().forEach(m => { const e = ECI[m.id][0]; svg.append(sv('circle', {cx:XB(e), cy:yM, r:rm, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':1.5}));
+    ptsB.push({x:XB(e), y:yM, mean:true, html:`<b>${esc(m.name)}</b><br>FECI <b>${f1(e)}</b>`}); });
+  svg.append(sv('text', {class:'val', x:XB(Math.max(...es)) + rm + 8, y:yM + 4.5, fill:'var(--ink-2)'}, `${es.length} models, ${Math.round(Math.min(...es))} to ${Math.round(Math.max(...es))}`));
+  svg.append(sv('rect', {x:XB(ECI_HUMAN) - 5.5, y:yM - 5.5, width:11, height:11, fill:'var(--ink)', stroke:'#fff', 'stroke-width':1.5}));
+  svg.append(sv('text', {class:'val halo', x:XB(ECI_HUMAN), y:yM + 24, 'text-anchor':'middle', fill:'var(--ink)'}, `Human ${ECI_HUMAN}`));
+  ptsB.push({x:XB(ECI_HUMAN), y:yM, mean:true, html:`<b>Human</b>, the authors’ code<br>FECI ${ECI_HUMAN} by definition`});
+  attachTip(svg, W, H, ptsB, $('#howbtip'));
+}
+$('#feci-how').addEventListener('toggle', drawHow);
+redraws.push(drawHow);
+
 /* ---------- questions ---------- */
 const fqHash = () => { const d = document.getElementById(location.hash.slice(1)); if (d && d.tagName === 'DETAILS') { d.open = true; d.scrollIntoView({block:'start'}); } };
 addEventListener('hashchange', fqHash); fqHash();
