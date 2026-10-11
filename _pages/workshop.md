@@ -85,7 +85,6 @@ page_css: fcs2
     <li><img src="{{ '/assets/img/workshop/joseph-gonzalez.jpg' | relative_url }}" alt="" width="176" height="176" loading="lazy"><div><b><a href="https://people.eecs.berkeley.edu/~jegonzal" target="_blank" rel="noopener noreferrer">Joseph E. Gonzalez</a></b><span>UC Berkeley</span><i>Senior advisor</i></div></li>
     <li><img src="{{ '/assets/img/workshop/alvin-cheung.jpg' | relative_url }}" alt="" width="176" height="176" loading="lazy"><div><b><a href="https://people.eecs.berkeley.edu/~akcheung" target="_blank" rel="noopener noreferrer">Alvin Cheung</a></b><span>UC Berkeley</span><i>Senior advisor</i></div></li>
   </ul>
-  <p class="tbd sb-n">Questions: <a href="mailto:wc9403@princeton.edu">wc9403@princeton.edu</a> or <a href="mailto:qmang@berkeley.edu">qmang@berkeley.edu</a>.</p>
 </section>
 </div>
 </div>
