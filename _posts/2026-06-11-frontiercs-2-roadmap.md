@@ -307,16 +307,14 @@ The same evaluation pattern appears in settings that are easy to see: the agent 
 
 <div class="showcase-grid">
   <figure>
-    <div class="showcase-media">
-      <img src="{{ 'assets/img/2026-06-11-frontiercs-2-roadmap/polyomino-packing-square@2x-homepage.gif' | relative_url }}" alt="Polyomino packing long-horizon improvement">
-    </div>
-    <figcaption><strong>Polyomino Packing.</strong> Codex + GPT-5.5 improves a fixed square-ish case from roughly 63.7 to 82.5 using record-high submissions.</figcaption>
+    <div class="showcase-media"><canvas id="bpk" role="img" aria-label="Ten packings of the same 104 pieces, from loose to tight"></canvas></div>
+    <p class="anim-cap" id="bpk-cap"></p>
+    <figcaption><strong>Polyomino Packing.</strong> Ten programs&rsquo; packings of one test case, drawn at one scale, from the loosest to the human reference. In our Harbor run, Codex + GPT-5.5 improved a fixed square-ish case from roughly 63.7 to 82.5.</figcaption>
   </figure>
   <figure>
-    <div class="showcase-media">
-      <img src="{{ 'assets/img/2026-06-11-frontiercs-2-roadmap/homepage-showcase-erdos100-2x.gif' | relative_url }}" alt="Erdos unit distance 100-point visual task">
-    </div>
-    <figcaption><strong>Erdős Unit Distance.</strong> A small 100-point visual task where the agent searches for better geometric constructions under a measurable objective.</figcaption>
+    <div class="showcase-media"><canvas id="bud" role="img" aria-label="One hundred points rearranged into constructions with more unit distances"></canvas></div>
+    <p class="anim-cap" id="bud-cap"></p>
+    <figcaption><strong>Erd&#337;s Unit Distance.</strong> Four constructions of 100 points, each with more pairs exactly one unit apart. The task asks an agent to search for better ones under this measurable objective.</figcaption>
   </figure>
   <figure>
     <div class="showcase-media">
@@ -420,3 +418,5 @@ Open-ended evaluation was the right direction for FrontierCS. FrontierCS 2 keeps
 <div class="callout">
   <strong>FrontierCS 2 in one line:</strong> more room for agents to search, build, and iterate; still hard to cheat.
 </div>
+
+<script defer src="{{ '/assets/js/blog-anim.js' | relative_url }}"></script>

@@ -1251,6 +1251,9 @@ mjx-container:not([display="true"]) > svg { display: inline; max-width: none; }
 .ar-main .showcase-grid figure:nth-child(3) .showcase-media { aspect-ratio: 900 / 570; }
 .ar-main .showcase-grid .showcase-media img { width: 100% !important; height: 100% !important; max-height: none !important; object-fit: cover; object-position: 50% 34%; border-radius: 0 !important; margin: 0 !important; transform: scale(1.12); }
 .ar-main .showcase-grid figure:nth-child(3) .showcase-media img { object-fit: contain; transform: none; }
+.ar-main .showcase-media canvas { display: block; width: 100%; height: 100%; }
+.ar-main .anim-cap { margin: 10px 0 0; font-size: 14.5px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; min-height: 1.5em; }
+.ar-main .anim-cap + figcaption { margin-top: 4px !important; }
 .ar-main .showcase-grid figcaption { text-align: left; max-width: none; margin: 12px 0 0 !important; }
 .ar-main img[src$=".gif"] { max-height: 440px; border: 1px solid var(--rule); border-radius: 8px; }
 .ar-main .showcase-grid img[src$=".gif"] { border: 0; }
