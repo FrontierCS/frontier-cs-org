@@ -1,15 +1,15 @@
 /* FrontierCS (v1) page: the two problem animations, leaderboard tabs and the sub-nav. */
 (() => {
-// three hues, each [dark, light]; every tile sits on a faint tint of its own hue
+// three hues, each [dark, light], on the page's white
 const HUES = [["#1a73e8", "#d2e3fc"], ["#8e5bef", "#e6dcfd"], ["#12a3a3", "#cdeeed"]];
 const INK = '#3c4043', dpr = () => window.devicePixelRatio || 1;
 const mix = (a, b, t) => '#' + [1, 3, 5].map(k => Math.round(parseInt(a.substr(k, 2), 16) * (1 - t) + parseInt(b.substr(k, 2), 16) * t).toString(16).padStart(2, '0')).join('');
-const LABEL = 64;   // the strip at the foot of a tile that holds its label
+const LABEL = 40;   // the strip at the foot of a tile that holds its label
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const ease = v => v <= 0 ? 0 : v >= 1 ? 1 : v * v * (3 - 2 * v), lerp = (a, b, t) => a + (b - a) * t;
 // a tile's canvas fills its figure; `paint(ctx, w, h, t)` draws one frame in CSS pixels, t in seconds (-1: the last frame, for reduced motion)
 function tile(id, hue, paint) { const c = document.getElementById(id); if (!c) return;
-  const ground = mix(HUES[hue][1], '#ffffff', .55); c.parentNode.style.background = ground;
+  const ground = '#fff';
   let w = 0, h = 0, t0 = 0, on = false;
   const frame = now => { const r = dpr(); if (c.clientWidth !== w || c.clientHeight !== h) { w = c.clientWidth; h = c.clientHeight; c.width = w * r; c.height = h * r; }
     const g = c.getContext('2d'); g.setTransform(r, 0, 0, r, 0, 0); g.fillStyle = ground; g.fillRect(0, 0, w, h);
@@ -54,7 +54,7 @@ function pkInstance(n, R) {
     P.forEach((p, id) => { g.fillStyle = TONES[id % TONES.length]; for (const [cx, cy] of p.o.c) g.fillRect(x0 + (p.x + cy) * cell - .3, y0 + (p.y + cx) * cell - .3, cell + .6, cell + .6); });
     if (cell >= 4) { g.fillStyle = '#fff'; for (const p of P) for (const [ex, ey, dx, dy] of p.o.edges) g.fillRect(x0 + (p.x + ey) * cell - .5, y0 + (p.y + ex) * cell - .5, dy * cell + 1, dx * cell + 1); }
     g.strokeStyle = INK; g.lineWidth = 1.5; g.strokeRect(x0 - 1, y0 - 1, W * cell + 2, H * cell + 2);
-    const s = a < .5 ? A : B; label.firstChild.textContent = 'Score ' + lerp(A.score, B.score, a).toFixed(1); label.lastChild.textContent = `${s.H} × ${s.W} · iteration ${s.it.toLocaleString('en-US')}`; }); }
+    label.firstChild.textContent = 'Score ' + lerp(A.score, B.score, a).toFixed(1); }); }
 
 // ---- World Map (problem 6): two valid maps of one of the task's test cases (14 countries, 28 borders), a walk laid
 // out one column per step and the same walk laid along diagonals. Both satisfy the checker's rule.
@@ -110,7 +110,7 @@ function wmDiagonal(n, edges) {
     if (!second) draw(maps[0], ease(u / T[0]) * 1.08, u < t1 ? 1 : 1 - ease((u - t1) / T[2]), (i, j, K) => j / K);
     if (u >= t1) { const [x0, y0] = box(K0); g.globalAlpha = second ? 1 : ease((u - t1) / T[2]); g.setLineDash([5, 5]); g.strokeStyle = '#9aa0a6'; g.lineWidth = 1.5; g.strokeRect(x0, y0, K0 * cell, K0 * cell); g.setLineDash([]); g.globalAlpha = 1; }
     if (second) draw(maps[1], ease((u - t2) / T[3]) * 1.08, 1, (i, j, K) => (i + j) / (2 * K));
-    const K = second ? K1 : K0; label.firstChild.textContent = 'Score ' + score(K).toFixed(1); label.lastChild.textContent = `K = ${K} for ${WM.n} countries`; }); }
+    const K = second ? K1 : K0; label.firstChild.textContent = `K = ${K} · score ${score(K).toFixed(1)}`; }); }
 
 // ---- Permutation (problem 2): a hidden permutation, and queries answered only with the number of positions that match.
 // A simple strategy of ours on n = 8: one pass with two values finds where 1 and 2 sit; after that 1 is a filler that
@@ -139,7 +139,7 @@ function wmDiagonal(n, edges) {
       g.fillStyle = probe ? '#fff' : '#5f6368'; g.font = `600 ${Math.round(cw * .34)}px 'Hanken Grotesk', sans-serif`; g.fillText(s.q[i], x + cw / 2, y2 + dy + cw * .4); g.globalAlpha = 1; }
     const ax = x0 + n * (cw + gap) + cw * .2; g.globalAlpha = ain; g.fillStyle = INK; g.font = `600 ${Math.round(cw * .34)}px 'Hanken Grotesk', sans-serif`; g.textAlign = 'left';
     g.fillText('→ ' + s.ans, ax, y2 + cw * .4); g.globalAlpha = 1;                                                                            // the answer: how many positions match
-    const kn = Object.keys(turn > .5 ? s.known : before).length; label.firstChild.textContent = `${k + 1} ${k ? 'queries' : 'query'}`; label.lastChild.textContent = `${kn} of ${n} positions known`; }); }
+    label.firstChild.textContent = `${k + 1} ${k ? 'queries' : 'query'}`; }); }
 
 // leaderboard tabs
 const tabs = [...document.querySelectorAll('#lbtabs .chip')];

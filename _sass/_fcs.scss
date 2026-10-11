@@ -1494,12 +1494,12 @@ footer.foot { margin-top: 120px; padding: 56px 0 28px; background: #202124; colo
 .fcs1 .res.runs td { padding-block: 8px; } .fcs1 .res.runs td:first-child { text-align: left; } .fcs1 .res.runs td.sc { width: 46%; }
 .fcs1 .cfoot a { text-decoration: underline; text-underline-offset: 3px; }
 .fcs1 .loopfig { margin: 0; justify-self: end; width: min(100%, 560px); }
-.fcs1 .loopfig svg { display: block; width: 100%; height: auto; background: #f1f6fe; border-radius: 8px; }
+.fcs1 .loopfig svg { display: block; width: 100%; height: auto; }
 .fcs1 .loopfig figcaption, .fcs1 .pnote { font-size: 13.5px; line-height: 1.45; color: var(--muted-2); margin: 12px 0 0; text-wrap: balance; }
 .fcs1 .probs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 48px 32px; }
-.fcs1 .ptile { position: relative; margin: 0 0 22px; aspect-ratio: 4 / 3; background: #f6f8fc; border-radius: 8px; overflow: hidden; }
+.fcs1 .ptile { position: relative; margin: 0 0 22px; aspect-ratio: 4 / 3; }
 .fcs1 .ptile canvas { display: block; width: 100%; height: 100%; }
-.fcs1 .ptile figcaption { position: absolute; left: 16px; bottom: 14px; display: flex; flex-direction: column; gap: 1px; font-variant-numeric: tabular-nums; }
+.fcs1 .ptile figcaption { position: absolute; left: 0; bottom: 6px; display: flex; flex-direction: column; gap: 1px; font-variant-numeric: tabular-nums; }
 .fcs1 .ptile figcaption b { font-size: 15px; font-weight: 600; color: var(--ink); } .fcs1 .ptile figcaption span { font-size: 12.5px; color: var(--muted); }
 .fcs1 .prob .meta { margin-bottom: 10px; }
 .fcs1 .prob h3 { font-size: clamp(22px, 2.2vw, 28px); font-weight: 500; margin: 0 0 10px; }
