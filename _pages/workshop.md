@@ -41,7 +41,7 @@ page_css: fcs2
     <div>
       <h2>Challenge <span class="venue">Problem to be announced</span></h2>
       <p class="chg-t">An open-ended problem in AI for AI R&amp;D</p>
-      <p class="chg-d">Every team gets the same problem and the same budget, and lets its research agents work on it. The winners present at the workshop.</p>
+      <p class="chg-d">Every team gets the same problem and the same budget. Let your research agents work on it alone, or collaborate with them. The winners present at the workshop.</p>
     </div>
     <svg class="chg-art" viewBox="0 0 420 220" aria-hidden="true">
       <g fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -54,7 +54,7 @@ page_css: fcs2
   </div>
   <ol class="chg-s">
     <li><b>Same start</b><span>One problem and one budget for every team</span></li>
-    <li><b>Your agents</b><span>Submit runnable code and a short report</span></li>
+    <li><b>Your agents, alone or with you</b><span>Let them run on their own or collaborate with them, then submit runnable code and a short report</span></li>
     <li><b>Our rerun</b><span>We rerun the top entries before the workshop</span></li>
   </ol>
 </section>
