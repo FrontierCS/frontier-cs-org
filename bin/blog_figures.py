@@ -274,6 +274,29 @@ def elo_reference():
     for k in range(1, 5): g += L(150 + k * 170, 60, 150 + k * 170, 330, LINE, 1.5, '3 6')
     return g + L(170, 300, 880, 100, BLUE, 3.5) + T(880, 86, 'repeated sampling', 16, 600, BLUE, 'end'), 1040, 400
 
+def calico_table():
+    """CALICO post: the multiplication table of a = [2, 3, 4, 4], with each observed entry marked satisfied, in error or discarded (as in the post's original figure)."""
+    a = ['a₁', 'a₂', 'a₃', 'a₄']; g = ''; S = 92
+    cells = {(0, 1): (6, 's'), (0, 2): (8, 's'), (0, 3): (8, ''), (1, 2): (12, 's'), (1, 3): (12, 'd'), (2, 3): (16, 'e')}
+    fill = {'s': (BLUE_L, BLUE), 'e': (RED_L, RED), 'd': (SOFT, MUTED), '': ('#fff', LINE)}
+    for i in range(5):
+        for j in range(5):
+            x, y = 40 + j * S, 30 + i * S
+            if i == 0 or j == 0: g += B(x, y, S - 8, S - 8, a[j - 1] if i == 0 and j else a[i - 1] if j == 0 and i else '', SOFT, LINE, 20, 500, tc=MUTED); continue
+            v, k = cells.get((min(i, j) - 1, max(i, j) - 1), ('', ''))
+            f, st = fill[k]; g += B(x, y, S - 8, S - 8, str(v), f, st if v != '' else LINE, 24, 600)
+    for k, (lab, key) in enumerate((('Satisfied', 's'), ('Error', 'e'), ('Discarded', 'd'))):
+        g += R(60 + k * 150, 510, 22, 22, fill[key][0], 4, fill[key][1]) + T(90 + k * 150, 527, lab, 16)
+    return g, 540, 560
+
+def calico_graph():
+    """CALICO post: the same instance as a graph; nodes hold a's values, edges carry target products, one edge is discarded (as in the post's original figure)."""
+    N = [(120, 110, 2), (420, 110, 3), (120, 410, 4), (420, 410, 4)]; g = ''
+    for (u, v, lab, dash, lx, ly) in ((0, 1, '6', '', 270, 92), (0, 2, '8', '', 150, 268), (1, 2, '12', '', 296, 284), (2, 3, '20', '', 270, 392), (1, 3, '', '8 8', 0, 0)):
+        g += L(N[u][0], N[u][1], N[v][0], N[v][1], BLUE if not dash else MUTED, 4, dash) + (T(lx, ly, lab, 22, 600, anchor='middle') if lab else '')
+    for x, y, v in N: g += C(x, y, 44, BLUE, '#fff', 4) + T(x, y + 10, str(v), 30, 600, '#fff', 'middle')
+    return g + L(110, 520, 150, 520, BLUE, 4) + T(162, 526, 'Constraint', 16) + L(300, 520, 340, 520, MUTED, 4, '8 8') + T(352, 526, 'Discarded', 16), 540, 560
+
 FIGS = {'2026-02-14-negative-optimization/closed-vs-open.svg': closed_vs_open, '2026-02-14-negative-optimization/query-budget.svg': query_budget,
         '2026-02-14-negative-optimization/best-of-n.svg': best_of_n, '2026-02-14-negative-optimization/binary-vs-continuous.svg': binary_vs_continuous,
         '2026-02-10-evaluation/pipeline.svg': eval_pipeline, '2026-02-10-evaluation/traditional-vs-frontiercs.svg': eval_traditional_vs_fcs,
@@ -281,7 +304,7 @@ FIGS = {'2026-02-14-negative-optimization/closed-vs-open.svg': closed_vs_open, '
         '2026-03-06-agent-evaluation/suite-scale.svg': suite_scale, '2026-03-06-agent-evaluation/permutation-task.svg': permutation_task,
         '2026-03-15-alma/memory-or-not.svg': memory_or_not, '2026-03-15-alma/memory-designs.svg': memory_designs,
         '2026-06-11-frontiercs-2-roadmap/environment-evolution.svg': env_evolution, '2026-06-11-frontiercs-2-roadmap/serverless-gpu.svg': serverless_gpu,
-        '2026-04-21-calico/results.svg': calico_results, '2026-05-12-harbor/trace-summary.svg': harbor_summary, '2026-05-12-harbor/saturating-vs-open.svg': saturating_vs_open,
+        '2026-04-21-calico/results.svg': calico_results, '2026-04-21-calico/table.svg': calico_table, '2026-04-21-calico/graph.svg': calico_graph, '2026-05-12-harbor/trace-summary.svg': harbor_summary, '2026-05-12-harbor/saturating-vs-open.svg': saturating_vs_open,
         '2026-05-15-frontiersmith/data-gap.svg': data_gap, '2026-06-16-humans-still-beat-ai/sampling-vs-agent.svg': sampling_vs_agent, '2026-06-16-humans-still-beat-ai/elo-reference.svg': elo_reference}
 
 if __name__ == '__main__':

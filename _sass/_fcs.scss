@@ -1219,7 +1219,7 @@ nav .pagination {
 .ar-main td { padding: 9px 14px 9px 0; border-bottom: 1px solid var(--rule-2); color: var(--ink-2); vertical-align: top; }
 .ar-main .fc-table-scroll, .ar-main .table-wrap { overflow-x: auto; }
 /* Embedded HTML figures assume a light page: keep a paper ground under them in both themes */
-.ar-main iframe { max-width: 100%; border: 1px solid var(--rule); background: #F6F3EC; }
+.ar-main iframe { max-width: 100%; border: 1px solid var(--rule); background: #fff; }
 .ar-main video { max-width: 100%; }
 .ar-main sup { font-family: var(--font-mono); font-size: 0.7em; color: var(--accent); line-height: 0; }
 .ar-main .footnotes { margin-top: 52px; padding-top: 18px; border-top: 1px solid var(--rule); }
