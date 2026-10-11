@@ -6,7 +6,8 @@ thumbnail: assets/img/blog-thumbs/agent-evaluation.svg
 
 date: 2026-03-10
 date_display: "Mar 10, 2026"
-image: assets/img/2026-03-06-agent-evaluation/permutation.png
+image: assets/img/2026-03-06-agent-evaluation/permutation-task.svg
+og_image: assets/img/2026-03-06-agent-evaluation/result.png   # link previews need a raster image
 htmlwidgets: true
 
 authors:
@@ -102,7 +103,7 @@ Each FrontierCS task is a distinct, open-ended problem with its own environment,
 
 <div style="text-align: center; margin-bottom: 0;">
   <figure style="margin-bottom: 0;">
-    <img src="{{ 'assets/img/2026-03-06-agent-evaluation/permutation.png' | relative_url }}" style="width: 50%; border-radius: 6px;" alt="Permutation Task" data-zoomable>
+    <img src="{{ 'assets/img/2026-03-06-agent-evaluation/permutation-task.svg' | relative_url }}" style="width: 50%; border-radius: 6px;" alt="A query of length n is answered only with the number of positions that match the hidden permutation" data-zoomable>
   </figure>
 </div>
 
@@ -114,7 +115,7 @@ FrontierCS is already helping push the field toward real large-scale evaluation.
 
 <div style="display: flex; justify-content: center; align-items: center; gap: 2rem; flex-wrap: wrap;">
   <figure style="text-align: center; margin: 0; flex: 1; max-width: 45%;">
-    <img src="{{ 'assets/img/2026-03-06-agent-evaluation/baby-giant.png' | relative_url }}" style="width: 100%; border-radius: 6px;" alt="Baby-Giant" data-zoomable>
+    <img src="{{ 'assets/img/2026-03-06-agent-evaluation/suite-scale.svg' | relative_url }}" style="width: 100%; border-radius: 6px;" alt="Earlier evaluations used a handful of tasks; this suite has 200+ tasks, 172 of them FrontierCS problems" data-zoomable>
     <figcaption style="margin-top: 0.5rem; font-size: 0.85em; font-weight: bold;">FrontierCS enables large-scale evolving agent benchmarking.</figcaption>
   </figure>
   <figure style="text-align: center; margin: 0; flex: 1; max-width: 45%;">
@@ -162,7 +163,7 @@ During offline training, ACE continuously expands its playbook of strategies. Th
 
 <div style="text-align: center; margin-bottom: 0;">
   <figure style="margin-bottom: 0;">
-    <img src="{{ 'assets/img/2026-03-06-agent-evaluation/playbook.png' | relative_url }}" style="width: 80%; border-radius: 6px;" alt="Permutation Task" data-zoomable>
+    <img src="{{ 'assets/img/2026-03-06-agent-evaluation/playbook.png' | relative_url }}" style="width: 80%; border-radius: 6px;" alt="A query of length n is answered only with the number of positions that match the hidden permutation" data-zoomable>
   </figure>
 </div>
 

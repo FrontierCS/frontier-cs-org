@@ -60,12 +60,8 @@ _styles: >
 
 ## Evaluating the Hardest CS Problems in the Age of LLMs
 
-<img src="{{ site.baseurl }}/assets/img/2026-02-10-evaluation/image1.jpg" alt="Evaluation pipeline overview" class="hero">
+<img src="{{ site.baseurl }}/assets/img/2026-02-10-evaluation/pipeline.svg" alt="Evaluation pipeline overview" class="hero">
 
-<!-- PLACEHOLDER: hero image — a stylized diagram showing diverse problem
-     types (CUDA kernel, algorithm, data structure) funneling into a unified
-     evaluation pipeline, with cluster icons and score outputs on the right.
-     Style: clean, minimal, matching the FrontierCS brand. -->
 
 Our [1.0 release](https://frontier-cs.org/blog/feb-release/) introduced
 **240 open-ended problems** spanning algorithmic competition and systems
@@ -99,13 +95,8 @@ scoring harness, and collecting results. Now multiply that by 7 models, 240
 problems, and 5 runs each. That's 8,400 evaluations per cycle, and a new
 cycle starts every time a model provider ships an update.
 
-<img src="{{ site.baseurl }}/assets/img/2026-02-10-evaluation/image2.png" alt="Traditional vs FrontierCS evaluation">
+<img src="{{ site.baseurl }}/assets/img/2026-02-10-evaluation/traditional-vs-frontiercs.svg" alt="Traditional vs FrontierCS evaluation">
 
-<!-- PLACEHOLDER: side-by-side comparison diagram.
-     Left: "Traditional benchmark" — code → test → pass/fail.
-     Right: "FrontierCS" — code → provision hardware → install deps →
-     run scoring harness → continuous score.
-     Emphasize the difference in complexity. -->
 
 ## 240 Problems, No Two Alike
 
@@ -184,13 +175,8 @@ accelerators, instance type) derived from each problem's `config.yaml`.
 Each group gets its own pool of SkyPilot clusters, sized proportionally to
 the number of problems in that group.
 
-<img src="{{ site.baseurl }}/assets/img/2026-02-10-evaluation/image3.png" alt="Resource-grouped cluster pools">
+<img src="{{ site.baseurl }}/assets/img/2026-02-10-evaluation/cluster-pools.svg" alt="Resource-grouped cluster pools">
 
-<!-- PLACEHOLDER: diagram showing resource grouping.
-     Three groups: "GPU problems" → GPU cluster pool (3 clusters),
-     "CPU-heavy problems" → CPU cluster pool (2 clusters),
-     "lightweight problems" → small cluster pool (1 cluster).
-     Workers pick from the right pool. -->
 
 CPU-only problems run on cheap instances. GPU problems get GPU instances.
 No cluster sits idle running the wrong workload.
@@ -233,13 +219,8 @@ guarantee that **every valid score on the leaderboard was produced under
 the same pinned conditions**. Determinism through immutability, not through
 cross-environment normalization.
 
-<img src="{{ site.baseurl }}/assets/img/2026-02-10-evaluation/image4.png" alt="Pin, hash, and invalidate cycle">
+<img src="{{ site.baseurl }}/assets/img/2026-02-10-evaluation/pin-hash-invalidate.svg" alt="Pin, hash, and invalidate cycle">
 
-<!-- PLACEHOLDER: diagram showing the "pin + hash + invalidate" cycle.
-     config.yaml pins hardware/CUDA/deps → Docker image & AMI lock the
-     environment → solution + problem directory hashed → result tagged
-     with hashes → any change triggers invalidation + re-run.
-     Circular flow, emphasizing that nothing escapes the hash. -->
 
 Evaluation determinism is becoming a first-class concern across the
 benchmarking community. Projects like
@@ -279,14 +260,8 @@ itself has side effects: it reads the environment, runs tests, modifies
 code across multiple turns. The boundary between "generating a solution"
 and "evaluating it" starts to blur.
 
-<img src="{{ site.baseurl }}/assets/img/2026-02-10-evaluation/image5.png" alt="File-based vs agentic submission pipeline">
+<img src="{{ site.baseurl }}/assets/img/2026-02-10-evaluation/file-vs-agentic.svg" alt="File-based vs agentic submission pipeline">
 
-<!-- PLACEHOLDER: side-by-side diagram.
-     Left "Today": LLM → source file → [sandbox] evaluation → score.
-     Clean boundary between generation and evaluation.
-     Right "Agentic future": Agent ↔ environment (write code, run on GPU,
-     observe output, iterate). Generation and evaluation interleaved.
-     Arrow showing the boundary dissolving. -->
 
 Our current architecture handles this by keeping the boundary sharp: no
 matter how the solution was produced (single-shot, chain-of-thought, 50
@@ -355,9 +330,6 @@ instead of SkyPilot clusters.
 
 <img src="{{ site.baseurl }}/assets/img/2026-02-10-evaluation/image6.png" alt="Batch run terminal output (mockup)">
 
-<!-- PLACEHOLDER: screenshot of a terminal showing a batch run in progress.
-     tqdm progress bar, [OK] and [FAIL] lines, final summary with
-     "Results exported to results/batch/research". -->
 
 ## Try It Yourself
 
