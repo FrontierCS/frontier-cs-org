@@ -12,10 +12,16 @@ page_css: fcs2
 
 <div class="col" id="main" tabindex="-1">
 <section class="intro" id="overview">
-  <p class="ws-st"><span class="venue hl">Proposal</span><span class="venue">ICLR 2027 workshop</span></p>
-  <h1>How Far Are AI Agents from Becoming Computer Scientists?</h1>
-  <p class="lead">Agents make progress when a person specifies the task and supplies a check on every answer. Real research often gives neither. This workshop is about what an agent does then.</p>
-  <p class="ws-prop">We have proposed this workshop and its challenge for ICLR 2027. ICLR decides on November 29, 2026.</p>
+  <div class="whero">
+    <div>
+    <p class="ws-st"><span class="venue hl">Proposal</span><span class="venue">ICLR 2027 workshop</span></p>
+    <h1>How Far Are AI Agents from Becoming Computer Scientists?</h1>
+    </div>
+    <div>
+    <p class="lead">Agents make progress when a person specifies the task and supplies a check on every answer. Real research often gives neither. This workshop is about what an agent does then.</p>
+    <p class="ws-prop">We have proposed this workshop and its challenge for ICLR 2027. ICLR decides on November 29, 2026.</p>
+    </div>
+  </div>
 
   <div class="lv">
     <article style="--h:#1a73e8; --l:#d2e3fc">
