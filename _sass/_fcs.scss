@@ -1540,7 +1540,7 @@ footer.foot { margin-top: 120px; padding: 56px 0 28px; background: #202124; colo
 .ws2 .tpw { overflow: hidden; padding: 14px 0; -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent); mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent); }
 .ws2 .tpr { list-style: none; margin: 0; padding: 0; display: flex; gap: 16px; padding-right: 16px !important; width: max-content; animation: tpdrift 60s linear infinite; }
 .ws2 .tpw:hover .tpr, .ws2 .tpw:hover .tpr li { animation-play-state: paused; }
-.ws2 .tpr li { flex: none; width: 272px; display: flex; flex-direction: column; gap: 4px; padding: 18px 20px 20px; border: 1px solid var(--line); border-radius: 10px; background: #fff; animation: tpbob 5s ease-in-out infinite; animation-delay: calc(var(--i) * -0.62s); }
+.ws2 .tpr li { flex: none; width: 272px; display: flex; flex-direction: column; gap: 4px; padding: 18px 20px 20px; border: 1px solid var(--line); border-radius: 10px; background: #fff; animation: tpbob 5s ease-in-out infinite; }   /* each card's delay is set inline: the CSS minifier breaks var() inside calc() */
 .ws2 .tpi { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 10px; background: var(--l); color: var(--h); margin-bottom: 10px; }
 .ws2 .tpi svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .ws2 .tpr b { font-size: 17.5px; font-weight: 500; } .ws2 .tpr li > span:last-child { font-size: 14.5px; line-height: 1.4; color: var(--ink-2); }
