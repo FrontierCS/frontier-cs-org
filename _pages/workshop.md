@@ -52,11 +52,6 @@ page_css: fcs2
       <g fill="#fff" stroke="#0b57d0" stroke-width="2.5"><circle cx="74" cy="154" r="5"/><circle cx="128" cy="136" r="5"/><circle cx="170" cy="106" r="5"/><circle cx="236" cy="88" r="5"/><circle cx="280" cy="68" r="5"/><circle cx="352" cy="52" r="5"/></g>
     </svg>
   </div>
-  <ol class="chg-s">
-    <li><b>Same start</b><span>One problem and one budget for every team</span></li>
-    <li><b>Your agents, alone or with you</b><span>Let them run on their own or collaborate with them, then submit runnable code and a short report</span></li>
-    <li><b>Our rerun</b><span>We rerun the top entries before the workshop</span></li>
-  </ol>
 </section>
 
 <section class="sec" id="topics">

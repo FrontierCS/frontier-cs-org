@@ -1570,11 +1570,7 @@ footer.foot { margin-top: 120px; padding: 56px 0 28px; background: #202124; colo
 .ws2 .chg-art { display: block; width: 100%; height: auto; }
 .ws2 .chg-run { stroke-dasharray: 100; stroke-dashoffset: 100; animation: chgrun 7s ease-in-out infinite; }
 @keyframes chgrun { 0% { stroke-dashoffset: 100; } 70%, 100% { stroke-dashoffset: 0; } }
-.ws2 .chg-s { list-style: none; counter-reset: s; margin: 40px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
-.ws2 .chg-s li { counter-increment: s; border-top: 1px solid var(--ink-2); padding-top: 14px; display: flex; flex-direction: column; gap: 3px; }
-.ws2 .chg-s li::before { content: "0" counter(s); font-size: 13px; font-weight: 600; color: var(--teal); margin-bottom: 4px; }
-.ws2 .chg-s b { font-size: 19px; font-weight: 500; } .ws2 .chg-s span { font-size: 15.5px; line-height: 1.4; color: var(--ink-2); }
-@media (max-width: 900px) { .ws2 .chg, .ws2 .chg-s { grid-template-columns: 1fr; } .ws2 .chg-art { max-width: 420px; } }
+@media (max-width: 900px) { .ws2 .chg { grid-template-columns: 1fr; } .ws2 .chg-art { max-width: 420px; } }
 @media (prefers-reduced-motion: reduce) { .ws2 .chg-run { animation: none; stroke-dashoffset: 0; } }
 .ws2 .tbd { font-size: 17px; line-height: 1.5; max-width: 44em; }
 .ws2 .sb-n { margin-top: 24px; } .ws2 .sb-n a { text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--line-2); }
