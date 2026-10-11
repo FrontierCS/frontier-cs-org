@@ -56,6 +56,7 @@ permalink: /team/
   <ul class="sponsor-row">
     <li><a class="partner" href="https://openrsi.foundation/" target="_blank" rel="noopener noreferrer"><img src="{{ 'assets/img/partners/openrsi.svg' | relative_url }}" class="openrsi" alt=""><span>OpenRSI</span></a></li>
     <li><a href="https://www.yukon.org/frontiercs" target="_blank" rel="noopener noreferrer"><img src="{{ 'assets/img/partners/yukon.svg' | relative_url }}" class="yukon" alt="Yukon"></a></li>
+    <li><a class="partner harbor" href="https://www.harborframework.com/" target="_blank" rel="noopener noreferrer"><span>harbor</span></a></li>
   </ul>
 </div>
 </section>

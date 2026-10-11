@@ -1672,6 +1672,7 @@ section.journal.team-sec.team-top { padding-top: clamp(56px, 6vw, 72px); }
 .sponsor-row img.laude { height: 44px; }
 .sponsor-row img.modal { height: 30px; }
 .sponsor-row img.openrsi { height: 34px; } .sponsor-row img.yukon { height: 26px; }
+.sponsor-row a.partner.harbor { font-family: var(--font-code); font-weight: 500; font-size: 25px; letter-spacing: 0; }   /* Harbor's own mark is its name in a monospace face */
 .sponsor-row a.partner { display: flex; align-items: center; gap: 10px; font-size: 24px; font-weight: 600; letter-spacing: -.01em; color: var(--ink); }
 .sponsor-row a { display: block; transition: opacity .15s; }
 .sponsor-row a:hover { opacity: .7; }
