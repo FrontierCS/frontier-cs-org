@@ -4,7 +4,7 @@ title: Papers
 permalink: /paper/
 ---
 
-<section class="page-hero">
+<section class="page-hero one-line">
   <div class="page" id="main" tabindex="-1">
     <h1>Papers</h1>
     <p class="lede">Papers from the FrontierCS team.</p>
