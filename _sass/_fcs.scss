@@ -1497,8 +1497,8 @@ footer.foot { margin-top: 120px; padding: 56px 0 28px; background: #202124; colo
 .fcs1 .intro h1 { max-width: none; font-size: clamp(32px, 3.5vw, 44px); }
 @media (max-width: 1000px) { .fcs1 .hero { grid-template-columns: 1fr; } }
 .fcs1 .loopfig { margin: 0; justify-self: end; width: min(100%, 600px); }
-/* a dotted ground whose edges fade out, as the paper wall on the FrontierCS 2 page does */
-.fcs1 .lf { padding: 11% 10%; background: radial-gradient(#c3d3ee 1.2px, transparent 1.6px) 0 0 / 20px 20px, #f3f7fe;
+/* a pale ground whose edges fade out, as the paper wall on the FrontierCS 2 page does */
+.fcs1 .lf { padding: 11% 10%; background: #eef3fd;
   -webkit-mask-image: linear-gradient(transparent, #000 20%, #000 80%, transparent), linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent); -webkit-mask-composite: source-in;
   mask-image: linear-gradient(transparent, #000 20%, #000 80%, transparent), linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent); mask-composite: intersect; }
 .fcs1 .loopfig svg { display: block; width: 100%; height: auto; }
