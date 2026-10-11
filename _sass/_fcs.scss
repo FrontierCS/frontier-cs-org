@@ -1477,30 +1477,46 @@ footer.foot { margin-top: 120px; padding: 56px 0 28px; background: #202124; colo
 .fc-table-wrap th { font-size: 13px; font-weight: 600; color: var(--ink-2); border-bottom: 1px solid var(--ink-2); }
 .fc-table-wrap td { font-size: 15px; font-variant-numeric: tabular-nums; }
 .fc-terminal-card { background: var(--paper-2); box-shadow: none; border-radius: 8px; }
-/* numbers right-aligned under their headers, model marked by a square in its maker's colour (as table.res on the FrontierCS 2 page) */
-.fc-table-wrap th, .fc-table-wrap td { padding: 11px 12px; }
-.fc-table-wrap th:nth-child(n+3), .fc-table-wrap td:nth-child(n+3) { text-align: right; }
-.fc-table-wrap th:first-child, .fc-table-wrap td:first-child { padding-left: 0; width: 56px; }
-.fc-table-wrap td:first-child { font-size: 14px; color: var(--ink-3); }
-.fc-table-wrap td { border-bottom-color: var(--rule); }
-.fc-model-logo { width: 20px; height: 20px; border: 0; border-radius: 0; background: none; }
-/* the ranking metric: a bar on the 0-100 scale in the maker's colour, then the number */
-.fc-table-wrap th:nth-child(3) { text-align: left; }
-.fc-table-wrap td.fc-score { text-align: left; width: 38%; min-width: 150px; }
-.fc-bar { display: inline-block; vertical-align: middle; margin-right: 12px; width: calc(100% - 64px); height: 10px; background: var(--rule-2); }
-.fc-bar i { display: block; height: 100%; background: var(--ink-3); }
-.fc-score b { font-weight: 600; color: var(--ink); }
-.fc-bar-openai i { background: #1f1f1f; } .fc-bar-google i { background: #4285f4; } .fc-bar-anthropic i { background: #d97757; }
-.fc-bar-deepseek i { background: var(--m-ds); } .fc-bar-xai i { background: #5f6368; } .fc-bar-qwen i { background: #615ced; } .fc-bar-kimi i { background: #1783ff; }
-.fc-bar-human i { background: repeating-linear-gradient(135deg, var(--fail) 0 4px, var(--rule-2) 4px 8px); }
-.fc-model-logo-human { display: inline-block; width: 20px; height: 20px; border-radius: 50%; border: 1.5px dashed var(--ink-3); }
-.fc-human-row td { color: var(--ink-3); } .fc-human-row .fc-model-name { color: var(--ink-2); }
-.fc-human-reference { font-size: 13px; color: var(--muted-2); margin-top: 14px; }
-/* example tasks: the animations are portrait cards on #ebf2fa; show them whole instead of cropping to a band */
-.fc-task-visual { aspect-ratio: 4 / 3; background: #ebf2fa; border-radius: 6px; }
-.fc-task-visual img { width: auto; max-width: 100%; height: 100%; object-fit: contain; mix-blend-mode: normal; }
-.fc-task-card { border-bottom: 0; padding-bottom: 0; }
-@media (max-width: 720px) { .fc-task-grid { row-gap: 36px; } }
+/* FrontierCS (v1) page: FrontierCS 2 layout (assets/css/fcs2.css) plus its own leaderboard rows and problem demos */
+.fcs1 .res.lb th, .fcs1 .res.lb td { text-align: right; }
+.fcs1 .res.lb th:nth-child(2), .fcs1 .res.lb td:nth-child(2), .fcs1 .res .sc { text-align: left; }
+.fcs1 .res .rk { text-align: left; width: 56px; color: var(--muted); }
+.fcs1 .res td.sc { width: 38%; min-width: 150px; white-space: nowrap; }
+.fcs1 .res td.sc b { font-weight: 600; }
+.fcs1 .sbar { display: inline-block; vertical-align: middle; width: calc(100% - 64px); height: 10px; margin-right: 12px; background: var(--grid); }
+.fcs1 .sbar i { display: block; height: 100%; }
+.fcs1 .sbar.hatch i { background: repeating-linear-gradient(135deg, #9aa0a6 0 4px, var(--grid) 4px 8px) !important; }
+.fcs1 .mdl { display: inline-flex; align-items: center; gap: 10px; white-space: nowrap; }
+.fcs1 .mdl small { font-size: 13px; color: var(--muted); margin-left: 4px; }
+.fcs1 .mlogo { flex: none; width: 20px; height: 20px; }
+.fcs1 .mlogo.human { border-radius: 50%; border: 1.5px dashed var(--muted); }
+.fcs1 .res .hum td { color: var(--ink-2); }
+.fcs1 .res.runs td { padding-block: 8px; } .fcs1 .res.runs td:first-child { text-align: left; } .fcs1 .res.runs td.sc { width: 46%; }
+.fcs1 .cfoot a { text-decoration: underline; text-underline-offset: 3px; }
+.fcs1 .intro .hero-text { max-width: 760px; }
+.fcs1 #teaser { margin-top: 56px; }
+.fcs1 .pkgrid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px 48px; align-items: start; margin-top: 14px; }
+.fcs1 .pkbox { line-height: 0; min-width: 0; min-height: 462px; } .fcs1 .pkbox canvas { display: block; max-width: 100%; }
+.fcs1 .pkside { min-width: 0; } .fcs1 .pkside .tstats { margin: 0 0 28px; gap: 16px 44px; } .fcs1 .pkside .tstats dd { font-size: 28px; }
+.fcs1 #pksvg { display: block; width: 100%; }
+.fcs1 #pkreplay { margin-top: 14px; }
+.fcs1 .probs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px 56px; }
+.fcs1 .prob h3 { font-size: clamp(22px, 2.2vw, 28px); font-weight: 500; margin: 0 0 10px; }
+.fcs1 .prob h4 { font-size: 13px; font-weight: 600; color: var(--ink-2); margin: 24px 0 2px; }
+.fcs1 .prob p { margin: 0; color: var(--ink-2); font-size: 17px; line-height: 1.5; max-width: 36em; }
+.fcs1 .prob .lk { display: flex; flex-wrap: wrap; gap: 18px; font-size: 14px; margin-top: 18px; }
+.fcs1 .prob .lk a { color: var(--ink-2); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--line-2); } .fcs1 .prob .lk a:hover { color: var(--teal); }
+.fcs1 .more { margin: 36px 0 0; }
+/* In research: papers that use the benchmark, grouped by what they use it for (a plain list, unlike the FrontierCS 2 paper wall) */
+.fcs1 #research .tbd { max-width: 40em; font-size: 17px; line-height: 1.5; }
+.fcs1 .uses { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 8px 56px; margin-top: 36px; padding-top: 20px; border-top: 1px solid var(--ink-2); }
+.fcs1 .uses > h3 { font-size: 21px; font-weight: 500; margin: 4px 0 0; }
+.fcs1 .uses .rows { margin: 0; } .fcs1 .uses .row { display: block; padding: 0 0 22px; margin-bottom: 22px; border-top: 0; border-bottom: 1px solid var(--line); } .fcs1 .uses .row:last-child { border-bottom: 0; margin-bottom: 0; padding-bottom: 0; }
+.fcs1 .uses h4 { font-size: clamp(18px, 1.7vw, 21px); font-weight: 500; line-height: 1.3; margin: 0 0 6px; max-width: 34em; }
+.fcs1 .uses h4 a { color: inherit; text-decoration: none; } .fcs1 .uses h4 a::after { content: ""; position: absolute; inset: 0; } .fcs1 .uses .row:hover h4 a { color: var(--teal-d); }
+.fcs1 .uses .au { font-size: 14px; color: var(--muted); margin: 0 0 8px; } .fcs1 .uses .row p:last-child { margin: 0; max-width: 44em; }
+@media (max-width: 900px) { .fcs1 .pkgrid, .fcs1 .probs, .fcs1 .uses { grid-template-columns: 1fr; } .fcs1 .pkbox { min-height: 0; } }
+@media (max-width: 640px) { .fcs1 .res.lb th:nth-child(n+4), .fcs1 .res.lb td:nth-child(n+4) { display: none; } .fcs1 .res .rk { width: 34px; } .fcs1 .res td.sc { width: 44%; min-width: 0; } .fcs1 .sbar { width: calc(100% - 58px); margin-right: 8px; } }
 
 /* sections separated by space, not full-width rules (Epoch) */
 section.journal { border-bottom: 0; padding: clamp(44px, 6vw, 72px) 0; }
