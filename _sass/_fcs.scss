@@ -1676,6 +1676,11 @@ section.journal.team-sec.team-top { padding-top: clamp(56px, 6vw, 72px); }
 .sponsor-row a.partner { display: flex; align-items: center; gap: 10px; font-size: 24px; font-weight: 600; letter-spacing: -.01em; color: var(--ink); }
 .sponsor-row a { display: block; transition: opacity .15s; }
 .sponsor-row a:hover { opacity: .7; }
+/* Team page: partners and sponsors on the institutions' grid, one logo centred in each equal cell */
+.sponsor-row.even { display: grid; grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)); gap: 40px 28px; margin-top: 24px; }
+.sponsor-row.even li { display: flex; justify-content: center; align-items: center; height: 52px; }
+.sponsor-row.even img { max-width: 100%; }
+@media (max-width: 640px) { .sponsor-row.even { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 16px; } }
 @media (max-width: 560px) {
   .team-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 14px; }
   .contact-grid { grid-template-columns: 1fr; }
