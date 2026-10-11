@@ -141,6 +141,13 @@ function wmDiagonal(n, edges) {
     g.fillText('→ ' + s.ans, ax, y2 + cw * .4); g.globalAlpha = 1;                                                                            // the answer: how many positions match
     label.firstChild.textContent = `${k + 1} ${k ? 'queries' : 'query'}`; }); }
 
+// the hero terminal: one submission line per lap of the loop beside it (6 s a lap, five laps, then it starts over)
+{ const lf = document.querySelector('.lf'), lines = lf ? [...lf.querySelectorAll('[data-k]')] : [];
+  if (lf && !reduced) { lf.classList.add('live'); const t0 = performance.now();
+    const tick = () => { const t = ((performance.now() - t0) / 1000) % 30;
+      lines.forEach(l => l.classList.toggle('on', t >= (l.dataset.k - 1) * 6 + (l.classList.contains('tok') ? 5.2 : 4))); };
+    tick(); setInterval(tick, 200); } }
+
 // leaderboard tabs
 const tabs = [...document.querySelectorAll('#lbtabs .chip')];
 tabs.forEach(t => t.onclick = () => { tabs.forEach(x => x.setAttribute('aria-pressed', x === t ? 'true' : 'false'));
