@@ -1657,9 +1657,10 @@ section.journal#hero { padding: clamp(56px, 6vw, 72px) 0 clamp(32px, 4vw, 48px);
 .sec-head { border-bottom: 0; padding-bottom: 0; margin-bottom: 22px; }
 .post-row .post-thumb.placeholder, .tile-thumb.placeholder { background: var(--paper-2); }
 
-/* navigation: Papers, Workshop and Team sit in the site nav, and move into the menu on phones */
+/* navigation: Papers, Workshop & Challenge and Team sit in the site nav, and move into the menu at 800px and below,
+   where the six links no longer fit beside the menu button (they overflowed from 701 to 781px) */
 .nav-aux .narrow-only { display: none; }
-@media (max-width: 700px) {
+@media (max-width: 800px) {
   .nav-main .wide-only { display: none; }
   .nav-aux .narrow-only { display: block; }
 }
