@@ -6,7 +6,6 @@ thumbnail: assets/img/blog-thumbs/agent-evaluation.svg
 
 date: 2026-03-10
 date_display: "Mar 10, 2026"
-image: assets/img/2026-03-06-agent-evaluation/permutation-task.svg
 og_image: assets/img/2026-03-06-agent-evaluation/result.png   # link previews need a raster image
 htmlwidgets: true
 

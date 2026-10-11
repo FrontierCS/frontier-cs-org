@@ -1228,6 +1228,21 @@ nav .pagination {
 .ar-main mjx-container[display="true"] { overflow-x: auto; overflow-y: hidden; padding: 4px 2px; }
 /* MathJax's SVG output: the site makes every svg a block, which put each inline formula on its own line */
 mjx-container:not([display="true"]) > svg { display: inline; max-width: none; }
+
+/* Article figures (2026-10): posts set their own widths (40% to 80%) and frames, which left diagrams too small to read and
+   no two alike. Every figure now takes the column, up to its natural size, with no frame; tall ones are capped by height. */
+.ar-page { grid-template-columns: 200px minmax(0, 760px); }
+.ar-main img:not(.emoji) { display: block; width: auto !important; max-width: 100% !important; max-height: 520px; margin-inline: auto; border-radius: 6px; }
+.ar-main figure img { border: 0; background: none; }
+.ar-main figure, .ar-main img.hero, .ar-main p > img:only-child, .ar-main div > img:only-child { margin-block: 36px; }
+.ar-main figure img { margin-block: 0; }
+.ar-main figure[style*="max-width: 45%"] { max-width: none !important; flex: 1 1 300px !important; }   /* pairs sit side by side when there is room */
+.ar-main figcaption, .ar-main .caption { font-family: var(--font-sans); font-size: 14.5px !important; font-weight: 400 !important; letter-spacing: 0; line-height: 1.5; color: var(--ink-3); text-align: center; max-width: 40em; margin: 14px auto 0 !important; }
+.ar-main figure + p, .ar-main div + p { margin-top: 0; }
+.ar-main div:has(> figure) { margin-block: 36px !important; } .ar-main div:has(> figure) > figure { margin-block: 0; }
+.ar-main iframe { border: 0; border-radius: 6px; background: #fff; }
+@media (max-width: 1100px) { .ar-page { grid-template-columns: 180px minmax(0, 760px); } }
+
 mjx-container[display="true"] > svg { margin-inline: auto; }
 
 /* distill.pub leftovers rendered without template.v2.js */
