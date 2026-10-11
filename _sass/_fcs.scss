@@ -1495,17 +1495,43 @@ footer.foot { margin-top: 120px; padding: 56px 0 28px; background: #202124; colo
 .fcs1 .cfoot a { text-decoration: underline; text-underline-offset: 3px; }
 .fcs1 .intro .hero-text { max-width: 760px; }
 .fcs1 #teaser { margin-top: 56px; }
+/* how an agent works a problem: four steps in a row, the last three joined by a loop */
+.fcs1 .flow { list-style: none; counter-reset: step; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 36px; margin: 14px 0 0; padding: 0; }
+.fcs1 .flow li { counter-increment: step; position: relative; border: 1px solid var(--line); border-radius: 6px; padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 6px; background: #fff; }
+.fcs1 .flow li::before { content: counter(step); font-size: 13px; font-weight: 600; color: var(--muted); }
+.fcs1 .flow b { font-size: 21px; font-weight: 500; } .fcs1 .flow span { font-size: 15.5px; line-height: 1.4; color: var(--ink-2); }
+.fcs1 .flow li + li::after { content: ""; position: absolute; left: -27px; top: 50%; width: 12px; height: 12px; border-top: 2px solid var(--ink-2); border-right: 2px solid var(--ink-2); transform: translateY(-50%) rotate(45deg); }
+.fcs1 .flowloop { margin: 0 0 0 calc(25% + 9px); height: 46px; border: 2px solid var(--teal); border-top: 0; border-radius: 0 0 10px 10px; position: relative; margin-inline: calc(37.5% - 4px) calc(12.5% - 13px); }
+.fcs1 .flowloop::before { content: ""; position: absolute; left: -7px; top: -2px; width: 10px; height: 10px; border-top: 2px solid var(--teal); border-left: 2px solid var(--teal); transform: rotate(45deg); }
+.fcs1 .flowloop span { position: absolute; left: 50%; bottom: -11px; transform: translateX(-50%); background: var(--bg); padding: 0 12px; font-size: 14px; font-weight: 600; color: var(--teal-d); white-space: nowrap; }
+.fcs1 #teaser .cfoot { margin-top: 28px; }
+@media (prefers-reduced-motion: no-preference) {
+  .fcs1 .flow .lp { animation: flowstep 6s infinite; } .fcs1 .flow .lp:nth-child(3) { animation-delay: 2s; } .fcs1 .flow .lp:nth-child(4) { animation-delay: 4s; }
+  @keyframes flowstep { 0%, 30%, 100% { border-color: var(--line); background: #fff; } 6%, 24% { border-color: var(--teal); background: #f3f7fe; } }
+}
+@media (max-width: 900px) {
+  .fcs1 .flow { grid-template-columns: 1fr; gap: 30px; }
+  .fcs1 .flow li + li::after { left: 50%; top: -21px; transform: translateX(-50%) rotate(135deg); }
+  .fcs1 .flowloop { height: auto; border: 0; margin: 18px 0 0; } .fcs1 .flowloop::before { display: none; }
+  .fcs1 .flowloop span { position: static; transform: none; padding: 0; background: none; white-space: normal; }
+}
 .fcs1 .pkgrid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px 48px; align-items: start; margin-top: 14px; }
 .fcs1 .pkbox { line-height: 0; min-width: 0; min-height: 462px; } .fcs1 .pkbox canvas { display: block; max-width: 100%; }
 .fcs1 .pkside { min-width: 0; } .fcs1 .pkside .tstats { margin: 0 0 28px; gap: 16px 44px; } .fcs1 .pkside .tstats dd { font-size: 28px; }
 .fcs1 #pksvg { display: block; width: 100%; }
 .fcs1 #pkreplay { margin-top: 14px; }
-.fcs1 .probs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px 56px; }
+.fcs1 .prob { padding: 8px 0 44px; } .fcs1 .prob + .prob { border-top: 1px solid var(--line); padding-top: 40px; }
+.fcs1 .prob.split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px 48px; align-items: start; padding-bottom: 0; }
 .fcs1 .prob h3 { font-size: clamp(22px, 2.2vw, 28px); font-weight: 500; margin: 0 0 10px; }
-.fcs1 .prob h4 { font-size: 13px; font-weight: 600; color: var(--ink-2); margin: 24px 0 2px; }
-.fcs1 .prob p { margin: 0; color: var(--ink-2); font-size: 17px; line-height: 1.5; max-width: 36em; }
-.fcs1 .prob .lk { display: flex; flex-wrap: wrap; gap: 18px; font-size: 14px; margin-top: 18px; }
+.fcs1 .prob p { margin: 0; color: var(--ink-2); font-size: 17px; line-height: 1.5; max-width: 40em; }
+.fcs1 .prob .lk { display: flex; flex-wrap: wrap; gap: 18px; font-size: 14px; margin-top: 16px; }
 .fcs1 .prob .lk a { color: var(--ink-2); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--line-2); } .fcs1 .prob .lk a:hover { color: var(--teal); }
+.fcs1 #pkfig { margin: 32px 0 0; }
+.fcs1 .wmex { margin: 0; display: flex; gap: 24px; align-items: center; }
+.fcs1 .wmcells { flex: none; display: grid; grid-template-columns: repeat(3, 52px); gap: 3px; }
+.fcs1 .wmcells i { height: 52px; display: flex; align-items: center; justify-content: center; font-style: normal; font-weight: 600; font-size: 17px; border-radius: 3px; }
+.fcs1 .wmcells .c1 { background: #d3e3fd; color: #041e49; } .fcs1 .wmcells .c2 { background: #8ab4f8; color: #041e49; } .fcs1 .wmcells .c3 { background: #1a73e8; color: #fff; }
+.fcs1 .wmex figcaption { font-size: 14px; line-height: 1.45; color: var(--muted-2); max-width: 26em; }
 .fcs1 .more { margin: 36px 0 0; }
 /* In research: papers that use the benchmark, grouped by what they use it for (a plain list, unlike the FrontierCS 2 paper wall) */
 .fcs1 #research .tbd { max-width: 40em; font-size: 17px; line-height: 1.5; }
@@ -1515,7 +1541,7 @@ footer.foot { margin-top: 120px; padding: 56px 0 28px; background: #202124; colo
 .fcs1 .uses h4 { font-size: clamp(18px, 1.7vw, 21px); font-weight: 500; line-height: 1.3; margin: 0 0 6px; max-width: 34em; }
 .fcs1 .uses h4 a { color: inherit; text-decoration: none; } .fcs1 .uses h4 a::after { content: ""; position: absolute; inset: 0; } .fcs1 .uses .row:hover h4 a { color: var(--teal-d); }
 .fcs1 .uses .au { font-size: 14px; color: var(--muted); margin: 0 0 8px; } .fcs1 .uses .row p:last-child { margin: 0; max-width: 44em; }
-@media (max-width: 900px) { .fcs1 .pkgrid, .fcs1 .probs, .fcs1 .uses { grid-template-columns: 1fr; } .fcs1 .pkbox { min-height: 0; } }
+@media (max-width: 900px) { .fcs1 .pkgrid, .fcs1 .prob.split, .fcs1 .uses { grid-template-columns: 1fr; } .fcs1 .pkbox { min-height: 0; } }
 @media (max-width: 640px) { .fcs1 .res.lb th:nth-child(n+4), .fcs1 .res.lb td:nth-child(n+4) { display: none; } .fcs1 .res .rk { width: 34px; } .fcs1 .res td.sc { width: 44%; min-width: 0; } .fcs1 .sbar { width: calc(100% - 58px); margin-right: 8px; } }
 
 /* sections separated by space, not full-width rules (Epoch) */
