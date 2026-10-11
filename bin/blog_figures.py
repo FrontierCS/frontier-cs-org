@@ -190,12 +190,99 @@ def memory_designs():
         if k == 3: g += ''.join(L(630, y + 8, 550 + a * 80, y + 48, MUTED, 2) for a in range(3)) + C(630, y + 8, 8, c) + ''.join(C(550 + a * 80, y + 48, 8, c) for a in range(3))
     return g + T(790, 240, 'The four sketches stand for', 15, 400, MUTED) + T(790, 262, 'different designs, not real ones', 15, 400, MUTED), 1040, 420
 
+def env_evolution():
+    """Roadmap post: single-turn benchmark, then a static sandbox, then an iterative environment with a controlled feedback interface."""
+    g = ''
+    g += B(30, 150, 230, 250, '', '#fff', INK) + T(145, 190, 'Single-turn bench', 18, 600, anchor='middle') + B(60, 220, 170, 56, 'Model answers once', SOFT, LINE, 15)
+    g += arrow(145, 330, 145, 284, MUTED) + B(75, 334, 140, 46, 'Evaluator', '#fff', MUTED, 15) + T(145, 430, 'Scores only after the answer', 14, 400, MUTED, 'middle')
+    g += arrow(268, 275, 312, 275)
+    g += B(320, 110, 300, 330, '', '#fff', INK) + T(470, 150, 'Terminal-Bench', 18, 600, anchor='middle') + T(470, 174, 'static sandbox', 14, 400, MUTED, 'middle') + B(410, 196, 120, 50, 'Agent', BLUE_L, BLUE, 16, 600)
+    for k, lab in enumerate(('terminal', 'files', 'data', 'tools')): g += B(345 + (k % 2) * 130, 264 + (k // 2) * 56, 120, 44, lab, SOFT, LINE, 14)
+    g += B(400, 384, 140, 44, 'Evaluator', '#fff', MUTED, 15) + T(470, 470, 'Stays outside the sandbox', 14, 400, MUTED, 'middle')
+    g += arrow(628, 275, 672, 275)
+    g += B(680, 60, 340, 430, '', '#fff', BLUE) + T(850, 100, 'FrontierCS 2', 20, 600, BLUE, 'middle') + T(850, 124, 'iterative environment', 14, 400, MUTED, 'middle')
+    g += f'<rect x="704" y="146" width="292" height="150" rx="12" fill="{BLUE_L}" opacity=".45" stroke="{BLUE}" stroke-width="2" stroke-dasharray="7 6"/>' + T(850, 174, 'Sandbox', 15, 500, MUTED, 'middle')
+    g += B(790, 188, 120, 48, 'Agent', '#fff', BLUE, 16, 600) + T(850, 268, 'explore, plan, code, test, iterate', 14, 400, INK, 'middle')
+    g += arrow(838, 300, 838, 338, BLUE) + arrow(862, 338, 862, 300, BLUE) + B(720, 342, 260, 46, 'Controlled feedback interface', '#fff', BLUE, 14, 600, tc=BLUE)
+    g += arrow(838, 392, 838, 418, BLUE) + arrow(862, 418, 862, 392, BLUE) + B(780, 422, 140, 44, 'Evaluator', '#fff', MUTED, 15)
+    return g + T(850, 516, 'Feedback during the search; answers stay hidden', 14, 400, MUTED, 'middle'), 1040, 540
+
+def serverless_gpu():
+    """Roadmap post: the agent and the evaluator stay CPU-only; the model server runs behind an endpoint on an on-demand GPU outside the agent container."""
+    g = B(30, 90, 250, 220, '', '#fff', INK) + T(155, 128, 'Agent container', 18, 600, anchor='middle') + T(155, 152, 'no local GPU', 14, 400, MUTED, 'middle') + B(80, 180, 150, 50, 'Agent', BLUE_L, BLUE, 16, 600) + T(155, 270, 'uses the GPU through the API', 14, 400, MUTED, 'middle')
+    g += B(360, 250, 220, 130, '', '#fff', INK) + T(470, 290, 'Evaluator', 18, 600, anchor='middle') + T(470, 314, 'hidden tests', 14, 400, MUTED, 'middle') + T(470, 350, 'CPU-only', 14, 400, MUTED, 'middle')
+    g += B(680, 60, 340, 330, '', '#fff', BLUE) + T(850, 100, 'Modal GPU boundary', 18, 600, BLUE, 'middle')
+    g += B(705, 140, 150, 80, 'vLLM endpoint', BLUE_L, BLUE, 15, 600, 'OpenAI-compatible') + B(885, 140, 110, 80, 'L40S', SOFT, LINE, 16, 600, 'on demand') + arrow(858, 172, 882, 172) + arrow(882, 190, 858, 190)
+    g += T(850, 270, 'Baseline, then the patched server,', 14, 400, INK, 'middle') + T(850, 292, 'measured one after the other', 14, 400, INK, 'middle') + T(850, 350, 'Caches hold weights, not evaluator secrets', 13, 400, MUTED, 'middle')
+    g += P('M234 196 H700', BLUE, 2.5, dash='8 6') + P('M688 188 L702 196 L688 204', BLUE, 2.5) + T(465, 186, 'controlled API', 14, 600, BLUE, 'middle')
+    return g + arrow(584, 320, 676, 320) + T(630, 310, 'measure', 13, 500, MUTED, 'middle'), 1040, 420
+
+def calico_results():
+    """CALICO post: of 285 submissions, 21 beat Level 1, 7 beat Level 2 and 1 beat Level 3."""
+    g = T(40, 44, 'Human submissions that beat each AI baseline, out of 285', 22, 600)
+    rows = (('Level 1', 'Grok 4 · 121 lines', 21), ('Level 2', 'GPT-5.4 · 377 lines', 7), ('Level 3', 'GPT-5.4 + agent · 533 lines', 1))
+    for k, (a, b, n) in enumerate(rows):
+        y = 84 + k * 86; w = 620
+        g += T(40, y + 24, a, 18, 600) + T(40, y + 46, b, 14, 400, MUTED) + R(290, y, w, 52, SOFT, 6) + R(290, y, max(6, w * n / 285), 52, BLUE, 6)
+        g += T(290 + max(6, w * n / 285) + 12, y + 32, f'{n} beat it', 17, 600, BLUE) + T(290 + w + 14, y + 32, f'{285 - n} did not', 14, 400, MUTED)
+    return g, 1040, 350
+
+def harbor_summary():
+    """Harbor post: partial score and average trajectory steps of the two agents on 178 tasks."""
+    g = T(40, 44, 'FrontierCS on Harbor: 178 algorithm tasks', 22, 600)
+    for col, (name, lo, hi, x) in enumerate((('Partial score (0 to 100)', 0, 100, 290), ('Average steps', 0, 100, 680))):
+        g += T(x, 92, name, 15, 600, MUTED)
+        for k, (agent, sc, st) in enumerate((('Claude Code Opus 4.7', 43.0, 77.2), ('Kimi K2.6', 46.9, 67.2))):
+            y = 112 + k * 70; v = (sc, st)[col]
+            if col == 0: g += T(40, y + 28, agent, 17, 600)
+            g += R(x, y, 300, 42, SOFT, 6) + R(x, y, 300 * v / 100, 42, BLUE if col == 0 else VIOLET, 6) + T(x + 300 * v / 100 + 10, y + 27, f'{v:.1f}', 16, 600)
+    return g, 1040, 270
+
+def saturating_vs_open():
+    """Harbor post: exam-style tasks reach a ceiling quickly; open-ended optimization keeps a slope (the curves are illustrative)."""
+    g = head(260, 'Single-turn, exam-style tasks', 'Pass or fail; scores are saturating') + head(780, 'Open-ended optimization', 'Continuous score; there is always a better answer') + L(520, 30, 520, 420, LINE, 2)
+    for x0, sat in ((90, True), (610, False)):
+        g += P(f'M{x0} 130 V370 H{x0 + 340}', INK, 2) + T(x0 - 12, 250, 'score', 14, 400, MUTED, 'end') + T(x0 + 170, 398, 'effort', 14, 400, MUTED, 'middle')
+        pts = [(x0 + i * 8.5, 370 - (215 * (1 - math.exp(-i / 5)) if sat else 34 * math.log1p(i) + 2.2 * i)) for i in range(41)]
+        if sat: g += L(x0, 150, x0 + 340, 150, MUTED, 1.5, '4 6') + T(x0 + 340, 142, 'ceiling', 13, 400, MUTED, 'end')
+        g += P('M' + ' L'.join(f'{a:.1f} {b:.1f}' for a, b in pts), BLUE, 3.5)
+    return g, 1040, 430
+
+def data_gap():
+    """FrontierSmith post: closed-ended coding problems are abundant; open-ended benchmarks together hold only hundreds of tasks."""
+    rnd = random.Random(2); g = head(300, 'Closed-ended coding tasks', 'Abundant, and more arrive all the time') + head(830, 'Open-ended tasks', 'Hundreds, across all the benchmarks') + L(630, 30, 630, 420, LINE, 2)
+    for i in range(46):
+        for j in range(22): g += f'<rect x="{50 + i * 11}" y="{120 + j * 11}" width="8" height="8" rx="1.5" fill="{MUTED}" opacity="{.35 + rnd.random() * .5:.2f}"/>'
+    for k in range(12): g += R(790 + (k % 4) * 22, 210 + (k // 4) * 22, 16, 16, BLUE, 3)
+    return g + T(300, 396, 'each square stands for many problems; the picture is not to scale', 13, 400, MUTED, 'middle'), 1040, 430
+
+def sampling_vs_agent():
+    """Humans post: repeated sampling draws independent tries and a verifier keeps the best; an agent tries, observes, reflects and revises inside one run."""
+    g = head(260, 'Repeated sampling', 'Independent tries; a verifier keeps the best') + head(780, 'Agent loop', 'Feedback is used inside the run') + L(520, 30, 520, 420, LINE, 2)
+    for k in range(3): g += B(60, 140 + k * 80, 110, 50, f'Try {k + 1}', '#fff', INK, 15) + arrow(174, 165 + k * 80, 256, 240)
+    g += B(262, 212, 120, 56, 'Verifier', SOFT, LINE, 16, 600) + arrow(322, 272, 322, 326, BLUE) + B(262, 330, 120, 50, 'Best', BLUE_L, BLUE, 16, 600)
+    cx, cy = 780, 255; labs = ('Try', 'Observe', 'Reflect', 'Revise'); pos = [(cx - 140, cy - 70), (cx + 140, cy - 70), (cx + 140, cy + 70), (cx - 140, cy + 70)]
+    for k, (x, y) in enumerate(pos):
+        x2, y2 = pos[(k + 1) % 4]
+        g += arrow(x + (64 if k == 0 else -64 if k == 2 else 0), y + (28 if k == 1 else -28 if k == 3 else 0), x2 + (-64 if k == 0 else 64 if k == 2 else 0), y2 + (-28 if k == 1 else 28 if k == 3 else 0), BLUE)
+    for k, (x, y) in enumerate(pos): g += B(x - 60, y - 26, 120, 52, labs[k], BLUE_L, BLUE, 16)
+    return g + T(cx, cy + 6, 'feedback', 15, 500, MUTED, 'middle'), 1040, 430
+
+def elo_reference():
+    """Humans post: under repeated sampling, Elo grows linearly in log test-time compute."""
+    g = P('M150 60 V330 H900', INK, 2) + T(525, 372, 'log test-time compute', 16, 500, MUTED, 'middle') + f'<text x="112" y="195" font-size="16" font-weight="500" fill="{MUTED}" text-anchor="middle" transform="rotate(-90 112 195)">Elo rating</text>'
+    for k in range(1, 5): g += L(150 + k * 170, 60, 150 + k * 170, 330, LINE, 1.5, '3 6')
+    return g + L(170, 300, 880, 100, BLUE, 3.5) + T(880, 86, 'repeated sampling', 16, 600, BLUE, 'end'), 1040, 400
+
 FIGS = {'2026-02-14-negative-optimization/closed-vs-open.svg': closed_vs_open, '2026-02-14-negative-optimization/query-budget.svg': query_budget,
         '2026-02-14-negative-optimization/best-of-n.svg': best_of_n, '2026-02-14-negative-optimization/binary-vs-continuous.svg': binary_vs_continuous,
         '2026-02-10-evaluation/pipeline.svg': eval_pipeline, '2026-02-10-evaluation/traditional-vs-frontiercs.svg': eval_traditional_vs_fcs,
         '2026-02-10-evaluation/cluster-pools.svg': eval_pools, '2026-02-10-evaluation/pin-hash-invalidate.svg': eval_pin_hash, '2026-02-10-evaluation/file-vs-agentic.svg': eval_agentic,
         '2026-03-06-agent-evaluation/suite-scale.svg': suite_scale, '2026-03-06-agent-evaluation/permutation-task.svg': permutation_task,
-        '2026-03-15-alma/memory-or-not.svg': memory_or_not, '2026-03-15-alma/memory-designs.svg': memory_designs}
+        '2026-03-15-alma/memory-or-not.svg': memory_or_not, '2026-03-15-alma/memory-designs.svg': memory_designs,
+        '2026-06-11-frontiercs-2-roadmap/environment-evolution.svg': env_evolution, '2026-06-11-frontiercs-2-roadmap/serverless-gpu.svg': serverless_gpu,
+        '2026-04-21-calico/results.svg': calico_results, '2026-05-12-harbor/trace-summary.svg': harbor_summary, '2026-05-12-harbor/saturating-vs-open.svg': saturating_vs_open,
+        '2026-05-15-frontiersmith/data-gap.svg': data_gap, '2026-06-16-humans-still-beat-ai/sampling-vs-agent.svg': sampling_vs_agent, '2026-06-16-humans-still-beat-ai/elo-reference.svg': elo_reference}
 
 if __name__ == '__main__':
     root = os.path.join(os.path.dirname(__file__), '..', 'assets', 'img')

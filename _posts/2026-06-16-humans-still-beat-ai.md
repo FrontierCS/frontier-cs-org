@@ -123,7 +123,7 @@ These studies measure model performance under an external test-time strategy. Th
 
 However, agents change this setup. During a run, an agent can try a solution, observe the result, reflect on what failed, and revise its next attempt. This raises the question we study: <strong>when an agent improves with more test-time compute, is it using a better test-time strategy, or is it mostly reproducing repeated sampling?</strong>
 
-<img class="w70" src="{{ 'assets/img/2026-06-16-humans-still-beat-ai/agent-vs-repeated-sampling-loop.png' | relative_url }}" alt="External repeated sampling versus an agent internal test-time loop">
+<img class="w70" src="{{ 'assets/img/2026-06-16-humans-still-beat-ai/sampling-vs-agent.svg' | relative_url }}" alt="External repeated sampling versus an agent internal test-time loop">
 
 <p class="caption">Repeated sampling is fixed outside the model, while an agent can use feedback inside the run.</p>
 
@@ -172,7 +172,7 @@ for any constant $$c$$.
 
 <strong>Thus, repeated sampling is a test-time strategy whose Elo is linear in log test-time compute.</strong> This is super helpful because it gives us a reference line. To judge an agent's intrinsic test-time strategy, we can plot its Elo curve as test-time compute increases and compare it to this line. If the curve is above, below, or close to linear, the agent's strategy is better than, worse than, or equivalent to repeated sampling.
 
-<img class="w60" src="{{ 'assets/img/2026-06-16-humans-still-beat-ai/repeated-sampling-elo-reference.png' | relative_url }}" alt="Repeated sampling forms a linear Elo reference line as log test-time compute increases">
+<img class="w60" src="{{ 'assets/img/2026-06-16-humans-still-beat-ai/elo-reference.svg' | relative_url }}" alt="Repeated sampling forms a linear Elo reference line as log test-time compute increases">
 
 <p class="caption">Repeated sampling gives a linear reference line in Elo versus log test-time compute.</p>
 

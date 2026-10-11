@@ -60,10 +60,6 @@ _styles: >
     margin-right: auto;
   }
 ---
-<div style="text-align: center;">
-  <img src="https://raw.githubusercontent.com/FrontierCS/Frontier-CS/main/assets/logo.png" style="width: 80%; border-radius: 6px;" alt="FrontierCS Logo">
-</div>
-
 ## Evolving Agents Are the Next Frontier for LLMs
 
 Evolving agent systems—including methods based on **continual learning**, **memory evolution**, and **context refinement**—are emerging as a promising path toward agents that improve through experience rather than relying on a fixed policy. This matters especially in discovery-style settings, where the agent must learn from prior failures, accumulate useful knowledge, and adapt its future behavior over long horizons. Recent work such as [GEPA](https://arxiv.org/abs/2507.19457) and [ACE (Agentic Context Evolution)](https://arxiv.org/abs/2601.08747), [SkyDiscover](https://skydiscover-ai.github.io/) reflects this trend.

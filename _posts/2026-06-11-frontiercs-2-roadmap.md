@@ -2,9 +2,8 @@
 layout: distill
 title: "Roadmap to FrontierCS 2"
 description: "FrontierCS 2 extends open-ended evaluation from static sandboxed tasks to Harbor-based feedback loops and repo-level environments."
-image: assets/img/2026-06-11-frontiercs-2-roadmap/benchmark-environment-evolution.jpg
 thumbnail: assets/img/blog-thumbs/frontiercs-2-roadmap.svg
-og_image: assets/img/2026-06-11-frontiercs-2-roadmap/benchmark-environment-evolution.jpg
+og_image: assets/img/fcs2-card.png   # link previews need a raster image
 
 date: 2026-06-11
 date_display: "Jun 11, 2026"
@@ -349,7 +348,7 @@ FrontierCS 2 builds on Harbor and changes this interface. For open-ended tasks, 
 
 The key is control. We do not expose the evaluator directly. We do not leak hidden answers. We do not want agents to optimize against quirks of the scoring script. We want a safe feedback channel: enough signal for iteration, enough isolation to preserve benchmark integrity.
 
-![The evolution of benchmark environments]({{ 'assets/img/2026-06-11-frontiercs-2-roadmap/benchmark-environment-evolution.jpg' | relative_url }}){: .diagram}
+![The evolution of benchmark environments]({{ 'assets/img/2026-06-11-frontiercs-2-roadmap/environment-evolution.svg' | relative_url }}){: .diagram}
 <div class="caption">FrontierCS 2 builds on the sandbox idea: agents get more room to iterate, while evaluators stay isolated.</div>
 
 ## What We Mean by Repo-Level
@@ -403,7 +402,7 @@ Some repo-level tasks need GPUs. That adds another benchmark boundary: even if t
 
 For the vLLM task, we use [Modal](https://modal.com) for that boundary. The agent and judge containers stay CPU-only. The model server runs on an on-demand NVIDIA L40S and exposes an OpenAI-compatible endpoint, so the agent can use the service without owning the GPU.
 
-![Serverless GPU evaluation boundary]({{ 'assets/img/2026-06-11-frontiercs-2-roadmap/serverless-gpu-evaluation.png' | relative_url }}){: .gpu-diagram}
+![Serverless GPU evaluation boundary]({{ 'assets/img/2026-06-11-frontiercs-2-roadmap/serverless-gpu.svg' | relative_url }}){: .gpu-diagram}
 <div class="caption">The agent can use GPU-backed serving through a controlled endpoint, while the GPU itself stays outside the agent container.</div>
 
 Each submitted patch is baked into a Modal image. vLLM precompiled CUDA kernels keep builds fast and enforce the Python-only patch policy. Baseline and patched servers are measured serially on the same GPU class, never concurrently: baseline is measured and cached; the patched server is launched, health-checked, measured, and stopped. Modal volumes cache model weights and vLLM artifacts without exposing hidden evaluator state. The goal is reproducible GPU serving evaluation, not just cheaper hosting.

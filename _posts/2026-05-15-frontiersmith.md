@@ -100,7 +100,7 @@ We think a major reason is data.
 
 Classic RLVR settings have huge amounts of high-quality training data. Competitive programming alone has more than 100,000 public problems, and the broader coding-data industry is continuously producing more. By contrast, if we add together open-ended optimization benchmarks such as [FrontierCS](https://github.com/FrontierCS/Frontier-CS), [ALE-bench](https://github.com/SakanaAI/ALE-Bench), [KernelBench](https://github.com/ScalingIntelligence/KernelBench), and the recent [MLS-Bench](https://mls-bench.com/), we still only get hundreds of tasks.
 
-![Closed-ended code tasks are abundant, but high-quality open-ended tasks are still rare.]({{ 'assets/img/2026-05-15-frontiersmith/data-gap.png' | relative_url }}){: .full}
+![Closed-ended code tasks are abundant, but high-quality open-ended tasks are still rare.]({{ 'assets/img/2026-05-15-frontiersmith/data-gap.svg' | relative_url }}){: .full}
 <div class="caption">Closed-ended coding data is abundant. High-quality open-ended coding tasks are still rare.</div>
 
 That gap is the bottleneck FrontierSmith targets. Frontier labs may already understand the value of open-ended optimization, but without enough scalable training tasks, it is hard to run the kind of training that made closed-ended coding models so strong.
