@@ -18,7 +18,7 @@ pagination:
 show_year: 2026
 ---
 
-<section class="page-hero">
+<section class="page-hero one-line">
   <div class="page" id="main" tabindex="-1">
     <h1>Blog</h1>
     <p class="lede">Research notes, benchmark releases, and agent evaluation insights.</p>
