@@ -1226,6 +1226,9 @@ nav .pagination {
 .ar-main .footnotes ol { font-size: 14.5px; color: var(--ink-3); line-height: 1.6; }
 .ar-main .footnotes p { font-size: 14.5px; margin: 0 0 8px; }
 .ar-main mjx-container[display="true"] { overflow-x: auto; overflow-y: hidden; padding: 4px 2px; }
+/* MathJax's SVG output: the site makes every svg a block, which put each inline formula on its own line */
+mjx-container:not([display="true"]) > svg { display: inline; max-width: none; }
+mjx-container[display="true"] > svg { margin-inline: auto; }
 
 /* distill.pub leftovers rendered without template.v2.js */
 d-math { font-family: inherit; }
