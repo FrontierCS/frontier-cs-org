@@ -1536,7 +1536,7 @@ footer.foot { margin-top: 120px; padding: 56px 0 28px; background: #202124; colo
 .ws2 .whero .lead { margin-top: 0; max-width: none; }
 @media (max-width: 900px) { .ws2 .whero { grid-template-columns: 1fr; } }
 .ws2 .intro h1 { max-width: 14em; font-size: clamp(36px, 4.9vw, 56px); }
-.ws2 .ws-st { display: flex; gap: 6px; margin: 0 0 16px; } .ws2 .ws-prop { margin: 16px 0 0; font-size: 16.5px; line-height: 1.45; color: var(--ink); padding: 12px 16px; background: var(--soft); border-radius: 6px; }
+.ws2 .ws-st { display: flex; gap: 6px; margin: 0 0 16px; } .ws2 .ws-prop { margin: 18px 0 0; padding: 14px 0 0; border-top: 1px solid var(--line); font-size: 16.5px; line-height: 1.45; color: var(--ink-2); }
 .ws2 .tstats { margin-top: 36px; } .ws2 .tstats dd { font-size: clamp(22px, 2.3vw, 28px); white-space: nowrap; }
 .ws2 .lv { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin-top: 48px; }
 .ws2 .lv article { border-top: 3px solid var(--h); padding-top: 18px; }
