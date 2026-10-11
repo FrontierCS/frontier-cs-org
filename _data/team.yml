@@ -16,7 +16,6 @@ institutions:
   - {name: NYU, logo: nyu.png, h: 42}
   - {name: Stanford, logo: stanford.png, h: 33}
   - {name: UW, logo: washington.png, h: 33}
-  - {name: NTU, logo: ntu.png, h: 43}
   - {name: Toronto, logo: toronto.png, h: 35}
   - {name: UIUC, logo: uiuc.png, h: 37}
   - {name: Michigan, logo: michigan.png, h: 32}
