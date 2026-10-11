@@ -1510,7 +1510,7 @@ footer.foot { margin-top: 120px; padding: 56px 0 28px; background: #202124; colo
 .fcs1 .ans pre { margin: 0 0 14px; padding: 12px 14px; background: var(--soft); border-radius: 6px; font-family: var(--font-code); font-size: 14px; line-height: 1.5; color: var(--ink); overflow-x: auto; white-space: pre; }
 .fcs1 .more { margin: 36px 0 0; }
 /* In research: papers that use the benchmark, grouped by what they use it for (a plain list, unlike the FrontierCS 2 paper wall) */
-.fcs1 #research .tbd { max-width: 40em; font-size: 17px; line-height: 1.5; }
+.fcs1 #research .tbd { max-width: 62em; font-size: 17px; line-height: 1.5; }
 .fcs1 .uses { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 8px 56px; margin-top: 36px; padding-top: 20px; border-top: 1px solid var(--ink-2); }
 .fcs1 .uses > h3 { font-size: 21px; font-weight: 500; margin: 4px 0 0; }
 .fcs1 .uses .rows { margin: 0; } .fcs1 .uses .row { display: grid; grid-template-columns: minmax(0, 1fr) 132px; gap: 16px 40px; align-items: start; padding: 0 0 22px; margin-bottom: 22px; border-top: 0; border-bottom: 1px solid var(--line); } .fcs1 .uses .row:last-child { border-bottom: 0; margin-bottom: 0; padding-bottom: 0; }
@@ -1525,10 +1525,16 @@ footer.foot { margin-top: 120px; padding: 56px 0 28px; background: #202124; colo
 @media (max-width: 640px) { .fcs1 .res.lb th:nth-child(n+4), .fcs1 .res.lb td:nth-child(n+4) { display: none; } .fcs1 .res .rk { width: 34px; } .fcs1 .res td.sc { width: 44%; min-width: 0; } .fcs1 .sbar { width: calc(100% - 58px); margin-right: 8px; } }
 
 /* Papers page: one row per paper, its first page on the left */
-.paper-list { display: flex; flex-direction: column; }
+.paper-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 56px; }
+@media (min-width: 901px) { .paper-row:nth-child(2) { border-top: 0; padding-top: 0; } }
+@media (max-width: 900px) { .paper-list { grid-template-columns: 1fr; } }
 .paper-row { display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: 16px 36px; align-items: start; padding: 28px 0; border-top: 1px solid var(--rule); }
 .paper-row:first-child { border-top: 0; padding-top: 0; }
 .paper-pg img { display: block; width: 132px; height: auto; aspect-ratio: 17 / 22; object-fit: cover; object-position: top; border-radius: 4px; background: #fff; box-shadow: 0 1px 4px rgba(32,33,36,.16), 0 0 0 1px rgba(32,33,36,.08); }
+.paper-row .post-meta { gap: 6px; }
+.venue { display: inline-block; padding: 4px 10px; border-radius: 4px; background: var(--mint); color: #041e49; font-size: 13px; font-weight: 600; line-height: 1.3; }
+.venue.hl { background: var(--accent); color: #fff; }
+.venue.plain { background: var(--paper-2); color: var(--ink-2); }
 @media (max-width: 640px) { .paper-row { grid-template-columns: 84px minmax(0, 1fr); gap: 12px 18px; } .paper-pg img { width: 84px; } }
 
 /* sections separated by space, not full-width rules (Epoch) */
