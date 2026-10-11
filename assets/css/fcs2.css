@@ -75,7 +75,9 @@ h2{font-weight:600; font-size:clamp(25px,2.4vw,30px); line-height:1.2; margin:0}
 .legend span{display:inline-flex; align-items:center; gap:7px}
 .legend i{width:12px; height:12px; display:inline-block}
 .cfoot{display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:16px; padding-top:14px; border-top:1px solid var(--line); font-size:13px; color:var(--muted-2)}
-.cfoot b{white-space:nowrap; font-weight:700; letter-spacing:.06em; font-size:12px; color:var(--muted)}
+/* the FrontierCS logo (mark and wordmark) signs each chart at the bottom left (owner, 2026-10-11) */
+.cfoot .clogo{display:inline-flex; align-items:center; gap:6px; flex:none; white-space:nowrap; font:500 15px/1 'Instrument Sans',var(--sans); letter-spacing:-.01em; color:var(--ink)}
+.cfoot .clogo svg{width:11px; height:13.6px; color:#0b57d0}
 .settings{border:1px solid var(--line); border-radius:6px; padding:20px 20px 24px}
 .settings h3{font-size:20px; font-weight:600; margin:0 0 14px; padding-bottom:14px; border-bottom:1px solid var(--line)}
 .settings h4{font-size:14px; font-weight:600; margin:18px 0 10px}

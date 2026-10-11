@@ -275,7 +275,7 @@ function squarify(vals, x, y, w, h) {
 }
 const nRan = d => TASKS.filter(t => t.d === d && RAN.has(t.s)).length;
 function drawMap() {
-  stopPlay();
+  stopPlay(false);
   const svg = $('#mapsvg'), W = $('#map').clientWidth, narrow = W < 640, H = narrow ? Math.round(W * 1.15) : Math.round(W * 0.36);
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
   const byArea = AREAS.map(a => ({a, n:a.d.reduce((s, d) => s + N_IN(d), 0)})).sort((p, q) => q.n - p.n), G = narrow ? 4 : 6, tol = .5;
@@ -314,31 +314,45 @@ function drawMap() {
    hue while the rest of the map fades under a 60% white veil, and each run's best development score so far draws itself as a white step line from the first to the last
    submission (spending on x, 0 to 100 on y), then holds; with several runs they follow in a
    loop. White words only: the task's name at the top left, the model of the run on screen at the bottom right (owner,
-   2026-10-10). Clicking the card opens the task page. Mouse only; reduced motion shows the card and each line at once. */
+   2026-10-10). Clicking the card opens the task page. Mouse only; reduced motion shows the card and each line at once.
+   Leaving, the card shrinks back into its tile and the veil fades out; moving from tile to tile keeps the veil up, so the
+   map does not flash (owner, 2026-10-11: the return to normal was too abrupt). */
 const mapTip = $('#maptip');
-let play = null;
-function stopPlay() { if (!play) return; clearTimeout(play.t); play.g.remove(); play = null; }
+let play = null, veil = null;
+// one white veil per map, under the cards; its opacity eases to op (0.6 behind a card, 0 when none)
+function veilTo(op) {
+  const svg = $('#mapsvg'), [, , W, H] = svg.getAttribute('viewBox').split(' ').map(Number);
+  if (!veil || !veil.isConnected) {
+    veil = sv('rect', {x:0, y:0, width:W, height:H, fill:'#fff', 'pointer-events':'none'});
+    veil.style.opacity = 0; svg.append(veil); veil.getBoundingClientRect();
+  }
+  veil.style.transition = calm ? 'none' : `opacity ${op ? 220 : 320}ms ease`;
+  veil.style.opacity = op;
+}
+function stopPlay(fade = true) {
+  if (!play) return;
+  const p = play; play = null; clearTimeout(p.t);
+  if (calm || !fade) { p.g.remove(); return; }
+  p.g.classList.remove('play'); p.g.style.pointerEvents = 'none';
+  p.card.animate([{transform:'none', opacity:1}, {transform:p.back, opacity:0}], {duration:200, easing:'cubic-bezier(.3,0,.8,.15)', fill:'forwards'}).onfinish = () => p.g.remove();
+}
 function startPlay(tile) {
   const s = tile.dataset.s, k = tile.dataset.k, runs = TRAJ.filter(r => r[1] === s && r[6].length), svg = $('#mapsvg');
   const [tx, ty, tw, th] = ['x', 'y', 'width', 'height'].map(a => +tile.getAttribute(a)), [, , W, H] = svg.getAttribute('viewBox').split(' ').map(Number);
   const w = Math.min(W - 8, Math.max(260, tw * 1.7)), h = w / 1.5, x = Math.min(W - w - 4, Math.max(4, tx + tw / 2 - w / 2)), y = Math.min(H - h - 4, Math.max(4, ty + th / 2 - h / 2));
   const root = sv('g', {class:'play', style:'cursor:pointer'}), card = sv('g'), cid = 'playclip';
-  // the rest of the map fades behind the card; the veil lets the pointer through to the other tiles
-  const mute = sv('rect', {x:0, y:0, width:W, height:H, fill:'#fff', opacity:calm ? .6 : 0, 'pointer-events':'none'});
   card.innerHTML = `<clipPath id="${cid}"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="10"/></clipPath>`
     + `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="10" fill="#fff" filter="drop-shadow(0 6px 16px rgba(32,33,36,.35))"/>`
     + `<g clip-path="url(#${cid})">${taskArt(s, k).replace('<svg class="art"', `<svg x="${x}" y="${y}" width="${w}" height="${h}" preserveAspectRatio="xMidYMid slice"`)}`
     + `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${ART_FIELD[k]}" opacity="${runs.length ? .7 : .35}"/></g>`;
   const who = sv('text', {x:x + w - 14, y:y + h - 14, 'text-anchor':'end', 'font-size':14, 'font-weight':600, fill:'#fff'});
   card.append(sv('text', {x:x + 14, y:y + 26, 'font-size':14, 'font-weight':600, fill:'#fff'}, s), who);
-  root.append(mute, card); svg.append(root);
+  // the rest of the map fades behind the card; the veil lets the pointer through to the other tiles
+  veilTo(.6); root.append(card); svg.append(root);
   card.style.transformOrigin = `${x + w / 2}px ${y + h / 2}px`;
-  if (!calm) {
-    mute.animate([{opacity:0}, {opacity:.6}], {duration:220, fill:'forwards'});
-    card.animate([{transform:`translate(${tx + tw / 2 - x - w / 2}px,${ty + th / 2 - y - h / 2}px) scale(${tw / w})`, opacity:.6}, {transform:'none', opacity:1}],
-      {duration:220, easing:'cubic-bezier(.2,0,0,1)', fill:'forwards'});
-  }
-  play = {tile, g:root, card, who, runs, k:0, x, y, w, h};
+  const back = `translate(${tx + tw / 2 - x - w / 2}px,${ty + th / 2 - y - h / 2}px) scale(${tw / w})`;   // the card's size and place as its tile
+  if (!calm) card.animate([{transform:back, opacity:.6}, {transform:'none', opacity:1}], {duration:220, easing:'cubic-bezier(.2,0,0,1)', fill:'forwards'});
+  play = {tile, g:root, card, who, runs, k:0, x, y, w, h, back};
   if (runs.length) play.t = setTimeout(showRun, calm ? 0 : 200);
 }
 function showRun() {
@@ -368,12 +382,12 @@ $('#mapsvg').addEventListener('pointermove', e => {
   if (e.pointerType !== 'mouse') { mapTip.hidden = true; return; }
   if (play && e.target.closest('.play')) { mapTip.hidden = true; return; }   // the card stays while the pointer is on it
   const g = e.target.closest('.blk'), tile = e.target.closest('svg.tile');
-  if (!play || play.tile !== tile) { stopPlay(); if (tile) startPlay(tile); }
+  if (!play || play.tile !== tile) { stopPlay(); if (tile) startPlay(tile); else veilTo(0); }
   if (!g || tile) { mapTip.hidden = true; return; }
   const d = g.dataset.d, r = $('#map').getBoundingClientRect();
   mapTip.innerHTML = `<b>${esc(d)}</b><br>${N_IN(d)} task${N_IN(d) > 1 ? 's' : ''}${nRan(d) ? ` · ${nRan(d)} with runs` : ''}`;
   mapTip.hidden = false; mapTip.style.left = (e.clientX - r.left) + 'px'; mapTip.style.top = (e.clientY - r.top) + 'px'; });
-$('#mapsvg').addEventListener('pointerleave', () => { mapTip.hidden = true; stopPlay(); });
+$('#mapsvg').addEventListener('pointerleave', () => { mapTip.hidden = true; stopPlay(); veilTo(0); });
 $('#mapsvg').addEventListener('click', e => { if (play && e.target.closest('.play')) location.href = taskHref(play.tile.dataset.s); });
 
 function drawRows() {

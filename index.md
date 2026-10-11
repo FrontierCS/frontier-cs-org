@@ -35,9 +35,9 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
 <section class="sec" id="leaderboard">
   <h2>Leaderboard</h2>
   <figure class="chart" style="margin:0">
-    <div class="chead"><span>Pass rate against cost per run</span></div>
-    <div class="plot" id="pcplot"><svg id="pcsvg" role="img" aria-label="Pass rate against cost per run"></svg><div class="tip" id="pctip" hidden></div></div>
-    <div class="cfoot"><b>FRONTIERCS 2</b><span>Preliminary · a run passes when its final submission meets the task’s pass criteria on every workload · cost is estimated from tokens and list prices</span></div>
+    <div class="chead"><span>Pass rate (over human)</span></div>
+    <div class="plot" id="pcplot"><svg id="pcsvg" role="img" aria-label="Pass rate (over human) against cost per run"></svg><div class="tip" id="pctip" hidden></div></div>
+    <div class="cfoot">{% include chart_logo.html %}<span>Preliminary · a run passes when its final submission meets the task’s pass criteria on every workload · cost is estimated from tokens and list prices</span></div>
   </figure>
 
   <details class="tbl-wrap fold" id="domains">
@@ -56,7 +56,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
       <button class="pill lg custom" id="custom" type="button" aria-expanded="false" aria-controls="settings">
         <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3M5.5 5.5l2.1 2.1M16.4 16.4l2.1 2.1M5.5 18.5l2.1-2.1M16.4 7.6l2.1-2.1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
         Customize graph</button>
-      <div class="cfoot"><b>FRONTIERCS 2</b><span id="lbnote">Preliminary · scores on each task’s own 0–100 scale</span></div>
+      <div class="cfoot">{% include chart_logo.html %}<span id="lbnote">Preliminary · scores on each task’s own 0–100 scale</span></div>
     </figure>
     <aside class="settings" id="settings" aria-label="Graph settings">
       <h3>Settings</h3>
@@ -74,13 +74,13 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
     <figure class="chart" style="margin:0">
       <div class="chead"><span>FrontierCS Epoch Capabilities Index (FECI)</span></div>
       <div class="plot" id="eciplot"><svg id="ecisvg" role="img" aria-label="FECI chart"></svg><div class="tip" id="ecitip" hidden></div></div>
-      <div class="cfoot"><b>FRONTIERCS 2</b><span id="ecinote">Preliminary · Human = 60 (the authors’ reference code), Kimi K2.7 Code = 0 (in the fit, not shown) · bars are 90% intervals</span></div>
+      <div class="cfoot">{% include chart_logo.html %}<span id="ecinote">Preliminary · Human = 60 (the authors’ reference code), Kimi K2.7 Code = 0 (in the fit, not shown) · bars are 90% intervals</span></div>
     </figure>
     <figure class="chart" style="margin:40px 0 0" id="scaling">
       <div class="chead"><span>Test-time scaling: FECI against cost budget per run</span></div>
       <div class="plot" id="ttsplot"><svg id="ttssvg" role="img" aria-label="Test-time scaling chart"></svg><div class="tip" id="ttstip" hidden></div></div>
       <div class="legend" id="ttslegend"></div>
-      <div class="cfoot"><b>FRONTIERCS 2</b><span>Preliminary · within a budget, a run counts its latest valid submission, scored on the development workloads and calibrated to the hidden suite · bands are 90% intervals</span></div>
+      <div class="cfoot">{% include chart_logo.html %}<span>Preliminary · within a budget, a run counts its latest valid submission, scored on the development workloads and calibrated to the hidden suite · bands are 90% intervals</span></div>
     </figure>
   </div>
 </section>
