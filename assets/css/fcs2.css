@@ -33,7 +33,8 @@ h2{font-weight:600; font-size:clamp(25px,2.4vw,30px); line-height:1.2; margin:0}
 .links{display:flex; flex-wrap:wrap; gap:10px; margin-top:26px}
 .pill[aria-disabled="true"]{opacity:.6; cursor:default; pointer-events:none}
 /* overview: the papers' first pages on a tilted, drifting wall, then the task map */
-.hero{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:24px 40px; align-items:center}
+.hero{display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr); gap:24px 40px; align-items:start}
+.intro h1{max-width:none; font-size:clamp(32px,3.5vw,44px)}   /* two lines, as on the FrontierCS and Workshop pages */
 @media (max-width:1000px){ .hero{grid-template-columns:1fr} }
 .papers{position:relative; height:460px; margin:0; overflow:hidden; perspective:1600px;
   -webkit-mask-image:linear-gradient(transparent,#000 18%,#000 82%,transparent),linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent); -webkit-mask-composite:source-in;
