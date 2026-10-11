@@ -7,7 +7,7 @@ page_css: fcs2
 ---
 <div class="fcs2 ws2">
 <nav class="sub" aria-label="Sections"><div class="col" id="subnav">
-  <a href="#overview" class="on">Overview</a><a href="#topics">Topics</a><a href="#speakers">Speakers</a><a href="#challenge">Challenge</a><a href="#submit">Submit</a><a href="#organizers">Organizers</a>
+  <a href="#overview" class="on">Overview</a><a href="#topics">Topics</a><a href="#speakers">Speakers</a><a href="#challenge">Challenge</a><a href="#organizers">Organizers</a>
 </div></nav>
 
 <div class="col" id="main" tabindex="-1">
@@ -69,29 +69,6 @@ page_css: fcs2
       <div><dt>We do</dt><dd>Rerun the top entries</dd></div>
     </dl>
   </div>
-</section>
-
-<section class="sec" id="submit">
-  <h2>Submit</h2>
-  <div class="sb">
-    <div>
-      <h3>What</h3>
-      <ul class="kv">
-        <li><b>Papers and extended abstracts</b><span>Empirical, methods, systems, benchmark or position work</span></li>
-        <li><b>Challenge reports and artifacts</b><span>Runnable entries with a short account, negative results included</span></li>
-        <li><b>Tiny and short papers</b><span>Small results, replications, early findings; human-written only</span></li>
-      </ul>
-    </div>
-    <div>
-      <h3>Who wrote it</h3>
-      <ul class="kv">
-        <li><b>Fully AI-written</b><span>An agent is the primary author</span></li>
-        <li><b>AI-written, human-reviewed</b><span>People reviewed it before submission</span></li>
-        <li><b>Human-written</b><span>AI assistance only as ICLR allows</span></li>
-      </ul>
-    </div>
-  </div>
-  <p class="tbd sb-n">Every submission states its track. People review every submission and make every decision. The OpenReview link will be posted here if the workshop is accepted.</p>
 </section>
 
 <section class="sec" id="organizers">
