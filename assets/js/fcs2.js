@@ -13,7 +13,7 @@ const reveal = el => { const p = el.parentElement, pr = p.getBoundingClientRect(
 const subLinks = [...document.querySelectorAll('#subnav a')];
 // The section on screen is the last one whose top has passed just under the sticky bar; at the page's end, the last section.
 // (A band in mid-screen picked the next section whenever a short one, like the case-studies placeholder, sat at the top.)
-const SECS = ['overview','leaderboard','tasks','private','cases','questions'].map(id => document.getElementById(id));
+const SECS = ['overview','leaderboard','tasks','private','cases','sponsors','questions'].map(id => document.getElementById(id));
 let spyRaf = 0;
 const spy = () => { spyRaf = 0;
   const bar = $('.sub').getBoundingClientRect().bottom + 24, end = innerHeight + scrollY >= document.documentElement.scrollHeight - 2;

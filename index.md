@@ -8,7 +8,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
 ---
 <div class="fcs2">
 <nav class="sub" aria-label="Sections"><div class="col" id="subnav">
-  <a href="#overview" class="on">Overview</a><a href="#leaderboard">Leaderboard</a><a href="#tasks">Tasks</a><a href="#private">Private set</a><a href="#cases">Case studies</a><a href="#questions">Questions</a>
+  <a href="#overview" class="on">Overview</a><a href="#leaderboard">Leaderboard</a><a href="#tasks">Tasks</a><a href="#private">Private set</a><a href="#cases">Case studies</a><a href="#sponsors">Sponsors</a><a href="#questions">Questions</a>
 </div></nav>
 
 <div class="col" id="main" tabindex="-1">
@@ -118,6 +118,14 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
 <section class="sec" id="cases">
   <h2>Case studies</h2>
   <p class="tbd">Case studies of single runs from the preview will appear here.</p>
+</section>
+
+<section class="sec" id="sponsors">
+  <h2>Sponsors</h2>
+  <ul class="sponsor-row">
+    <li><a href="https://www.laude.org/" target="_blank" rel="noopener noreferrer"><img src="{{ 'assets/img/sponsors/laude-institute-wordmark.png' | relative_url }}" class="laude" alt="Laude Institute"></a></li>
+    <li><a href="https://modal.com/" target="_blank" rel="noopener noreferrer"><img src="{{ 'assets/img/sponsors/modal.svg' | relative_url }}" class="modal" alt="Modal"></a></li>
+  </ul>
 </section>
 
 <section class="sec" id="questions">
