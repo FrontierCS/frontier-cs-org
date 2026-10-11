@@ -1,248 +1,150 @@
 ---
 layout: default
-title: Automatic Agents for Computer Science
-description: ICLR 2027 Workshop on Automatic Agents for Computer Science. A half-day workshop on autoresearch agents that formulate questions, run investigations, validate data, and produce reproducible results.
+title: Workshop
+description: "How Far Are AI Agents from Becoming Computer Scientists? A proposed ICLR 2027 workshop on how a research agent learns what to improve, what to trust, and what to explore."
 permalink: /workshop/
+page_css: fcs2
 ---
+<div class="fcs2 ws2">
+<nav class="sub" aria-label="Sections"><div class="col" id="subnav">
+  <a href="#overview" class="on">Overview</a><a href="#topics">Topics</a><a href="#schedule">Schedule</a><a href="#speakers">Speakers</a><a href="#challenge">Challenge</a><a href="#submit">Submit</a><a href="#organizers">Organizers</a>
+</div></nav>
 
-<section class="page-hero">
-  <div class="page" id="main" tabindex="-1">
-    <p class="eyebrow">ICLR 2027 Workshop · San Francisco · April 2027</p>
-    <h1>Automatic Agents for Computer Science</h1>
-    <p class="lede">A half-day workshop on autoresearch agents: AI systems that formulate questions and hypotheses, plan and run investigations, generate and validate data, interpret evidence, and produce results that others can reproduce and scrutinize.</p>
-    <p class="ws-status">Workshop proposal for ICLR 2027. Program and dates are tentative until ICLR's decision on November 29, 2026.</p>
-    <div class="ws-facts" aria-label="Workshop at a glance">
-      <div class="ws-fact">
-        <p class="ws-fact-label">Format</p>
-        <p class="ws-fact-value">Half-day, in-person, non-archival</p>
-      </div>
-      <div class="ws-fact">
-        <p class="ws-fact-label">Venue</p>
-        <p class="ws-fact-value">ICLR 2027, San Francisco</p>
-      </div>
-      <div class="ws-fact">
-        <p class="ws-fact-label">Date</p>
-        <p class="ws-fact-value">April 29 or 30, 2027</p>
-      </div>
-      <div class="ws-fact">
-        <p class="ws-fact-label">Submission deadline</p>
-        <p class="ws-fact-value">February 1, 2027, tentative</p>
-      </div>
-    </div>
+<div class="col" id="main" tabindex="-1">
+<section class="intro" id="overview">
+  <p class="ws-st"><span class="venue hl">Proposal</span><span class="venue">ICLR 2027 workshop</span></p>
+  <h1>How Far Are AI Agents from Becoming Computer Scientists?</h1>
+  <p class="lead">Agents make progress when a person specifies the task and supplies a check on every answer. Real research often gives neither. This workshop is about what an agent does then.</p>
+  <p class="ws-prop">This is a proposal. The dates, schedule and speakers below are tentative until ICLR decides on November 29, 2026.</p>
+  <dl class="tstats">
+    <div><dt>Format</dt><dd>Full day</dd><span>In person, non-archival</span></div>
+    <div><dt>Submit by, tentative</dt><dd>Feb 1, 2027</dd><span>11:59 p.m. AoE</span></div>
+    <div><dt>Challenge, tentative</dt><dd>Feb 2&ndash;8, 2027</dd><span>Problem to be announced</span></div>
+    <div><dt>Decisions, tentative</dt><dd>Feb 26, 2027</dd><span>Posted on OpenReview</span></div>
+  </dl>
+
+  <div class="lv">
+    <article style="--h:#1a73e8; --l:#d2e3fc">
+      <span class="lv-n">1</span><h2>What to improve</h2>
+      <ul class="lv-g"><li class="on">Task given</li><li class="on">Feedback verifiable</li></ul>
+      <p>Today&rsquo;s successes. How do harnesses, teams of agents, people in the loop and post-training get more out of the same setup?</p>
+    </article>
+    <article style="--h:#8e5bef; --l:#e6dcfd">
+      <span class="lv-n">2</span><h2>What to trust</h2>
+      <ul class="lv-g"><li class="on">Task given</li><li>Feedback sparse</li></ul>
+      <p>Most real research. How does an agent verify, replicate and try to refute a result it produced itself?</p>
+    </article>
+    <article style="--h:#12a3a3; --l:#cdeeed">
+      <span class="lv-n">3</span><h2>What to explore</h2>
+      <ul class="lv-g"><li>No task</li><li>No feedback</li></ul>
+      <p>The last mile. How does an agent choose a question, judge its novelty and decide when to drop it?</p>
+    </article>
   </div>
 </section>
 
-<section class="journal" id="about">
-<div class="page">
-  <div class="sec-head">
-    <h2 class="sec-title">About the workshop</h2>
-  </div>
-  <div class="prose">
-    <p>AI agents can increasingly write code, search the technical literature, call tools, and run long experimental workflows. Research asks for more than tool use. A research agent must identify useful questions, formulate testable hypotheses, choose informative experiments, allocate limited resources, interpret noisy evidence, revise its plan, and report findings with enough provenance for others to scrutinize and reproduce them. It must also fail legibly: an agent that produces an impressive number while hiding invalid assumptions, uncontrolled variables, or irreproducible steps is not yet a research system.</p>
-    <p>This workshop convenes researchers studying the methods, environments, evidence standards, evaluation protocols, and interaction patterns that turn capable agents into reliable research collaborators. We center the scientific method itself, whatever the research substrate. Progress may come from a new idea, algorithm, proof, measurement, experiment, system, dataset, or human-agent workflow. Data synthesis sits at the center of this agenda, because research agents increasingly construct examples, curricula, simulations, and evaluation cases, then decide how those artifacts are filtered, validated, and used.</p>
-    <p>The scope spans algorithms, systems, programming languages, theory, human-computer interaction, software engineering, and other computer-science domains, together with interfaces to scientific discovery beyond machine learning.</p>
-  </div>
-
-  <div class="ws-columns">
-    <div>
-      <p class="ws-subhead">Goals</p>
-      <ol class="ws-list">
-        <li>Define autoresearch as an end-to-end scientific process, from question formation through experimentation, verification, evaluation, and human collaboration.</li>
-        <li>Develop credible evidence of research capability: reproducible artifacts, carefully specified environments, meaningful baselines, and evaluations that separate genuine progress from brittle benchmark optimization.</li>
-        <li>Understand which research strategies succeed and which fail: how agents search, allocate compute, choose experiments, synthesize and validate data, respond to evidence, and divide labor with people.</li>
-        <li>Build a durable community with shared terminology, evaluation principles, reusable artifacts, and an open-problem agenda for autoresearch across computer science.</li>
-      </ol>
-    </div>
-    <div>
-      <p class="ws-subhead">Open questions</p>
-      <ol class="ws-list">
-        <li>What should count as a new, valid, and reproducible research result produced under a fixed compute budget?</li>
-        <li>How should an agent generate, select, and validate data without creating self-confirming evidence or optimizing a misleading proxy?</li>
-        <li>Which records of hypotheses, code changes, experiments, failures, and human interventions are needed to audit and reproduce an agent's result?</li>
-        <li>Which capabilities transfer across research problems, and which gains come from problem-specific engineering or benchmark leakage?</li>
-        <li>How should people supervise, collaborate with, evaluate, and share credit with autoresearch agents?</li>
-      </ol>
-    </div>
-  </div>
-</div>
-</section>
-
-<section class="journal" id="call">
-<div class="page">
-  <div class="sec-head">
-    <div>
-      <h2 class="sec-title">Call for contributions</h2>
-      <p class="sec-intro">The workshop is non-archival. We welcome empirical, methodological, systems, benchmark, and position work on the topics below. Submission instructions, page limits, and the OpenReview link will be posted on this page.</p>
-    </div>
-    <span class="sec-count">Deadline Feb 1, 2027</span>
-  </div>
-
-  <p class="ws-subhead">Topics</p>
-  <ul class="ws-topics">
-    <li>End-to-end autoresearch agents and multi-agent research systems</li>
-    <li>Hypothesis generation, research planning, experiment design, and adaptive experimentation</li>
-    <li>Search, exploration, optimization, and compute allocation for research agents</li>
-    <li>Coding agents and execution environments for research across computer science</li>
-    <li>Data synthesis, curriculum construction, data selection, simulation, and validation inside research loops</li>
-    <li>Automated analysis, interpretation, visualization, and scientific communication</li>
-    <li>Verification, falsification, uncertainty estimation, and detection of spurious or irreproducible results</li>
-    <li>Benchmarks, environments, and evaluation protocols for research agents</li>
-    <li>Reproducible research artifacts and provenance of human and agent contributions</li>
-    <li>Human-AI collaboration, interfaces, oversight, and division of labor</li>
-    <li>Memory, reflection, self-improvement, and learning from research trajectories</li>
-    <li>Negative results, failure analysis, reward hacking, safety, security, attribution, and governance</li>
-    <li>Applications across algorithms, machine learning, scientific discovery, search, programming languages, software engineering, systems, theory, and human-computer interaction</li>
+<section class="sec" id="topics">
+  <h2>Topics</h2>
+  <ul class="tp">
+    <li>Scaling at test time: harnesses, search, sampling, evolution</li>
+    <li>Multi-agent research: coordination, division of work, review</li>
+    <li>Training research agents: post-training, RL, synthetic data</li>
+    <li>Verification and trust: replication, falsification, self-made evidence</li>
+    <li>Failure modes: reward hacking, leakage, gains that do not transfer</li>
+    <li>Choosing questions: hypotheses, novelty, research taste</li>
+    <li>People and agents: collaborators, verifiers, sources of taste</li>
+    <li>Benchmarks and environments for open-ended CS tasks</li>
+    <li>Applied agents: systems, kernels, algorithm discovery</li>
   </ul>
-
-  <p class="ws-subhead">Formats</p>
-  <div class="ws-tracks">
-    <div class="fc-hero-feature">
-      <span class="fc-hero-feature-num">01</span>
-      <p class="fc-hero-feature-label">Research papers and extended abstracts</p>
-      <p class="fc-hero-feature-body">Empirical, methodological, systems, benchmark, or position work, presented as posters, with selected contributed talks in the oral session.</p>
-    </div>
-    <div class="fc-hero-feature">
-      <span class="fc-hero-feature-num">02</span>
-      <p class="fc-hero-feature-label">Challenge reports and artifacts</p>
-      <p class="fc-hero-feature-body">Concise reports on competition systems, findings, negative results, and research trajectories.</p>
-    </div>
-    <div class="fc-hero-feature">
-      <span class="fc-hero-feature-num">03</span>
-      <p class="fc-hero-feature-label">Tiny and short papers</p>
-      <p class="fc-hero-feature-body">Focused implementations, modest self-contained results, replications, re-analyses, and early findings. This format follows the ICLR prohibition on AI-generated tiny papers.</p>
-    </div>
-  </div>
-
-  <p class="ws-subhead">AI-participation tracks</p>
-  <div class="ws-tracks">
-    <div class="fc-hero-feature">
-      <span class="fc-hero-feature-num">Track A</span>
-      <p class="fc-hero-feature-label">Fully AI-written</p>
-      <p class="fc-hero-feature-body">An agent is the primary author. A human submitter remains accountable for compliance, provenance, safety, and rights.</p>
-    </div>
-    <div class="fc-hero-feature">
-      <span class="fc-hero-feature-num">Track B</span>
-      <p class="fc-hero-feature-label">AI-written with human review</p>
-      <p class="fc-hero-feature-body">Agent-written work that people reviewed and revised before submission.</p>
-    </div>
-    <div class="fc-hero-feature">
-      <span class="fc-hero-feature-num">Track C</span>
-      <p class="fc-hero-feature-label">Completely human-written</p>
-      <p class="fc-hero-feature-body">Human-authored work, with AI assistance only as ICLR policy allows.</p>
-    </div>
-  </div>
-
-  <div class="prose ws-prose-gap">
-    <p>Every submission discloses its track and gives an auditable account of human and agent contributions. Tiny and short papers remain human-authored. Submissions are evaluated for relevance, technical soundness, clarity, quality of evidence or argument, reproducibility where applicable, and potential to generate useful discussion. Human reviewers and organizers make all acceptance decisions. Organizers do not review submissions from their own institutions or with other conflicts, and organizer-authored submissions are not permitted.</p>
-  </div>
-</div>
 </section>
 
-<section class="journal" id="dates">
-<div class="page">
-  <div class="sec-head">
-    <h2 class="sec-title">Important dates</h2>
-    <span class="sec-count">All deadlines 11:59 p.m. AoE</span>
-  </div>
-  <ul class="log ws-dates" aria-label="Important dates">
-    <li><span class="date">Feb 1, 2027</span><span class="title">Submission deadline, tentative</span></li>
-    <li><span class="date">Feb 26, 2027</span><span class="title">Author notification. Accepted papers are posted on OpenReview.</span></li>
-    <li><span class="date">Late Feb 2027</span><span class="title">Competition opens, immediately after acceptance decisions</span></li>
-    <li><span class="date">Apr 2027</span><span class="title">Competition closes, the day before ICLR 2027 begins</span></li>
-    <li><span class="date">Apr 29 or 30, 2027</span><span class="title">Workshop day in San Francisco. ICLR assigns the exact day.</span></li>
+<section class="sec" id="schedule">
+  <h2>Tentative schedule</h2>
+  <div class="res-scroll"><table class="res num sch">
+    <tbody>
+        <tr><td class="t">08:30</td><td>Opening remarks</td><td class="w"></td></tr>
+        <tr><td class="t">08:40</td><td>Invited talk</td><td class="w">Alex Dimakis</td></tr>
+        <tr><td class="t">09:15</td><td>Invited talk</td><td class="w">Yuandong Tian</td></tr>
+        <tr><td class="t">09:50</td><td>Contributed orals</td><td class="w">Four 8-minute spotlights</td></tr>
+        <tr><td class="t">10:30</td><td>Posters and artifacts I</td><td class="w">With coffee</td></tr>
+        <tr><td class="t">11:45</td><td>Challenge orals</td><td class="w">Results and the winning teams</td></tr>
+        <tr><td class="t">12:30</td><td>Lunch</td><td class="w"></td></tr>
+        <tr><td class="t">13:30</td><td>Invited talk</td><td class="w">Matei Zaharia</td></tr>
+        <tr><td class="t">14:05</td><td>Invited talk</td><td class="w">Azalia Mirhoseini</td></tr>
+        <tr><td class="t">14:40</td><td>Coffee</td><td class="w"></td></tr>
+        <tr><td class="t">15:10</td><td>Panel</td><td class="w">Alex Dimakis, Matei Zaharia, Yuandong Tian, Azalia Mirhoseini</td></tr>
+        <tr><td class="t">16:00</td><td>Breakouts on open problems</td><td class="w"></td></tr>
+        <tr><td class="t">16:40</td><td>Posters and artifacts II</td><td class="w"></td></tr>
+        <tr><td class="t">17:20</td><td>Awards and closing</td><td class="w"></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="sec" id="speakers">
+  <h2>Invited speakers <span class="venue">Confirmed</span></h2>
+  <ul class="spk">
+    <li><img src="{{ '/assets/img/workshop/alex-dimakis.jpg' | relative_url }}" alt="" width="240" height="240" loading="lazy"><b>Alex Dimakis</b><span>UC Berkeley · Bespoke Labs</span></li>
+    <li><img src="{{ '/assets/img/workshop/yuandong-tian.png' | relative_url }}" alt="" width="240" height="240" loading="lazy"><b>Yuandong Tian</b><span>Recursive Superintelligence</span></li>
+    <li><img src="{{ '/assets/img/workshop/matei-zaharia.jpg' | relative_url }}" alt="" width="240" height="240" loading="lazy"><b>Matei Zaharia</b><span>UC Berkeley · Databricks</span></li>
+    <li><img src="{{ '/assets/img/workshop/azalia-mirhoseini.jpg' | relative_url }}" alt="" width="240" height="240" loading="lazy"><b>Azalia Mirhoseini</b><span>Stanford · Ricursive Intelligence</span></li>
   </ul>
-</div>
 </section>
 
-<section class="journal" id="schedule">
-<div class="page">
-  <div class="sec-head">
-    <h2 class="sec-title">Schedule</h2>
-    <span class="sec-count">Tentative morning program</span>
+<section class="sec" id="challenge">
+  <div class="chb">
+    <p class="ws-st"><span class="venue hl">One-week challenge</span><span class="venue">Problem to be announced</span></p>
+    <h2>An open-ended problem in AI for AI R&amp;D</h2>
+    <p>Every team gets the same problem and the same budget, and lets its research agents work on it for a week. The winners present at the workshop.</p>
+    <dl class="tstats">
+      <div><dt>Window, tentative</dt><dd>Feb 2&ndash;8, 2027</dd></div>
+      <div><dt>Budget</dt><dd>Equal for every team</dd></div>
+      <div><dt>You submit</dt><dd>Code and a report</dd></div>
+      <div><dt>We do</dt><dd>Rerun the top entries</dd></div>
+    </dl>
   </div>
-  <div class="fc-table-wrap ws-schedule">
-    <table>
-      <thead>
-        <tr>
-          <th>Time</th>
-          <th>Session</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>08:30–08:40</td><td>Opening remarks and workshop questions</td></tr>
-        <tr><td>08:40–09:10</td><td>Invited talk 1. Speaker to be announced.</td></tr>
-        <tr><td>09:10–09:40</td><td>Invited talk 2. Speaker to be announced.</td></tr>
-        <tr><td>09:40–10:20</td><td>Oral paper session: selected contributed work and discussion</td></tr>
-        <tr><td>10:20–10:50</td><td>Coffee break with the poster and artifact session</td></tr>
-        <tr><td>10:50–11:20</td><td>Invited talk 3. Speaker to be announced.</td></tr>
-        <tr><td>11:20–12:20</td><td>Competition results, reproducibility summary, and winning-team talk</td></tr>
-        <tr><td>12:20–12:30</td><td>Awards, synthesis, and closing remarks</td></tr>
-      </tbody>
-    </table>
-  </div>
-  <p class="fc-human-reference">Clock times follow the half-day block that ICLR assigns.</p>
-</div>
 </section>
 
-<section class="journal" id="speakers">
-<div class="page">
-  <div class="sec-head">
-    <h2 class="sec-title">Invited speakers</h2>
+<section class="sec" id="submit">
+  <h2>Submit</h2>
+  <div class="sb">
+    <div>
+      <h3>What</h3>
+      <ul class="kv">
+        <li><b>Papers and extended abstracts</b><span>Empirical, methods, systems, benchmark or position work</span></li>
+        <li><b>Challenge reports and artifacts</b><span>Runnable entries with a short account, negative results included</span></li>
+        <li><b>Tiny and short papers</b><span>Small results, replications, early findings; human-written only</span></li>
+      </ul>
+    </div>
+    <div>
+      <h3>Who wrote it</h3>
+      <ul class="kv">
+        <li><b>Fully AI-written</b><span>An agent is the primary author</span></li>
+        <li><b>AI-written, human-reviewed</b><span>People reviewed it before submission</span></li>
+        <li><b>Human-written</b><span>AI assistance only as ICLR allows</span></li>
+      </ul>
+    </div>
   </div>
-  <div class="prose">
-    <p>Three invited talks anchor the program. Speakers will be announced here once they confirm.</p>
-  </div>
-</div>
+  <p class="tbd sb-n">Every submission states its track. People review every submission and make every decision. The OpenReview link will be posted here if the workshop is accepted.</p>
 </section>
 
-<section class="journal" id="competition">
-<div class="page">
-  <div class="sec-head">
-    <h2 class="sec-title">Competition</h2>
-    <span class="sec-count">Opens after paper decisions</span>
-  </div>
-  <div class="prose">
-    <p>The workshop hosts a competition centered on one fixed, research-oriented problem. Participants receive a standardized environment and aim to produce a reproducible new research result under constrained compute. An automatic metric scores the final artifact. Entries and reports use the same three participation tracks as the workshop papers.</p>
-    <p>The competition opens immediately after workshop-paper decisions are released and closes the day before ICLR 2027 begins. Results, awards, and the winning-team talk are presented at the workshop. The problem statement, baseline, environment, metric, compute limits, and leaderboard will be posted on this page when the competition launches.</p>
-    <p>The competition gives the workshop a shared empirical case study: how research agents allocate experiments, synthesize and validate data, respond to evidence, and produce reproducible artifacts. The workshop remains open to autoresearch work that does not use the challenge environment.</p>
-  </div>
-</div>
+<section class="sec" id="organizers">
+  <h2>Organizers</h2>
+  <ul class="ppl">
+    <li><b><a href="https://wenhaochai.com/" target="_blank" rel="noopener noreferrer">Wenhao Chai</a></b><span>Princeton · Google DeepMind</span><i>General lead</i></li>
+    <li><b><a href="https://melissa-pan.github.io/" target="_blank" rel="noopener noreferrer">Melissa Pan</a></b><span>UC Berkeley</span><i>Outreach and panel</i></li>
+    <li><b><a href="https://peppaking8.github.io/" target="_blank" rel="noopener noreferrer">Xianbang Wang</a></b><span>MIT</span><i>Challenge</i></li>
+    <li><b><a href="https://joyemang33.github.io/" target="_blank" rel="noopener noreferrer">Qiuyang Mang</a></b><span>UC Berkeley</span><i>Challenge evaluation and review</i></li>
+    <li><b><a href="https://diannedaian.github.io/" target="_blank" rel="noopener noreferrer">Dingning Cao</a></b><span>MIT</span><i>Student volunteer</i></li>
+    <li><b><a href="https://people.eecs.berkeley.edu/~jegonzal" target="_blank" rel="noopener noreferrer">Joseph E. Gonzalez</a></b><span>UC Berkeley</span><i>Senior advisor</i></li>
+    <li><b><a href="https://people.eecs.berkeley.edu/~akcheung" target="_blank" rel="noopener noreferrer">Alvin Cheung</a></b><span>UC Berkeley</span><i>Senior advisor</i></li>
+  </ul>
+  <p class="tbd sb-n">Questions: <a href="mailto:wc9403@princeton.edu">wc9403@princeton.edu</a> or <a href="mailto:qmang@berkeley.edu">qmang@berkeley.edu</a>.</p>
 </section>
-
-<section class="journal" id="organizers">
-<div class="page">
-  <div class="sec-head">
-    <h2 class="sec-title">Organizers</h2>
-  </div>
-  <div class="ws-people">
-    <div class="ws-person">
-      <h3 class="ws-person-name"><a href="https://diannedaian.github.io/" target="_blank" rel="noopener noreferrer">Dingning Cao</a></h3>
-      <p class="ws-person-affil">MIT</p>
-      <p class="ws-person-bio">Undergraduate at MIT advised by William T. Freeman, working on human-computer interaction, design intelligence, and generative models. Organizer of the MIT Informatics Tournament and HackMIT.</p>
-    </div>
-    <div class="ws-person">
-      <h3 class="ws-person-name"><a href="https://wenhaochai.com/" target="_blank" rel="noopener noreferrer">Wenhao Chai</a></h3>
-      <p class="ws-person-affil">Princeton University · Google DeepMind</p>
-      <p class="ws-person-bio">Ph.D. student at Princeton advised by Karthik Narasimhan and student researcher at Google DeepMind. Leads MovieChat, co-leads LiveCodeBench Pro, and has organized workshops and competitions at CVPR 2024, 2025, and 2026.</p>
-    </div>
-    <div class="ws-person">
-      <h3 class="ws-person-name"><a href="https://peppaking8.github.io/" target="_blank" rel="noopener noreferrer">Xianbang Wang</a></h3>
-      <p class="ws-person-affil">MIT</p>
-      <p class="ws-person-bio">Undergraduate in mathematics and computer science at MIT advised by Kaiming He, working on efficient visual generation and multi-agent systems for automated research. Leads MiniT2I. Gold medalist at the 65th International Mathematical Olympiad.</p>
-    </div>
-    <div class="ws-person">
-      <h3 class="ws-person-name"><a href="https://joyemang33.github.io/" target="_blank" rel="noopener noreferrer">Qiuyang Mang</a></h3>
-      <p class="ws-person-affil">UC Berkeley</p>
-      <p class="ws-person-bio">Ph.D. student in the Sky Computing Lab at UC Berkeley advised by Alvin Cheung. Leads FrontierCS and FrontierSmith, which study open-ended, verifiable computer-science challenges and data synthesis for LLM-driven algorithm evolution.</p>
-    </div>
-    <div class="ws-person">
-      <h3 class="ws-person-name"><a href="https://hanchenli.github.io/" target="_blank" rel="noopener noreferrer">Hanchen Li</a></h3>
-      <p class="ws-person-affil">UC Berkeley</p>
-      <p class="ws-person-bio">Ph.D. student in the Sky Computing Lab at UC Berkeley advised by Ion Stoica and Joseph E. Gonzalez, working on agent infrastructure, inference, and context-engineering automation. EuroSys 2025 Best Paper Award.</p>
-    </div>
-  </div>
-  <div class="prose ws-prose-gap">
-    <p>Questions about the workshop or the competition: write to Wenhao Chai at <a href="mailto:wc9403@princeton.edu">wc9403@princeton.edu</a> or Qiuyang Mang at <a href="mailto:qmang@berkeley.edu">qmang@berkeley.edu</a>.</p>
-  </div>
 </div>
-</section>
+</div>
+<script>
+(() => { const links = [...document.querySelectorAll('#subnav a')], secs = links.map(a => document.querySelector(a.getAttribute('href')));
+  const spy = () => { const bar = document.querySelector('.sub').getBoundingClientRect().bottom + 24, end = innerHeight + scrollY >= document.documentElement.scrollHeight - 2;
+    const cur = end ? secs[secs.length - 1] : secs.filter(e => e.getBoundingClientRect().top <= bar).pop() || secs[0];
+    links.forEach((a, i) => a.classList.toggle('on', secs[i] === cur)); };
+  addEventListener('scroll', spy, {passive: true}); spy(); })();
+</script>
