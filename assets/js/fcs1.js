@@ -1,15 +1,18 @@
 /* FrontierCS (v1) page: the two problem animations, leaderboard tabs and the sub-nav. */
 (() => {
-// three hues, each [dark, light], on a soft ground
+// three hues, each [dark, light]; every tile sits on a faint tint of its own hue
 const HUES = [["#1a73e8", "#d2e3fc"], ["#8e5bef", "#e6dcfd"], ["#12a3a3", "#cdeeed"]];
-const FIELD = '#f1f3f4', DEEP = '#ffffff', INK = '#3c4043', dpr = () => window.devicePixelRatio || 1;
+const INK = '#3c4043', dpr = () => window.devicePixelRatio || 1;
+const mix = (a, b, t) => '#' + [1, 3, 5].map(k => Math.round(parseInt(a.substr(k, 2), 16) * (1 - t) + parseInt(b.substr(k, 2), 16) * t).toString(16).padStart(2, '0')).join('');
 const LABEL = 64;   // the strip at the foot of a tile that holds its label
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const ease = v => v <= 0 ? 0 : v >= 1 ? 1 : v * v * (3 - 2 * v), lerp = (a, b, t) => a + (b - a) * t;
 // a tile's canvas fills its figure; `paint(ctx, w, h, t)` draws one frame in CSS pixels, t in seconds (-1: the last frame, for reduced motion)
-function tile(id, paint) { const c = document.getElementById(id); if (!c) return;
+function tile(id, hue, paint) { const c = document.getElementById(id); if (!c) return;
+  const ground = mix(HUES[hue][1], '#ffffff', .55); c.parentNode.style.background = ground;
   let w = 0, h = 0, t0 = 0, on = false;
   const frame = now => { const r = dpr(); if (c.clientWidth !== w || c.clientHeight !== h) { w = c.clientWidth; h = c.clientHeight; c.width = w * r; c.height = h * r; }
-    const g = c.getContext('2d'); g.setTransform(r, 0, 0, r, 0, 0); g.fillStyle = FIELD; g.fillRect(0, 0, w, h);
+    const g = c.getContext('2d'); g.setTransform(r, 0, 0, r, 0, 0); g.fillStyle = ground; g.fillRect(0, 0, w, h);
     paint(g, w, h, reduced ? -1 : (now - t0) / 1000); if (on && !reduced) requestAnimationFrame(frame); };
   new IntersectionObserver(es => { const v = es[0].isIntersecting; if (v && !on) { on = true; t0 = t0 || performance.now(); requestAnimationFrame(frame); } else if (!v) on = false; }).observe(c);
   addEventListener('resize', () => { if (!on || reduced) requestAnimationFrame(frame); }); }
@@ -38,22 +41,20 @@ function pkInstance(n, R) {
   return {pieces, total};
 }
 { const pieces = pkInstance(PK.n, pkRng(PK.seed)).pieces, TONES = HUES.flat();
-  const snaps = PK.hist.map(([it, score, W, H, s]) => { const g = new Int16Array(W * H).fill(-1);
-    pieces.forEach((os, id) => { const o = os[+s[5 * id]], x = parseInt(s.substr(5 * id + 1, 2), 36), y = parseInt(s.substr(5 * id + 3, 2), 36);
-      for (const [cx, cy] of o.c) g[(y + cy) * W + x + cx] = id; });
-    return {it, score, W, H, g}; });
-  const L = Math.log10(PK.iters), RUN = 14, HOLD = 4, label = document.getElementById('pklabel');
-  tile('pktile', (g, w, h, t) => { const u = t < 0 ? 1 : Math.min(1, (t % (RUN + HOLD)) / RUN), it = 10 ** (u * L); let k = 0; while (k + 1 < snaps.length && snaps[k + 1].it <= it) k++;
-    const r = snaps[k], flip = r.H > r.W, s = flip ? {W: r.H, H: r.W, g: {}} : r, at = (x, y) => flip ? r.g[x * r.W + y] : r.g[y * r.W + x];   // drawn on its side when taller than wide
-    const pad = 28, hh = h - LABEL, cell = Math.max(1, Math.floor(Math.min((w - 2 * pad) / s.W, (hh - pad) / s.H))), x0 = Math.round((w - s.W * cell) / 2), y0 = Math.round(pad / 2 + (hh - s.H * cell) / 2);
-    g.fillStyle = DEEP; g.fillRect(x0, y0, s.W * cell, s.H * cell);
-    for (let y = 0; y < s.H; y++) for (let x = 0; x < s.W; x++) { const id = at(x, y); if (id < 0) continue; g.fillStyle = TONES[id % TONES.length]; g.fillRect(x0 + x * cell, y0 + y * cell, cell, cell); }
-    if (cell >= 4) { g.fillStyle = '#fff';   // seams between different pieces
-      for (let y = 0; y < s.H; y++) for (let x = 0; x < s.W; x++) { const id = at(x, y);
-        if (x + 1 < s.W && at(x + 1, y) !== id) g.fillRect(x0 + (x + 1) * cell - .5, y0 + y * cell, 1, cell);
-        if (y + 1 < s.H && at(x, y + 1) !== id) g.fillRect(x0 + x * cell, y0 + (y + 1) * cell - .5, cell, 1); } }
-    g.strokeStyle = INK; g.lineWidth = 1.5; g.strokeRect(x0 - 1, y0 - 1, s.W * cell + 2, s.H * cell + 2);
-    label.firstChild.textContent = 'Score ' + r.score.toFixed(1); label.lastChild.textContent = `${s.W} × ${s.H} · iteration ${Math.round(it).toLocaleString('en-US')}`; }); }
+  for (const os of pieces) for (const o of os) { const has = new Set(o.c.map(c => c.join())); o.edges = [];   // the outline of each orientation, for the seams
+    for (const [x, y] of o.c) { if (!has.has([x + 1, y].join())) o.edges.push([x + 1, y, 0, 1]); if (!has.has([x - 1, y].join())) o.edges.push([x, y, 0, 1]);
+      if (!has.has([x, y + 1].join())) o.edges.push([x, y + 1, 1, 0]); if (!has.has([x, y - 1].join())) o.edges.push([x, y, 1, 0]); } }
+  const snaps = PK.hist.map(([it, score, W, H, s]) => ({it, score, W, H, at: pieces.map((os, id) => ({o: os[+s[5 * id]], x: parseInt(s.substr(5 * id + 1, 2), 36), y: parseInt(s.substr(5 * id + 3, 2), 36)}))}));
+  const STEP = .2, HOLD = 4, N = snaps.length - 1, label = document.getElementById('pklabel');
+  tile('pktile', 0, (g, w, h, t) => { const f = t < 0 ? N : Math.min(N, (t % (N * STEP + HOLD)) / STEP), k = Math.min(N - 1, Math.floor(f)), a = ease(f - k), A = snaps[k], B = snaps[k + 1];
+    // every packing is drawn on its side (the rectangles are taller than wide), and the view zooms in as the rectangle tightens
+    const W = lerp(A.H, B.H, a), H = lerp(A.W, B.W, a), pad = 28, hh = h - LABEL, cell = Math.min((w - 2 * pad) / W, (hh - pad) / H), x0 = (w - W * cell) / 2, y0 = pad / 2 + (hh - H * cell) / 2;
+    g.fillStyle = '#fff'; g.fillRect(x0, y0, W * cell, H * cell);
+    const P = A.at.map((p, id) => { const q = B.at[id]; return {o: a < .5 ? p.o : q.o, x: lerp(p.y, q.y, a), y: lerp(p.x, q.x, a)}; });
+    P.forEach((p, id) => { g.fillStyle = TONES[id % TONES.length]; for (const [cx, cy] of p.o.c) g.fillRect(x0 + (p.x + cy) * cell - .3, y0 + (p.y + cx) * cell - .3, cell + .6, cell + .6); });
+    if (cell >= 4) { g.fillStyle = '#fff'; for (const p of P) for (const [ex, ey, dx, dy] of p.o.edges) g.fillRect(x0 + (p.x + ey) * cell - .5, y0 + (p.y + ex) * cell - .5, dy * cell + 1, dx * cell + 1); }
+    g.strokeStyle = INK; g.lineWidth = 1.5; g.strokeRect(x0 - 1, y0 - 1, W * cell + 2, H * cell + 2);
+    const s = a < .5 ? A : B; label.firstChild.textContent = 'Score ' + lerp(A.score, B.score, a).toFixed(1); label.lastChild.textContent = `${s.H} × ${s.W} · iteration ${s.it.toLocaleString('en-US')}`; }); }
 
 // ---- World Map (problem 6): two valid maps of one of the task's test cases (14 countries, 28 borders), a walk laid
 // out one column per step and the same walk laid along diagonals. Both satisfy the checker's rule.
@@ -94,19 +95,22 @@ function wmDiagonal(n, edges) {
   }
   return wmRows(n, edges);
 }
-{ const maps = [wmRows(WM.n, WM.e), wmDiagonal(WM.n, WM.e)], K0 = maps[0].length, label = document.getElementById('wmlabel');
+{ const maps = [wmRows(WM.n, WM.e), wmDiagonal(WM.n, WM.e)], K0 = maps[0].length, K1 = maps[1].length, label = document.getElementById('wmlabel');
   // each hue in five steps from its dark to near white: fifteen colours for the fourteen countries
-  const mix = (a, b, t) => '#' + [1, 3, 5].map(k => Math.round(parseInt(a.substr(k, 2), 16) * (1 - t) + parseInt(b.substr(k, 2), 16) * t).toString(16).padStart(2, '0')).join('');
   const PAL = HUES.flatMap(([d, l]) => [0, .3, .6, .85, 1.15].map(t => t <= 1 ? mix(d, l, t) : mix(l, '#ffffff', .5))), tone = c => PAL[(c * 4) % 15];
-  const score = K => Math.max(0, Math.min(100, (6 - K / WM.n) / 4.5 * 100)), ease = v => v < 0 ? 0 : v > 1 ? 1 : v * v * (3 - 2 * v);
-  const T = [3.5, 2.5, 3.5, 4.5], CY = T.reduce((a, b) => a + b);   // draw the first, hold, draw the second, hold
-  tile('wmtile', (g, w, h, t) => { const u = t < 0 ? CY - .01 : t % CY, second = u >= T[0] + T[1], C = maps[second ? 1 : 0], K = C.length, pad = 28;
-    const hh = h - LABEL, cell = Math.max(1, Math.floor(Math.min(w - 2 * pad, hh - pad) / K0)), x0 = Math.round((w - K * cell) / 2), y0 = Math.round(pad / 2 + (hh - K * cell) / 2);
-    const p = ease(second ? (u - T[0] - T[1]) / T[2] : u / T[0]);   // the first map appears column by column, the second diagonal by diagonal
-    g.fillStyle = DEEP; g.fillRect(x0, y0, K * cell, K * cell);
-    for (let i = 0; i < K; i++) for (let j = 0; j < K; j++) { if ((second ? (i + j) / (2 * K - 2) : j / (K - 1)) > p) continue; g.fillStyle = tone(C[i][j]); g.fillRect(x0 + j * cell, y0 + i * cell, cell, cell); }
-    g.strokeStyle = INK; g.lineWidth = 1.5; g.strokeRect(x0 - 1, y0 - 1, K * cell + 2, K * cell + 2);
-    label.firstChild.textContent = 'Score ' + score(K).toFixed(1); label.lastChild.textContent = `K = ${K} for ${WM.n} countries`; }); }
+  const score = K => Math.max(0, Math.min(100, (6 - K / WM.n) / 4.5 * 100));
+  const T = [3.2, 1.8, .9, 3.2, 4.4], CY = T.reduce((a, b) => a + b);   // draw the first map, hold, let it fade to an outline, draw the second inside it, hold
+  tile('wmtile', 1, (g, w, h, t) => { const u = t < 0 ? CY - .01 : t % CY, hh = h - LABEL, pad = 28, cell = Math.min(w - 2 * pad, hh - pad) / K0;
+    const box = K => [(w - K * cell) / 2, pad / 2 + (hh - K * cell) / 2], draw = (C, p, alpha, key) => { const K = C.length, [x0, y0] = box(K); g.globalAlpha = alpha;
+      g.fillStyle = '#fff'; g.fillRect(x0, y0, K * cell, K * cell);
+      for (let i = 0; i < K; i++) for (let j = 0; j < K; j++) { const d = (p - key(i, j, K)) * 14; if (d <= 0) continue;   // a soft front sweeps across
+        g.globalAlpha = alpha * Math.min(1, d); g.fillStyle = tone(C[i][j]); g.fillRect(x0 + j * cell - .3, y0 + i * cell - .3, cell + .6, cell + .6); }
+      g.globalAlpha = alpha; g.strokeStyle = INK; g.lineWidth = 1.5; g.strokeRect(x0 - 1, y0 - 1, K * cell + 2, K * cell + 2); g.globalAlpha = 1; };
+    const t1 = T[0] + T[1], t2 = t1 + T[2], second = u >= t2;
+    if (!second) draw(maps[0], ease(u / T[0]) * 1.08, u < t1 ? 1 : 1 - ease((u - t1) / T[2]), (i, j, K) => j / K);
+    if (u >= t1) { const [x0, y0] = box(K0); g.globalAlpha = second ? 1 : ease((u - t1) / T[2]); g.setLineDash([5, 5]); g.strokeStyle = '#9aa0a6'; g.lineWidth = 1.5; g.strokeRect(x0, y0, K0 * cell, K0 * cell); g.setLineDash([]); g.globalAlpha = 1; }
+    if (second) draw(maps[1], ease((u - t2) / T[3]) * 1.08, 1, (i, j, K) => (i + j) / (2 * K));
+    const K = second ? K1 : K0; label.firstChild.textContent = 'Score ' + score(K).toFixed(1); label.lastChild.textContent = `K = ${K} for ${WM.n} countries`; }); }
 
 // ---- Permutation (problem 2): a hidden permutation, and queries answered only with the number of positions that match.
 // A simple strategy of ours on n = 8: one pass with two values finds where 1 and 2 sit; after that 1 is a filler that
@@ -119,20 +123,23 @@ function wmDiagonal(n, edges) {
     while (cand.length > 1) { const S = cand.slice(0, cand.length >> 1), q = HID.map((_, j) => S.includes(j) ? v : j === known[1] ? 2 : 1);
       cand = ask(q) ? S : cand.filter(i => !S.includes(i)); if (cand.length === 1) known[v] = cand[0]; push(q, S, v); steps[steps.length - 1].known = {...known}; }
     known[v] = cand[0]; if (v === n) steps[steps.length - 1].known = {...known}; }
-  const STEP = .55, HOLD = 3.5, label = document.getElementById('pmlabel');
+  const STEP = .85, HOLD = 3.5, label = document.getElementById('pmlabel');
   const rr = (g, x, y, w, h, r) => { g.beginPath(); g.roundRect(x, y, w, h, r); };
-  tile('pmtile', (g, w, h, t) => { const k = t < 0 ? steps.length - 1 : Math.min(steps.length - 1, Math.floor((t % (steps.length * STEP + HOLD)) / STEP)), s = steps[k];
+  tile('pmtile', 2, (g, w, h, t) => { const f = t < 0 ? steps.length - .001 : Math.min(steps.length - .001, (t % (steps.length * STEP + HOLD)) / STEP), k = Math.floor(f), a = f - k, s = steps[k], before = k ? steps[k - 1].known : {};
     const hh = h - LABEL, gap = Math.max(4, Math.min(12, w / 60)), cw = Math.min(64, (w - 56 - (n - 1) * gap) / (n + 1.6)), x0 = (w - (n * cw + (n - 1) * gap) - cw * 1.6) / 2, y1 = hh / 2 - cw * 1.25, y2 = hh / 2 + cw * .45;
-    const at = Object.fromEntries(Object.entries(s.known).map(([v, i]) => [i, +v]));
+    const now = Object.fromEntries(Object.entries(s.known).map(([v, i]) => [i, +v])), was = Object.fromEntries(Object.entries(before).map(([v, i]) => [i, +v]));
+    const qin = ease(a / .3), ain = ease((a - .35) / .2), turn = ease((a - .6) / .35);   // the query slides in, the answer appears, new cards turn over
     g.textAlign = 'center'; g.textBaseline = 'middle';
-    for (let i = 0; i < n; i++) { const x = x0 + i * (cw + gap), v = at[i], hue = v && HUES[v % 3];
-      rr(g, x, y1, cw, cw * 1.25, 8); g.fillStyle = v ? hue[1] : '#fff'; g.fill(); g.strokeStyle = v ? hue[0] : '#bdc1c6'; g.lineWidth = 1.5; g.stroke();   // the hidden permutation
-      g.fillStyle = v ? INK : '#9aa0a6'; g.font = `600 ${Math.round(cw * .42)}px 'Hanken Grotesk', sans-serif`; g.fillText(v || '?', x + cw / 2, y1 + cw * .64);
-      const probe = s.probe.includes(i); rr(g, x + cw * .12, y2, cw * .76, cw * .76, 6); g.fillStyle = probe ? HUES[0][0] : '#e8eaed'; g.fill();                  // the query
-      g.fillStyle = probe ? '#fff' : '#5f6368'; g.font = `600 ${Math.round(cw * .34)}px 'Hanken Grotesk', sans-serif`; g.fillText(s.q[i], x + cw / 2, y2 + cw * .4); }
-    const ax = x0 + n * (cw + gap) + cw * .2; g.fillStyle = INK; g.font = `600 ${Math.round(cw * .34)}px 'Hanken Grotesk', sans-serif`; g.textAlign = 'left';
-    g.fillText('→ ' + s.ans, ax, y2 + cw * .4);                                                                                                                      // the answer: how many positions match
-    label.firstChild.textContent = `${k + 1} ${k ? 'queries' : 'query'}`; label.lastChild.textContent = `${Object.keys(s.known).length} of ${n} positions known`; }); }
+    for (let i = 0; i < n; i++) { const x = x0 + i * (cw + gap), fresh = now[i] && !was[i], v = fresh ? (turn > .5 ? now[i] : 0) : now[i], hue = v && HUES[v % 3], sx = fresh ? Math.abs(1 - 2 * turn) : 1;
+      g.save(); g.translate(x + cw / 2, 0); g.scale(Math.max(.04, sx), 1);                                                                  // the hidden permutation
+      rr(g, -cw / 2, y1, cw, cw * 1.25, 8); g.fillStyle = v ? hue[1] : '#fff'; g.fill(); g.strokeStyle = v ? hue[0] : '#bdc1c6'; g.lineWidth = 1.5; g.stroke();
+      g.fillStyle = v ? INK : '#9aa0a6'; g.font = `600 ${Math.round(cw * .42)}px 'Hanken Grotesk', sans-serif`; g.fillText(v || '?', 0, y1 + cw * .64); g.restore();
+      const probe = s.probe.includes(i), dy = (1 - qin) * cw * .35; g.globalAlpha = qin;                                                    // the query
+      rr(g, x + cw * .12, y2 + dy, cw * .76, cw * .76, 6); g.fillStyle = probe ? HUES[0][0] : '#fff'; g.fill(); if (!probe) { g.strokeStyle = '#dadce0'; g.lineWidth = 1; g.stroke(); }
+      g.fillStyle = probe ? '#fff' : '#5f6368'; g.font = `600 ${Math.round(cw * .34)}px 'Hanken Grotesk', sans-serif`; g.fillText(s.q[i], x + cw / 2, y2 + dy + cw * .4); g.globalAlpha = 1; }
+    const ax = x0 + n * (cw + gap) + cw * .2; g.globalAlpha = ain; g.fillStyle = INK; g.font = `600 ${Math.round(cw * .34)}px 'Hanken Grotesk', sans-serif`; g.textAlign = 'left';
+    g.fillText('→ ' + s.ans, ax, y2 + cw * .4); g.globalAlpha = 1;                                                                            // the answer: how many positions match
+    const kn = Object.keys(turn > .5 ? s.known : before).length; label.firstChild.textContent = `${k + 1} ${k ? 'queries' : 'query'}`; label.lastChild.textContent = `${kn} of ${n} positions known`; }); }
 
 // leaderboard tabs
 const tabs = [...document.querySelectorAll('#lbtabs .chip')];
