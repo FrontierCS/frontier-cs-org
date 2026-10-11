@@ -301,7 +301,7 @@ This FrontierCS 2 update includes four changes.
 
 The short version is simple: open-ended evaluation remains the core idea. FrontierCS 2 changes the environment around it.
 
-## The Feedback Loop in Three Settings
+## The Feedback Loop in Two Settings
 
 The same evaluation pattern appears in settings that are easy to see: the agent proposes an artifact, receives feedback, and improves it over time.
 
@@ -316,15 +316,9 @@ The same evaluation pattern appears in settings that are easy to see: the agent 
     <p class="anim-cap" id="bud-cap"></p>
     <figcaption><strong>Erd&#337;s Unit Distance.</strong> Four constructions of 100 points, each with more pairs exactly one unit apart. The task asks an agent to search for better ones under this measurable objective.</figcaption>
   </figure>
-  <figure>
-    <div class="showcase-media">
-      <img src="{{ 'assets/img/2026-06-11-frontiercs-2-roadmap/generals-io-strategy.gif' | relative_url }}" alt="Generals.io bot strategy replay">
-    </div>
-    <figcaption><strong>Generals.io Strategy.</strong> A dynamic replay where the artifact is not a static solution, but a policy playing out over time.</figcaption>
-  </figure>
 </div>
 
-These settings have different artifacts. A packing layout. A geometric construction. A game strategy. A database patch. A serving scheduler. The common structure is the same: the agent needs to try, measure, revise, and keep improving.
+These settings have different artifacts. A packing layout. A geometric construction. A database patch. A serving scheduler. The common structure is the same: the agent needs to try, measure, revise, and keep improving.
 
 ## Why This Direction
 
