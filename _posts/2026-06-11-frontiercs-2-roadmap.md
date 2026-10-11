@@ -17,7 +17,7 @@ authors:
 
 toc:
   - name: "What's New in FrontierCS 2"
-  - name: "The Feedback Loop in Three Settings"
+  - name: "The Feedback Loop in Two Settings"
   - name: "Why This Direction"
   - name: "From Static Harbor to Feedback"
   - name: "What We Mean by Repo-Level"
