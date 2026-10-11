@@ -231,6 +231,7 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
   .faq details[open]::details-content{block-size:auto}
 }
 .tbd{color:var(--ink-2); font-size:16px; margin:0}
+.pcontact{color:var(--ink-2); font-size:16px; margin:20px 0 0}
 /* private set: blurred task illustrations under locks (the post card's picture) */
 .locked{display:grid; grid-template-columns:repeat(6, minmax(0,1fr)); gap:6px; margin-top:24px}
 .lk-tile{position:relative; aspect-ratio:3/2; border-radius:8px; overflow:hidden}

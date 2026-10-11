@@ -31,6 +31,14 @@ permalink: /paper/
         </div>
       </article>
       <article class="paper-row">
+        <a class="paper-pg" href="https://arxiv.org/abs/2506.11928" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img src="{{ '/assets/img/fcs1-papers/2506.11928.jpg' | relative_url }}" alt="" width="440" height="570" loading="lazy"></a>
+        <div>
+          <div class="post-meta"><span class="venue">NeurIPS 2025</span></div>
+          <h2 class="post-title"><a href="https://arxiv.org/abs/2506.11928" target="_blank" rel="noopener noreferrer">LiveCodeBench Pro: How Do Olympiad Medalists Judge LLMs in Competitive Programming?</a></h2>
+          <p class="post-desc">Competitive-programming problems from live contests, annotated by Olympiad medalists, to find where LLMs still fall short of experts.</p>
+        </div>
+      </article>
+      <article class="paper-row">
         <a class="paper-pg" href="https://arxiv.org/abs/2609.15309" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img src="{{ '/assets/img/fcs1-papers/2609.15309.jpg' | relative_url }}" alt="" width="440" height="570" loading="lazy"></a>
         <div>
           <div class="post-meta"><span class="venue plain">arXiv 2026</span></div>
