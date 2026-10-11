@@ -8,19 +8,10 @@ permalink: /team/
 {%- assign everyone = t.contributors | concat: t.advisors -%}
 {%- assign fs = site.data.team.fsmith -%}
 
-<section class="page-hero">
-  <div class="page" id="main" tabindex="-1">
-    <h1>Team</h1>
-    <p class="lede">The people who build FrontierCS, the institutions they come from, and the sponsors who support the project.</p>
-  </div>
-</section>
 
-<section class="journal team-sec">
+<section class="journal team-sec team-top">
 <div class="page">
-  <div class="sec-head"><div>
-    <h2 class="sec-title">Authors</h2>
-  </div></div>
-
+  <h1 class="vh" id="main" tabindex="-1">Team</h1>
   <details class="team-fold">
     <summary><h3 class="team-group">FrontierCS <span>{{ t.venue }} · {{ everyone.size }} authors</span></h3></summary>
     <p class="team-note"><a href="{{ t.url }}" target="_blank" rel="noopener noreferrer">{{ t.title }}</a>, in paper order.</p>

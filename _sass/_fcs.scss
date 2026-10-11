@@ -1647,6 +1647,8 @@ a.tm-n:hover { color: var(--accent-hover); text-decoration-color: currentColor; 
 .tm-a { font-size: 14px; color: var(--ink-3); margin-top: 2px; }
 .tm-mail { font-size: 14px; color: var(--ink-2); margin-top: 4px; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--rule); overflow-wrap: anywhere; }
 .tm-mail:hover { color: var(--accent-hover); }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }   /* a heading for assistive technology only */
+section.journal.team-sec.team-top { padding-top: clamp(56px, 6vw, 72px); }
 /* the author lists fold away; the heading with its count is the control (as the folded table on the FrontierCS 2 page) */
 .team-fold { border-top: 1px solid var(--rule); } .team-fold:last-of-type { border-bottom: 1px solid var(--rule); }
 .team-fold summary { list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 0; cursor: pointer; }
