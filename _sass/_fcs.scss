@@ -1493,7 +1493,7 @@ footer.foot { margin-top: 120px; padding: 56px 0 28px; background: #202124; colo
 .fcs1 .res .hum td { color: var(--ink-2); }
 .fcs1 .res.runs td { padding-block: 8px; } .fcs1 .res.runs td:first-child { text-align: left; } .fcs1 .res.runs td.sc { width: 46%; }
 .fcs1 .cfoot a { text-decoration: underline; text-underline-offset: 3px; }
-.fcs1 .hero { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); }
+.fcs1 .hero { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); align-items: start; }
 .fcs1 .intro h1 { max-width: none; font-size: clamp(32px, 3.5vw, 44px); }
 @media (max-width: 1000px) { .fcs1 .hero { grid-template-columns: 1fr; } }
 .fcs1 .loopfig { margin: 0; justify-self: end; width: min(100%, 600px); }
@@ -1532,11 +1532,12 @@ footer.foot { margin-top: 120px; padding: 56px 0 28px; background: #202124; colo
 @media (max-width: 640px) { .fcs1 .res.lb th:nth-child(n+4), .fcs1 .res.lb td:nth-child(n+4) { display: none; } .fcs1 .res .rk { width: 34px; } .fcs1 .res td.sc { width: 44%; min-width: 0; } .fcs1 .sbar { width: calc(100% - 58px); margin-right: 8px; } }
 
 /* Workshop page: FrontierCS 2 layout (assets/css/fcs2.css) plus its own blocks */
-.ws2 .whero { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 24px 64px; align-items: end; }
-.ws2 .whero .lead { margin-top: 0; max-width: none; }
+.ws2 .whero { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 24px 40px; align-items: start; }
+.ws2 .whero .lead { margin-top: 38px; max-width: none; }
+@media (max-width: 900px) { .ws2 .whero .lead { margin-top: 0; } }
 @media (max-width: 900px) { .ws2 .whero { grid-template-columns: 1fr; } }
 .ws2 .intro h1 { max-width: none; font-size: clamp(32px, 3.5vw, 44px); }
-.ws2 .ws-st { display: flex; gap: 6px; margin: 0 0 16px; } .ws2 .ws-prop { margin: 18px 0 0; padding: 14px 0 0; border-top: 1px solid var(--line); font-size: 16.5px; line-height: 1.45; color: var(--ink-2); }
+.ws2 .ws-st { display: flex; gap: 6px; margin: 0 0 12px; } .ws2 .ws-prop { margin: 18px 0 0; padding: 14px 0 0; border-top: 1px solid var(--line); font-size: 16.5px; line-height: 1.45; color: var(--ink-2); }
 .ws2 .tstats { margin-top: 36px; } .ws2 .tstats dd { font-size: clamp(22px, 2.3vw, 28px); white-space: nowrap; }
 .ws2 .lv { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin-top: 48px; }
 .ws2 .lv article { border-top: 3px solid var(--h); padding-top: 18px; }
