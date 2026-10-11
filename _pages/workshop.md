@@ -53,15 +53,24 @@ page_css: fcs2
 
 <section class="sec" id="challenge">
   <div class="chb">
-    <p class="ws-st"><span class="venue hl">Challenge</span><span class="venue">Problem to be announced</span></p>
-    <h2>An open-ended problem in AI for AI R&amp;D</h2>
-    <p>Every team gets the same problem and the same budget, and lets its research agents work on it. The winners present at the workshop.</p>
-    <dl class="tstats">
-      <div><dt>Dates</dt><dd>To be announced</dd></div>
-      <div><dt>Budget</dt><dd>Equal for every team</dd></div>
-      <div><dt>You submit</dt><dd>Code and a report</dd></div>
-      <div><dt>We do</dt><dd>Rerun the top entries</dd></div>
-    </dl>
+    <div class="chb-t">
+      <p class="chb-k">Challenge <span>Problem to be announced</span></p>
+      <h2>An open-ended problem in AI for AI R&amp;D</h2>
+      <p>Every team gets the same problem and the same budget, and lets its research agents work on it. The winners present at the workshop.</p>
+    </div>
+    <svg class="chb-art" viewBox="0 0 420 240" aria-hidden="true">
+      <g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M24 216H404" stroke-opacity=".35" stroke-width="1.5"/><path d="M24 40H404" stroke-opacity=".35" stroke-width="1.5" stroke-dasharray="2 8"/>
+        <path d="M24 196H74V168H128V150H170V118H236V100H280V78H352V62H404" stroke-opacity=".3" stroke-width="3"/>
+        <path class="chb-run" pathLength="100" d="M24 196H74V168H128V150H170V118H236V100H280V78H352V62H404" stroke-width="3"/>
+      </g>
+      <g fill="#fff"><circle cx="74" cy="168" r="5"/><circle cx="128" cy="150" r="5"/><circle cx="170" cy="118" r="5"/><circle cx="236" cy="100" r="5"/><circle cx="280" cy="78" r="5"/><circle cx="352" cy="62" r="5"/></g>
+    </svg>
+    <ol class="chb-s">
+      <li><b>Same start</b><span>One problem and one budget for every team</span></li>
+      <li><b>Your agents</b><span>Submit runnable code and a short report</span></li>
+      <li><b>Our rerun</b><span>We rerun the top entries before the workshop</span></li>
+    </ol>
   </div>
 </section>
 
