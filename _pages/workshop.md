@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Workshop
+title: "Workshop & Challenge"
 description: "How Far Are AI Agents from Becoming Computer Scientists? A proposed ICLR 2027 workshop on how a research agent learns what to improve, what to trust, and what to explore."
 permalink: /workshop/
 page_css: fcs2
@@ -15,13 +15,7 @@ page_css: fcs2
   <p class="ws-st"><span class="venue hl">Proposal</span><span class="venue">ICLR 2027 workshop</span></p>
   <h1>How Far Are AI Agents from Becoming Computer Scientists?</h1>
   <p class="lead">Agents make progress when a person specifies the task and supplies a check on every answer. Real research often gives neither. This workshop is about what an agent does then.</p>
-  <p class="ws-prop">This is a proposal. The dates below are tentative until ICLR decides on November 29, 2026.</p>
-  <dl class="tstats">
-    <div><dt>Format</dt><dd>Full day</dd><span>In person, non-archival</span></div>
-    <div><dt>Submit by, tentative</dt><dd>Feb 1, 2027</dd><span>11:59 p.m. AoE</span></div>
-    <div><dt>Challenge</dt><dd>To be announced</dd><span>Problem and dates</span></div>
-    <div><dt>Decisions, tentative</dt><dd>Feb 26, 2027</dd><span>Posted on OpenReview</span></div>
-  </dl>
+  <p class="ws-prop">We have proposed this workshop and its challenge for ICLR 2027. ICLR decides on November 29, 2026.</p>
 
   <div class="lv">
     <article style="--h:#1a73e8; --l:#d2e3fc">
