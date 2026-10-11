@@ -6,6 +6,7 @@ permalink: /team/
 ---
 {%- assign t = site.data.team.fcs1 -%}
 {%- assign everyone = t.contributors | concat: t.advisors -%}
+{%- assign fs = site.data.team.fsmith -%}
 
 <section class="page-hero">
   <div class="page" id="main" tabindex="-1">
@@ -17,24 +18,31 @@ permalink: /team/
 <section class="journal team-sec">
 <div class="page">
   <div class="sec-head"><div>
-    <h2 class="sec-title">FrontierCS</h2>
-    <p class="sec-intro">The {{ everyone.size }} authors of <a href="{{ t.url }}" target="_blank" rel="noopener noreferrer">{{ t.title }}</a>, {{ t.venue }}, in paper order.</p>
+    <h2 class="sec-title">Authors</h2>
   </div></div>
 
   <details class="team-fold">
-    <summary><h3 class="team-group">Contributors <span>{{ t.contributors.size }}</span></h3></summary>
+    <summary><h3 class="team-group">FrontierCS <span>{{ t.venue }} · {{ everyone.size }} authors</span></h3></summary>
+    <p class="team-note"><a href="{{ t.url }}" target="_blank" rel="noopener noreferrer">{{ t.title }}</a>, in paper order.</p>
+    <h4 class="team-sub">Contributors <span>{{ t.contributors.size }}</span></h4>
     <ul class="team-grid">
       {%- for p in t.contributors %}{% include team_person.html p=p eq="Equal contribution" %}{% endfor %}
     </ul>
-  </details>
-
-  <details class="team-fold">
-    <summary><h3 class="team-group">Advisors <span>{{ t.advisors.size }}</span></h3></summary>
+    <h4 class="team-sub">Advisors <span>{{ t.advisors.size }}</span></h4>
     <ul class="team-grid">
       {%- for p in t.advisors %}{% include team_person.html p=p eq="Equal advising" %}{% endfor %}
     </ul>
+    <p class="team-note">* Equal contribution among contributors; equal advising among advisors.</p>
   </details>
-  <p class="team-note">* Equal contribution among contributors; equal advising among advisors.</p>
+
+  <details class="team-fold">
+    <summary><h3 class="team-group">FrontierSmith <span>{{ fs.venue }} · {{ fs.authors.size }} authors</span></h3></summary>
+    <p class="team-note"><a href="{{ fs.url }}" target="_blank" rel="noopener noreferrer">{{ fs.title }}</a>, in paper order.</p>
+    <ul class="team-grid">
+      {%- for p in fs.authors %}{% include team_person.html p=p eq="Equal contribution" %}{% endfor %}
+    </ul>
+    <p class="team-note">* Equal contribution.</p>
+  </details>
 </div>
 </section>
 

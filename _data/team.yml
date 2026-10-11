@@ -88,3 +88,28 @@ fcs1:
     - {name: Joseph E. Gonzalez, affil: [UC Berkeley], eq: true, url: "https://people.eecs.berkeley.edu/~jegonzal/"}
     - {name: Jingbo Shang, affil: [UCSD], eq: true, url: "https://shangjingbo1226.github.io/"}
     - {name: Alvin Cheung, affil: [UC Berkeley], eq: true, url: "https://people.eecs.berkeley.edu/~akcheung/"}
+
+# fsmith: authors of "FrontierSmith: Synthesizing Open-Ended Coding Problems at Scale", in the order and with the
+#   equal-contribution marks of arXiv 2605.14445v1. Homepages are the ones already listed under fcs1.
+fsmith:
+  title: "FrontierSmith: Synthesizing Open-Ended Coding Problems at Scale"
+  url: "https://arxiv.org/abs/2605.14445"
+  venue: "NeurIPS 2026 Spotlight"
+  authors:
+    - {name: Runyuan He, eq: true}
+    - {name: Qiuyang Mang, eq: true, url: "https://joyemang33.github.io"}
+    - {name: Shang Zhou, url: "https://scholar.google.com/citations?user=_0dEBNAAAAAJ"}
+    - {name: Kaiyuan Liu}
+    - {name: Hanchen Li, url: "https://hanchenli.github.io/"}
+    - {name: Huanzhi Mao}
+    - {name: Qizheng Zhang, url: "https://alex-q-z.github.io/"}
+    - {name: Zerui Li}
+    - {name: Bo Peng}
+    - {name: Lufeng Cheng}
+    - {name: Tianfu Fu}
+    - {name: Yichuan Wang}
+    - {name: Wenhao Chai, url: "https://wenhaochai.com/"}
+    - {name: Jingbo Shang, url: "https://shangjingbo1226.github.io/"}
+    - {name: Alex Dimakis}
+    - {name: Joseph E. Gonzalez, url: "https://people.eecs.berkeley.edu/~jegonzal/"}
+    - {name: Alvin Cheung, url: "https://people.eecs.berkeley.edu/~akcheung/"}

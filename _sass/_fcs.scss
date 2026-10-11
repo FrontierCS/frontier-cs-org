@@ -1652,7 +1652,9 @@ a.tm-n:hover { color: var(--accent-hover); text-decoration-color: currentColor; 
 .team-fold summary::after { content: ""; flex: none; width: 14px; height: 14px; background: linear-gradient(currentColor, currentColor) center / 14px 1.6px no-repeat, linear-gradient(currentColor, currentColor) center / 1.6px 14px no-repeat; transition: background-size .2s; }
 .team-fold[open] summary::after { background-size: 14px 1.6px, 1.6px 0; }
 .team-fold summary:hover .team-group { color: var(--accent-hover); }
-.team-fold .team-grid { padding: 4px 0 22px; }
+.team-fold .team-grid { padding: 4px 0 18px; }
+.team-fold > .team-note { margin: 0 0 16px; } .team-fold > .team-note:last-child { margin: 0 0 22px; } .team-fold .team-note a { text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--rule); }
+.team-sub { display: flex; align-items: baseline; gap: 8px; font-size: 16px; font-weight: 600; margin: 6px 0 10px; } .team-sub span { font-size: 13px; font-weight: 500; color: var(--ink-3); }
 .team-note { font-size: 14px; color: var(--ink-3); margin: 18px 0 0; }
 .contact-grid { margin-top: 6px; }
 .logo-wall { list-style: none; margin: 24px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)); gap: 40px 28px; align-items: center; }
