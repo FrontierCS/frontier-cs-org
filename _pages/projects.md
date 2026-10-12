@@ -56,7 +56,7 @@ permalink: /paper/
   <div class="page">
     <div class="sec-head"><div>
       <h2 class="sec-title">Built on FrontierCS</h2>
-      <p class="sec-intro">Work that uses the benchmark. Some of it asks how far an agent gets with more time and tokens, some compares search methods, and some trains models on the tasks.</p>
+      <p class="sec-intro">More time and tokens, new search methods, and training on the tasks.</p>
     </div></div>
 
     <div class="grp">
