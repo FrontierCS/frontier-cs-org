@@ -56,7 +56,7 @@ permalink: /paper/
   <div class="page">
     <div class="sec-head"><div>
       <h2 class="sec-title">Built on FrontierCS</h2>
-      <p class="sec-intro">More time and tokens, new search methods, and training on the tasks.</p>
+      <p class="sec-intro">Internal and external research papers built on FrontierCS benchmarks and infrastructure.</p>
     </div></div>
 
     <div class="grp">
