@@ -279,6 +279,8 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 .tcrit b{color:var(--ink)}
 .crit{display:flex; flex-wrap:wrap; gap:8px; margin:0 0 16px; padding:0; list-style:none}
 .crit li{border:1px solid #a8c7fa; border-radius:100px; padding:4px 12px; font-size:14px; color:var(--ink-2); background:#fff}
+.tcrit .tthr{font-size:15px; margin:0 0 16px}
+.tcrit .tthr{font-size:15px; margin:0 0 16px}
 .tcrit .tnote{font-size:14.5px; color:var(--muted, var(--ink-2))}
 .tstats div{display:flex; flex-direction:column; gap:4px}
 .tstats dt{font-size:13.5px; font-weight:600; color:var(--ink-2)}

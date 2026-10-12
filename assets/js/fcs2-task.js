@@ -32,6 +32,8 @@ function drawPage() {
     + (ref != null ? `<div><dt>Human baseline</dt><dd>${f1(ref)}</dd><span>the authors’ code, the bar to beat</span></div>` : '') + '</dl>'
     + (CHECKS[t.s] ? `<section class="tcrit"><h2 class="th2">Pass criteria</h2><p>A run passes only when its final submission beats the human baseline on <b>every</b> metric below, on every hidden workload. A higher total score alone is not a pass.</p>`
       + `<ul class="crit">${CHECKS[t.s].metrics.map(m => `<li>${esc(m.replace(/_/g, ' '))}</li>`).join('')}</ul>`
+      + `<p class="tbd tthr">The threshold each metric must meet, relative to the human baseline, will appear here.</p>`   // placeholder until the task configs are in (owner, 2026-10-11)
+      + `<p class="tbd tthr">The threshold each metric must meet, relative to the human baseline, will appear here.</p>`   // placeholder until the task configs are in (owner, 2026-10-11)
       + `<p class="tnote">The agent submits as often as it likes on the development workloads and picks one version for the hidden evaluation workloads. A wrong pick is not corrected: choosing what to submit is part of the task, so only the final submission counts.</p></section>` : '')
     + figure('fs', 'Final score by model', plural(runs.length, 'run'))
     + figure('dc', 'Development score against cost')
