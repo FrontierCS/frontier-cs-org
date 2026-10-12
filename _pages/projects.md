@@ -111,7 +111,7 @@ permalink: /paper/
         <article class="paper-row">
           <a class="paper-pg" href="https://arxiv.org/abs/2602.23413" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img src="{{ '/assets/img/fcs1-papers/2602.23413.jpg' | relative_url }}" alt="" width="440" height="570" loading="lazy"></a>
           <div>
-            <div class="post-meta"><span class="venue plain">arXiv 2026</span></div>
+            <div class="post-meta"><span class="venue">COLM 2026</span></div>
             <h2 class="post-title"><a href="https://arxiv.org/abs/2602.23413" target="_blank" rel="noopener noreferrer">EvoX: Meta-Evolution for Automated Discovery</a></h2>
             <p class="post-desc">Evolves the search strategy during a run as well as the solutions. On the FrontierCS algorithmic problems, with 100 iterations each, it reaches a mean of 62.6 and a median of 75.5.</p>
           </div>
@@ -119,7 +119,7 @@ permalink: /paper/
         <article class="paper-row">
           <a class="paper-pg" href="https://arxiv.org/abs/2604.01658" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img src="{{ '/assets/img/fcs1-papers/2604.01658.jpg' | relative_url }}" alt="" width="440" height="570" loading="lazy"></a>
           <div>
-            <div class="post-meta"><span class="venue plain">arXiv 2026</span></div>
+            <div class="post-meta"><span class="venue">COLM 2026</span></div>
             <h2 class="post-title"><a href="https://arxiv.org/abs/2604.01658" target="_blank" rel="noopener noreferrer">CORAL: Towards Autonomous Multi-Agent Evolution for Open-Ended Discovery</a></h2>
             <p class="post-desc">Replaces fixed evolutionary rules with long-running agents that share memory. On Polyomino Packing, four agents reach 89.4% coverage, against 56.0% for a single attempt.</p>
           </div>
