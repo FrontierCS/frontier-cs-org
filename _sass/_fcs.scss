@@ -1747,7 +1747,7 @@ section.journal.team-sec.team-top { padding-top: clamp(56px, 6vw, 72px); }
   .tm-a { font-size: 13px; }
   .logo-wall { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 16px; }
   .logo-wall li { height: 40px; }
-  .logo-wall img { height: calc(var(--h, 36px) * .75); }
+  .logo-wall img { height: var(--h-sm, 27px); }   /* 3/4 of --h, set beside it in team.md: the production minifier breaks calc(var(--h) ...) */
   .sponsor-row img.laude { height: 38px; }
   .sponsor-row img.modal { height: 26px; }
 }
