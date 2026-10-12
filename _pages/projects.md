@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Papers
+title: Research
 permalink: /paper/
 ---
 
 <section class="page-hero one-line">
   <div class="page" id="main" tabindex="-1">
-    <h1>Papers</h1>
+    <h1>Research</h1>
     <p class="lede">Papers from the FrontierCS team.</p>
   </div>
 </section>
