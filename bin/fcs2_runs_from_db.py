@@ -50,6 +50,12 @@ from datetime import datetime
 
 # database display name -> (domain folder, paper short name or None)
 TASK = {
+    'Access-Pattern Rewriting': ('Programming Language', 'Glenside'),
+    'Binary Fuse Filter Construction and Lookup': ('Theory', None),
+    'CKKS Precision Propagation at 2,048 Slots': ('Crypto', 'CKKS noise'),
+    'Exact Sequence Alignment': ('Bioinformatics', None),
+    'Go1 Joystick Policy Training': ('Robotics', 'MuJoCo Playground'),
+    'Private Set List Decoding': ('Crypto', 'QuarterPIR'),
     'Adaptive Robustness Evaluation for Prompt-Injection Defense': ('Security', 'Adaptive attacks'),
     'Approximate-MIPS Query Stopping': ('Database', None),
     'Argument-aware runtime privilege control': ('Security', 'Progent'),
@@ -190,7 +196,7 @@ def scaling(db, curves):
         dev = {ph: pts[(r, sid)][0] for sid, kind, ph in subs[r] if kind == 'train' and (r, sid) in pts}
         fin = [ph for sid, kind, ph in subs[r] if kind == 'final']
         if fin and fin[0] in dev: gaps[t].append(hidden - dev[fin[0]])
-    g = np.mean([x for v in gaps.values() for x in v]); off = {t: (sum(v) + g) / (len(v) + 1) for t, v in gaps.items()}
+    g = np.mean([x for v in gaps.values() for x in v]) if gaps else 0.0; off = {t: (sum(v) + g) / (len(v) + 1) for t, v in gaps.items()}
 
     def cap(ys):
         t = list(ys); y = np.clip(np.array([ys[k] for k in t]) / 100, 1e-3, 1 - 1e-3)
@@ -230,6 +236,7 @@ rows = db.execute('''select c.name, t.name, r.display_score, r.state, r.display_
 missing = {r[1] for r in rows} - set(TASK)
 assert not missing, f'unmapped tasks: {missing}'
 assert not {c for c, *_ in rows} - set(MODEL), 'unmapped model'
+MODEL = {c: v for c, v in MODEL.items() if c in {r[0] for r in rows} or c == LOW_ANCHOR}   # only the models this database has
 
 runs = []
 for cand, task, score, state, verdict in rows:
