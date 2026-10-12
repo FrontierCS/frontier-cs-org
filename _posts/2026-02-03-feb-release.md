@@ -101,6 +101,6 @@ frontier eval --algorithmic 0 algorithmic/problems/0/examples/gpt5.cpp
 
 ## Getting in Touch
 
-We are always looking for more problems to add for our next release and evaluating on [more models and agents](https://github.com/FrontierCS/Frontier-CS/blob/main/SUBMIT.md). We love to hear about your comments and feedback! Join us on [discord](https://discord.com/invite/k4hd2nU4UE) or [email us](mailto:frontiercs@berkeley.edu)!
+We are always looking for more problems to add for our next release and evaluating on [more models and agents](https://github.com/FrontierCS/Frontier-CS/blob/main/SUBMIT.md). We love to hear about your comments and feedback! Join us on [Slack](https://join.slack.com/t/frontiercsworkspace/shared_invite/zt-45amo198k-I5GhwahF36_o40U98ulTDA) or [email us](mailto:frontiercs@berkeley.edu)!
 
 And if you find FrontierCS useful, please consider <a href="https://github.com/FrontierCS/Frontier-CS">giving us a ⭐ on GitHub</a>! 

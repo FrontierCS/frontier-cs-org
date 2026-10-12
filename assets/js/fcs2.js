@@ -378,7 +378,7 @@ function drawMap() {
    Leaving, the card shrinks back into its tile and the veil fades out; moving from tile to tile keeps the veil up, so the
    map does not flash (owner, 2026-10-11: the return to normal was too abrupt). */
 const mapTip = $('#maptip');
-let play = null, veil = null, playN = 0;
+let play = null, veil = null, playN = 0, wait = null;   // wait: the tile the pointer rests on, and its timer
 // one white veil per map, under the cards; its opacity eases to op (0.6 behind a card, 0 when none)
 function veilTo(op) {
   const svg = $('#mapsvg'), [, , W, H] = svg.getAttribute('viewBox').split(' ').map(Number);
@@ -410,9 +410,7 @@ function startPlay(tile) {
   // the rest of the map fades behind the card; the veil lets the pointer through to the other tiles
   veilTo(.6); root.append(card); svg.append(root);
   card.style.transformOrigin = `${x + w / 2}px ${y + h / 2}px`;
-  // the card's size and place as its tile, width and height each: a uniform scale left the 1.5:1 card short of a
-  // taller tile, and with the veil already up (tile to tile) the veiled tile showed white around it (owner, 2026-10-11)
-  const back = `translate(${tx + tw / 2 - x - w / 2}px,${ty + th / 2 - y - h / 2}px) scale(${tw / w},${th / h})`;
+  const back = `translate(${tx + tw / 2 - x - w / 2}px,${ty + th / 2 - y - h / 2}px) scale(${tw / w})`;   // the card's size and place as its tile
   if (!calm) card.animate([{transform:back, opacity:.6}, {transform:'none', opacity:1}], {duration:220, easing:'cubic-bezier(.2,0,0,1)', fill:'forwards'});
   play = {tile, g:root, card, who, runs, k:0, x, y, w, h, back};
   if (runs.length) play.t = setTimeout(showRun, calm ? 0 : 200);
@@ -444,12 +442,19 @@ $('#mapsvg').addEventListener('pointermove', e => {
   if (e.pointerType !== 'mouse') { mapTip.hidden = true; return; }
   if (play && e.target.closest('.play')) { mapTip.hidden = true; return; }   // the card stays while the pointer is on it
   const g = e.target.closest('.blk'), tile = e.target.closest('svg.tile');
-  if (!play || play.tile !== tile) { stopPlay(); if (tile) startPlay(tile); else veilTo(0); }
+  // what the pointer rests on for 0.1 s takes effect, a tile's card or none, so a pointer crossing tiles or the seams
+  // between them changes nothing on the way (owner, 2026-10-11: switching jumped)
+  const want = tile || null, now = play ? play.tile : null;
+  if (want === now) { if (wait) { clearTimeout(wait.t); wait = null; } }
+  else if (!wait || wait.tile !== want) {
+    clearTimeout(wait?.t);
+    wait = {tile:want, t:setTimeout(() => { wait = null; stopPlay(); if (want) startPlay(want); else veilTo(0); }, calm ? 0 : 100)};
+  }
   if (!g || tile) { mapTip.hidden = true; return; }
   const d = g.dataset.d, r = $('#map').getBoundingClientRect();
   mapTip.innerHTML = `<b>${esc(d)}</b><br>${N_IN(d)} task${N_IN(d) > 1 ? 's' : ''}${nRan(d) ? ` · ${nRan(d)} with runs` : ''}`;
   mapTip.hidden = false; mapTip.style.left = (e.clientX - r.left) + 'px'; mapTip.style.top = (e.clientY - r.top) + 'px'; });
-$('#mapsvg').addEventListener('pointerleave', () => { mapTip.hidden = true; stopPlay(); veilTo(0); });
+$('#mapsvg').addEventListener('pointerleave', () => { mapTip.hidden = true; clearTimeout(wait?.t); wait = null; stopPlay(); veilTo(0); });
 $('#mapsvg').addEventListener('click', e => { if (play && e.target.closest('.play')) location.href = taskHref(play.tile.dataset.s); });
 
 function drawRows() {

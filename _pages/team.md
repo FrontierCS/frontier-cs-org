@@ -95,6 +95,6 @@ permalink: /team/
     <li class="tm"><img class="tm-av" src="{{ 'assets/img/workshop/qiuyang-mang.jpg' | relative_url }}" alt="" width="144" height="144" loading="lazy"><span class="tm-tx"><a class="tm-n" href="https://joyemang33.github.io" target="_blank" rel="noopener noreferrer">Qiuyang Mang</a><span class="tm-a">UC Berkeley</span><a class="tm-mail" href="mailto:qmang@berkeley.edu">qmang@berkeley.edu</a></span></li>
     <li class="tm"><img class="tm-av" src="{{ 'assets/img/workshop/wenhao-chai.jpg' | relative_url }}" alt="" width="144" height="144" loading="lazy"><span class="tm-tx"><a class="tm-n" href="https://wenhaochai.com/" target="_blank" rel="noopener noreferrer">Wenhao Chai</a><span class="tm-a">Princeton</span><a class="tm-mail" href="mailto:wenhao.chai@princeton.edu">wenhao.chai@princeton.edu</a></span></li>
   </ul>
-  <div class="fc-pills"><a class="pill" href="https://discord.com/invite/k4hd2nU4UE" target="_blank" rel="noopener noreferrer">Discord</a></div>
+  <div class="fc-pills"><a class="pill" href="https://join.slack.com/t/frontiercsworkspace/shared_invite/zt-45amo198k-I5GhwahF36_o40U98ulTDA" target="_blank" rel="noopener noreferrer">Slack</a></div>
 </div>
 </section>
