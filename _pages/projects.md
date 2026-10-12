@@ -155,7 +155,7 @@ permalink: /paper/
   <div class="page">
     <div class="sec-head"><div>
       <h2 class="sec-title">Infra for FrontierCS</h2>
-      <p class="sec-intro">Built for efficiency, robustness, and adaptivity as the problems and the agents change.</p>
+      <p class="sec-intro">Built for efficiency, robustness, and adaptivity as the frontier and agents evolve throughout time.</p>
     </div></div>
     <div class="paper-list">
       <article class="paper-row">
