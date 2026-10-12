@@ -28,7 +28,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
 
   <figure class="chart" id="teaser">
     <div class="chead"><span>Tasks</span></div>
-    <div class="map" id="map"><svg id="mapsvg" aria-label="The 92 tasks by domain"></svg><div class="tip" id="maptip" hidden></div></div>
+    <div class="map" id="map"><svg id="mapsvg" aria-label="The 92 tasks by domain"></svg></div>
   </figure>
 </section>
 

@@ -305,7 +305,6 @@ function squarify(vals, x, y, w, h) {
   }
   return out;
 }
-const nRan = d => TASKS.filter(t => t.d === d && RAN.has(t.s)).length;
 function drawMap() {
   stopPlay(false);
   const svg = $('#mapsvg'), W = $('#map').clientWidth, narrow = W < 640, H = narrow ? Math.round(W * 1.15) : Math.round(W * 0.36);
@@ -349,7 +348,6 @@ function drawMap() {
    2026-10-10). Clicking the card opens the task page. Mouse only; reduced motion shows the card and each line at once.
    Leaving, the card shrinks back into its tile and the veil fades out; moving from tile to tile keeps the veil up, so the
    map does not flash (owner, 2026-10-11: the return to normal was too abrupt). */
-const mapTip = $('#maptip');
 let play = null, veil = null, playN = 0, wait = null;   // wait: the tile the pointer rests on, and its timer
 // one white veil per map, under the cards; its opacity eases to op (0.6 behind a card, 0 when none)
 function veilTo(op) {
@@ -411,9 +409,9 @@ function showRun() {
   }, draw + hold);
 }
 $('#mapsvg').addEventListener('pointermove', e => {
-  if (e.pointerType !== 'mouse') { mapTip.hidden = true; return; }
-  if (play && e.target.closest('.play')) { mapTip.hidden = true; return; }   // the card stays while the pointer is on it
-  const g = e.target.closest('.blk'), tile = e.target.closest('svg.tile');
+  if (e.pointerType !== 'mouse') return;
+  if (play && e.target.closest('.play')) return;   // the card stays while the pointer is on it
+  const tile = e.target.closest('svg.tile');
   // what the pointer rests on for 0.1 s takes effect, a tile's card or none, so a pointer crossing tiles or the seams
   // between them changes nothing on the way (owner, 2026-10-11: switching jumped)
   const want = tile || null, now = play ? play.tile : null;
@@ -422,11 +420,8 @@ $('#mapsvg').addEventListener('pointermove', e => {
     clearTimeout(wait?.t);
     wait = {tile:want, t:setTimeout(() => { wait = null; stopPlay(); if (want) startPlay(want); else veilTo(0); }, calm ? 0 : 100)};
   }
-  if (!g || tile) { mapTip.hidden = true; return; }
-  const d = g.dataset.d, r = $('#map').getBoundingClientRect();
-  mapTip.innerHTML = `<b>${esc(d)}</b><br>${N_IN(d)} task${N_IN(d) > 1 ? 's' : ''}${nRan(d) ? ` · ${nRan(d)} with runs` : ''}`;
-  mapTip.hidden = false; mapTip.style.left = (e.clientX - r.left) + 'px'; mapTip.style.top = (e.clientY - r.top) + 'px'; });
-$('#mapsvg').addEventListener('pointerleave', () => { mapTip.hidden = true; clearTimeout(wait?.t); wait = null; stopPlay(); veilTo(0); });
+});   // no box for a domain: its chip already names it and counts its tasks (owner, 2026-10-11)
+$('#mapsvg').addEventListener('pointerleave', () => { clearTimeout(wait?.t); wait = null; stopPlay(); veilTo(0); });
 $('#mapsvg').addEventListener('click', e => { if (play && e.target.closest('.play')) location.href = taskHref(play.tile.dataset.s); });
 
 function drawRows() {
