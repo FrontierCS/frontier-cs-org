@@ -242,7 +242,7 @@ const redraws = [];
 /* ---------- How FECI works: a fold under the FECI chart (owner, 2026-10-11) ----------
    A: three tasks' fitted curves, expected score = 100 / (1 + exp(-k (FECI - d))) from TFIT, picked in code as the tasks
    with a clear S (k >= 0.03) whose difficulty is nearest 20, 60 and 110, so the picture follows the data.
-   B: every task's difficulty (grey) and every model's FECI (its colour) on one FECI axis, Human at 60. */
+   (owner, 2026-10-11: the second step, task difficulties beside the models' FECI, is gone) */
 function drawHow() {
   const box = $('#feci-how'); if (!box || !box.open) return;
   const fits = Object.entries(TFIT), clear = fits.filter(([, [, k]]) => k >= .03);
@@ -269,32 +269,6 @@ function drawHow() {
   });
   attachTip(svg, W, H, pts, $('#howatip'));
   $('#howalegend').innerHTML = picks.map(([s, [d]], i) => `<span><i style="background:${INKS[i]}"></i>${esc(s)}, difficulty ${Math.round(d)}</span>`).join('');
-  // B
-  svg = $('#howbsvg'); W = Math.max(300, $('#howbplot').clientWidth); narrow = W < 560;
-  const ds = fits.map(([s, [d]]) => ({s, d})).sort((a, b) => a.d - b.d);
-  const lo = Math.floor(ds[0].d / 50) * 50, hi = Math.ceil(ds[ds.length - 1].d / 50) * 50;
-  L = narrow ? 58 : 70; R = narrow ? 12 : 24; const rowT = 34, rowM = 34, gapR = 18, Bb = 52;
-  // tasks stack upward where their dots would touch
-  const XB = v => L + (v - lo) / (hi - lo) * (W - L - R), rr = narrow ? 3.5 : 4.5, lanes = [];
-  ds.forEach(t => { const x = XB(t.d); let j = 0; while (lanes[j] != null && x - lanes[j] < rr * 2 + 1) j++; lanes[j] = x; t.j = j; });
-  const nl = Math.max(1, lanes.length), tasksH = Math.max(rowT, nl * (rr * 2 + 1) + 12);
-  H = tasksH + gapR + rowM + Bb; const yT = tasksH - 8, yM = tasksH + gapR + rowM / 2;
-  svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
-  for (let v = lo; v <= hi; v += 50) { svg.append(sv('line', {x1:XB(v), x2:XB(v), y1:6, y2:H - Bb + 6, stroke:'var(--grid)', 'stroke-width':1})); svg.append(sv('text', {x:XB(v), y:H - Bb + 28, 'text-anchor':'middle'}, v)); }
-  svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'FECI'));
-  svg.append(sv('text', {class:'lab', x:0, y:yT + 4}, 'Tasks'));
-  svg.append(sv('text', {class:'lab', x:0, y:yM + 4}, 'Models'));
-  const ptsB = [];
-  ds.forEach(t => { const cy = yT - t.j * (rr * 2 + 1); svg.append(sv('circle', {cx:XB(t.d), cy, r:rr, fill:'var(--ink-2)', opacity:.45}));
-    ptsB.push({x:XB(t.d), y:cy, html:`<b>${esc(t.s)}</b><br>Difficulty ${f1(t.d)}`}); });
-  const es = RANKED.map(m => ECI[m.id][0]), rm = narrow ? 5 : 7;
-  [...RANKED].reverse().forEach(m => { const e = ECI[m.id][0]; svg.append(sv('circle', {cx:XB(e), cy:yM, r:rm, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':1.5}));
-    ptsB.push({x:XB(e), y:yM, mean:true, html:`<b>${esc(m.name)}</b><br>FECI <b>${f1(e)}</b>`}); });
-  svg.append(sv('text', {class:'val', x:XB(Math.max(...es)) + rm + 8, y:yM + 4.5, fill:'var(--ink-2)'}, `${es.length} models, ${Math.round(Math.min(...es))} to ${Math.round(Math.max(...es))}`));
-  svg.append(sv('rect', {x:XB(ECI_HUMAN) - 5.5, y:yM - 5.5, width:11, height:11, fill:'var(--ink)', stroke:'#fff', 'stroke-width':1.5}));
-  svg.append(sv('text', {class:'val halo', x:XB(ECI_HUMAN), y:yM + 22, 'text-anchor':'middle', fill:'var(--ink)'}, `Human ${ECI_HUMAN}`));
-  ptsB.push({x:XB(ECI_HUMAN), y:yM, mean:true, html:`<b>Human</b>, the authors’ code<br>FECI ${ECI_HUMAN} by definition`});
-  attachTip(svg, W, H, ptsB, $('#howbtip'));
 }
 $('#feci-how').addEventListener('toggle', drawHow);
 redraws.push(drawHow);

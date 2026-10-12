@@ -91,17 +91,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
             <div class="legend" id="howalegend"></div>
           </figure>
         </div>
-        <div class="how-row">
-          <div class="how-txt">
-            <p class="how-step"><span>2</span>One fit, one scale</p>
-            <p>One fit estimates every model’s FECI and every task’s difficulty and slope <i>k</i> from all final scores, with Epoch AI’s own fitting code. The authors’ code takes part as one more entrant, Human. The scale is then set so that Human is 60 and Kimi K2.7 Code is 0.</p>
-          </div>
-          <figure class="chart how-fig">
-            <div class="chead"><span>Task difficulty and model FECI on one scale</span></div>
-            <div class="plot" id="howbplot"><svg id="howbsvg" role="img" aria-label="Task difficulties and model FECI on the FECI scale"></svg><div class="tip" id="howbtip" hidden></div></div>
-          </figure>
-        </div>
-        <p class="how-step"><span>3</span>Why FECI</p>
+        <p class="how-step"><span>2</span>Why FECI</p>
         <ul class="how-why">
           <li><b>It is fair to models that ran different tasks.</b> Each model ran its own set, <span id="how-ntasks">19 to 40</span> of the <span id="how-nall">42</span> tasks with runs. A mean score or a pass rate rewards a model that drew easy tasks; FECI weighs each score by how hard its task is.</li>
           <li><b>It has a human anchor.</b> Every task scores on its own scale. FECI turns them into one number, and 60 always means the authors’ code.</li>
