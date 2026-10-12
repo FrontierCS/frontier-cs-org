@@ -111,6 +111,7 @@ MODEL = {
     'Qwen 3.8 Max Code': ('qwen', 'Qwen 3.8 Max', 'Qwen 3.8 Max', '', 'Qwen'),   # shown without 'Code' (owner, 2026-10-09)
     'DeepSeek V4.1 Flash (DSH)': ('ds', 'DeepSeek V4.1 Flash', 'DeepSeek V4.1 Flash', 'DSH', 'DeepSeek'),
     'GLM 5.3 (ZCode)': ('glm', 'GLM 5.3', 'GLM 5.3', 'ZCode', 'Z.ai'),
+    'Claude Code · Opus 5.5 (Subscription, max effort)': ('opus', 'Claude Opus 5.5', 'Opus 5.5', 'Claude Code', 'Anthropic'),
 }
 
 HUMAN_VALUE = 60                               # owner's choice, 2026-10-09 (tried 100 and 25; K2.7 was 20)
@@ -168,6 +169,7 @@ def usd(m, total, output):
     """Owner's approximation (2026-10-09): output tokens at the output price plus every token at the cache-read price,
     as if all input were a cache hit. Tool-reported total tokens count cached input differently per tool, so they enter
     only here, never as an axis."""
+    if m not in PRICE: return 0.0   # no usage reported (a subscription run): no spend, so no cost and no scaling curve
     po, pc = PRICE[m]
     return (output * po + total * pc) / 1e6
 
@@ -218,6 +220,7 @@ def scaling(db, curves):
         out[axis] = {}
         for c in sorted({v[0] for v in info.values()}, key=lambda c: MODEL[c][0]):
             runs = [r for r in info if info[r][0] == c]; tasks = sorted({info[r][1] for r in runs}); ends = [traj[r][1] for r in runs]
+            if not max(ends): continue   # no spend reported: no curve
             rng, curve = np.random.default_rng(3), []
             # budgets are rounded up to the stored precision before use, so each point is exact at its stored budget
             for B in np.ceil(np.geomspace(1e-3, max(ends), SCALE_POINTS) * 1e5) / 1e5:

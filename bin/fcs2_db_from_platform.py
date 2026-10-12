@@ -26,7 +26,8 @@ for a in sys.argv[2:]:
     if a.startswith('--api='): API = a[6:]
     if a.startswith('--min-scored='): MIN = int(a[13:])
 # cache-read US$ per million tokens, as PRICE in the converter, keyed by the platform's candidate name
-CACHE = {'GPT-6 Astra': 1.00, 'GPT-6.1 Sol': 0.10, 'Kimi K3 (Modal)': 0.30, 'DeepSeek V4.1 Flash (DSH)': 0.003, 'Muse Code - Muse Spark 1.3': 0.15, 'GLM 5.3 (ZCode)': 0.26}
+CACHE = {'GPT-6 Astra': 1.00, 'GPT-6.1 Sol': 0.10, 'Kimi K3 (Modal)': 0.30, 'DeepSeek V4.1 Flash (DSH)': 0.003, 'Muse Code - Muse Spark 1.3': 0.15, 'GLM 5.3 (ZCode)': 0.26,
+         'Claude Code · Opus 5.5 (Subscription, max effort)': None, 'Kimi K2.7 Code': None}   # None: run on a subscription, the platform reports no usage
 
 
 def get(path):
@@ -40,7 +41,8 @@ evs = {}
 for e in sorted(get('evaluations?limit=200'), key=lambda e: e['created_at']):
     if e['is_formal'] and e['total_runs'] == 47 and not e['archived_at'] and e['candidate_name'] in CACHE: evs[e['candidate_name']] = e
 items = {c: get('evaluations/' + e['id'])['items'] for c, e in evs.items()}
-items = {c: v for c, v in items.items() if sum(i['score'] is not None for i in v) >= MIN}
+done = lambda i: i['score'] is not None or i['run_state'] == 'TIMED_OUT'   # a timeout is a result: it scores 0
+items = {c: v for c, v in items.items() if sum(map(done, v)) >= MIN}
 rids = [(c, i['run_id']) for c, v in items.items() for i in v if i.get('run_id')]
 with ThreadPoolExecutor(16) as ex:
     pulled = list(ex.map(lambda cr: (cr[0], get('runs/' + cr[1]), get(f'runs/{cr[1]}/events?limit=500')), rids))
@@ -60,11 +62,11 @@ for c, r, events in pulled:
     tasks.setdefault(r['task_id'], r['task_name'])
     start, end = (ts(r[k]) if r.get(k) else None for k in ('started_at', 'finished_at'))
     usage = (r.get('model_usage') or {}).get('keys', [])
-    usd = sum(k.get('estimated_cost_usd') or 0 for k in usage) or sum(k.get('total_tokens') or 0 for k in usage) * CACHE[c] / 1e6
-    units = lambda x: x * 1e6 / CACHE[c]
+    usd = sum(k.get('estimated_cost_usd') or 0 for k in usage) or sum(k.get('total_tokens') or 0 for k in usage) * (CACHE[c] or 0) / 1e6
+    units = lambda x: x * 1e6 / CACHE[c] if CACHE[c] else 0
     priv = (r.get('metrics') or {}).get('private') or {}
     fb = {'reference_score': priv.get('reference_score'), 'checks': [{'label': k} for k in (priv.get('beat_spec_progress') or {})]}
-    db.execute('insert into runs values (?,?,?,?,?,?)', (r['id'], r['score'], r['state'], r['verdict'], end - start if start and end else None, json.dumps(fb)))
+    db.execute('insert into runs values (?,?,?,?,?,?)', (r['id'], 0.0 if r['score'] is None and r['state'] == 'TIMED_OUT' else r['score'], r['state'], r['verdict'], end - start if start and end else None, json.dumps(fb)))
     db.execute('insert into cells values (?,?,?)', (r['id'], c, r['task_id']))
     n = 0
     for e in events:
@@ -77,4 +79,4 @@ for c, r, events in pulled:
         db.execute('insert into score_points values (?,?,?,?,0)', (r['id'], 'final', r['score'], units(usd)))
 for n, (t, name) in enumerate(sorted(tasks.items(), key=lambda kv: kv[1])): db.execute('insert into tasks values (?,?,?)', (t, name, n))
 db.commit()
-for c, v in items.items(): print(f"{c}: {sum(i['score'] is not None for i in v)} scored of {len(v)} (evaluation {evs[c]['id']})")
+for c, v in items.items(): print(f"{c}: {sum(map(done, v))} scored of {len(v)} (evaluation {evs[c]['id']})")
