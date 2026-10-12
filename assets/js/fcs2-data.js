@@ -14,7 +14,14 @@ const AREAS = [
 ];
 const DOMAINS = AREAS.flatMap(a => a.d);
 const AREA_OF = Object.fromEntries(AREAS.flatMap(a => a.d.map(d => [d, a])));
-const TASKS = TASKS_RAW.map(([d, s, t, p, r, n]) => ({d: SHOWN[d] || d, s, t: t === s ? '' : t, p, r: /^https?:/.test(r) && !/arxiv\.org/.test(r) ? r : '', n: n || s, title: t || s}));   // title: the paper's name, shown as the task's heading; n: the task's own name
+// the name a task is shown under, where its key in the run data is informal
+const SHORT = {'Adaptive attacks':'Adaptive Attacks', 'Approximate-MIPS Query Stopping':'FARGO Query Stopping', 'FARGO paper-aligned query core':'FARGO Query Core',
+  'Persistent Treap Update Engine':'Persistent Treap', 'kmeans kernel':'FlashLib K-Means', 'dbscan kernel':'FlashLib DBSCAN', 'ivf_pq kernel':'FlashLib IVF-PQ', 'knn kernel':'FlashLib k-NN',
+  'Robust Image Tokenizer':'DeTok', 'Differentiable Population Statistics':'Representation Fréchet Loss', 'OCR Distillation Trajectory Sampling':'Flow-OPD', 'Residual State Advancement':'JoinBoost',
+  'Exact Sequence Alignment':'Edlib', 'CKKS noise':'CKKS Noise', 'Binary Fuse Filter Construction and Lookup':'Binary Fuse Filter', 'Structured LWE':'Structured LWE'};
+const NO_PAPER = new Set(['Structured LWE', 'kmeans kernel', 'dbscan kernel', 'ivf_pq kernel', 'knn kernel']);   // no paper: shown by short name alone
+const NAME = s => SHORT[s] || s;
+const TASKS = TASKS_RAW.map(([d, s, t, p, r, n]) => ({d: SHOWN[d] || d, s, name: NAME(s), t: NO_PAPER.has(s) || t === NAME(s) ? '' : t, p, r: /^https?:/.test(r) && !/arxiv\.org/.test(r) ? r : '', n: n || s}));   // name: short name; t: the paper's title; n: the task's own name (search only)
 const N_IN = d => TASKS.filter(t => t.d === d).length;
 
 // BEGIN converter block (bin/fcs2_runs_from_db.py writes everything up to END)

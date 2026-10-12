@@ -290,10 +290,10 @@ function drawHow() {
     const f = x => 100 / (1 + Math.exp(-k * (x - d)));
     svg.append(sv('path', {d:Array.from({length:161}, (_, x) => `${x ? 'L' : 'M'}${X(x).toFixed(1)},${Y(f(x)).toFixed(1)}`).join(''), fill:'none', stroke:INKS[i], 'stroke-width':2.5}));
     svg.append(sv('circle', {cx:X(d), cy:Y(50), r:5, fill:INKS[i], stroke:'#fff', 'stroke-width':2}));   // the difficulty: expected score 50
-    for (let x = 0; x <= 160; x += 4) pts.push({x:X(x), y:Y(f(x)), html:`<b>${esc(s)}</b><br>Difficulty ${f1(d)}, slope ${k.toFixed(3)}<br>At FECI ${x}: expected score <b>${f1(f(x))}</b>`});
+    for (let x = 0; x <= 160; x += 4) pts.push({x:X(x), y:Y(f(x)), html:`<b>${esc(NAME(s))}</b><br>Difficulty ${f1(d)}, slope ${k.toFixed(3)}<br>At FECI ${x}: expected score <b>${f1(f(x))}</b>`});
   });
   attachTip(svg, W, H, pts, $('#howatip'));
-  $('#howalegend').innerHTML = picks.map(([s, [d]], i) => `<span><i style="background:${INKS[i]}"></i>${esc(s)}, difficulty ${Math.round(d)}</span>`).join('');
+  $('#howalegend').innerHTML = picks.map(([s, [d]], i) => `<span><i style="background:${INKS[i]}"></i>${esc(NAME(s))}, difficulty ${Math.round(d)}</span>`).join('');
 }
 $('#feci-how').addEventListener('toggle', drawHow);
 redraws.push(drawHow);
@@ -311,7 +311,7 @@ $('#q').addEventListener('input', e => { q = e.target.value; limit = 5; drawRows
 $('#showmore').addEventListener('click', () => { limit += 20; drawRows(); });
 function hits() {
   const w = q.toLowerCase().split(/\s+/).filter(Boolean);
-  let h = TASKS.filter(t => (!picked.size || picked.has(t.d)) && w.every(x => (t.s + ' ' + t.t + ' ' + t.n + ' ' + t.d).toLowerCase().includes(x)));
+  let h = TASKS.filter(t => (!picked.size || picked.has(t.d)) && w.every(x => (t.s + ' ' + t.name + ' ' + t.t + ' ' + t.n + ' ' + t.d).toLowerCase().includes(x)));
   // hardest first by the FECI fit's task difficulty (owner, 2026-10-11); tasks without runs have none and follow by domain
   const dif = t => TFIT[t.s] ? TFIT[t.s][0] : null;
   return [...h].sort((a, b) => (dif(b) ?? -1e9) - (dif(a) ?? -1e9) || DOMAINS.indexOf(a.d) - DOMAINS.indexOf(b.d) || a.s.localeCompare(b.s));
@@ -401,7 +401,7 @@ function startPlay(tile) {
     + `<g clip-path="url(#${cid})">${taskArt(s, k).replace('<svg class="art"', `<svg x="${x}" y="${y}" width="${w}" height="${h}" preserveAspectRatio="xMidYMid slice"`)}`
     + `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${ART_FIELD[k]}" opacity="${runs.length ? .7 : .35}"/></g>`;
   const who = sv('text', {x:x + w - 14, y:y + h - 14, 'text-anchor':'end', 'font-size':14, 'font-weight':600, fill:'#fff'});
-  card.append(sv('text', {x:x + 14, y:y + 26, 'font-size':14, 'font-weight':600, fill:'#fff'}, s), who);
+  card.append(sv('text', {x:x + 14, y:y + 26, 'font-size':14, 'font-weight':600, fill:'#fff'}, NAME(s)), who);
   // the rest of the map fades behind the card; the veil lets the pointer through to the other tiles
   veilTo(.6); root.append(card); svg.append(root);
   card.style.transformOrigin = `${x + w / 2}px ${y + h / 2}px`;
@@ -452,7 +452,7 @@ $('#mapsvg').addEventListener('click', e => { if (play && e.target.closest('.pla
 function drawRows() {
   const h = hits(); $('#fcount').textContent = picked.size ? `(${picked.size})` : '';
   $('#rows').innerHTML = h.slice(0, limit).map(t => `<article class="trow" data-s="${esc(t.s)}"><span class="tag">${esc(t.d)}</span>
-    <h3><a class="stretch" href="${esc(taskHref(t.s))}">${esc(t.title)}</a></h3><p>${esc(t.n === t.title ? '' : t.n)}</p><div class="lk">${t.p ? `<a href="${esc(t.p)}" target="_blank" rel="noopener">Paper</a>` : '<span>No paper link</span>'}${t.r ? `<a href="${esc(t.r)}" target="_blank" rel="noopener">Code</a>` : ''}</div></article>`).join('')
+    <h3><a class="stretch" href="${esc(taskHref(t.s))}">${esc(t.name)}</a></h3><p>${esc(t.t)}</p><div class="lk">${t.p ? `<a href="${esc(t.p)}" target="_blank" rel="noopener">${t.t ? 'Paper' : 'Project'}</a>` : '<span>No paper link</span>'}${t.r ? `<a href="${esc(t.r)}" target="_blank" rel="noopener">Code</a>` : ''}</div></article>`).join('')
     || `<p class="empty">No task matches. Clear the filter or try another word.</p>`;
   $('#showmore').hidden = h.length <= limit;
   $('#showmore').textContent = `Show more (${h.length - limit} left)`;
