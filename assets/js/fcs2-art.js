@@ -632,6 +632,74 @@ Object.assign(ART, {
     return g;
   },
 });
+/* tasks added with the 47-task evaluation set */
+Object.assign(ART, {
+  // FARGO, query stopping: candidates probed in order of promise; the search stops (white bar) once the best cannot be beaten
+  'Approximate-MIPS Query Stopping'(R, [bg, s1, s2]) {
+    let g = ''; const h = Array.from({length:20}, (_, i) => 150 * Math.exp(-i / 6) + 14 + R() * 14);
+    h.forEach((v, i) => g += Rc(18 + i * 13.4, 176 - v, 9, v, {rx:4, fill:i < 8 ? s2 : s1, 'fill-opacity':i < 8 ? 1 : .55}));
+    return g + Rc(18, 176 - h[0], 9, h[0], {rx:4, fill:WHITE}) + Pa('M122,22V184', {stroke:WHITE, 'stroke-width':5, 'stroke-dasharray':'2 11'});
+  },
+  // FARGO, query core: data vectors fanned from the origin; the query (white) and the cone of directions it probes
+  'FARGO paper-aligned query core'(R, [bg, s1, s2]) {
+    const o = [40, 170]; let g = '';
+    for (let i = 0; i < 11; i++) { const a = -.08 - i * .145, l = 120 + R() * 110, e = [o[0] + l * Math.cos(a), o[1] + l * Math.sin(a)];
+      g += Pa(`M${o}L${r1(e[0])},${r1(e[1])}`, {stroke:s1, 'stroke-width':5}) + C(e[0], e[1], 7, {fill:s2}); }
+    const qa = -.62, q = [o[0] + 220 * Math.cos(qa), o[1] + 220 * Math.sin(qa)];
+    return `<path d="M${o}L${r1(o[0] + 250 * Math.cos(qa - .2))},${r1(o[1] + 250 * Math.sin(qa - .2))}L${r1(o[0] + 250 * Math.cos(qa + .2))},${r1(o[1] + 250 * Math.sin(qa + .2))}Z" fill="${WHITE}" opacity=".22"/>`
+      + g + Pa(`M${o}L${r1(q[0])},${r1(q[1])}`, {stroke:WHITE, 'stroke-width':8}) + C(q[0], q[1], 11, {fill:WHITE}) + C(o[0], o[1], 10, {fill:WHITE});
+  },
+  // a persistent treap: an update copies only the path to the root (white); the old version keeps the rest
+  'Persistent Treap Update Engine'(R, [bg, s1, s2]) {
+    const N = [[130, 36], [70, 88], [196, 88], [36, 144], [104, 144], [162, 144], [236, 144], [208, 186], [264, 186]], E = [[0, 1], [0, 2], [1, 3], [1, 4], [2, 5], [2, 6], [6, 7], [6, 8]];
+    const M = [[176, 22], [238, 66], [278, 118]];
+    return E.map(([u, v]) => curveEdge(N[u], N[v], {stroke:s1, 'stroke-width':7})).join('')
+      + curveEdge(M[0], M[1], {stroke:WHITE, 'stroke-width':7}) + curveEdge(M[1], M[2], {stroke:WHITE, 'stroke-width':7})
+      + curveEdge(M[0], N[1], {stroke:WHITE, 'stroke-width':3.5, 'stroke-dasharray':'8 7'}) + curveEdge(M[1], N[5], {stroke:WHITE, 'stroke-width':3.5, 'stroke-dasharray':'8 7'})
+      + N.map(p => C(p[0], p[1], 10, {fill:s2})).join('') + M.map(p => C(p[0], p[1], 11, {fill:WHITE})).join('');
+  },
+  // JoinBoost: boosting over joined tables; each round shrinks the residuals kept beside the fact table (white column)
+  'Residual State Advancement'(R, [bg, s1, s2]) {
+    let g = grid(6, 3, 22, 28, 25, (r, c) => ({fill:c === 2 ? WHITE : s1}));
+    g += grid(4, 2, 22 + 25 * 3 + 22, 28, 25, () => ({fill:s1, 'fill-opacity':.6})) + Pa('M97,40H119', {stroke:s2, 'stroke-width':4});
+    [1, .72, .5, .33, .2].forEach((k, j) => { for (let i = 0; i < 6; i++) { const v = (10 + R() * 26) * k; g += Rc(188 + j * 22, 46 + i * 25 - v / 2, 14, v, {rx:5, fill:j === 4 ? WHITE : s2}); } });
+    return g;
+  },
+  // a tokenizer trained on corrupted latents: a noisy image grid on the left, the clean tokens it still yields on the right
+  'Robust Image Tokenizer'(R, [bg, s1, s2]) {
+    let g = grid(6, 6, 20, 22, 26, () => ({fill:R() < .45 ? s2 : s1, 'fill-opacity':.45 + R() * .55}));
+    g += Pa('M184,100H212', {stroke:WHITE, 'stroke-width':6}) + Pa('M202,88L214,100L202,112', {stroke:WHITE, 'stroke-width':6});
+    return g + grid(4, 2, 228, 36, 32, (r, c) => ({fill:(r + c) % 3 === 0 ? WHITE : s2}), 6);
+  },
+  // a Frechet distance as a loss: two distributions, the generated one (white) pulled onto the reference
+  'Differentiable Population Statistics'(R, [bg, s1, s2]) {
+    let g = ''; [58, 42, 26].forEach(r => g += `<ellipse cx="104" cy="104" rx="${r * 1.35}" ry="${r}" fill="none" stroke="${s1}" stroke-width="6"/>`);
+    [58, 42, 26].forEach(r => g += `<ellipse cx="204" cy="92" rx="${r}" ry="${r * 1.2}" fill="none" stroke="${WHITE}" stroke-width="5" transform="rotate(-24 204 92)" opacity="${r === 26 ? 1 : .7}"/>`);
+    return g + blob(R, 104, 104, 70, 50, 22).map(p => C(p[0], p[1], 4.5, {fill:s2})).join('') + C(104, 104, 9, {fill:s2}) + C(204, 92, 9, {fill:WHITE})
+      + Pa('M190,94H124', {stroke:WHITE, 'stroke-width':4, 'stroke-dasharray':'8 7'});
+  },
+  // Flow-OPD: lines of rendered text sharpen along the student's own sampling trajectory; the last step is white
+  'OCR Distillation Trajectory Sampling'(R, [bg, s1, s2]) {
+    let g = ''; [0, 1, 2].forEach(j => { const x0 = 18 + j * 96, k = [.3, .6, 1][j];
+      g += Rc(x0, 34, 76, 104, {rx:8, fill:'none', stroke:j === 2 ? WHITE : s1, 'stroke-width':5});
+      for (let i = 0; i < 5; i++) { let x = x0 + 10; while (x < x0 + 60) { const w = Math.min(8 + R() * 20, x0 + 66 - x); g += Rc(x, 48 + i * 17, w, 7, {rx:3.5, fill:j === 2 ? WHITE : s2, 'fill-opacity':k}); x += w + 5; } } });
+    return g + Pa('M56,166C104,186 196,186 248,166', {stroke:WHITE, 'stroke-width':4, 'stroke-dasharray':'8 7'}) + [56, 152, 248].map((x, j) => C(x, j === 1 ? 180 : 166, j === 2 ? 9 : 7, {fill:j === 2 ? WHITE : s2})).join('');
+  },
+  // Edlib: the edit-distance table; only a band around the diagonal is filled, the optimal path is white
+  'Exact Sequence Alignment'(R, [bg, s1, s2]) {
+    const path = new Set(); let r = 0, c = 0; path.add('0,0');
+    while (r < 7 || c < 11) { const t = R(); if (r < 7 && c < 11 && t < .55) { r++; c++; } else if (c < 11 && (r === 7 || c * 7 <= r * 11 + 8)) c++; else r++; path.add(`${r},${c}`); }
+    return grid(8, 12, 15, 12, 22.6, (r, c) => path.has(`${r},${c}`) ? {fill:WHITE} : Math.abs(c * 7 - r * 11) <= 26 ? {fill:s2, 'fill-opacity':.8} : {fill:s1, 'fill-opacity':.3});
+  },
+  // a binary fuse filter: each key hashes to three cells in three consecutive segments; their fingerprints XOR to the key's
+  'Binary Fuse Filter Construction and Lookup'(R, [bg, s1, s2]) {
+    const hit = [3, 9, 16], x = i => 16 + i * 13.6; let g = '';
+    for (let i = 0; i < 20; i++) g += Rc(x(i), 132, 10, 34, {rx:4, fill:hit.includes(i) ? WHITE : (Math.floor(i / 5) % 2 ? s1 : s2)});
+    hit.forEach(i => g += Pa(`M150,48C150,96 ${x(i) + 5},84 ${x(i) + 5},124`, {stroke:WHITE, 'stroke-width':5}));
+    for (let k = 0; k < 4; k++) g += Pa(`M${x(k * 5) - 1},178H${x(k * 5 + 4) + 11}`, {stroke:s1, 'stroke-width':4});
+    return g + C(150, 40, 16, {fill:WHITE});
+  },
+});
 window.taskArt = art;
 window.ART_FIELD = Object.fromEntries(Object.entries(HUE).map(([k, v]) => [k, v[0]]));
 })();

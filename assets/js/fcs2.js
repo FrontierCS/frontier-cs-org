@@ -311,7 +311,7 @@ $('#q').addEventListener('input', e => { q = e.target.value; limit = 5; drawRows
 $('#showmore').addEventListener('click', () => { limit += 20; drawRows(); });
 function hits() {
   const w = q.toLowerCase().split(/\s+/).filter(Boolean);
-  let h = TASKS.filter(t => (!picked.size || picked.has(t.d)) && w.every(x => (t.s + ' ' + t.t + ' ' + t.d).toLowerCase().includes(x)));
+  let h = TASKS.filter(t => (!picked.size || picked.has(t.d)) && w.every(x => (t.s + ' ' + t.t + ' ' + t.n + ' ' + t.d).toLowerCase().includes(x)));
   // hardest first by the FECI fit's task difficulty (owner, 2026-10-11); tasks without runs have none and follow by domain
   const dif = t => TFIT[t.s] ? TFIT[t.s][0] : null;
   return [...h].sort((a, b) => (dif(b) ?? -1e9) - (dif(a) ?? -1e9) || DOMAINS.indexOf(a.d) - DOMAINS.indexOf(b.d) || a.s.localeCompare(b.s));
@@ -452,7 +452,7 @@ $('#mapsvg').addEventListener('click', e => { if (play && e.target.closest('.pla
 function drawRows() {
   const h = hits(); $('#fcount').textContent = picked.size ? `(${picked.size})` : '';
   $('#rows').innerHTML = h.slice(0, limit).map(t => `<article class="trow" data-s="${esc(t.s)}"><span class="tag">${esc(t.d)}</span>
-    <h3><a class="stretch" href="${esc(taskHref(t.s))}">${esc(t.s)}</a></h3><p>${esc(t.t || '')}</p><div class="lk">${t.p ? `<a href="${esc(t.p)}" target="_blank" rel="noopener">Paper</a>` : '<span>No paper link</span>'}${t.r ? `<a href="${esc(t.r)}" target="_blank" rel="noopener">Code</a>` : ''}</div></article>`).join('')
+    <h3><a class="stretch" href="${esc(taskHref(t.s))}">${esc(t.title)}</a></h3><p>${esc(t.n === t.title ? '' : t.n)}</p><div class="lk">${t.p ? `<a href="${esc(t.p)}" target="_blank" rel="noopener">Paper</a>` : '<span>No paper link</span>'}${t.r ? `<a href="${esc(t.r)}" target="_blank" rel="noopener">Code</a>` : ''}</div></article>`).join('')
     || `<p class="empty">No task matches. Clear the filter or try another word.</p>`;
   $('#showmore').hidden = h.length <= limit;
   $('#showmore').textContent = `Show more (${h.length - limit} left)`;

@@ -15,11 +15,11 @@ function drawPage() {
   if (!t) return drawIndex();
   const runs = TRAJ.filter(r => r[1] === t.s).sort((a, b) => RANK[a[0]] - RANK[b[0]] || b[2] - a[2]);
   cur = {t, runs};
-  document.title = `${t.s} · FrontierCS 2`;
+  document.title = `${t.title} · FrontierCS 2`;
   $('#crumbdom').innerHTML = `<span>/</span><span>${esc(t.d)}</span>`;
   $('#tmeta').innerHTML = `<span class="tag">${esc(t.d)}</span>`;
-  $('#tname').textContent = t.s;
-  $('#tpaper').textContent = t.t || '';
+  $('#tname').textContent = t.title;
+  $('#tpaper').textContent = t.n === t.title ? '' : t.n;
   $('#tlinks').innerHTML = (t.p ? `<a class="pill" href="${esc(t.p)}" target="_blank" rel="noopener">Paper</a>` : '')
     + (t.r ? `<a class="pill" href="${esc(t.r)}" target="_blank" rel="noopener">Code</a>` : '');
   const desc = DESC[t.s] ? `<p class="tdesc">${esc(DESC[t.s])}</p>` : '<p class="tdesc tbd">A description of this task will appear here.</p>';
@@ -53,7 +53,7 @@ function drawIndex() {
   $('#tname').textContent = 'Tasks';
   $('#tpaper').textContent = `${TASKS.length} tasks in ${DOMAINS.filter(d => N_IN(d)).length} domains. Select a task for its description and results.`;
   $('#tbody').innerHTML = DOMAINS.filter(d => N_IN(d)).map(d => `<section class="tgroup"><h2>${esc(d)}</h2><ul>`
-    + TASKS.filter(t => t.d === d).map(t => `<li><a href="#${slug(t.s)}">${esc(t.s)}</a></li>`).join('')
+    + TASKS.filter(t => t.d === d).map(t => `<li><a href="#${slug(t.s)}">${esc(t.title)}</a></li>`).join('')
     + '</ul></section>').join('');
 }
 
