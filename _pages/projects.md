@@ -40,14 +40,6 @@ permalink: /paper/
           <p class="post-desc">Competitive-programming problems from live contests, annotated by Olympiad medalists, to find where LLMs still fall short of experts.</p>
         </div>
       </article>
-      <article class="paper-row">
-        <a class="paper-pg" href="https://arxiv.org/abs/2609.36802" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img src="{{ '/assets/img/fcs1-papers/2609.36802.jpg' | relative_url }}" alt="" width="440" height="570" loading="lazy"></a>
-        <div>
-          <div class="post-meta"><span class="venue plain">arXiv 2026</span></div>
-          <h2 class="post-title"><a href="https://arxiv.org/abs/2609.36802" target="_blank" rel="noopener noreferrer">EasyPPO: Stabilizing the Critic Is Key</a></h2>
-          <p class="post-desc">A stable PPO for language models, trained with FrontierCS&rsquo;s continuous score among its rewards.</p>
-        </div>
-      </article>
     </div>
   </div>
 </section>
@@ -99,11 +91,11 @@ permalink: /paper/
       <h3>Post-training</h3>
       <div class="paper-list">
         <article class="paper-row">
-          <a class="paper-pg" href="https://arxiv.org/abs/2606.29082" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img src="{{ '/assets/img/fcs1-papers/2606.29082.jpg' | relative_url }}" alt="" width="440" height="570" loading="lazy"></a>
+          <a class="paper-pg" href="https://arxiv.org/abs/2609.36802" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img src="{{ '/assets/img/fcs1-papers/2609.36802.jpg' | relative_url }}" alt="" width="440" height="570" loading="lazy"></a>
           <div>
             <div class="post-meta"><span class="venue plain">arXiv 2026</span></div>
-            <h2 class="post-title"><a href="https://arxiv.org/abs/2606.29082" target="_blank" rel="noopener noreferrer">Evolution Fine-Tuning: Learning to Discover Across 371 Optimization Tasks</a></h2>
-            <p class="post-desc">Turns evolutionary search runs into training data; nearly half of its 371 tasks derive from FrontierCS. On held-out problems its 9B model averages 46.01, against 32.46 for the base model.</p>
+            <h2 class="post-title"><a href="https://arxiv.org/abs/2609.36802" target="_blank" rel="noopener noreferrer">EasyPPO: Stabilizing the Critic Is Key</a></h2>
+            <p class="post-desc">A stable PPO for language models, trained with FrontierCS&rsquo;s continuous score among its rewards.</p>
           </div>
         </article>
       </div>
