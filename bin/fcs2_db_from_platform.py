@@ -9,10 +9,11 @@ score_points. Only GET requests are made.
 
 What the API does not give, and what stands in for it:
 - Spend per submission. The API reports a run's total tokens and, for some models, the gateway's estimated cost.
-  A run's spend is that estimated cost when it is above 0, else total tokens at the model's cache-read list price
-  (a lower bound: output tokens are not reported). Spend at a development submission is the run's spend times the
-  share of the run's wall time elapsed at that submission. It is stored as total_tokens = US$ * 1e6 / cache-read price
-  with output_tokens = 0, so the converter's usd() returns the US$ figure unchanged.
+  A run's spend is that estimated cost when it is above 0, else the cost Claude Code reports for itself
+  (claude_trace.usage), else total tokens at the model's cache-read list price (a lower bound: output tokens are
+  not reported). Spend at a development submission is the run's spend times the
+  share of the run's wall time elapsed at that submission. It is stored as total_tokens = US$ * 1e6
+  with output_tokens NULL, which the converter's usd() reads as US$ directly.
 - The patch behind the final submission. Development payload ids do not match the final checkpoint's, so no
   development score is paired with the hidden score and the converter applies no dev-to-hidden calibration.
 - Check labels. feedback_json.checks lists the metric names of metrics.private.beat_spec_progress.
@@ -47,6 +48,21 @@ rids = [(c, i['run_id']) for c, v in items.items() for i in v if i.get('run_id')
 with ThreadPoolExecutor(16) as ex:
     pulled = list(ex.map(lambda cr: (cr[0], get('runs/' + cr[1]), get(f'runs/{cr[1]}/events?limit=500')), rids))
 
+# Claude Code usage with tokens but no cost (a run without the CLI's final result): price the four token kinds at the
+# rates implied by the runs that report both, per model (least squares; the CLI's cost is linear in them).
+KINDS = ('input_tokens', 'output_tokens', 'cache_read_input_tokens', 'cache_creation_input_tokens')
+claude = lambda r: (r.get('claude_trace') or {}).get('usage') or {}
+RATE = {}
+for c in items:
+    both = [claude(r) for cc, r, _ in pulled if cc == c and claude(r).get('estimated_cost_usd')]
+    if len(both) >= 8:
+        import numpy as np
+        RATE[c] = np.linalg.lstsq(np.array([[u.get(k) or 0 for k in KINDS] for u in both], float), np.array([u['estimated_cost_usd'] for u in both]), rcond=None)[0]
+def agent_usd(c, r):
+    u = claude(r)
+    if u.get('estimated_cost_usd'): return u['estimated_cost_usd']
+    return float(max(0, RATE[c] @ [u.get(k) or 0 for k in KINDS])) if u and c in RATE else 0
+
 if os.path.exists(sys.argv[1]): os.remove(sys.argv[1])
 db = sqlite3.connect(sys.argv[1])
 db.executescript('''create table release(generated_at text);
@@ -62,8 +78,9 @@ for c, r, events in pulled:
     tasks.setdefault(r['task_id'], r['task_name'])
     start, end = (ts(r[k]) if r.get(k) else None for k in ('started_at', 'finished_at'))
     usage = (r.get('model_usage') or {}).get('keys', [])
-    usd = sum(k.get('estimated_cost_usd') or 0 for k in usage) or sum(k.get('total_tokens') or 0 for k in usage) * (CACHE[c] or 0) / 1e6
-    units = lambda x: x * 1e6 / CACHE[c] if CACHE[c] else 0
+    agent = agent_usd(c, r)   # Claude Code reports its own usage
+    usd = sum(k.get('estimated_cost_usd') or 0 for k in usage) or agent or sum(k.get('total_tokens') or 0 for k in usage) * (CACHE[c] or 0) / 1e6
+    units = lambda x: x * 1e6
     priv = (r.get('metrics') or {}).get('private') or {}
     fb = {'reference_score': priv.get('reference_score'), 'checks': [{'label': k} for k in (priv.get('beat_spec_progress') or {})]}
     db.execute('insert into runs values (?,?,?,?,?,?)', (r['id'], 0.0 if r['score'] is None and r['state'] == 'TIMED_OUT' else r['score'], r['state'], r['verdict'], end - start if start and end else None, json.dumps(fb)))
@@ -73,10 +90,10 @@ for c, r, events in pulled:
         if e['kind'] != 'VERIFIER_TRAIN_COMPLETED' or not (start and end): continue
         p = e['payload']; frac = min(1, max(0, (ts(e['occurred_at']) - start) / max(end - start, 1)))
         db.execute('insert into submissions values (?,?,?,?,?)', (r['id'], p['verification_id'], 'train', p['payload_id'], n)); n += 1
-        db.execute('insert into score_points values (?,?,?,?,0)', (r['id'], p['verification_id'], p.get('raw_score') or 0, units(usd * frac)))
+        db.execute('insert into score_points values (?,?,?,?,null)', (r['id'], p['verification_id'], p.get('raw_score') or 0, units(usd * frac)))
     if r['score'] is not None and usd:
         db.execute('insert into submissions values (?,?,?,?,?)', (r['id'], 'final', 'final', 'final:' + r['id'], n))
-        db.execute('insert into score_points values (?,?,?,?,0)', (r['id'], 'final', r['score'], units(usd)))
+        db.execute('insert into score_points values (?,?,?,?,null)', (r['id'], 'final', r['score'], units(usd)))
 for n, (t, name) in enumerate(sorted(tasks.items(), key=lambda kv: kv[1])): db.execute('insert into tasks values (?,?,?)', (t, name, n))
 db.commit()
 for c, v in items.items(): print(f"{c}: {sum(map(done, v))} scored of {len(v)} (evaluation {evs[c]['id']})")

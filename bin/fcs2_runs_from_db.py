@@ -169,7 +169,8 @@ def usd(m, total, output):
     """Owner's approximation (2026-10-09): output tokens at the output price plus every token at the cache-read price,
     as if all input were a cache hit. Tool-reported total tokens count cached input differently per tool, so they enter
     only here, never as an axis."""
-    if m not in PRICE: return 0.0   # no usage reported (a subscription run): no spend, so no cost and no scaling curve
+    if output is None: return (total or 0) / 1e6   # bin/fcs2_db_from_platform.py stores US$ directly (as micro-dollars)
+    if m not in PRICE: return 0.0
     po, pc = PRICE[m]
     return (output * po + total * pc) / 1e6
 
