@@ -79,18 +79,26 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
     <details class="fold how" id="feci-how">
       <summary><h3>How FECI works</h3></summary>
       <div class="how-body">
-        <p>FECI puts every model and the authors’ code on one scale. Each task gets an S-shaped curve: a model’s expected score on the task rises from 0 to 100 as its FECI passes the task’s difficulty, the FECI at which the expected score is 50.</p>
-        <div class="how-eq">\[\text{expected score} = \frac{100}{1 + e^{-k\,(\text{FECI} - \text{difficulty})}}\]</div>
-        <figure class="chart how-fig">
-          <div class="chead"><span>Expected score on three tasks</span></div>
-          <div class="plot" id="howaplot"><svg id="howasvg" role="img" aria-label="Expected score against FECI on three tasks"></svg><div class="tip" id="howatip" hidden></div></div>
-          <div class="legend" id="howalegend"></div>
-        </figure>
-        <p>One fit estimates every model’s FECI and every task’s difficulty and slope <i>k</i> from all final scores, with Epoch AI’s own fitting code. The authors’ code takes part as one more entrant, Human. The scale is then set so that Human is 60 and Kimi K2.7 Code is 0.</p>
-        <figure class="chart how-fig">
-          <div class="chead"><span>Task difficulty and model FECI on one scale</span></div>
-          <div class="plot" id="howbplot"><svg id="howbsvg" role="img" aria-label="Task difficulties and model FECI on the FECI scale"></svg><div class="tip" id="howbtip" hidden></div></div>
-        </figure>
+        <div class="how-row">
+          <div class="how-txt">
+            <p>FECI puts every model and the authors’ code on one scale. Each task gets an S-shaped curve: a model’s expected score on the task rises from 0 to 100 as its FECI passes the task’s difficulty, the FECI at which the expected score is 50.</p>
+            <div class="how-eq">\[\text{expected score} = \frac{100}{1 + e^{-k\,(\text{FECI} - \text{difficulty})}}\]</div>
+          </div>
+          <figure class="chart how-fig">
+            <div class="chead"><span>Expected score on three tasks</span></div>
+            <div class="plot" id="howaplot"><svg id="howasvg" role="img" aria-label="Expected score against FECI on three tasks"></svg><div class="tip" id="howatip" hidden></div></div>
+            <div class="legend" id="howalegend"></div>
+          </figure>
+        </div>
+        <div class="how-row">
+          <div class="how-txt">
+            <p>One fit estimates every model’s FECI and every task’s difficulty and slope <i>k</i> from all final scores, with Epoch AI’s own fitting code. The authors’ code takes part as one more entrant, Human. The scale is then set so that Human is 60 and Kimi K2.7 Code is 0.</p>
+          </div>
+          <figure class="chart how-fig">
+            <div class="chead"><span>Task difficulty and model FECI on one scale</span></div>
+            <div class="plot" id="howbplot"><svg id="howbsvg" role="img" aria-label="Task difficulties and model FECI on the FECI scale"></svg><div class="tip" id="howbtip" hidden></div></div>
+          </figure>
+        </div>
         <h4>Why FECI</h4>
         <ul class="how-why">
           <li><b>It is fair to models that ran different tasks.</b> Each model ran its own set, <span id="how-ntasks">19 to 40</span> of the <span id="how-nall">42</span> tasks with runs. A mean score or a pass rate rewards a model that drew easy tasks; FECI weighs each score by how hard its task is.</li>

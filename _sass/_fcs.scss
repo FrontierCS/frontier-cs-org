@@ -1432,6 +1432,15 @@ body { background: #fff; line-height: 1.5; }
 .nav-main a:hover { color: var(--accent-hover); }
 .nav-main a.active { color: var(--ink); border-bottom-color: var(--accent); }
 .nav-main a.active::after, .nav-aux a.active::after { display: none; }
+/* hover underline: the active link's 2px bar, drawn from the left at the same place (owner, 2026-10-11: the old 1px
+   inset line from the earlier padded nav jumped against the active bar) */
+.nav-main a:not(.active), .nav-aux a:not(.active):not(.nav-icon) {
+  background: linear-gradient(var(--accent), var(--accent)) 0 100% / 0 2px no-repeat border-box;
+  transition: background-size 0.25s cubic-bezier(0.2, 0.7, 0.3, 1), color 0.15s;
+}
+.nav-main a:not(.active):hover, .nav-aux a:not(.active):not(.nav-icon):hover { background-size: 100% 2px; }
+@media (max-width: 1000px) { .nav-aux a:not(.active):not(.nav-icon) { background: none; } }
+@media (prefers-reduced-motion: reduce) { .nav-main a, .nav-aux a { transition: none; } }
 .nav-aux { margin-left: auto; gap: 22px; }
 .nav-aux a { padding: 6px 0; font-size: 15px; font-weight: 500; color: var(--ink-3); }
 .nav-aux a:hover, .nav-aux a.active { color: var(--accent-hover); }
