@@ -12,8 +12,8 @@ permalink: /team/
 <section class="journal team-sec team-top">
 <div class="page">
   <h1 class="vh" id="main" tabindex="-1">Team</h1>
-  {%- assign earlier = "lcbpro" | split: "," -%}
-  {%- for k in earlier %}{% assign pp = site.data.team[k] %}
+  {%- assign later = "easyppo,tts,fsmith" | split: "," -%}
+  {%- for k in later %}{% assign pp = site.data.team[k] %}
   <details class="team-fold">
     <summary><h3 class="team-group">{{ pp.short }} <span>{{ pp.venue }} · {{ pp.authors.size }} authors</span></h3></summary>
     <p class="team-note"><a href="{{ pp.url }}" target="_blank" rel="noopener noreferrer">{{ pp.title }}</a>, in paper order.</p>
@@ -37,8 +37,8 @@ permalink: /team/
     <p class="team-note">* Equal contribution among contributors; equal advising among advisors.</p>
   </details>
 
-  {%- assign later = "fsmith,tts,easyppo" | split: "," -%}
-  {%- for k in later %}{% assign pp = site.data.team[k] %}
+  {%- assign earlier = "lcbpro" | split: "," -%}
+  {%- for k in earlier %}{% assign pp = site.data.team[k] %}
   <details class="team-fold">
     <summary><h3 class="team-group">{{ pp.short }} <span>{{ pp.venue }} · {{ pp.authors.size }} authors</span></h3></summary>
     <p class="team-note"><a href="{{ pp.url }}" target="_blank" rel="noopener noreferrer">{{ pp.title }}</a>, in paper order.</p>

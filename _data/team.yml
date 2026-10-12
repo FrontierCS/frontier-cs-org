@@ -143,7 +143,7 @@ lcbpro:
 
 # tts: authors in the order and with the equal-contribution marks of arXiv 2609.15309v1. Homepages are the ones already listed under fcs1.
 tts:
-  short: "When Agents Slow Down"
+  short: "Elo-per-token"
   title: "When Agents Slow Down: Understanding LLM Agents' Test-Time Strategies via Elo-per-token Analysis"
   url: "https://arxiv.org/abs/2609.15309"
   venue: "arXiv, September 2026"
