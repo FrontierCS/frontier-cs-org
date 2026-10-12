@@ -155,7 +155,7 @@ permalink: /paper/
   <div class="page">
     <div class="sec-head"><div>
       <h2 class="sec-title">Infra for FrontierCS</h2>
-      <p class="sec-intro">The systems that score a solution and run an agent on the problems.</p>
+      <p class="sec-intro">Built for efficiency, robustness, and adaptivity as the problems and the agents change.</p>
     </div></div>
     <div class="paper-list">
       <article class="paper-row">
