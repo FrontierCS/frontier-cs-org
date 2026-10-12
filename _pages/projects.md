@@ -1,23 +1,20 @@
 ---
 layout: default
 title: Research
-description: Featured research from the team, in AI and infrastructure, and research built on FrontierCS.
+description: Featured research from the team, research built on FrontierCS, and the infrastructure that runs it.
 permalink: /paper/
 ---
 
 <section class="page-hero one-line">
   <div class="page" id="main" tabindex="-1">
     <h1>Research</h1>
-    <p class="lede">Featured work from the team, and research built on FrontierCS.</p>
+    <p class="lede">Featured work from the team, research built on FrontierCS, and the infrastructure that runs it.</p>
   </div>
 </section>
 
-<section class="journal research-sec" id="ai">
+<section class="journal research-sec" id="featured">
   <div class="page">
-    <div class="sec-head"><div>
-      <h2 class="sec-title">AI</h2>
-      <p class="sec-intro">Featured research from the team.</p>
-    </div></div>
+    <div class="sec-head"><h2 class="sec-title">Featured by the team</h2></div>
     <div class="paper-list">
       <article class="paper-row">
         <a class="paper-pg" href="https://arxiv.org/abs/2512.15699" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img src="{{ '/assets/img/fcs1-papers/2512.15699.jpg' | relative_url }}" alt="" width="440" height="570" loading="lazy"></a>
@@ -49,25 +46,6 @@ permalink: /paper/
           <div class="post-meta"><span class="venue plain">arXiv 2026</span></div>
           <h2 class="post-title"><a href="https://arxiv.org/abs/2609.36802" target="_blank" rel="noopener noreferrer">EasyPPO: Stabilizing the Critic Is Key</a></h2>
           <p class="post-desc">A stable PPO for language models, trained with FrontierCS&rsquo;s continuous score among its rewards.</p>
-        </div>
-      </article>
-    </div>
-  </div>
-</section>
-
-<section class="journal research-sec" id="infra">
-  <div class="page">
-    <div class="sec-head"><div>
-      <h2 class="sec-title">Infra</h2>
-      <p class="sec-intro">Featured research from the team.</p>
-    </div></div>
-    <div class="paper-list">
-      <article class="paper-row">
-        <a class="paper-pg" href="https://arxiv.org/abs/2511.02230" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img src="{{ '/assets/img/fcs1-papers/2511.02230.jpg' | relative_url }}" alt="" width="440" height="570" loading="lazy"></a>
-        <div>
-          <div class="post-meta"><span class="venue plain">arXiv 2025</span></div>
-          <h2 class="post-title"><a href="https://arxiv.org/abs/2511.02230" target="_blank" rel="noopener noreferrer">Continuum: Efficient and Robust Multi-Turn LLM Agent Scheduling with KV Cache Time-to-Live</a></h2>
-          <p class="post-desc">Keeps an agent&rsquo;s KV cache on the GPU across tool calls, for a time-to-live, so the next turn resumes instead of recomputing the prefix.</p>
         </div>
       </article>
     </div>
@@ -169,6 +147,33 @@ permalink: /paper/
           </div>
         </article>
       </div>
+    </div>
+  </div>
+</section>
+
+<section class="journal research-sec" id="infra">
+  <div class="page">
+    <div class="sec-head"><div>
+      <h2 class="sec-title">Infra for FrontierCS</h2>
+      <p class="sec-intro">The systems that score a solution and run an agent on the problems.</p>
+    </div></div>
+    <div class="paper-list">
+      <article class="paper-row">
+        <a class="paper-pg note" href="{{ '/blog/evaluation/' | relative_url }}" tabindex="-1" aria-hidden="true"><img src="{{ '/assets/img/blog-thumbs/evaluation.svg' | relative_url }}" alt="" width="1600" height="1000" loading="lazy"></a>
+        <div>
+          <div class="post-meta"><span class="venue plain">Blog</span></div>
+          <h2 class="post-title"><a href="{{ '/blog/evaluation/' | relative_url }}">Evaluating the Hardest CS Problems in the Age of LLMs</a></h2>
+          <p class="post-desc">The evaluation behind the leaderboard: resume from hashes, group machines by the hardware a problem needs, and pin the environment so a score can be reproduced.</p>
+        </div>
+      </article>
+      <article class="paper-row">
+        <a class="paper-pg note" href="{{ '/blog/harbor/' | relative_url }}" tabindex="-1" aria-hidden="true"><img src="{{ '/assets/img/blog-thumbs/harbor.svg' | relative_url }}" alt="" width="1600" height="1000" loading="lazy"></a>
+        <div>
+          <div class="post-meta"><span class="venue plain">Blog</span></div>
+          <h2 class="post-title"><a href="{{ '/blog/harbor/' | relative_url }}">Your Next Long-Context Recipe: Open-Ended Problems</a></h2>
+          <p class="post-desc">FrontierCS runs inside Harbor, with a preview leaderboard of long-horizon agent runs on the open-ended algorithmic tasks.</p>
+        </div>
+      </article>
     </div>
   </div>
 </section>

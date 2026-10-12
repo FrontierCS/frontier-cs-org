@@ -1661,10 +1661,11 @@ footer.foot { margin-top: 120px; padding: 56px 0 28px; background: #202124; colo
 .venue.plain { background: var(--paper-2); color: var(--ink-2); }
 @media (max-width: 640px) { .paper-row { grid-template-columns: 84px minmax(0, 1fr); gap: 12px 18px; } .paper-pg img { width: 84px; } }
 
-/* Research page: AI, Infra, then work built on the benchmark */
+/* Research page: featured by the team, work built on the benchmark, then the systems that run it */
 section.journal.research-sec { padding: clamp(28px, 4vw, 44px) 0; }
 .research-sec .grp + .grp { margin-top: 40px; }
 .research-sec .grp h3 { font-size: 18px; font-weight: 600; margin: 0 0 18px; }
+.paper-pg.note img { aspect-ratio: 16 / 10; object-fit: cover; object-position: center; box-shadow: none; background: var(--paper-2); }
 
 /* sections separated by space, not full-width rules (Epoch) */
 section.journal { border-bottom: 0; padding: clamp(44px, 6vw, 72px) 0; }
