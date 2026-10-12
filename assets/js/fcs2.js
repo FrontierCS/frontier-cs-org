@@ -378,7 +378,7 @@ function drawMap() {
    Leaving, the card shrinks back into its tile and the veil fades out; moving from tile to tile keeps the veil up, so the
    map does not flash (owner, 2026-10-11: the return to normal was too abrupt). */
 const mapTip = $('#maptip');
-let play = null, veil = null;
+let play = null, veil = null, playN = 0;
 // one white veil per map, under the cards; its opacity eases to op (0.6 behind a card, 0 when none)
 function veilTo(op) {
   const svg = $('#mapsvg'), [, , W, H] = svg.getAttribute('viewBox').split(' ').map(Number);
@@ -400,7 +400,7 @@ function startPlay(tile) {
   const s = tile.dataset.s, k = tile.dataset.k, runs = TRAJ.filter(r => r[1] === s && r[6].length), svg = $('#mapsvg');
   const [tx, ty, tw, th] = ['x', 'y', 'width', 'height'].map(a => +tile.getAttribute(a)), [, , W, H] = svg.getAttribute('viewBox').split(' ').map(Number);
   const w = Math.min(W - 8, Math.max(260, tw * 1.7)), h = w / 1.5, x = Math.min(W - w - 4, Math.max(4, tx + tw / 2 - w / 2)), y = Math.min(H - h - 4, Math.max(4, ty + th / 2 - h / 2));
-  const root = sv('g', {class:'play', style:'cursor:pointer'}), card = sv('g'), cid = 'playclip';
+  const root = sv('g', {class:'play', style:'cursor:pointer'}), card = sv('g'), cid = `playclip${++playN}`;   // own id: the leaving card keeps its clip for 0.2 s
   card.innerHTML = `<clipPath id="${cid}"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="10"/></clipPath>`
     + `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="10" fill="#fff" filter="drop-shadow(0 6px 16px rgba(32,33,36,.35))"/>`
     + `<g clip-path="url(#${cid})">${taskArt(s, k).replace('<svg class="art"', `<svg x="${x}" y="${y}" width="${w}" height="${h}" preserveAspectRatio="xMidYMid slice"`)}`
@@ -410,7 +410,9 @@ function startPlay(tile) {
   // the rest of the map fades behind the card; the veil lets the pointer through to the other tiles
   veilTo(.6); root.append(card); svg.append(root);
   card.style.transformOrigin = `${x + w / 2}px ${y + h / 2}px`;
-  const back = `translate(${tx + tw / 2 - x - w / 2}px,${ty + th / 2 - y - h / 2}px) scale(${tw / w})`;   // the card's size and place as its tile
+  // the card's size and place as its tile, width and height each: a uniform scale left the 1.5:1 card short of a
+  // taller tile, and with the veil already up (tile to tile) the veiled tile showed white around it (owner, 2026-10-11)
+  const back = `translate(${tx + tw / 2 - x - w / 2}px,${ty + th / 2 - y - h / 2}px) scale(${tw / w},${th / h})`;
   if (!calm) card.animate([{transform:back, opacity:.6}, {transform:'none', opacity:1}], {duration:220, easing:'cubic-bezier(.2,0,0,1)', fill:'forwards'});
   play = {tile, g:root, card, who, runs, k:0, x, y, w, h, back};
   if (runs.length) play.t = setTimeout(showRun, calm ? 0 : 200);
