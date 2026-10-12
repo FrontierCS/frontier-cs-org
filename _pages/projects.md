@@ -62,6 +62,14 @@ permalink: /paper/
             <p class="post-desc">Tracks the best solution at every token budget in sessions of up to 100M tokens. On Polyomino Packing, splitting 100M tokens across parallel sessions gains 264 Elo over one long session.</p>
           </div>
         </article>
+        <article class="paper-row">
+          <a class="paper-pg" href="https://arxiv.org/abs/2610.07625" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img src="{{ '/assets/img/fcs1-papers/2610.07625.jpg' | relative_url }}" alt="" width="440" height="570" loading="lazy"></a>
+          <div>
+            <div class="post-meta"><span class="venue plain">arXiv 2026</span></div>
+            <h2 class="post-title"><a href="https://arxiv.org/abs/2610.07625" target="_blank" rel="noopener noreferrer">Stateless Language Agents: Scaling Long-Horizon Automated Research</a></h2>
+            <p class="post-desc">Keeps the research state in the harness and builds a fresh context for every agent call. On a FrontierCS algorithm-design problem it scores 59.5 at 200M tokens, against 58.0 for the strongest baseline.</p>
+          </div>
+        </article>
       </div>
     </div>
 
