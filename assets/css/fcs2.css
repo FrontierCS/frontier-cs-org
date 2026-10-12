@@ -193,19 +193,20 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 .sel{height:42px; border:1px solid var(--line-2); border-radius:4px; padding:0 10px; font:inherit; font-size:15px; background:#fff; color:var(--ink-2)}
 .cnt{font-size:15px; color:var(--ink-2); white-space:nowrap}
 .rows{margin-top:10px}
-.row{position:relative; padding:24px 0; border-top:1px solid var(--line)}
-.row:first-child{border-top:0}
-.row h3{font-size:clamp(20px,2vw,24px); font-weight:500; margin:0 0 6px; overflow-wrap:anywhere}
-.row h3 a{color:inherit; text-decoration:none}
-.row h3 a::after{content:""; position:absolute; inset:0}
-.row:hover h3 a{color:var(--teal-d)}
-.row .lk a{position:relative; z-index:1}
-.row p{margin:0 0 10px; color:var(--ink-2); font-size:16px; line-height:1.4}
-.row .lk{display:flex; gap:18px; font-size:14px; color:var(--muted-2)}
-.row .lk a{color:var(--ink-2); text-decoration:underline; text-underline-offset:3px; text-decoration-color:var(--line-2)} .row .lk a:hover{color:var(--teal); text-decoration-color:currentColor}
-.row .ran{display:inline-flex; align-items:center; gap:7px; font-weight:600; font-size:13.5px; color:var(--ink-2)}
-.row .ran i{width:10px; height:10px; border-radius:50%; background:var(--teal)}
-.row.flash{background:#e8f0fe; box-shadow:-12px 0 0 #e8f0fe, 12px 0 0 #e8f0fe}
+/* task index rows: one grid so domain, name, paper title and links line up from row to row (owner, 2026-10-11; the class
+   was .row, which _fcs.scss also styles as a wrapping flex row, so the parts drifted) */
+.trow{position:relative; display:grid; grid-template-columns:184px minmax(0,15em) minmax(0,1fr) auto; gap:6px 28px; align-items:center; padding:20px 0; border-top:1px solid var(--line)}
+.trow:first-child{border-top:0}
+.trow .tag{justify-self:start}
+.trow h3{font-size:clamp(19px,1.8vw,22px); font-weight:500; margin:0; overflow-wrap:anywhere}
+.trow h3 a{color:inherit; text-decoration:none}
+.trow h3 a::after{content:""; position:absolute; inset:0}
+.trow:hover h3 a{color:var(--teal-d)}
+.trow p{margin:0; color:var(--ink-2); font-size:16px; line-height:1.4}
+.trow .lk{display:flex; gap:18px; font-size:14px; color:var(--muted-2); white-space:nowrap}
+.trow .lk a{position:relative; z-index:1; color:var(--ink-2); text-decoration:underline; text-underline-offset:3px; text-decoration-color:var(--line-2)} .trow .lk a:hover{color:var(--teal); text-decoration-color:currentColor}
+.trow.flash{background:#e8f0fe; box-shadow:-12px 0 0 #e8f0fe, 12px 0 0 #e8f0fe}
+@media (max-width:900px){ .trow{grid-template-columns:minmax(0,1fr) auto; gap:8px 16px} .trow .tag{grid-column:1} .trow .lk{grid-column:2; grid-row:1; justify-self:end} .trow h3, .trow p{grid-column:1 / -1} }
 .empty{color:var(--muted); padding:30px 0}
 .showmore{margin-top:16px}
 

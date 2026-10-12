@@ -304,20 +304,18 @@ const fqHash = () => { const d = document.getElementById(location.hash.slice(1))
 addEventListener('hashchange', fqHash); fqHash();
 
 /* ---------- task index ---------- */
-let picked = new Set(), q = '', sort = 'domain', limit = 5;
+let picked = new Set(), q = '', limit = 5;
 $('#checks').innerHTML = DOMAINS.map(d => `<label><input type="checkbox" value="${esc(d)}"> ${esc(d)} (${N_IN(d)})</label>`).join('');
 $('#checks').addEventListener('change', e => { e.target.checked ? picked.add(e.target.value) : picked.delete(e.target.value); limit = 5; drawRows(); });
 $('#ftoggle').addEventListener('click', () => { const f = $('#filter'), o = !f.classList.contains('open'); f.classList.toggle('open', o); $('#ftoggle').setAttribute('aria-expanded', String(o)); });
 $('#q').addEventListener('input', e => { q = e.target.value; limit = 5; drawRows(); });
-$('#sort').addEventListener('change', e => { sort = e.target.value; drawRows(); });
 $('#showmore').addEventListener('click', () => { limit += 20; drawRows(); });
 function hits() {
   const w = q.toLowerCase().split(/\s+/).filter(Boolean);
   let h = TASKS.filter(t => (!picked.size || picked.has(t.d)) && w.every(x => (t.s + ' ' + t.t + ' ' + t.d).toLowerCase().includes(x)));
-  if (sort === 'name') h = [...h].sort((a, b) => a.s.localeCompare(b.s, 'en', {sensitivity:'base'}));
-  else if (sort === 'runs') h = [...h].sort((a, b) => RAN.has(b.s) - RAN.has(a.s));
-  else h = [...h].sort((a, b) => DOMAINS.indexOf(a.d) - DOMAINS.indexOf(b.d));
-  return h;
+  // hardest first by the FECI fit's task difficulty (owner, 2026-10-11); tasks without runs have none and follow by domain
+  const dif = t => TFIT[t.s] ? TFIT[t.s][0] : null;
+  return [...h].sort((a, b) => (dif(b) ?? -1e9) - (dif(a) ?? -1e9) || DOMAINS.indexOf(a.d) - DOMAINS.indexOf(b.d) || a.s.localeCompare(b.s));
 }
 function squarify(vals, x, y, w, h) {
   const tot = vals.reduce((a, b) => a + b, 0), areas = vals.map(v => v * w * h / tot), out = [];
@@ -458,9 +456,9 @@ $('#mapsvg').addEventListener('pointerleave', () => { mapTip.hidden = true; clea
 $('#mapsvg').addEventListener('click', e => { if (play && e.target.closest('.play')) location.href = taskHref(play.tile.dataset.s); });
 
 function drawRows() {
-  const h = hits(); $('#cnt').textContent = `${h.length} task${h.length === 1 ? '' : 's'}`; $('#fcount').textContent = picked.size ? `(${picked.size})` : '';
-  $('#rows').innerHTML = h.slice(0, limit).map(t => `<article class="row" data-s="${esc(t.s)}"><div class="meta"><span class="tag">${esc(t.d)}</span>${RAN.has(t.s) ? '<span class="ran"><i></i>Has runs</span>' : ''}</div>
-    <h3><a class="stretch" href="${esc(taskHref(t.s))}">${esc(t.s)}</a></h3>${t.t ? `<p>${esc(t.t)}</p>` : ''}<div class="lk">${t.p ? `<a href="${esc(t.p)}" target="_blank" rel="noopener">Paper</a>` : '<span>No paper link</span>'}${t.r ? `<a href="${esc(t.r)}" target="_blank" rel="noopener">Code</a>` : ''}</div></article>`).join('')
+  const h = hits(); $('#fcount').textContent = picked.size ? `(${picked.size})` : '';
+  $('#rows').innerHTML = h.slice(0, limit).map(t => `<article class="trow" data-s="${esc(t.s)}"><span class="tag">${esc(t.d)}</span>
+    <h3><a class="stretch" href="${esc(taskHref(t.s))}">${esc(t.s)}</a></h3><p>${esc(t.t || '')}</p><div class="lk">${t.p ? `<a href="${esc(t.p)}" target="_blank" rel="noopener">Paper</a>` : '<span>No paper link</span>'}${t.r ? `<a href="${esc(t.r)}" target="_blank" rel="noopener">Code</a>` : ''}</div></article>`).join('')
     || `<p class="empty">No task matches. Clear the filter or try another word.</p>`;
   $('#showmore').hidden = h.length <= limit;
   $('#showmore').textContent = `Show more (${h.length - limit} left)`;

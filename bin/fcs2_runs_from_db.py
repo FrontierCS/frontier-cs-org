@@ -321,6 +321,7 @@ for a in sys.argv[2:]:
                'models': [dict(zip(['id', 'name', 'short', 'harness', 'lab'], m)) for m in models], 'dropped': dict(dropped),
                'pass': pass_rate(runs), 'cost_usd': CO, 'price_per_mtok': PRICE, 'eci': eci_js, 'eci_human': HUMAN_VALUE,
                'eci_low': [LOW_ANCHOR, LOW_VALUE], 'eci_boot_kept': nboot, 'eci_boot_dropped': nbad, 'eci_pinned_task': pinned,
-               'eci_reference_tasks': E['reference'][3], 'scaling_columns': ['usd', 'eci', 'lo90', 'hi90', 'share_running'], 'scaling': SC}
+               'eci_reference_tasks': E['reference'][3], 'scaling_columns': ['usd', 'eci', 'lo90', 'hi90', 'share_running'], 'scaling': SC,
+               'task_reference': REF, 'task_fit_columns': ['difficulty', 'slope'], 'task_fit': TFIT}   # per task, for the paper's task-difficulty section
         json.dump(out, open(a[7:], 'w'), indent=1)
         print('wrote', a[7:])

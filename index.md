@@ -108,7 +108,11 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
         </ul>
       </div>
     </details>
-    <figure class="chart" style="margin:40px 0 0" id="scaling">
+  </div>
+
+  <div class="tbl-wrap" id="tts">
+    <h3>Test-time scaling</h3>
+    <figure class="chart" style="margin:0" id="scaling">
       <div class="chead"><span>Test-time scaling: FECI against cost budget per run</span></div>
       <div class="plot" id="ttsplot"><svg id="ttssvg" role="img" aria-label="Test-time scaling chart"></svg><div class="tip" id="ttstip" hidden></div></div>
       <div class="legend" id="ttslegend"></div>
@@ -132,8 +136,6 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
       <div class="bar">
         <label class="field" for="q"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
           <input id="q" type="search" placeholder="Search" autocomplete="off"></label>
-        <select class="sel" id="sort" aria-label="Sort tasks"><option value="domain">By domain</option><option value="name">A–Z</option><option value="runs">With runs first</option></select>
-        <span class="cnt num" id="cnt">92 tasks</span>
       </div>
       <div class="rows" id="rows"></div>
       <button class="pill lg showmore" type="button" id="showmore">Show more</button>
