@@ -50,6 +50,12 @@ from datetime import datetime
 
 # database display name -> (domain folder, paper short name or None)
 TASK = {
+    'Access-Pattern Rewriting': ('Programming Language', 'Glenside'),
+    'Binary Fuse Filter Construction and Lookup': ('Theory', None),
+    'CKKS Precision Propagation at 2,048 Slots': ('Crypto', 'CKKS noise'),
+    'Exact Sequence Alignment': ('Bioinformatics', None),
+    'Go1 Joystick Policy Training': ('Robotics', 'MuJoCo Playground'),
+    'Private Set List Decoding': ('Crypto', 'QuarterPIR'),
     'Adaptive Robustness Evaluation for Prompt-Injection Defense': ('Security', 'Adaptive attacks'),
     'Approximate-MIPS Query Stopping': ('Database', None),
     'Argument-aware runtime privilege control': ('Security', 'Progent'),
@@ -105,6 +111,7 @@ MODEL = {
     'Qwen 3.8 Max Code': ('qwen', 'Qwen 3.8 Max', 'Qwen 3.8 Max', '', 'Qwen'),   # shown without 'Code' (owner, 2026-10-09)
     'DeepSeek V4.1 Flash (DSH)': ('ds', 'DeepSeek V4.1 Flash', 'DeepSeek V4.1 Flash', 'DSH', 'DeepSeek'),
     'GLM 5.3 (ZCode)': ('glm', 'GLM 5.3', 'GLM 5.3', 'ZCode', 'Z.ai'),
+    'Claude Code · Opus 5.5 (Subscription, max effort)': ('opus', 'Claude Opus 5.5', 'Opus 5.5', 'Claude Code', 'Anthropic'),
 }
 
 HUMAN_VALUE = 60                               # owner's choice, 2026-10-09 (tried 100 and 25; K2.7 was 20)
@@ -162,6 +169,8 @@ def usd(m, total, output):
     """Owner's approximation (2026-10-09): output tokens at the output price plus every token at the cache-read price,
     as if all input were a cache hit. Tool-reported total tokens count cached input differently per tool, so they enter
     only here, never as an axis."""
+    if output is None: return (total or 0) / 1e6   # bin/fcs2_db_from_platform.py stores US$ directly (as micro-dollars)
+    if m not in PRICE: return 0.0
     po, pc = PRICE[m]
     return (output * po + total * pc) / 1e6
 
@@ -190,7 +199,7 @@ def scaling(db, curves):
         dev = {ph: pts[(r, sid)][0] for sid, kind, ph in subs[r] if kind == 'train' and (r, sid) in pts}
         fin = [ph for sid, kind, ph in subs[r] if kind == 'final']
         if fin and fin[0] in dev: gaps[t].append(hidden - dev[fin[0]])
-    g = np.mean([x for v in gaps.values() for x in v]); off = {t: (sum(v) + g) / (len(v) + 1) for t, v in gaps.items()}
+    g = np.mean([x for v in gaps.values() for x in v]) if gaps else 0.0; off = {t: (sum(v) + g) / (len(v) + 1) for t, v in gaps.items()}
 
     def cap(ys):
         t = list(ys); y = np.clip(np.array([ys[k] for k in t]) / 100, 1e-3, 1 - 1e-3)
@@ -212,6 +221,7 @@ def scaling(db, curves):
         out[axis] = {}
         for c in sorted({v[0] for v in info.values()}, key=lambda c: MODEL[c][0]):
             runs = [r for r in info if info[r][0] == c]; tasks = sorted({info[r][1] for r in runs}); ends = [traj[r][1] for r in runs]
+            if not max(ends): continue   # no spend reported: no curve
             rng, curve = np.random.default_rng(3), []
             # budgets are rounded up to the stored precision before use, so each point is exact at its stored budget
             for B in np.ceil(np.geomspace(1e-3, max(ends), SCALE_POINTS) * 1e5) / 1e5:
@@ -230,6 +240,7 @@ rows = db.execute('''select c.name, t.name, r.display_score, r.state, r.display_
 missing = {r[1] for r in rows} - set(TASK)
 assert not missing, f'unmapped tasks: {missing}'
 assert not {c for c, *_ in rows} - set(MODEL), 'unmapped model'
+MODEL = {c: v for c, v in MODEL.items() if c in {r[0] for r in rows} or c == LOW_ANCHOR}   # only the models this database has
 
 runs = []
 for cand, task, score, state, verdict in rows:

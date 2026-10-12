@@ -156,7 +156,7 @@ function drawTTS() {
   svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'Cost budget per run in US$, log scale'));
   const g = sv('g', {'clip-path':'url(#ttsclip)'}); svg.append(g);
   const pts = [];
-  [...RANKED].reverse().forEach(m => {
+  [...RANKED].reverse().filter(m => SCALE[m.id]).forEach(m => {   // a model with no reported spend has no curve
     const c = SCALE[m.id], path = c.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join('');
     const band = c.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[3]).toFixed(1)}`).join('')
       + [...c].reverse().map(p => `L${X(p[0]).toFixed(1)},${Y(p[2]).toFixed(1)}`).join('') + 'Z';
