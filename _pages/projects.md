@@ -83,6 +83,9 @@ permalink: /paper/
         <li><a href="https://arxiv.org/abs/2609.37221" target="_blank" rel="noopener noreferrer">OptiCom: A Unified Framework for State-Conditioned Composition in LLM-Driven Optimization</a><span class="au">Wei et al.</span><p>Composes search operators according to the state of the run. Averaged over 172 FrontierCS problems, its best of five runs scores 0.693, against 0.632 for the strongest baseline.</p></li>
         <li><a href="https://arxiv.org/abs/2610.00675" target="_blank" rel="noopener noreferrer">LabBook: Harnessing Experimental History for Efficient LLM-Driven Discovery</a><span class="au">Yuan et al.</span><p>Reuses the history of earlier experiments to guide the search. On 49 FrontierCS algorithmic problems its mean best score is 6.13 points above the strongest baseline with DeepSeek V4 Flash.</p></li>
       </ul></div>
+      <div class="built-grp"><h3>Evaluation infra</h3><ul>
+        <li><a href="https://arxiv.org/abs/2609.04298" target="_blank" rel="noopener noreferrer">Harbor Adapters and Harbor-Index: Infrastructure and a Curated Meta-Dataset for Large-Scale Agentic Evaluation</a><span class="au">Shi et al.</span><p>Ports benchmarks to one agent-evaluation format and checks each port against the original. Its catalog has a verified adapter for the FrontierCS algorithmic problems, checked on 10 of the 172.</p></li>
+      </ul></div>
     </div>
   </div>
 </section>
