@@ -470,7 +470,9 @@ function drawPapers() {
   const card = t => `<a class="pg" href="${esc(taskHref(t.s))}" tabindex="-1"><img src="${PAPER_DIR}${slug(t.s)}.webp" alt="" decoding="async" width="150" height="194"></a>`;
   let h = '';
   for (let c = 0; c < cols; c++) {
-    let own = ts.filter((t, i) => i % cols === c); while (own.length < 8) own = own.concat(own);   // tall enough to cover the frame
+    // only about four neighbouring columns are in view at once, so the papers are dealt over four columns and the deal repeats:
+    // every paper passes through the frame, whichever columns it shows
+    let own = ts.filter((t, i) => i % 4 === c % 4); while (own.length < 8) own = own.concat(own);   // tall enough to cover the frame
     const list = own.map(card).join('');
     h += `<div class="pcol${c % 2 ? ' dn' : ''}" style="left:${(c - cols / 2) * (pw + gap)}px;top:${-(own.length * (pw * 1.3 + gap)) / 2 + (c % 3) * 40}px;animation-duration:${44 + (c % 4) * 7}s">${list}${list}</div>`;
   }
