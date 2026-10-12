@@ -24,15 +24,17 @@ addEventListener('scroll', () => { spyRaf ||= requestAnimationFrame(spy); }, {pa
 
 /* ---------- scroll-in animation ----------
    The mean-score, FECI and test-time scaling charts play once when they first come into view (owner, 2026-10-11): bars
-   grow from 0, dots slide in from 0 along their row, curves are uncovered left to right. A chart drawn again later (resize,
+   grow from 0, run dots appear one after another and then the mean (owner, 2026-10-11), curves are uncovered left to right.
+   A chart starts once 65% of it is on screen, or, if it is taller than that, once it fills 65% of the window (owner: 30% was too early). A chart drawn again later (resize,
    fonts) is drawn still. Off with reduced motion, without IntersectionObserver, and for the thread cards (CHART_H). */
 const shown = new Set(), moving = !matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window && !window.CHART_H;
-const io = moving && new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return;
+const io = moving && new IntersectionObserver(es => es.forEach(e => {
+  if (!e.isIntersecting || (e.intersectionRatio < .65 && e.intersectionRect.height < innerHeight * .65)) return;
   const svg = e.target; io.unobserve(svg); shown.add(svg.id); svg.getBoundingClientRect();
-  requestAnimationFrame(() => requestAnimationFrame(() => svg.classList.remove('pre'))); }), {threshold:.3});
+  requestAnimationFrame(() => requestAnimationFrame(() => svg.classList.remove('pre'))); }), {threshold:[...Array(21).keys()].map(k => k / 20)});
 // whether this draw of the chart animates; call before drawing its children
 const animates = svg => { const on = moving && !shown.has(svg.id); svg.classList.toggle('anim', on); svg.classList.toggle('pre', on); if (on) io.observe(svg); return on; };
-// mark an element: kind a-bar | a-wipe | a-fade | a-slide, delay in s, dx the slide's start offset in px
+// mark an element: kind a-bar | a-wipe | a-fade | a-pop, delay in s, dx a start offset in px (unused for now)
 const mark = (el, kind, d = 0, dx = 0) => { el.classList.add(kind); el.style.setProperty('--d', d.toFixed(2) + 's'); if (dx) el.style.setProperty('--dx', dx.toFixed(1) + 'px'); return el; };
 
 /* ---------- leaderboard chart ---------- */
@@ -226,20 +228,21 @@ function drawLB() {
     r.items.forEach((it, k) => {
       const yc = y0 + h / 2;
       const ss = it.runs.map(x => x.s), mu = mean(ss);
-      const d = ri * .07;
+      // the play: this row's run dots pop in one after another, lowest score first, over 1.1 s, rows 0.06 s apart; then the range line, the mean and its value
+      const d = ri * .06, dn = 1.1 / Math.max(1, it.runs.length), dm = d + 1.25, rank = new Map([...it.runs].sort((a, b) => a.s - b.s).map((x, k) => [x, k]));
       if (ss.length > 1) { const rg = sv('line', {x1:X(Math.min(...ss)), x2:X(Math.max(...ss)), y1:yc, y2:yc, stroke:MCOL[it.m], 'stroke-width':2, opacity:.35});
-        svg.append(rg); if (an) mark(rg, 'a-fade', .7 + d); }
+        svg.append(rg); if (an) mark(rg, 'a-fade', dm - .2); }
       if (showRuns) it.runs.forEach((x, j) => {
         const jy = ((j * 37) % 17 - 8) * (narrow ? .9 : 1.2);
         const c = sv('circle', {cx:X(x.s), cy:yc + jy, r:4.5, fill:MCOL[it.m], opacity:.4});
-        svg.append(c); if (an) mark(c, 'a-fade', .7 + d); pts.push({x:X(x.s), y:yc + jy, html:`<b>${esc(MNAME[it.m])}</b><br>${esc(x.t)} · ${esc(x.d)}<br>Final score <b>${f1(x.s)}</b>`});
+        svg.append(c); if (an) mark(c, 'a-pop', d + rank.get(x) * dn); pts.push({x:X(x.s), y:yc + jy, html:`<b>${esc(MNAME[it.m])}</b><br>${esc(x.t)} · ${esc(x.d)}<br>Final score <b>${f1(x.s)}</b>`});
       });
       const dot = sv('circle', {cx:X(mu), cy:yc, r:8, fill:MCOL[it.m], stroke:'#fff', 'stroke-width':2});
       pts.push({x:X(mu), y:yc, html:`<b>${esc(MNAME[it.m])}</b><br>Mean <b>${f1(mu)}</b>`, mean:true});
       // the mean sits above its own dot, with a white halo over the run dots
       const val = sv('text', {class:'val halo', x:X(mu), y:yc - 15, fill:MCOL[it.m], 'text-anchor':'middle'}, f1(mu));
       svg.append(dot, val);
-      if (an) { mark(dot, 'a-slide', d, X(0) - X(mu)); mark(val, 'a-slide', d, X(0) - X(mu)); }
+      if (an) { mark(dot, 'a-pop', dm); mark(val, 'a-fade', dm + .15); }
     });
     y0 += h;
   });
