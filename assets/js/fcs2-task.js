@@ -60,8 +60,8 @@ function drawCharts() {
   drawFinal(); drawDev(); if (TFIT[cur.t.s]) drawFit();
 }
 
-/* One bar per model, ranked by FECI: the mean final score of its runs on this task, in its colour; with several runs,
-   a thin white tick per run on the bar. The human baseline, the authors' code, is a bar of its own on top, outlined
+/* One bar per model, ranked by FECI: its best final score on this task, in its colour (owner, 2026-10-11: a model that
+   ran the task more than once shows its best run). The human baseline, the authors' code, is a bar of its own on top, outlined
    (owner, 2026-10-11: bars, no passed / did-not-pass marks, no vertical line). */
 function drawFinal() {
   const {t, runs} = cur, ref = REF[t.s], ms = RANKED.filter(m => runs.some(r => r[0] === m.id));
@@ -87,16 +87,15 @@ function drawFinal() {
     pts.push({x:X(ref), y:yc, mean:true, html:`<b>Human baseline</b>, the authors’ code<br>Score <b>${f1(ref)}</b>`});
   }
   ms.forEach((m, i) => {
-    const yc = T + (i + (ref != null ? 1 : 0)) * lane + lane / 2, rs = runs.filter(r => r[0] === m.id), sc = rs.map(r => r[2]), mu = mean(sc), np = rs.filter(r => r[3]).length;
+    const yc = T + (i + (ref != null ? 1 : 0)) * lane + lane / 2, rs = runs.filter(r => r[0] === m.id), sc = rs.map(r => r[2]), mu = Math.max(...sc), np = rs.filter(r => r[3]).length;
     svg.append(sv('text', {class:'lab', x:L - 12, y:yc + 4, 'text-anchor':'end'}, narrow ? m.short : m.name));
     svg.append(sv('rect', {class:'mbar', x:L, y:yc - bh / 2, width:Math.max(1.5, X(mu) - L), height:bh, rx:2, fill:MCOL[m.id], opacity:.88}));
-    if (rs.length > 1) sc.forEach(v => svg.append(sv('line', {x1:X(v), x2:X(v), y1:yc - bh / 2 + 3, y2:yc + bh / 2 - 3, stroke:'#fff', 'stroke-width':1.5, opacity:X(v) <= X(mu) ? 1 : 0})));
-    svg.append(sv('text', {class:'val', x:X(mu) + 8, y:yc + 4.5, fill:'var(--ink-2)'}, rs.length > 1 && !narrow ? `${f1(mu)} · mean of ${rs.length} runs` : f1(mu)));
-    pts.push({x:X(mu), y:yc, mean:true, html:`<b>${esc(m.name)}</b><br>Final score <b>${f1(mu)}</b>${rs.length > 1 ? `, mean of ${rs.length} runs (${sc.map(f1).join(', ')})` : ''}<br>${np ? `Passed in ${np} of ${rs.length}` : 'Did not pass'}`});
+    svg.append(sv('text', {class:'val', x:X(mu) + 8, y:yc + 4.5, fill:'var(--ink-2)'}, f1(mu)));
+    pts.push({x:X(mu), y:yc, mean:true, html:`<b>${esc(m.name)}</b><br>Final score <b>${f1(mu)}</b>${rs.length > 1 ? `, best of ${rs.length} runs (${sc.map(f1).join(', ')})` : ''}<br>${np ? `Passed in ${np} of ${rs.length}` : 'Did not pass'}`});
   });
   attachTip(svg, W, H, pts, $('#fstip'));
   $('#fslegend').innerHTML = '';
-  $('#fsnote').textContent = 'Each bar is a model’s mean final score on this task. A run passes only when its final submission beats the human baseline on every metric of every hidden workload, so a bar longer than the human baseline’s is not always a pass.';
+  $('#fsnote').textContent = 'Each bar is a model’s best final score on this task. A run passes only when its final submission beats the human baseline on every metric of every hidden workload, so a bar longer than the human baseline’s is not always a pass.';
 }
 
 /* Every run's development score at each submission against its estimated spend so far, US$ on a log scale. */
