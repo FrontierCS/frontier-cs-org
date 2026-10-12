@@ -12,7 +12,7 @@ button{font:inherit; color:inherit; cursor:pointer}
 .col{max-width:1320px; margin-inline:auto}
 .num{font-variant-numeric:tabular-nums}
 
-.sub{position:sticky; top:env(safe-area-inset-top,0px); z-index:25; background:var(--bg); margin-inline:calc(-1 * var(--gutter)); padding-inline:var(--gutter); border-bottom:1px solid var(--line)}
+.sub{position:sticky; top:env(safe-area-inset-top,0px); z-index:25; background:var(--bg); margin-inline:clamp(-60px, -4.2vw, -20px); padding-inline:var(--gutter); border-bottom:1px solid var(--line)}
 .sub .col{display:flex; gap:30px; overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch}
 .sub .col::-webkit-scrollbar{display:none}
 .sub a{flex:none; text-decoration:none; color:var(--ink-2); font-size:16px; padding:15px 0 13px; border-bottom:2px solid transparent; white-space:nowrap}
@@ -42,11 +42,11 @@ h2{font-weight:600; font-size:clamp(25px,2.4vw,30px); line-height:1.2; margin:0}
 .pcol{position:absolute; display:flex; flex-direction:column; gap:18px; animation:pdrift 48s linear infinite; transform-style:preserve-3d}
 .pcol.dn{animation-direction:reverse}
 .papers:hover .pcol{animation-play-state:paused}
-@keyframes pdrift{from{transform:translateY(0)} to{transform:translateY(calc(-50% - 9px))}}
+@keyframes pdrift{from{transform:translateY(0)} to{transform:translateY(-50%) translateY(-9px)}}
 .pg{flex:none; display:block; width:150px; height:194px; border-radius:4px; overflow:hidden; background:#fff; box-shadow:0 2px 6px rgba(32,33,36,.18),0 0 0 1px rgba(32,33,36,.08); transition:transform .25s, box-shadow .25s}
 .pg img{display:block; width:100%; height:100%; object-fit:cover; object-position:top}
 .pg:hover{transform:translateZ(24px); box-shadow:0 14px 28px rgba(32,33,36,.28),0 0 0 1px rgba(32,33,36,.08)}
-@media (max-width:640px){ .papers{height:300px} .pcol{gap:12px} .pg{width:110px; height:142px} @keyframes pdrift{to{transform:translateY(calc(-50% - 6px))}} }
+@media (max-width:640px){ .papers{height:300px} .pcol{gap:12px} .pg{width:110px; height:142px} @keyframes pdrift{to{transform:translateY(-50%) translateY(-6px)}} }
 @media (prefers-reduced-motion:reduce){ .pcol{animation:none} }
 #teaser{margin:44px 0 0}
 .pill{display:inline-flex; align-items:center; align-self:flex-start; gap:8px; background:var(--mint); color:#041e49; border:0; border-radius:50px; font-weight:600; font-size:14px; padding:6px 11px; text-decoration:none; margin-top:auto}
@@ -69,7 +69,7 @@ h2{font-weight:600; font-size:clamp(25px,2.4vw,30px); line-height:1.2; margin:0}
 .plot .lab{fill:var(--ink); font-size:13px; font-weight:500}
 .plot .val{font-size:12.5px; font-weight:600}
 .plot .ax{fill:var(--ink); font-size:13px; font-weight:500}
-.tip{position:absolute; z-index:5; pointer-events:none; background:#fff; border:1px solid var(--line-2); box-shadow:0 6px 18px rgba(32,33,36,.14); border-radius:6px; padding:8px 10px; font-size:13px; line-height:1.35; white-space:nowrap; transform:translate(-50%,calc(-100% - 12px))}
+.tip{position:absolute; z-index:5; pointer-events:none; background:#fff; border:1px solid var(--line-2); box-shadow:0 6px 18px rgba(32,33,36,.14); border-radius:6px; padding:8px 10px; font-size:13px; line-height:1.35; white-space:nowrap; transform:translate(-50%,-100%) translateY(-12px)}
 .tip b{font-weight:600}
 .legend{display:flex; flex-wrap:wrap; gap:6px 16px; margin-top:14px; font-size:14px}
 .legend span{display:inline-flex; align-items:center; gap:7px}
