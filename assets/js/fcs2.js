@@ -273,14 +273,14 @@ function drawHow() {
   svg = $('#howbsvg'); W = Math.max(300, $('#howbplot').clientWidth); narrow = W < 560;
   const ds = fits.map(([s, [d]]) => ({s, d})).sort((a, b) => a.d - b.d);
   const lo = Math.floor(ds[0].d / 50) * 50, hi = Math.ceil(ds[ds.length - 1].d / 50) * 50;
-  L = narrow ? 58 : 70; R = narrow ? 12 : 24; const rowT = 34, rowM = 34, gapR = 18, Bb = 46;
+  L = narrow ? 58 : 70; R = narrow ? 12 : 24; const rowT = 34, rowM = 34, gapR = 18, Bb = 52;
   // tasks stack upward where their dots would touch
   const XB = v => L + (v - lo) / (hi - lo) * (W - L - R), rr = narrow ? 3.5 : 4.5, lanes = [];
   ds.forEach(t => { const x = XB(t.d); let j = 0; while (lanes[j] != null && x - lanes[j] < rr * 2 + 1) j++; lanes[j] = x; t.j = j; });
   const nl = Math.max(1, lanes.length), tasksH = Math.max(rowT, nl * (rr * 2 + 1) + 12);
   H = tasksH + gapR + rowM + Bb; const yT = tasksH - 8, yM = tasksH + gapR + rowM / 2;
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
-  for (let v = lo; v <= hi; v += 50) { svg.append(sv('line', {x1:XB(v), x2:XB(v), y1:6, y2:H - Bb + 6, stroke:'var(--grid)', 'stroke-width':1})); svg.append(sv('text', {x:XB(v), y:H - Bb + 22, 'text-anchor':'middle'}, v)); }
+  for (let v = lo; v <= hi; v += 50) { svg.append(sv('line', {x1:XB(v), x2:XB(v), y1:6, y2:H - Bb + 6, stroke:'var(--grid)', 'stroke-width':1})); svg.append(sv('text', {x:XB(v), y:H - Bb + 28, 'text-anchor':'middle'}, v)); }
   svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'FECI'));
   svg.append(sv('text', {class:'lab', x:0, y:yT + 4}, 'Tasks'));
   svg.append(sv('text', {class:'lab', x:0, y:yM + 4}, 'Models'));
@@ -292,7 +292,7 @@ function drawHow() {
     ptsB.push({x:XB(e), y:yM, mean:true, html:`<b>${esc(m.name)}</b><br>FECI <b>${f1(e)}</b>`}); });
   svg.append(sv('text', {class:'val', x:XB(Math.max(...es)) + rm + 8, y:yM + 4.5, fill:'var(--ink-2)'}, `${es.length} models, ${Math.round(Math.min(...es))} to ${Math.round(Math.max(...es))}`));
   svg.append(sv('rect', {x:XB(ECI_HUMAN) - 5.5, y:yM - 5.5, width:11, height:11, fill:'var(--ink)', stroke:'#fff', 'stroke-width':1.5}));
-  svg.append(sv('text', {class:'val halo', x:XB(ECI_HUMAN), y:yM + 24, 'text-anchor':'middle', fill:'var(--ink)'}, `Human ${ECI_HUMAN}`));
+  svg.append(sv('text', {class:'val halo', x:XB(ECI_HUMAN), y:yM + 22, 'text-anchor':'middle', fill:'var(--ink)'}, `Human ${ECI_HUMAN}`));
   ptsB.push({x:XB(ECI_HUMAN), y:yM, mean:true, html:`<b>Human</b>, the authors’ code<br>FECI ${ECI_HUMAN} by definition`});
   attachTip(svg, W, H, ptsB, $('#howbtip'));
 }

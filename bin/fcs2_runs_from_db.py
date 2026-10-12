@@ -270,6 +270,20 @@ def task_facts(db, curves):
     return REF, dict(sorted(FIT.items()))
 
 
+def task_checks(db):
+    """Per task short name: what its judge checks, from the run feedback's check labels (suite/workload/metric, or a bare
+    metric for an aggregate): {'metrics': [metric names in first-seen order], 'final': distinct final-suite workloads}.
+    A run passes only when every check on the final suite passes; the thresholds themselves are not in the database."""
+    out = {}
+    for t, fj in db.execute('select t.name, r.feedback_json from cells ce join runs r on r.id = ce.run_id join tasks t on t.id = ce.task_id where r.feedback_json is not null'):
+        o = out.setdefault(TASK[t][1] or t.split(' — ')[0], {'metrics': [], 'final': set()})
+        for ch in json.loads(fj).get('checks', []):
+            p = ch['label'].split('/')
+            if p[-1] not in o['metrics']: o['metrics'].append(p[-1])
+            if len(p) == 3 and p[0] == 'final': o['final'].add(p[1])
+    return {t: {'metrics': o['metrics'], 'final': len(o['final'])} for t, o in sorted(out.items())}
+
+
 def descriptions():
     """Task short name -> description, from bin/fcs2_descriptions.tsv (tab-separated: short, description)."""
     path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fcs2_descriptions.tsv')
@@ -292,6 +306,7 @@ E, nboot, nbad, pinned, curves = eci(db.execute('''select c.name, t.name, r.disp
   join runs r on r.id = ce.run_id join candidates c on c.id = ce.candidate_id join tasks t on t.id = ce.task_id''').fetchall())
 SC, CO = scaling(db, curves), cost(db)
 REF, TFIT = task_facts(db, curves)
+CHECKS = task_checks(db)
 eci_js = {MODEL[c][0]: list(E[c]) for c in MODEL if c not in HIDDEN}
 block = (f'// One entry per scored run in the preview results database of {when:%Y-%m-%d} (bin/fcs2_runs_from_db.py):\n'
          f'// model, domain, task, final score (0-100, the task\'s own scale), passed (1 = verdict PASS). Timeouts score 0; {sum(dropped.values())} unscored runs are left out' + ''.join(f'; {c} is left out (only the ECI 0 point)' for c in sorted(HIDDEN)) + '.\n'
@@ -305,6 +320,7 @@ block = (f'// One entry per scored run in the preview results database of {when:
          f"// Cost per model: [mean US$ per scored run, runs]; output tokens x output price + every token x cache-read price (PRICE above).\nconst COST = {json.dumps(CO)};\nconst PRICE = {json.dumps(PRICE)};\n"
          f"// Every scored run: [model, task, final score, passed, US$ at end, hours, [[US$, dev score] per development submission]].\nconst TRAJ = {json.dumps(trajectories(db), separators=(',', ':'), ensure_ascii=False)};\n"
          f"// Per task: the authors' reference score, and its FECI curve [difficulty, slope] (score = 100 / (1 + exp(-slope (FECI - difficulty)))).\nconst REF = {json.dumps(REF, ensure_ascii=False)};\nconst TFIT = {json.dumps(TFIT, ensure_ascii=False)};\n"
+         f"// Per task: the metrics its judge checks and the number of hidden final workloads; a run passes only when every check passes on every final workload.\nconst CHECKS = {json.dumps(CHECKS, ensure_ascii=False, separators=(',', ':'))};\n"
          f"// Task descriptions from the paper repo (bin/fcs2_descriptions.tsv).\nconst DESC = {json.dumps(descriptions(), ensure_ascii=False)};\n")
 js = open(js_path, encoding='utf-8').read()   # read late: the fits above take minutes
 BEGIN, END = '// BEGIN converter block (bin/fcs2_runs_from_db.py writes everything up to END)\n', '// END converter block\n'
@@ -322,6 +338,6 @@ for a in sys.argv[2:]:
                'pass': pass_rate(runs), 'cost_usd': CO, 'price_per_mtok': PRICE, 'eci': eci_js, 'eci_human': HUMAN_VALUE,
                'eci_low': [LOW_ANCHOR, LOW_VALUE], 'eci_boot_kept': nboot, 'eci_boot_dropped': nbad, 'eci_pinned_task': pinned,
                'eci_reference_tasks': E['reference'][3], 'scaling_columns': ['usd', 'eci', 'lo90', 'hi90', 'share_running'], 'scaling': SC,
-               'task_reference': REF, 'task_fit_columns': ['difficulty', 'slope'], 'task_fit': TFIT}   # per task, for the paper's task-difficulty section
+               'task_reference': REF, 'task_fit_columns': ['difficulty', 'slope'], 'task_fit': TFIT, 'task_checks': CHECKS}   # per task, for the paper's task-difficulty section
         json.dump(out, open(a[7:], 'w'), indent=1)
         print('wrote', a[7:])

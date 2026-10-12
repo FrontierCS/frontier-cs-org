@@ -37,7 +37,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
   <figure class="chart" style="margin:0">
     <div class="chead"><span>Pass rate (over human)</span></div>
     <div class="plot" id="pcplot"><svg id="pcsvg" role="img" aria-label="Pass rate (over human) against cost per run"></svg><div class="tip" id="pctip" hidden></div></div>
-    <div class="cfoot">{% include chart_logo.html %}<span>Preliminary · a run passes when its final submission meets the task’s pass criteria on every workload · cost is estimated from tokens and list prices</span></div>
+    <div class="cfoot">{% include chart_logo.html %}<span>Preliminary · a run passes only when its final submission beats the human baseline on every metric of every hidden workload, not on its total score · cost is estimated from tokens and list prices</span></div>
   </figure>
 
   <details class="tbl-wrap fold" id="domains">
@@ -81,6 +81,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
       <div class="how-body">
         <div class="how-row">
           <div class="how-txt">
+            <p class="how-step"><span>1</span>One curve per task</p>
             <p>FECI puts every model and the authors’ code on one scale. Each task gets an S-shaped curve: a model’s expected score on the task rises from 0 to 100 as its FECI passes the task’s difficulty, the FECI at which the expected score is 50.</p>
             <div class="how-eq">\[\text{expected score} = \frac{100}{1 + e^{-k\,(\text{FECI} - \text{difficulty})}}\]</div>
           </div>
@@ -92,6 +93,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
         </div>
         <div class="how-row">
           <div class="how-txt">
+            <p class="how-step"><span>2</span>One fit, one scale</p>
             <p>One fit estimates every model’s FECI and every task’s difficulty and slope <i>k</i> from all final scores, with Epoch AI’s own fitting code. The authors’ code takes part as one more entrant, Human. The scale is then set so that Human is 60 and Kimi K2.7 Code is 0.</p>
           </div>
           <figure class="chart how-fig">
@@ -99,7 +101,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
             <div class="plot" id="howbplot"><svg id="howbsvg" role="img" aria-label="Task difficulties and model FECI on the FECI scale"></svg><div class="tip" id="howbtip" hidden></div></div>
           </figure>
         </div>
-        <h4>Why FECI</h4>
+        <p class="how-step"><span>3</span>Why FECI</p>
         <ul class="how-why">
           <li><b>It is fair to models that ran different tasks.</b> Each model ran its own set, <span id="how-ntasks">19 to 40</span> of the <span id="how-nall">42</span> tasks with runs. A mean score or a pass rate rewards a model that drew easy tasks; FECI weighs each score by how hard its task is.</li>
           <li><b>It has a human anchor.</b> Every task scores on its own scale. FECI turns them into one number, and 60 always means the authors’ code.</li>
@@ -168,8 +170,9 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
     <h2>Questions</h2>
     <div class="fqlist">
       <details id="q-built"><summary>How is a task built?</summary><div class="ans"><p>We delete a paper’s contribution from its own repository. The agent writes it back and is scored against the authors’ code.</p></div></details>
-      <details id="q-see"><summary>What does the agent see?</summary><div class="ans"><p>It sees its repository and, for each patch, a development score and one message. The evaluator, the hidden suite and the reference stay with the judge. Each run has a wall-clock budget of 5 hours.</p></div></details>
-      <details id="q-bar"><summary>What counts as a pass?</summary><div class="ans"><p>A run passes when its final submission meets the task’s pass criteria on every workload. The criteria are set from the reference’s own measurements. For SVG-EAR, its latency must be at most 0.96 of the reference’s, with PSNR, SSIM and LPIPS within fixed bands.</p></div></details>
+      <details id="q-see"><summary>What does the agent see?</summary><div class="ans"><p>It sees its repository and, for each patch it submits, a score on the development workloads and one message. The development and evaluation sets are separate: the evaluator, the hidden evaluation workloads and the reference stay with the judge. At the end the agent picks one of its versions as its final submission, and only that version is scored on the hidden workloads. Each run has a wall-clock budget of 5 hours.</p></div></details>
+      <details id="q-pick"><summary>What if the agent picks the wrong version?</summary><div class="ans"><p>We report it as it is. Agents sometimes end on a version that fails although an earlier one would have passed. Choosing which version to submit is part of the work we measure, so we do not correct the choice: every run is scored by the submission the agent chose.</p></div></details>
+      <details id="q-bar"><summary>What counts as a pass?</summary><div class="ans"><p>A run passes only when its final submission beats the human baseline, the authors’ code, on every metric the task checks and on every hidden workload. A higher total score is not enough: a run that is faster on average but worse on one metric or one workload does not pass. The criteria are set from the reference’s own measurements. For SVG-EAR, its latency must be at most 0.96 of the reference’s, with PSNR, SSIM and LPIPS within fixed bands. Each task’s page lists the metrics its judge checks.</p></div></details>
       <details id="q-score"><summary>How are scores computed?</summary><div class="ans"><p>The leaderboard’s main number is pass rate, the share of runs that pass by the criteria above. Each task’s evaluator also scores the final submission on the hidden suite, from 0 to 100, and a run that times out scores 0. The mean score chart averages these scores. FECI, the FrontierCS Epoch Capabilities Index, is fitted with Epoch AI’s own ECI code. It fits one logistic curve per task to every model’s score and to the human reference, the authors’ own code, then scales the result so Human is 60 and Kimi K2.7 Code is 0. Kimi K2.7 Code takes part in the fit as this 0 point but is not on the leaderboard. Above 60 means above the authors’ code on each task’s own scale. FECI’s bars are 90% intervals from Epoch’s bootstrap, which resamples each model’s task results. Costs are estimates; “How is cost estimated?” below gives the method. The results are preliminary: <span data-fill="summary">263 runs on 42 tasks by 7 models</span>.</p></div></details>
       <details id="q-scaling"><summary>How is test-time scaling computed?</summary><div class="ans"><p>The agent submits many times during a run, and each submission is scored on the task’s development workloads. At a cost budget, a run counts its latest valid submission within that budget, the latest whose development score is above 0, or a score of 0 if it has none yet. One submission in ten scores 0, mostly from a failed build, validation or correctness gate, and agents usually recover from it; counting such a failure as the run’s result would score an experiment instead of the agent’s working code. Taking the best submission so far instead would choose with hindsight, and agents keep their best development submission as the final one in only 72% of runs. Development scores run above hidden-suite scores, so we shift them by each task’s average gap between the final submission’s development and hidden scores. This leaves an error of 5.5 points per run, against 8.9 without the shift. Once the budget covers a whole run, its hidden final score counts, so every curve ends at the model’s leaderboard value. The budget is the estimated cost, as the next answer explains.</p></div></details>
       <details id="q-cost"><summary>How is cost estimated?</summary><div class="ans"><p>The results record tokens, not dollars. We price a run’s output tokens at the model’s output price and every token it used at the cache-read price, as if all input were a cache hit. Muse Spark 1.3 lists no cache price, so we use the cache-read price its model gateway charged. Prices are list prices in US$ per million tokens, found on October 9, 2026, output and then cache read: GPT-6 Astra 50 and 1.00, GPT-6.1 Sol 10 and 0.10, Kimi K3 15 and 0.30, Qwen 3.8 Max 6 and 0.25, DeepSeek V4.1 Flash 0.60 and 0.003 (off-peak), GLM 5.3 4.40 and 0.26, Muse Spark 1.3 4.25 and 0.15 (gateway). Each agent tool counts tokens its own way, so costs compare orders of magnitude better than small gaps.</p></div></details>
