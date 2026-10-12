@@ -22,6 +22,19 @@ const spy = () => { spyRaf = 0;
   const on = subLinks.find(a => a.classList.contains('on')); on && reveal(on); };
 addEventListener('scroll', () => { spyRaf ||= requestAnimationFrame(spy); }, {passive:true}); spy();
 
+/* ---------- scroll-in animation ----------
+   The mean-score, FECI and test-time scaling charts play once when they first come into view (owner, 2026-10-11): bars
+   grow from 0, dots slide in from 0 along their row, curves are uncovered left to right. A chart drawn again later (resize,
+   fonts) is drawn still. Off with reduced motion, without IntersectionObserver, and for the thread cards (CHART_H). */
+const shown = new Set(), moving = !matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window && !window.CHART_H;
+const io = moving && new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return;
+  const svg = e.target; io.unobserve(svg); shown.add(svg.id); svg.getBoundingClientRect();
+  requestAnimationFrame(() => requestAnimationFrame(() => svg.classList.remove('pre'))); }), {threshold:.3});
+// whether this draw of the chart animates; call before drawing its children
+const animates = svg => { const on = moving && !shown.has(svg.id); svg.classList.toggle('anim', on); svg.classList.toggle('pre', on); if (on) io.observe(svg); return on; };
+// mark an element: kind a-bar | a-wipe | a-fade | a-slide, delay in s, dx the slide's start offset in px
+const mark = (el, kind, d = 0, dx = 0) => { el.classList.add(kind); el.style.setProperty('--d', d.toFixed(2) + 's'); if (dx) el.style.setProperty('--dx', dx.toFixed(1) + 'px'); return el; };
+
 /* ---------- leaderboard chart ---------- */
 // Chart heights the page can override (bin/fcs2_thread_cards.py sets them to fit its 16:9 cards); the page itself sets none.
 const CHART_H = window.CHART_H || {};
@@ -86,13 +99,13 @@ function drawPassCost() {
 /* On phones the model column is as wide as the longest model name, so every name shows in full (owner: "DeepSeek V4.1 Flash", not cut). */
 const nameCol = svg => { svg.replaceChildren(); const w = Math.max(...MODELS.map(m => { const t = sv('text', {class:'lab', x:-999, y:-999}, m.short); svg.append(t); return t.getComputedTextLength(); })); svg.replaceChildren(); return Math.max(112, Math.ceil(w) + 12); };
 
-/* FECI: one row per model ranked by ECI, its 90% interval as a bar. */
+/* FECI: one row per model ranked by ECI, a bar from 0 to its FECI and its 90% interval as a whisker. */
 function drawECI() {
   const order = [...MODELS].sort((a, b) => ECI[b.id][0] - ECI[a.id][0]);
   const svg = $('#ecisvg'), W = Math.max(300, $('#eciplot').clientWidth), narrow = W < 560;
   const L = narrow ? nameCol(svg) : 190, R = 34, T = 14, B = 46, lane = CHART_H.eciLane || (narrow ? 56 : 64);
   const xmax = Math.ceil(Math.max(...MODELS.map(m => ECI[m.id][2])) / 20) * 20, step = narrow && xmax > 120 ? 40 : 20;
-  const H = T + order.length * lane + B;
+  const H = T + order.length * lane + B, an = animates(svg), bh = narrow ? 16 : 18;
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
   const X = v => L + v / xmax * (W - L - R);
   for (let v = 0; v <= xmax; v += step) {
@@ -106,9 +119,11 @@ function drawECI() {
     if (i) svg.append(sv('line', {x1:0, x2:W - R, y1:y0, y2:y0, stroke:'var(--line)', 'stroke-width':1}));
     svg.append(sv('text', {class:'lab', x:0, y:yc + (m.h ? -3 : 4)}, narrow ? m.short : m.name));
     if (m.h) svg.append(sv('text', {x:0, y:yc + 14, 'font-size':12}, m.h));
-    svg.append(sv('line', {x1:X(lo), x2:X(hi), y1:yc, y2:yc, stroke:MCOL[m.id], 'stroke-width':6, 'stroke-linecap':'round', opacity:.25}));
-    svg.append(sv('circle', {cx:X(e), cy:yc, r:7, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':2}));
-    svg.append(sv('text', {class:'val halo', x:X(e), y:yc - 13, fill:MCOL[m.id], 'text-anchor':'middle'}, String(Math.round(e))));
+    const bar = sv('rect', {class:'ebar', x:X(0), y:yc - bh / 2, width:Math.max(0, X(e) - X(0)), height:bh, fill:MCOL[m.id], 'data-m':m.id});
+    const wk = sv('path', {class:'ewhisk', d:`M${X(lo)},${yc}H${X(hi)}M${X(lo)},${yc - 5}v10M${X(hi)},${yc - 5}v10`, fill:'none', stroke:'var(--ink)', 'stroke-width':1.5});
+    const val = sv('text', {class:'val halo', x:X(e), y:yc - bh / 2 - 6, fill:MCOL[m.id], 'text-anchor':'middle'}, String(Math.round(e)));
+    svg.append(bar, wk, val);
+    if (an) { mark(bar, 'a-bar', i * .07); mark(wk, 'a-fade', .55 + i * .07); mark(val, 'a-fade', .55 + i * .07); }
     pts.push({x:X(e), y:yc, mean:true, html:`<b>${esc(m.name)}</b><br>FECI <b>${f1(e)}</b><br>90% interval ${Math.round(lo)}–${Math.round(hi)}`});
   });
   attachTip(svg, W, H, pts, $('#ecitip'));
@@ -124,8 +139,10 @@ function drawTTS() {
   const x0 = Math.log10(Math.min(...all.filter(p => p[1] >= 0).map(p => p[0]))) - 0.5, x1 = Math.log10(Math.max(...all.map(p => p[0])));
   const ymax = Math.ceil(Math.max(...all.map(p => p[3])) / 20) * 20;
   const X = v => L + (Math.log10(v) - x0) / (x1 - x0) * (W - L - R), Y = v => T + (1 - v / ymax) * (H - T - B);
+  const an = animates(svg);
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
-  const clip = sv('clipPath', {id:'ttsclip'}); clip.append(sv('rect', {x:L, y:T - 4, width:W - L - R + 8, height:H - T - B + 4})); svg.append(clip);
+  const clip = sv('clipPath', {id:'ttsclip'}), cr = sv('rect', {x:L, y:T - 4, width:W - L - R + 8, height:H - T - B + 4}); clip.append(cr); svg.append(clip);
+  if (an) mark(cr, 'a-wipe');   // the curves and bands are uncovered left to right, along the budget axis
   for (let v = 0; v <= ymax; v += 20) {
     svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1}));
     svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, v));
@@ -141,10 +158,11 @@ function drawTTS() {
     const c = SCALE[m.id], path = c.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join('');
     const band = c.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[3]).toFixed(1)}`).join('')
       + [...c].reverse().map(p => `L${X(p[0]).toFixed(1)},${Y(p[2]).toFixed(1)}`).join('') + 'Z';
-    g.append(sv('path', {d:band, fill:MCOL[m.id], opacity:.12}));
-    g.append(sv('path', {d:path, fill:'none', stroke:MCOL[m.id], 'stroke-width':2.2, 'stroke-linejoin':'round'}));
-    const e = c[c.length - 1];
-    g.append(sv('circle', {cx:X(e[0]), cy:Y(e[1]), r:4.5, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':1.5}));
+    const bp = sv('path', {d:band, fill:MCOL[m.id], opacity:.12});
+    const lp = sv('path', {d:path, fill:'none', stroke:MCOL[m.id], 'stroke-width':2.2, 'stroke-linejoin':'round'});
+    const e = c[c.length - 1], end = sv('circle', {cx:X(e[0]), cy:Y(e[1]), r:4.5, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':1.5});
+    g.append(bp, lp, end);
+    if (an) mark(end, 'a-fade', 1.3);
     c.forEach(p => { if (p[1] >= 0) pts.push({x:X(p[0]), y:Y(p[1]), html:`<b>${esc(m.name)}</b><br>FECI <b>${f1(p[1])}</b> at ${usdfmt(p[0])} per run`
       + `<br>90% interval ${Math.round(Math.max(p[2], 0))}–${Math.round(p[3])}<br>${Math.round(p[4] * 100)}% of runs still going`}); });
   });
@@ -174,7 +192,7 @@ function drawLB() {
   const L = narrow ? (group === 'model' ? nameCol(svg) : 112) : 190, R = 34, T = 8, B = 46;
   const lane = group === 'model' ? (CHART_H.lbLane || (narrow ? 64 : 76)) : 30;
   const rowH = () => lane;
-  const H = T + rows.reduce((a, r) => a + rowH(r), 0) + B;
+  const H = T + rows.reduce((a, r) => a + rowH(r), 0) + B, an = animates(svg) && group === 'model';
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
   const X = v => L + v / 100 * (W - L - R);
   for (let v = 0; v <= 100; v += 20) {
@@ -208,16 +226,20 @@ function drawLB() {
     r.items.forEach((it, k) => {
       const yc = y0 + h / 2;
       const ss = it.runs.map(x => x.s), mu = mean(ss);
-      if (ss.length > 1) svg.append(sv('line', {x1:X(Math.min(...ss)), x2:X(Math.max(...ss)), y1:yc, y2:yc, stroke:MCOL[it.m], 'stroke-width':2, opacity:.35}));
+      const d = ri * .07;
+      if (ss.length > 1) { const rg = sv('line', {x1:X(Math.min(...ss)), x2:X(Math.max(...ss)), y1:yc, y2:yc, stroke:MCOL[it.m], 'stroke-width':2, opacity:.35});
+        svg.append(rg); if (an) mark(rg, 'a-fade', .7 + d); }
       if (showRuns) it.runs.forEach((x, j) => {
         const jy = ((j * 37) % 17 - 8) * (narrow ? .9 : 1.2);
         const c = sv('circle', {cx:X(x.s), cy:yc + jy, r:4.5, fill:MCOL[it.m], opacity:.4});
-        svg.append(c); pts.push({x:X(x.s), y:yc + jy, html:`<b>${esc(MNAME[it.m])}</b><br>${esc(x.t)} · ${esc(x.d)}<br>Final score <b>${f1(x.s)}</b>`});
+        svg.append(c); if (an) mark(c, 'a-fade', .7 + d); pts.push({x:X(x.s), y:yc + jy, html:`<b>${esc(MNAME[it.m])}</b><br>${esc(x.t)} · ${esc(x.d)}<br>Final score <b>${f1(x.s)}</b>`});
       });
-      svg.append(sv('circle', {cx:X(mu), cy:yc, r:8, fill:MCOL[it.m], stroke:'#fff', 'stroke-width':2}));
+      const dot = sv('circle', {cx:X(mu), cy:yc, r:8, fill:MCOL[it.m], stroke:'#fff', 'stroke-width':2});
       pts.push({x:X(mu), y:yc, html:`<b>${esc(MNAME[it.m])}</b><br>Mean <b>${f1(mu)}</b>`, mean:true});
       // the mean sits above its own dot, with a white halo over the run dots
-      svg.append(sv('text', {class:'val halo', x:X(mu), y:yc - 15, fill:MCOL[it.m], 'text-anchor':'middle'}, f1(mu)));
+      const val = sv('text', {class:'val halo', x:X(mu), y:yc - 15, fill:MCOL[it.m], 'text-anchor':'middle'}, f1(mu));
+      svg.append(dot, val);
+      if (an) { mark(dot, 'a-slide', d, X(0) - X(mu)); mark(val, 'a-slide', d, X(0) - X(mu)); }
     });
     y0 += h;
   });

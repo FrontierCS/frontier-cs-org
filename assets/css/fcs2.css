@@ -301,3 +301,13 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 .tgroup li a:hover{color:var(--teal-d); text-decoration:underline; text-underline-offset:3px}
 .tgroup .ran{display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:600; color:var(--ink-2)}
 .tgroup .ran i{width:8px; height:8px; border-radius:50%; background:var(--teal)}
+
+/* scroll-in animation of the mean-score, FECI and test-time scaling charts (fcs2.js: animates, mark); .pre is the state before the chart comes into view */
+.anim .a-bar{transform-box:fill-box; transform-origin:left center; transition:transform .8s cubic-bezier(.2,.7,.2,1) var(--d,0s)}
+.anim.pre .a-bar{transform:scaleX(0)}
+.anim .a-fade{transition:opacity .45s ease var(--d,0s)}
+.anim.pre .a-fade{opacity:0}
+.anim .a-slide{transition:transform .9s cubic-bezier(.2,.7,.2,1) var(--d,0s), opacity .3s ease var(--d,0s)}
+.anim.pre .a-slide{transform:translateX(var(--dx,0)); opacity:0}
+.anim .a-wipe{transform-box:fill-box; transform-origin:left center; transition:transform 1.4s cubic-bezier(.45,0,.25,1) var(--d,0s)}
+.anim.pre .a-wipe{transform:scaleX(0)}

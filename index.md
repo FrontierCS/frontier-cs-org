@@ -74,7 +74,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
     <figure class="chart" style="margin:0">
       <div class="chead"><span>FrontierCS Epoch Capabilities Index (FECI)</span></div>
       <div class="plot" id="eciplot"><svg id="ecisvg" role="img" aria-label="FECI chart"></svg><div class="tip" id="ecitip" hidden></div></div>
-      <div class="cfoot">{% include chart_logo.html %}<span id="ecinote">Preliminary · Human = 60 (the authors’ reference code), Kimi K2.7 Code = 0 (in the fit, not shown) · bars are 90% intervals</span></div>
+      <div class="cfoot">{% include chart_logo.html %}<span id="ecinote">Preliminary · Human = 60 (the authors’ reference code), Kimi K2.7 Code = 0 (in the fit, not shown) · whiskers are 90% intervals</span></div>
     </figure>
     <details class="fold how" id="feci-how">
       <summary><h3>How FECI works</h3></summary>
