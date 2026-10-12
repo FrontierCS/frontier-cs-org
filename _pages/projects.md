@@ -70,30 +70,6 @@ permalink: /paper/
             <p class="post-desc">Tracks the best solution at every token budget in sessions of up to 100M tokens. On Polyomino Packing, splitting 100M tokens across parallel sessions gains 264 Elo over one long session.</p>
           </div>
         </article>
-        <article class="paper-row">
-          <a class="paper-pg" href="https://arxiv.org/abs/2609.21032" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img src="{{ '/assets/img/fcs1-papers/2609.21032.jpg' | relative_url }}" alt="" width="440" height="570" loading="lazy"></a>
-          <div>
-            <div class="post-meta"><span class="venue plain">arXiv 2026</span></div>
-            <h2 class="post-title"><a href="https://arxiv.org/abs/2609.21032" target="_blank" rel="noopener noreferrer">Scaling Discovery through Test-Time Communication</a></h2>
-            <p class="post-desc">Compares a team of agents that share findings with the best of as many independent agents. On Polyomino Packing the team reaches 0.945, above the best score reported before it.</p>
-          </div>
-        </article>
-        <article class="paper-row">
-          <a class="paper-pg" href="https://arxiv.org/abs/2610.07447" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img src="{{ '/assets/img/fcs1-papers/2610.07447.jpg' | relative_url }}" alt="" width="440" height="570" loading="lazy"></a>
-          <div>
-            <div class="post-meta"><span class="venue plain">arXiv 2026</span></div>
-            <h2 class="post-title"><a href="https://arxiv.org/abs/2610.07447" target="_blank" rel="noopener noreferrer">Fork-and-Flush: Escaping Idea Basins in Autoresearch Agents</a></h2>
-            <p class="post-desc">Periodically forks an agent&rsquo;s run and clears its context so it leaves a plateau. Nine of its thirteen tasks come from FrontierCS; its normalized average is 0.78, against 0.47 for a single run.</p>
-          </div>
-        </article>
-        <article class="paper-row">
-          <a class="paper-pg" href="https://arxiv.org/abs/2610.07625" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img src="{{ '/assets/img/fcs1-papers/2610.07625.jpg' | relative_url }}" alt="" width="440" height="570" loading="lazy"></a>
-          <div>
-            <div class="post-meta"><span class="venue plain">arXiv 2026</span></div>
-            <h2 class="post-title"><a href="https://arxiv.org/abs/2610.07625" target="_blank" rel="noopener noreferrer">Stateless Language Agents: Scaling Long-Horizon Automated Research</a></h2>
-            <p class="post-desc">Keeps the research state in the harness and builds a fresh context for every agent call. On a FrontierCS algorithm-design problem it scores 59.5 at 200M tokens, against 58.0 for the strongest baseline.</p>
-          </div>
-        </article>
       </div>
     </div>
 
@@ -114,22 +90,6 @@ permalink: /paper/
             <div class="post-meta"><span class="venue">COLM 2026</span></div>
             <h2 class="post-title"><a href="https://arxiv.org/abs/2602.23413" target="_blank" rel="noopener noreferrer">EvoX: Meta-Evolution for Automated Discovery</a></h2>
             <p class="post-desc">Evolves the search strategy during a run as well as the solutions. On the FrontierCS algorithmic problems, with 100 iterations each, it reaches a mean of 62.6 and a median of 75.5.</p>
-          </div>
-        </article>
-        <article class="paper-row">
-          <a class="paper-pg" href="https://arxiv.org/abs/2604.01658" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img src="{{ '/assets/img/fcs1-papers/2604.01658.jpg' | relative_url }}" alt="" width="440" height="570" loading="lazy"></a>
-          <div>
-            <div class="post-meta"><span class="venue">COLM 2026</span></div>
-            <h2 class="post-title"><a href="https://arxiv.org/abs/2604.01658" target="_blank" rel="noopener noreferrer">CORAL: Towards Autonomous Multi-Agent Evolution for Open-Ended Discovery</a></h2>
-            <p class="post-desc">Replaces fixed evolutionary rules with long-running agents that share memory. On Polyomino Packing, four agents reach 89.4% coverage, against 56.0% for a single attempt.</p>
-          </div>
-        </article>
-        <article class="paper-row">
-          <a class="paper-pg" href="https://arxiv.org/abs/2610.00675" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img src="{{ '/assets/img/fcs1-papers/2610.00675.jpg' | relative_url }}" alt="" width="440" height="570" loading="lazy"></a>
-          <div>
-            <div class="post-meta"><span class="venue plain">arXiv 2026</span></div>
-            <h2 class="post-title"><a href="https://arxiv.org/abs/2610.00675" target="_blank" rel="noopener noreferrer">LabBook: Harnessing Experimental History for Efficient LLM-Driven Discovery</a></h2>
-            <p class="post-desc">Reuses the history of earlier experiments to guide the search. On 49 FrontierCS algorithmic problems its mean best score is 6.13 points above the strongest baseline with DeepSeek V4 Flash.</p>
           </div>
         </article>
       </div>
