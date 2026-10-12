@@ -91,6 +91,7 @@ fcs1:
 # fsmith: authors of "FrontierSmith: Synthesizing Open-Ended Coding Problems at Scale", in the order and with the
 #   equal-contribution marks of arXiv 2605.14445v1. Homepages are the ones already listed under fcs1.
 fsmith:
+  short: "FrontierSmith"
   title: "FrontierSmith: Synthesizing Open-Ended Coding Problems at Scale"
   url: "https://arxiv.org/abs/2605.14445"
   venue: "NeurIPS 2026 Spotlight"
@@ -112,3 +113,65 @@ fsmith:
     - {name: Alex Dimakis}
     - {name: Joseph E. Gonzalez, url: "https://people.eecs.berkeley.edu/~jegonzal/"}
     - {name: Alvin Cheung, url: "https://people.eecs.berkeley.edu/~akcheung/"}
+
+# lcbpro: authors in the order and with the equal-contribution marks of arXiv 2506.11928v1. Homepages are the ones already listed under fcs1.
+lcbpro:
+  short: "LiveCodeBench Pro"
+  title: "LiveCodeBench Pro: How Do Olympiad Medalists Judge LLMs in Competitive Programming?"
+  url: "https://arxiv.org/abs/2506.11928"
+  venue: "NeurIPS 2025"
+  authors:
+    - {name: Zihan Zheng, eq: true}
+    - {name: Zerui Cheng, eq: true}
+    - {name: Zeyu Shen, eq: true}
+    - {name: Shang Zhou, eq: true, url: "https://scholar.google.com/citations?user=_0dEBNAAAAAJ"}
+    - {name: Kaiyuan Liu, eq: true}
+    - {name: Hansen He, eq: true}
+    - {name: Dongruixuan Li}
+    - {name: Stanley Wei}
+    - {name: Hangyi Hao}
+    - {name: Jianzhu Yao}
+    - {name: Peiyao Sheng}
+    - {name: Zixuan Wang}
+    - {name: Wenhao Chai, url: "https://wenhaochai.com/"}
+    - {name: Aleksandra Korolova, url: "https://www.korolova.com/"}
+    - {name: Peter Henderson, url: "https://www.peterhenderson.co/"}
+    - {name: Sanjeev Arora}
+    - {name: Pramod Viswanath}
+    - {name: Jingbo Shang, url: "https://shangjingbo1226.github.io/"}
+    - {name: Saining Xie, url: "https://www.sainingxie.com/"}
+
+# tts: authors in the order and with the equal-contribution marks of arXiv 2609.15309v1. Homepages are the ones already listed under fcs1.
+tts:
+  short: "When Agents Slow Down"
+  title: "When Agents Slow Down: Understanding LLM Agents' Test-Time Strategies via Elo-per-token Analysis"
+  url: "https://arxiv.org/abs/2609.15309"
+  venue: "arXiv, September 2026"
+  authors:
+    - {name: Kaiyuan Liu, eq: true}
+    - {name: Qiuyang Mang, eq: true, url: "https://joyemang33.github.io"}
+    - {name: Bo Peng}
+    - {name: Wenhao Chai, url: "https://wenhaochai.com/"}
+    - {name: Hanchen Li, url: "https://hanchenli.github.io/"}
+    - {name: Shreyas Pimpalgaonkar}
+    - {name: Luke Zettlemoyer}
+    - {name: Alex Dimakis}
+    - {name: Alvin Cheung, url: "https://people.eecs.berkeley.edu/~akcheung/"}
+
+# easyppo: authors in the order and with the equal-contribution marks of arXiv 2609.36802v1. Homepages are the ones already listed under fcs1.
+easyppo:
+  short: "EasyPPO"
+  title: "EasyPPO: Stabilizing the Critic Is Key"
+  url: "https://arxiv.org/abs/2609.36802"
+  venue: "arXiv, September 2026"
+  authors:
+    - {name: Xuanyi Zhou, eq: true}
+    - {name: Qiuyang Mang, eq: true, url: "https://joyemang33.github.io"}
+    - {name: Huanzhi Mao, eq: true}
+    - {name: Dacheng Li}
+    - {name: Wenhao Chai, url: "https://wenhaochai.com/"}
+    - {name: Mayank Mishra}
+    - {name: Yichuan Wang}
+    - {name: Karthik Narasimhan}
+    - {name: Alvin Cheung, url: "https://people.eecs.berkeley.edu/~akcheung/"}
+    - {name: Joseph E. Gonzalez, url: "https://people.eecs.berkeley.edu/~jegonzal/"}
