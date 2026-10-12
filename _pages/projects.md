@@ -1,14 +1,14 @@
 ---
 layout: default
 title: Research
-description: Open-ended problems drawn from computer-science research, and the papers that take them further.
+description: Benchmarking advances in computer-science research, and the papers that take them further.
 permalink: /paper/
 ---
 
 <section class="page-hero one-line">
   <div class="page" id="main" tabindex="-1">
     <h1>Research</h1>
-    <p class="lede">Open-ended problems drawn from computer-science research, and the papers that take them further.</p>
+    <p class="lede">Benchmarking advances in computer-science research, and the papers that take them further.</p>
   </div>
 </section>
 
