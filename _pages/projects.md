@@ -64,6 +64,10 @@ permalink: /paper/
     <h2 class="built-h">Built on FrontierCS</h2>
     <p class="built-lede">Research that uses the FrontierCS benchmarks.</p>
     <div class="built">
+      <div class="built-grp"><h3>Post-training</h3><ul>
+        <li><a href="https://arxiv.org/abs/2606.29082" target="_blank" rel="noopener noreferrer">Evolution Fine-Tuning: Learning to Discover Across 371 Optimization Tasks</a><span class="au">Lee et al.</span><p>Turns evolutionary search runs into training data; nearly half of its 371 tasks derive from FrontierCS. On held-out problems its 9B model averages 46.01, against 32.46 for the base model.</p></li>
+        <li><a href="https://arxiv.org/abs/2609.38288" target="_blank" rel="noopener noreferrer">AREX-2: Advancing Self-Improving Agents through Long-Horizon Reflective Tasks</a><span class="au">Qian et al.</span><p>Trains a 27B agent on long trajectories in which it keeps improving its own solution. On 188 FrontierCS tasks it scores 70.7, 16.0 points above the strongest open-weight baseline.</p></li>
+      </ul></div>
       <div class="built-grp"><h3>Test-time scaling</h3><ul>
         <li><a href="https://arxiv.org/abs/2609.21032" target="_blank" rel="noopener noreferrer">Scaling Discovery through Test-Time Communication</a><span class="au">Park et al.</span><p>Compares a team of agents that share findings with the best of as many independent agents. On Polyomino Packing the team reaches 0.945, above the best score reported before it.</p></li>
         <li><a href="https://arxiv.org/abs/2610.06269" target="_blank" rel="noopener noreferrer">Evolving in Thought Space: Training a Small Model at Test Time Unlocks Better Discoveries</a><span class="au">Jiang et al.</span><p>Trains a small guidance model with reinforcement learning during the search; a frozen model writes the code. On Polyomino Packing it reaches 91.89, against 89.40 for CORAL and 89.10 for the human reference.</p></li>
@@ -78,10 +82,6 @@ permalink: /paper/
         <li><a href="https://arxiv.org/abs/2609.02749" target="_blank" rel="noopener noreferrer">Repo-To-Skill: Distilling GitHub Repositories Into AI4AI Skills</a><span class="au">Chen et al.</span><p>Distills GitHub repositories and papers into verified skills for a research agent. On 188 FrontierCS tasks the skills raise Codex from 70.63 to 77.14.</p></li>
         <li><a href="https://arxiv.org/abs/2609.37221" target="_blank" rel="noopener noreferrer">OptiCom: A Unified Framework for State-Conditioned Composition in LLM-Driven Optimization</a><span class="au">Wei et al.</span><p>Composes search operators according to the state of the run. Averaged over 172 FrontierCS problems, its best of five runs scores 0.693, against 0.632 for the strongest baseline.</p></li>
         <li><a href="https://arxiv.org/abs/2610.00675" target="_blank" rel="noopener noreferrer">LabBook: Harnessing Experimental History for Efficient LLM-Driven Discovery</a><span class="au">Yuan et al.</span><p>Reuses the history of earlier experiments to guide the search. On 49 FrontierCS algorithmic problems its mean best score is 6.13 points above the strongest baseline with DeepSeek V4 Flash.</p></li>
-      </ul></div>
-      <div class="built-grp"><h3>Post-training</h3><ul>
-        <li><a href="https://arxiv.org/abs/2606.29082" target="_blank" rel="noopener noreferrer">Evolution Fine-Tuning: Learning to Discover Across 371 Optimization Tasks</a><span class="au">Lee et al.</span><p>Turns evolutionary search runs into training data; nearly half of its 371 tasks derive from FrontierCS. On held-out problems its 9B model averages 46.01, against 32.46 for the base model.</p></li>
-        <li><a href="https://arxiv.org/abs/2609.38288" target="_blank" rel="noopener noreferrer">AREX-2: Advancing Self-Improving Agents through Long-Horizon Reflective Tasks</a><span class="au">Qian et al.</span><p>Trains a 27B agent on long trajectories in which it keeps improving its own solution. On 188 FrontierCS tasks it scores 70.7, 16.0 points above the strongest open-weight baseline.</p></li>
       </ul></div>
     </div>
   </div>
