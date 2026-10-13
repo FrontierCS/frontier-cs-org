@@ -87,15 +87,12 @@ function drawPassCost() {
       [cx + 8, cy - 11, 'start'], [cx - 8, cy - 11, 'end'], [cx + 8, cy + 20, 'start'], [cx - 8, cy + 20, 'end'],
       [cx, cy - 31, 'middle'], [cx, cy + 40, 'middle'], [cx + 6, cy - 29, 'start'], [cx - 6, cy - 29, 'end'], [cx + 6, cy + 38, 'start'], [cx - 6, cy + 38, 'end'],
       [cx, cy - 49, 'middle'], [cx, cy + 58, 'middle'], [cx - 6, cy - 47, 'end'], [cx - 6, cy + 56, 'end']];
-    const box = ([x, y, an]) => ({x:an === 'start' ? x : an === 'end' ? x - w : x - w / 2, y:y - 13, w, h:18});   // the rendered text's height
+    const box = ([x, y, an]) => ({x:an === 'start' ? x : an === 'end' ? x - w : x - w / 2, y:y - 11, w, h:14});   // the glyphs' own height, so a label can sit beside its dot in a tight cluster
     const hit = q => boxes.some(o => q.x < o.x + o.w && o.x < q.x + q.w && q.y < o.y + o.h && o.y < q.y + q.h) || q.x < L || q.x + q.w > W || q.y < 0;
     const spot = spots.find(sp => !hit(box(sp)));
     if (spot) { boxes.push(box(spot)); lab.setAttribute('x', spot[0]); lab.setAttribute('y', spot[1]); lab.setAttribute('text-anchor', spot[2]);
-      // a label wears its dot's colour, darkened to read on white, so a crowded patch still pairs each name with its dot;
-      // one that sits above or below its dot, not beside it, is also tied to it by a short line
-      const ink = `color-mix(in srgb, ${MCOL[m.id]} 78%, #000)`; lab.style.fill = ink;
-      if (spots.indexOf(spot) > 1) { const b = box(spot), up = spot[1] < cy, tx = Math.max(b.x + 4, Math.min(b.x + b.w - 4, cx));
-        svg.insertBefore(sv('line', {x1:cx, y1:cy + (up ? -8 : 8), x2:tx, y2:up ? b.y + b.h - 3 : b.y + 2, stroke:ink, 'stroke-width':1.2}), lab); } }
+      // a label wears its dot's colour, darkened to read on white, so a crowded patch still pairs each name with its dot
+      lab.style.fill = `color-mix(in srgb, ${MCOL[m.id]} 78%, #000)`; }
     else lab.remove();
     const pct = PASS[m.id][0];
     pts.push({x:cx, y:cy, mean:true, html:`<b>${esc(m.name)}</b><br>Pass rate <b>${f1(pct)}%</b><br>${usdfmt(COST[m.id][0])} per run, mean`});
