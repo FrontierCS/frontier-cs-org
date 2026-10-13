@@ -58,7 +58,7 @@ permalink: /team/
   </div></div>
   <ul class="logo-wall">
     {%- for i in site.data.team.institutions %}
-    <li><img src="{{ 'assets/img/institutions/wordmarks/' | append: i.logo | relative_url }}" alt="{{ i.name }}" style="--h:{{ i.h }}px"></li>
+    <li><img src="{{ 'assets/img/institutions/wordmarks/' | append: i.logo | relative_url }}" alt="{{ i.name }}" style="--h:{{ i.h }}px; --h-sm:{{ i.h | times: 0.75 }}px"></li>
     {%- endfor %}
   </ul>
 </div>

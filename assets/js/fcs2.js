@@ -380,6 +380,7 @@ function squarify(vals, x, y, w, h) {
   }
   return out;
 }
+const CHIP_SHORT = {'Programming Languages':'Languages', 'Machine Learning':'ML', 'Bioinformatics':'Bio', 'Cryptography':'Crypto', 'Architecture':'Arch'};   // map chips only, where the full name does not fit
 function drawMap() {
   stopPlay(false);
   const svg = $('#mapsvg'), W = $('#map').clientWidth, narrow = W < 640, H = narrow ? Math.round(W * 1.15) : Math.round(W * 0.36);
@@ -399,23 +400,22 @@ function drawMap() {
         for (let c = 0; c < cnt; c++, i++) tiles += taskArt(ts[i].s, a.k).replace('<svg class="art"', `<svg class="tile" data-s="${esc(ts[i].s)}" data-k="${a.k}" x="${(x0 + c * (tw + gap)).toFixed(1)}" y="${(y0 + r * (th + gap)).toFixed(1)}" width="${tw.toFixed(1)}" height="${th.toFixed(1)}" preserveAspectRatio="xMidYMid slice"`); }
       g.insertAdjacentHTML('beforeend', `<clipPath id="${cid}"><rect x="${x0}" y="${y0}" width="${bw}" height="${bh}" rx="${narrow ? 6 : 8}"/></clipPath><g clip-path="url(#${cid})"><rect x="${x0}" y="${y0}" width="${bw}" height="${bh}" fill="#fff"/>${tiles}</g>`);
       svg.append(g);
-      // a white chip at the top left: name and count, then the name alone, lying flat, then standing up along the left edge
+      // a white chip at the top left: name and count, then the name alone, lying flat, then standing up along the left edge.
+      // The large sizes are tried in all four forms before the small one, so a tall narrow block gets a standing chip at full
+      // size instead of a tiny flat one; a block too small for the full name takes its short name (CHIP_SHORT).
       const ink = AINK[a.k], meas = (str, fs) => { const t = sv('text', {x:-999, y:-999, 'font-size':fs, 'font-weight':600}, str); svg.append(t); const w = t.getComputedTextLength(); t.remove(); return w; };
-      // a block too small for its name takes a shorter one, so no domain goes unnamed
-      const SHORTER = {'Bioinformatics':'Bioinfo', 'Programming Languages':'PL', 'Machine Learning':'ML', 'Architecture':'Arch', 'Cryptography':'Crypto'};
-      let named = false;
-      for (const nm of [d, SHORTER[d]].filter(Boolean)) { if (named) break;
-      for (const rot of [false, true]) { let done = false;
-        for (const cnt of [true, false]) { for (const fs of narrow ? [13, 11, 10] : [15, 13, 11]) {
-          const pw = meas(cnt ? `${nm}  ${n}` : nm, fs) + fs * 1.2, ph = fs * 1.75, m = fs < 13 ? 4 : 8, along = rot ? bh : bw, across = rot ? bw : bh;
-          if (pw + 2 * m > along || ph + 2 * m > across) continue;
-          const ox = x0 + m, oy = rot ? y0 + bh - m : y0 + m, chip = sv('g', {'pointer-events':'none', transform:rot ? `rotate(-90 ${ox} ${oy})` : null});
-          chip.append(sv('rect', {x:ox, y:oy, width:pw.toFixed(1), height:ph.toFixed(1), rx:(ph / 2).toFixed(1), fill:'#fff'}));
-          const t = sv('text', {x:(ox + fs * .6).toFixed(1), y:(oy + ph * .68).toFixed(1), 'font-size':fs, 'font-weight':600, fill:ink}, nm);
-          if (cnt) t.append(sv('tspan', {'font-weight':400, dx:fs * .45}, n));
-          chip.append(t); g.append(chip); done = named = true; break; }
-          if (done) break; }
-        if (done) break; } }
+      const big = narrow ? [13, 11] : [15, 13], small = narrow ? [10] : [11];
+      const forms = [];
+      for (const [sizes, name] of [[big, d], [small, d], [small, CHIP_SHORT[d]]]) if (name)
+        for (const rot of [false, true]) for (const cnt of [true, false]) for (const fs of sizes) forms.push({name, rot, cnt, fs});
+      for (const {name, rot, cnt, fs} of forms) {
+        const pw = meas(cnt ? `${name}  ${n}` : name, fs) + fs * 1.2, ph = fs * 1.75, m = fs < 11 ? 3 : fs < 13 ? 4 : 8, along = rot ? bh : bw, across = rot ? bw : bh;
+        if (pw + 2 * m > along || ph + 2 * m > across) continue;
+        const ox = x0 + m, oy = rot ? y0 + bh - m : y0 + m, chip = sv('g', {'pointer-events':'none', transform:rot ? `rotate(-90 ${ox} ${oy})` : null});
+        chip.append(sv('rect', {x:ox, y:oy, width:pw.toFixed(1), height:ph.toFixed(1), rx:(ph / 2).toFixed(1), fill:'#fff'}));
+        const t = sv('text', {x:(ox + fs * .6).toFixed(1), y:(oy + ph * .68).toFixed(1), 'font-size':fs, 'font-weight':600, fill:ink}, name);
+        if (cnt) t.append(sv('tspan', {'font-weight':400, dx:fs * .45}, n));
+        chip.append(t); g.append(chip); break; }
     });
   });
 }

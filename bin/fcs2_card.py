@@ -23,7 +23,7 @@ html,body{{margin:0}}
 .card{{position:relative; width:{W}px; height:{H}px; background:#fff; color:#1f1f1f; font-family:'Hanken Grotesk',sans-serif; overflow:hidden}}
 .txt{{position:absolute; left:56px; top:52px; bottom:52px; width:{W - MW - 40 - 56 - 48}px; display:flex; flex-direction:column}}
 .brand{{display:flex; align-items:center; gap:12px; font-size:26px; font-weight:500; letter-spacing:-.015em}}
-.brand svg{{width:17px; height:17px; color:#0b57d0}}
+.brand svg{{width:26px; height:26px}}
 h1{{font-size:64px; font-weight:600; line-height:1; letter-spacing:-.02em; margin:auto 0 18px}}
 .sub{{font-size:29px; font-weight:500; line-height:1.2; margin:0 0 20px}}
 .lead{{font-size:21px; line-height:1.35; color:#5f6368; margin:0 0 auto}}
@@ -34,7 +34,7 @@ svg#map text{{font-family:'Hanken Grotesk',sans-serif}}
 <script src="{(JS / 'fcs2-data.js').as_uri()}"></script><script src="{(JS / 'fcs2-art.js').as_uri()}"></script></head>
 <body><div class="card">
 <div class="txt">
-  <div class="brand"><svg viewBox="49 47 81 100"><path d="M59.78 135.86 L75.94 71.24 A17.5 17.5 0 0 1 92.89 58 L118.5 58" fill="none" stroke="currentColor" stroke-width="21" stroke-linecap="round"/><circle cx="109" cy="97" r="10.5" fill="currentColor"/></svg>FrontierCS</div>
+  <div class="brand"><svg viewBox="4.5 14.44 81.06 81.06"><path d="M10 40 A50 50 0 0 1 60 90" fill="none" style="stroke:var(--mk-in,#1f1f1f)" stroke-width="11" stroke-linecap="round"/><path d="M50.45 19.94 A80.9 80.9 0 0 1 80.06 49.55" fill="none" style="stroke:var(--mk-out,#0b57d0)" stroke-width="11" stroke-linecap="round"/></svg>FrontierCS</div>
   <h1>FrontierCS 2</h1>
   <p class="sub">A benchmark for agentic computer&#8209;science R&amp;D</p>
   <p class="lead" id="lead"></p>
@@ -75,18 +75,20 @@ function draw() {{
       g.insertAdjacentHTML('beforeend', `<clipPath id="${{cid}}"><rect x="${{x0}}" y="${{y0}}" width="${{bw}}" height="${{bh}}" rx="8"/></clipPath><g clip-path="url(#${{cid}})"><rect x="${{x0}}" y="${{y0}}" width="${{bw}}" height="${{bh}}" fill="#fff"/>${{tiles}}</g>`);
       svg.append(g);
       const ink = AINK[a.k], meas = (str, fs) => {{ const t = sv('text', {{x:-999, y:-999, 'font-size':fs, 'font-weight':600}}, str); svg.append(t); const w = t.getComputedTextLength(); t.remove(); return w; }};
+      // as drawMap(): the large sizes in all four forms before the small one, then the short name (CHIP_SHORT in fcs2.js)
       let labeled = false;
-      for (const rot of [false, true]) {{ let done = false;
-        for (const cnt of [true, false]) {{ for (const fs of [15, 13, 11]) {{
-          const pw = meas(cnt ? `${{d}}  ${{n}}` : d, fs) + fs * 1.2, ph = fs * 1.75, m = fs < 13 ? 4 : 8, along = rot ? bh : bw, across = rot ? bw : bh;
-          if (pw + 2 * m > along || ph + 2 * m > across) continue;
-          const ox = x0 + m, oy = rot ? y0 + bh - m : y0 + m, chip = sv('g', {{transform:rot ? `rotate(-90 ${{ox}} ${{oy}})` : null}});
-          chip.append(sv('rect', {{x:ox, y:oy, width:pw.toFixed(1), height:ph.toFixed(1), rx:(ph / 2).toFixed(1), fill:'#fff'}}));
-          const t = sv('text', {{x:(ox + fs * .6).toFixed(1), y:(oy + ph * .68).toFixed(1), 'font-size':fs, 'font-weight':600, fill:ink}}, d);
-          if (cnt) t.append(sv('tspan', {{'font-weight':400, dx:fs * .45}}, n));
-          chip.append(t); g.append(chip); done = labeled = true; break; }}
-          if (done) break; }}
-        if (done) break; }}
+      const SHORTN = {{'Programming Languages':'Languages', 'Machine Learning':'ML', 'Bioinformatics':'Bio', 'Cryptography':'Crypto', 'Architecture':'Arch'}};
+      const forms = [];
+      for (const [sizes, name] of [[[15, 13], d], [[11], d], [[11], SHORTN[d]]]) if (name)
+        for (const rot of [false, true]) for (const cnt of [true, false]) for (const fs of sizes) forms.push({{name, rot, cnt, fs}});
+      for (const {{name, rot, cnt, fs}} of forms) {{
+        const pw = meas(cnt ? `${{name}}  ${{n}}` : name, fs) + fs * 1.2, ph = fs * 1.75, m = fs < 13 ? 4 : 8, along = rot ? bh : bw, across = rot ? bw : bh;
+        if (pw + 2 * m > along || ph + 2 * m > across) continue;
+        const ox = x0 + m, oy = rot ? y0 + bh - m : y0 + m, chip = sv('g', {{transform:rot ? `rotate(-90 ${{ox}} ${{oy}})` : null}});
+        chip.append(sv('rect', {{x:ox, y:oy, width:pw.toFixed(1), height:ph.toFixed(1), rx:(ph / 2).toFixed(1), fill:'#fff'}}));
+        const t = sv('text', {{x:(ox + fs * .6).toFixed(1), y:(oy + ph * .68).toFixed(1), 'font-size':fs, 'font-weight':600, fill:ink}}, name);
+        if (cnt) t.append(sv('tspan', {{'font-weight':400, dx:fs * .45}}, n));
+        chip.append(t); g.append(chip); labeled = true; break; }}
       if (!labeled) unlabeled.push(d);
     }});
   }});
