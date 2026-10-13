@@ -87,15 +87,16 @@ const KEYM = (() => { const L = 'Latency', TP = 'Throughput', ACC = 'Accuracy', 
 }; })();
 // Where each paper appeared, for the map card. Checked against the venue's own record: the PVLDB volume in the link
 // (16, 17, 18 are VLDB 2023, 2024, 2025), the first page of the PDF, arXiv's comments or journal reference, ePrint's
-// publication info, or Crossref. A paper with no venue on record is listed as an arXiv preprint with its year.
+// publication info, Crossref, or the conference's own programme page (ICLR 2026, RSS 2025, USENIX Security 2026).
+// SVG-EAR's venue is from its authors (owner, 2026-10-13). A paper with no venue found is an arXiv preprint with its year.
 const VENUE = {
-  'ScaleGPM':'VLDB 2025', 'Yannakakis':'VLDB 2025', 'SVG-EAR':'arXiv 2026', 'BBQ':'NSDI 2024', 'Adaptive attacks':'arXiv 2025', 'Hygra':'PPoPP 2020',
+  'ScaleGPM':'VLDB 2025', 'Yannakakis':'VLDB 2025', 'SVG-EAR':'ECCV 2026', 'BBQ':'NSDI 2024', 'Adaptive attacks':'USENIX Security 2026', 'Hygra':'PPoPP 2020',
   'Approximate-MIPS Query Stopping':'VLDB 2023', 'FARGO paper-aligned query core':'VLDB 2023', 'Spectrum':'VLDB 2024', 'Shockwave':'NSDI 2023',
   'BABBLE':'POPL 2023', 'SCOPE':'VLDB 2024', 'Diffusion Policy':'RSS 2023', 'Hacking Blind':'IEEE S&P 2014', 'LeJEPA':'arXiv 2026', 'Progent':'arXiv 2025',
   'egg':'POPL 2021', 'Spectre':'IEEE S&P 2019', 'Opal':'arXiv 2026', 'Clusterwise SpGEMM':'SC 2025', 'Persistent Treap Update Engine':'VLDB 2025',
   'Polygon':'PLDI 2025', 'KAMI':'SC 2025', 'ParButterfly':'APOCS 2020', 'Parallel DBSCAN':'SIGMOD 2020', 'RegionsSort':'SPAA 2019', 'Seer':'VLDB 2025',
-  'Polar Express':'arXiv 2025', 'kmeans kernel':'arXiv 2026', 'Robust Image Tokenizer':'ICLR 2026', 'Differentiable Population Statistics':'arXiv 2026',
-  'Glenside':'MAPS 2021', 'MetaOpt':'SIGCOMM 2025', 'OCR Distillation Trajectory Sampling':'arXiv 2026', 'MuJoCo Playground':'arXiv 2025',
+  'Polar Express':'ICLR 2026', 'kmeans kernel':'arXiv 2026', 'Robust Image Tokenizer':'ICLR 2026', 'Differentiable Population Statistics':'arXiv 2026',
+  'Glenside':'MAPS 2021', 'MetaOpt':'SIGCOMM 2025', 'OCR Distillation Trajectory Sampling':'arXiv 2026', 'MuJoCo Playground':'RSS 2025',
   'Residual State Advancement':'VLDB 2023', 'QuarterPIR':'EUROCRYPT 2024', 'dbscan kernel':'Blog', 'ivf_pq kernel':'Blog', 'knn kernel':'Blog',
   'RAGEN':'arXiv 2025', 'DyT':'CVPR 2025', 'Nano World Model':'arXiv 2026', 'Exact Sequence Alignment':'Bioinformatics 2017', 'CKKS noise':'IACR CiC 2025',
   'Binary Fuse Filter Construction and Lookup':'ACM JEA 2022', 'RUNLTS':'CBP 2025',
