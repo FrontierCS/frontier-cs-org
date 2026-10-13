@@ -414,24 +414,46 @@ function startPlay(tile) {
   play = {tile, g:root, card, who, runs, k:0, x, y, w, h, back};
   if (runs.length) play.t = setTimeout(showRun, calm ? 0 : 200);
 }
+// The card plays every run of the task, two at a time: best development score so far against US$ spent, both on one spend
+// axis so the pair can be compared, and each line ends in its run's verdict (a tick or a cross in a disc). Runs are ordered by
+// how much their curve moves (the most steps up in best score, then the largest climb, then the model's place on the
+// leaderboard) and taken in pairs; an odd run out plays alone (owner, 2026-10-13).
+function cardPairs(runs) {
+  const rank = Object.fromEntries(RANKED.map((m, i) => [m.id, i]));
+  const shape = r => { let best = -1, steps = 0, first = null; r[6].forEach(([, v]) => { if (v > best + .5) { if (best >= 0) steps++; best = v; } if (first === null && v > 0) first = v; }); return [steps, best - (first ?? best)]; };
+  const by = runs.map(r => [r, shape(r)]).sort((a, b) => b[1][0] - a[1][0] || b[1][1] - a[1][1] || rank[a[0][0]] - rank[b[0][0]]).map(x => x[0]);
+  const out = []; for (let i = 0; i < by.length; i += 2) out.push(by.slice(i, i + 2).sort((a, b) => rank[a[0]] - rank[b[0]]));
+  return out;
+}
 function showRun() {
-  const p = play, [m, , , , end, , seq] = p.runs[p.k], n = p.runs.length;
-  const PL = 24, PR = 24, PT = 44, PB = 44, sw = 4;
-  const x0 = seq[0][0], x1 = Math.max(end, ...seq.map(q => q[0]));
+  const p = play; p.pairs = p.pairs || cardPairs(p.runs);
+  const field = ART_FIELD[p.tile.dataset.k];
+  const two = p.pairs[p.k], n = p.pairs.length;
+  const PL = 24, PR = 24, PT = 44, PB = 62;
+  const x0 = Math.min(...two.map(r => r[6][0][0])), x1 = Math.max(...two.map(r => Math.max(r[4], ...r[6].map(q => q[0]))));
   const X = v => p.x + PL + (v - x0) / (x1 - x0 || 1) * (p.w - PL - PR), Y = v => p.y + PT + (1 - v / 100) * (p.h - PT - PB);
-  let best = -1, d = '';
-  seq.forEach(([u, v], i) => { best = Math.max(best, v); d += i ? `H${X(u).toFixed(1)}V${Y(best).toFixed(1)}` : `M${X(u).toFixed(1)},${Y(best).toFixed(1)}`; });
-  d += `H${X(x1).toFixed(1)}`;
-  const line = sv('g', {class:'pline'}), path = sv('path', {d, pathLength:1, fill:'none', stroke:'#fff', 'stroke-width':sw, 'stroke-linejoin':'round', 'stroke-linecap':'round'});
-  const dot = sv('circle', {cx:X(x1), cy:Y(best), r:6.5, fill:'#fff', opacity:calm ? 1 : 0});
-  line.append(path, dot); p.card.querySelector('.pline')?.remove(); p.card.append(line);
-  p.who.textContent = MNAME[m];
-  const draw = calm ? 0 : 1100, hold = 1300;
-  if (!calm) {
-    path.setAttribute('stroke-dasharray', '1 1');
-    path.animate([{strokeDashoffset:1}, {strokeDashoffset:0}], {duration:draw, easing:'cubic-bezier(.6,0,.3,1)', fill:'forwards'});
-    dot.animate([{opacity:0}, {opacity:1}], {duration:200, delay:draw - 100, fill:'forwards'});
-  }
+  const line = sv('g', {class:'pline'}), draw = calm ? 0 : 1100, hold = 1600;
+  two.forEach(([m, , , ok, end, , seq], j) => {
+    const xe = Math.max(end, ...seq.map(q => q[0])), op = j ? .6 : 1; let best = -1, d = '';
+    seq.forEach(([u, v], i) => { best = Math.max(best, v); d += i ? `H${X(u).toFixed(1)}V${Y(best).toFixed(1)}` : `M${X(u).toFixed(1)},${Y(best).toFixed(1)}`; });
+    d += `H${X(xe).toFixed(1)}`;
+    const path = sv('path', {d, pathLength:1, fill:'none', stroke:'#fff', 'stroke-opacity':op, 'stroke-width':j ? 3 : 4, 'stroke-linejoin':'round', 'stroke-linecap':'round'});
+    // the line ends in its verdict: a white disc holding a tick for a pass, a cross for a fail, in the field's colour
+    const ex = X(xe), ey = Y(best), R = j ? 8 : 9.5, dot = sv('g', {opacity:calm ? 1 : 0, 'aria-label':ok ? 'Pass' : 'Fail'});
+    dot.append(sv('circle', {cx:ex, cy:ey, r:R, fill:'#fff'}), sv('path', {d:ok ? `M${ex - R * .46},${ey + R * .04}l${R * .32},${R * .34}l${R * .6},${-R * .7}` : `M${ex - R * .36},${ey - R * .36}l${R * .72},${R * .72}M${ex + R * .36},${ey - R * .36}l${-R * .72},${R * .72}`,
+      fill:'none', stroke:field, 'stroke-width':2.2, 'stroke-linecap':'round', 'stroke-linejoin':'round'}));
+    // the legend sits along the bottom: a stroke sample in the line's own weight, then the model
+    const ly = p.y + p.h - 36 + j * 21;
+    line.append(path, dot, sv('line', {x1:p.x + 14, x2:p.x + 36, y1:ly - 4, y2:ly - 4, stroke:'#fff', 'stroke-opacity':op, 'stroke-width':j ? 3 : 4, 'stroke-linecap':'round'}),
+      sv('text', {x:p.x + 44, y:ly, 'font-size':13, 'font-weight':j ? 400 : 600, fill:'#fff'}, MNAME[m]));
+    if (!calm) {
+      path.setAttribute('stroke-dasharray', '1 1');
+      path.animate([{strokeDashoffset:1}, {strokeDashoffset:0}], {duration:draw, easing:'cubic-bezier(.6,0,.3,1)', fill:'forwards'});
+      dot.animate([{opacity:0}, {opacity:1}], {duration:200, delay:draw - 100, fill:'forwards'});
+    }
+  });
+  p.card.querySelector('.pline')?.remove(); p.card.append(line);
+  p.who.textContent = '';
   if (n > 1) p.t = setTimeout(() => {
     const go = () => { if (play !== p) return; p.k = (p.k + 1) % n; showRun(); };
     if (calm) go(); else line.animate([{opacity:1}, {opacity:0}], {duration:250, fill:'forwards'}).onfinish = go;

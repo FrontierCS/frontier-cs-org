@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build the sqlite.db that bin/fcs2_runs_from_db.py reads, straight from the evaluation platform's read-only API.
 
-usage: python3 bin/fcs2_db_from_platform.py out.db [--api=http://127.0.0.1:18080/api/v1/] [--min-scored=40]
+usage: python3 bin/fcs2_db_from_platform.py out.db [--api=http://127.0.0.1:18080/api/v1/] [--min-scored=40] [--claude-usage=recovered.json]
 
 Takes every formal 47-task evaluation that is not archived and has at least --min-scored scored runs (one per model;
 the newest wins), and writes the tables the converter queries: release, candidates, tasks, cells, runs, submissions,
@@ -66,7 +66,24 @@ for c in items:
     if len(both) >= 8:
         import numpy as np
         RATE[c] = np.linalg.lstsq(np.array([[u.get(k) or 0 for k in KINDS] for u in both], float), np.array([u['estimated_cost_usd'] for u in both]), rcond=None)[0]
+# --claude-usage=FILE: usage recovered from saved Claude Code traces (schema frontiercs2.opus55-usage-recovered/v1), for runs
+# the API has no usage for. An exact run keeps its reported cost. A lower-bound run (the trace stops before the run ends)
+# is priced from the token classes of the saved part at OPUS_RATE, scaled up by the file's estimate of the run's total
+# tokens; the missing part of the trace is the only estimate in it.
+# OPUS_RATE, US$ per million tokens (output, cache read, cache write): the cost Claude Code reports for Opus 5.5 equals
+# these rates exactly on 32 of the file's 34 exact runs (to the cent); the other two report about $2 more than the rates give.
+OPUS_RATE = (20.0, 0.20, 8.0)
+RECOVERED = {}
+for a in sys.argv[2:]:
+    if a.startswith('--claude-usage='):
+        for x in json.load(open(a[15:]))['runs']:
+            if x['usage_status'] == 'exact': RECOVERED[x['run_id']] = x['estimated_cost_usd']
+            else:
+                known = (x['known_output_tokens'] * OPUS_RATE[0] + x['cache_read_input_tokens'] * OPUS_RATE[1] + x['cache_creation_input_tokens'] * OPUS_RATE[2]) / 1e6
+                RECOVERED[x['run_id']] = known * x['estimated_total_tokens'] / x['known_total_tokens']
+
 def agent_usd(c, r):
+    if r['id'] in RECOVERED: return RECOVERED[r['id']]
     u = claude(r)
     if u.get('estimated_cost_usd'): return u['estimated_cost_usd']
     return float(max(0, RATE[c] @ [u.get(k) or 0 for k in KINDS])) if u and c in RATE else 0
