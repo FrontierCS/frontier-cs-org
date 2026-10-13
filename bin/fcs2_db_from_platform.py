@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Build the sqlite.db that bin/fcs2_runs_from_db.py reads, straight from the evaluation platform's read-only API.
 
-usage: python3 bin/fcs2_db_from_platform.py out.db [--api=http://127.0.0.1:18080/api/v1/] [--min-scored=40]
+usage: python3 bin/fcs2_db_from_platform.py out.db [--api=http://127.0.0.1:18080/api/v1/] [--min-scored=40] [--claude-usage=recovered.json]
 
-Takes every formal 47-task evaluation that is not archived and has at least --min-scored scored runs (one per model;
-the newest wins; the API lists at most the newest 200 evaluations), and writes the tables the converter queries: release, candidates, tasks, cells, runs, submissions,
+Takes every formal evaluation of the full task set (47 tasks or more) that is not archived and has at least --min-scored scored runs (one per model;
+the newest wins), and writes the tables the converter queries: release, candidates, tasks, cells, runs, submissions,
 score_points. Only GET requests are made.
 
 What the API does not give, and what stands in for it:
@@ -28,7 +28,9 @@ for a in sys.argv[2:]:
     if a.startswith('--min-scored='): MIN = int(a[13:])
 # cache-read US$ per million tokens, as PRICE in the converter, keyed by the platform's candidate name
 CACHE = {'GPT-6 Astra': 1.00, 'GPT-6.1 Sol': 0.10, 'Kimi K3 (Modal)': 0.30, 'DeepSeek V4.1 Flash (DSH)': 0.003, 'Muse Code - Muse Spark 1.3': 0.15, 'GLM 5.3 (ZCode)': 0.26,
-         'Claude Code · Opus 5.5 (Subscription, max effort)': None, 'Kimi K2.7 Code': None}   # None: run on a subscription, the platform reports no usage
+         'Claude Code · Opus 5.5 (Subscription, max effort)': None, 'Kimi K2.7 Code': None, 'Muse Code · Muse Wonder 1.0': None,
+         'Codex · Qwen 3.8 Max': 0.25,           # as 'qwen' in the converter's PRICE
+         'GLM 5.3 Flash (ZCode)': 0.03}          # list cached-input rate, eesel.ai's GLM-5.3-Flash pricing write-up, found 2026-10-13   # None: run on a subscription, the platform reports no usage
 
 
 def get(path):
@@ -39,8 +41,16 @@ def get(path):
 
 ts = lambda s: datetime.fromisoformat(s[:19]).replace(tzinfo=timezone.utc).timestamp()
 evs = {}
-for e in sorted(get('evaluations?limit=200'), key=lambda e: e['created_at']):
-    if e['is_formal'] and e['total_runs'] == 47 and not e['archived_at'] and e['candidate_name'] in CACHE: evs[e['candidate_name']] = e
+def evaluations():
+    """Every evaluation: the list is paged, 200 at a time, with the next page's cursor in the x-next-cursor header."""
+    out, cursor = [], None
+    while True:
+        r = urllib.request.urlopen(API + 'evaluations?limit=200' + (f'&cursor={cursor}' if cursor else ''), timeout=30)
+        out += json.load(r); cursor = r.headers.get('x-next-cursor')
+        if not cursor: return out
+
+for e in sorted(evaluations(), key=lambda e: e['created_at']):
+    if e['is_formal'] and e['total_runs'] >= 47 and not e['archived_at'] and e['candidate_name'] in CACHE: evs[e['candidate_name']] = e
 items = {c: get('evaluations/' + e['id'])['items'] for c, e in evs.items()}
 done = lambda i: i['score'] is not None or i['run_state'] == 'TIMED_OUT'   # a timeout is a result: it scores 0
 items = {c: v for c, v in items.items() if sum(map(done, v)) >= MIN}
@@ -58,7 +68,24 @@ for c in items:
     if len(both) >= 8:
         import numpy as np
         RATE[c] = np.linalg.lstsq(np.array([[u.get(k) or 0 for k in KINDS] for u in both], float), np.array([u['estimated_cost_usd'] for u in both]), rcond=None)[0]
+# --claude-usage=FILE: usage recovered from saved Claude Code traces (schema frontiercs2.opus55-usage-recovered/v1), for runs
+# the API has no usage for. An exact run keeps its reported cost. A lower-bound run (the trace stops before the run ends)
+# is priced from the token classes of the saved part at OPUS_RATE, scaled up by the file's estimate of the run's total
+# tokens; the missing part of the trace is the only estimate in it.
+# OPUS_RATE, US$ per million tokens (output, cache read, cache write): the cost Claude Code reports for Opus 5.5 equals
+# these rates exactly on 32 of the file's 34 exact runs (to the cent); the other two report about $2 more than the rates give.
+OPUS_RATE = (20.0, 0.20, 8.0)
+RECOVERED = {}
+for a in sys.argv[2:]:
+    if a.startswith('--claude-usage='):
+        for x in json.load(open(a[15:]))['runs']:
+            if x['usage_status'] == 'exact': RECOVERED[x['run_id']] = x['estimated_cost_usd']
+            else:
+                known = (x['known_output_tokens'] * OPUS_RATE[0] + x['cache_read_input_tokens'] * OPUS_RATE[1] + x['cache_creation_input_tokens'] * OPUS_RATE[2]) / 1e6
+                RECOVERED[x['run_id']] = known * x['estimated_total_tokens'] / x['known_total_tokens']
+
 def agent_usd(c, r):
+    if r['id'] in RECOVERED: return RECOVERED[r['id']]
     u = claude(r)
     if u.get('estimated_cost_usd'): return u['estimated_cost_usd']
     return float(max(0, RATE[c] @ [u.get(k) or 0 for k in KINDS])) if u and c in RATE else 0

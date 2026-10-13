@@ -74,6 +74,11 @@ h2{font-weight:600; font-size:clamp(25px,2.4vw,30px); line-height:1.2; margin:0}
 .legend{display:flex; flex-wrap:wrap; gap:6px 16px; margin-top:14px; font-size:14px}
 .legend span{display:inline-flex; align-items:center; gap:7px}
 .legend i{width:12px; height:12px; display:inline-block}
+#ttslegend button{display:inline-flex; align-items:center; gap:7px; padding:3px 9px 3px 7px; margin:-3px -9px -3px -7px; border:0; border-radius:14px; background:none; font:inherit; color:var(--ink); cursor:pointer}
+#ttslegend button:hover{background:var(--grid)}
+#ttslegend button.off{color:var(--ink-2)}
+#ttslegend button.off i{background:#c9ccd1!important}
+#ttslegend{gap:10px 26px}
 .cfoot{display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:16px; padding-top:14px; border-top:1px solid var(--line); font-size:13px; color:var(--muted-2)}
 /* the FrontierCS logo (mark and wordmark) signs each chart at the bottom left (owner, 2026-10-11) */
 .cfoot .clogo{display:inline-flex; align-items:center; gap:6px; flex:none; white-space:nowrap; font:500 15px/1 'Instrument Sans',var(--sans); letter-spacing:-.01em; color:var(--ink)}
@@ -311,3 +316,5 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 .anim.pre .a-pop{transform:scale(0); opacity:0}
 .anim .a-wipe{transform-box:fill-box; transform-origin:left center; transition:transform 1.4s cubic-bezier(.45,0,.25,1) var(--d,0s)}
 .anim.pre .a-wipe{transform:scaleX(0)}
+.anim .a-draw{stroke-dasharray:1; stroke-dashoffset:0; transition:stroke-dashoffset .9s cubic-bezier(.5,0,.3,1) var(--d,0s)}
+.anim.pre .a-draw{stroke-dashoffset:1}

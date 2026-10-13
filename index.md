@@ -1,7 +1,7 @@
 ---
 layout: default
 title: FrontierCS 2
-description: A benchmark of 47 open-ended computer-science R&D tasks built from published papers, where the authors’ own code is the reference to beat.
+description: A benchmark of 48 open-ended computer-science R&D tasks built from published papers, where the authors’ own code is the reference to beat.
 permalink: /
 page_css: fcs2
 og_image: assets/img/fcs2-card.png   # share card for X and other link previews, drawn by bin/fcs2_card.py
@@ -16,7 +16,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
   <div class="hero">
   <div class="hero-text">
   <p class="upd"><i></i><span>Last updated: {{ site.time | date: "%B %-d, %Y" }}</span></p>
-  <h1>FrontierCS 2: A benchmark for agentic computer-science R&amp;D</h1>
+  <h1>FrontierCS 2: A benchmark for computer-science R&amp;D</h1>
   <p class="lead">Each task deletes a published paper’s contribution from the repository its authors released. The agent writes it back, and the authors’ own code is the reference it must beat.</p>
 
   <div class="links"><a class="pill lg" id="paperlink" aria-disabled="true">Paper (coming soon)</a></div>
@@ -28,7 +28,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
 
   <figure class="chart" id="teaser">
     <div class="chead"><span>Tasks</span></div>
-    <div class="map" id="map"><svg id="mapsvg" aria-label="The 47 tasks by domain"></svg></div>
+    <div class="map" id="map"><svg id="mapsvg" aria-label="The 48 tasks by domain"></svg></div>
   </figure>
 </section>
 
@@ -37,7 +37,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
   <figure class="chart" style="margin:0">
     <div class="chead"><span>Pass rate (over human)</span></div>
     <div class="plot" id="pcplot"><svg id="pcsvg" role="img" aria-label="Pass rate (over human) against cost per run"></svg><div class="tip" id="pctip" hidden></div></div>
-    <div class="cfoot">{% include chart_logo.html %}<span>Preliminary · a run passes only when its final submission beats the human baseline on every metric of every hidden workload, not on its total score · cost is the platform’s estimate, a lower bound for Kimi K3, DeepSeek V4.1 Flash and GLM 5.3</span></div>
+    <div class="cfoot">{% include chart_logo.html %}<span>Preliminary · a run passes only when its final submission beats the human baseline on every metric of every hidden workload, not on its total score · cost is the platform’s estimate, a lower bound for Kimi K3, DeepSeek V4.1 Flash, GLM 5.3, GLM 5.3 Flash and Qwen 3.8 Max</span></div>
   </figure>
 
   <details class="tbl-wrap fold" id="domains">
@@ -108,7 +108,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
       <div class="chead"><span>Test-time scaling: FECI against cost budget per run</span></div>
       <div class="plot" id="ttsplot"><svg id="ttssvg" role="img" aria-label="Test-time scaling chart"></svg><div class="tip" id="ttstip" hidden></div></div>
       <div class="legend" id="ttslegend"></div>
-      <div class="cfoot">{% include chart_logo.html %}<span>Preliminary · within a budget, a run counts the development score of its latest valid submission; past its end, its hidden final score · spend at a submission is the run’s spend prorated by wall time · bands are 90% intervals</span></div>
+      <div class="cfoot">{% include chart_logo.html %}<span>Preliminary · within a budget, a run counts the best development score it has reached, capped at its final hidden score · spend at a submission is the run’s spend prorated by wall time · bands are 90% intervals</span></div>
     </figure>
   </div>
 </section>

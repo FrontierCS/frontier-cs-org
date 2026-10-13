@@ -34,7 +34,7 @@ const io = moving && new IntersectionObserver(es => es.forEach(e => {
   requestAnimationFrame(() => requestAnimationFrame(() => svg.classList.remove('pre'))); }), {threshold:[...Array(21).keys()].map(k => k / 20)});
 // whether this draw of the chart animates; call before drawing its children
 const animates = svg => { const on = moving && !shown.has(svg.id); svg.classList.toggle('anim', on); svg.classList.toggle('pre', on); if (on) io.observe(svg); return on; };
-// mark an element: kind a-bar | a-wipe | a-fade | a-pop, delay in s, dx a start offset in px (unused for now)
+// mark an element: kind a-bar | a-wipe | a-fade | a-pop | a-draw (a path with pathLength 1), delay in s, dx a start offset in px (unused for now)
 const mark = (el, kind, d = 0, dx = 0) => { el.classList.add(kind); el.style.setProperty('--d', d.toFixed(2) + 's'); if (dx) el.style.setProperty('--dx', dx.toFixed(1) + 'px'); return el; };
 
 /* ---------- leaderboard chart ---------- */
@@ -50,7 +50,7 @@ $('#showruns').addEventListener('change', e => { showRuns = e.target.checked; dr
 $('#custom').addEventListener('click', () => { const s = $('#settings'); const o = !s.classList.contains('open'); s.classList.toggle('open', o); $('#custom').setAttribute('aria-expanded', String(o)); });
 $('#lblegend').innerHTML = RANKED.map(m => `<span><i style="background:${MCOL[m.id]}"></i>${esc(m.name)}</span>`).join('');
 
-/* Main chart: pass rate against mean cost per run in US$, one dot per model (PASS, COST). Each label takes the first
+/* Main chart: pass rate against mean cost per run in US$, one dot per model (PASS, COST); the dots on the Pareto frontier are emphasised. Each label takes the first
    spot right, left, above or below its dot that clears every dot, every placed label and the edges; a dot with no free
    spot keeps no label (the tooltip still names it). No legend: the labels name the dots. */
 function drawPassCost() {
@@ -59,9 +59,9 @@ function drawPassCost() {
   const ms = MODELS.filter(m => COST[m.id]), tx = ms.map(m => COST[m.id][0]);
   // the axis runs 0.15 decade past the outermost dots and no further (owner, 2026-10-10: half-decade rounding left
   // the range loose); an edge dot whose label has no room on its outer side takes another spot
-  // (on phones the right side keeps a little more, so the label of the right-most dot in the $9 cluster still fits)
-  const x0 = Math.log10(Math.min(...tx)) - .15, x1 = Math.log10(Math.max(...tx)) + (narrow ? .3 : .15);
-  const ymax = Math.min(100, Math.ceil((Math.max(...ms.map(m => PASS[m.id][0])) + 5) / 20) * 20);
+  // (on phones the right side keeps more, so the labels of the dots near the right edge fit on their right)
+  const x0 = Math.log10(Math.min(...tx)) - .15, x1 = Math.log10(Math.max(...tx)) + (narrow ? .74 : .15);
+  const ymax = 100;   // the full scale, so the room left above the best model shows (owner, 2026-10-13)
   const X = v => L + (Math.log10(v) - x0) / (x1 - x0) * (W - L - R), Y = v => T + (1 - v / ymax) * (H - T - B);
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
   for (let v = 0; v <= ymax; v += 20) {
@@ -77,9 +77,14 @@ function drawPassCost() {
   const pts = [], order = [...ms].sort((a, b) => PASS[b.id][0] - PASS[a.id][0]);
   const at = m => [X(COST[m.id][0]), Y(PASS[m.id][0])];
   const boxes = order.map(m => { const [cx, cy] = at(m); return {x:cx - 9, y:cy - 9, w:18, h:18}; });
+  // the Pareto frontier: the models no cheaper model matches or beats on pass rate
+  const front = [...ms].sort((p, q) => COST[p.id][0] - COST[q.id][0] || PASS[q.id][0] - PASS[p.id][0]).filter((m, i, a) => a.slice(0, i).every(o => PASS[o.id][0] < PASS[m.id][0]));
   order.forEach(m => {
     const [cx, cy] = at(m), name = narrow ? m.short : m.name;
-    svg.append(sv('circle', {cx, cy, r:7, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':2, 'data-m':m.id}));
+    // the frontier reads from the dots themselves, with no line: a model on it has a larger dot and a bold name, a model
+    // under it a smaller dot and a regular name, both at full colour (owner, 2026-10-13: keep the chart clean)
+    const lead = front.includes(m);
+    svg.append(sv('circle', {cx, cy, r:lead ? 7.5 : 5, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':2, 'data-m':m.id}));
     const lab = sv('text', {class:'lab halo', x:cx, y:cy}, name); svg.append(lab);
     const w = lab.getComputedTextLength() + 2;
     // right, left, above, below, the four diagonals, then the same one and two lines further out; the first spot clear of every dot and placed label wins
@@ -87,10 +92,12 @@ function drawPassCost() {
       [cx + 8, cy - 11, 'start'], [cx - 8, cy - 11, 'end'], [cx + 8, cy + 20, 'start'], [cx - 8, cy + 20, 'end'],
       [cx, cy - 31, 'middle'], [cx, cy + 40, 'middle'], [cx + 6, cy - 29, 'start'], [cx - 6, cy - 29, 'end'], [cx + 6, cy + 38, 'start'], [cx - 6, cy + 38, 'end'],
       [cx, cy - 49, 'middle'], [cx, cy + 58, 'middle'], [cx - 6, cy - 47, 'end'], [cx - 6, cy + 56, 'end']];
-    const box = ([x, y, an]) => ({x:an === 'start' ? x : an === 'end' ? x - w : x - w / 2, y:y - 13, w, h:18});   // the rendered text's height
+    const box = ([x, y, an]) => ({x:an === 'start' ? x : an === 'end' ? x - w : x - w / 2, y:y - 11, w, h:14});   // the glyphs' own height, so a label can sit beside its dot in a tight cluster
     const hit = q => boxes.some(o => q.x < o.x + o.w && o.x < q.x + q.w && q.y < o.y + o.h && o.y < q.y + q.h) || q.x < L || q.x + q.w > W || q.y < 0;
     const spot = spots.find(sp => !hit(box(sp)));
-    if (spot) { boxes.push(box(spot)); lab.setAttribute('x', spot[0]); lab.setAttribute('y', spot[1]); lab.setAttribute('text-anchor', spot[2]); }
+    if (spot) { boxes.push(box(spot)); lab.setAttribute('x', spot[0]); lab.setAttribute('y', spot[1]); lab.setAttribute('text-anchor', spot[2]);
+      // a label wears its dot's colour, darkened to read on white, so a crowded patch still pairs each name with its dot
+      lab.style.fill = `color-mix(in srgb, ${MCOL[m.id]} 78%, #000)`; if (lead) lab.style.fontWeight = 600; }
     else lab.remove();
     const pct = PASS[m.id][0];
     pts.push({x:cx, y:cy, mean:true, html:`<b>${esc(m.name)}</b><br>Pass rate <b>${f1(pct)}%</b><br>${usdfmt(COST[m.id][0])} per run, mean`});
@@ -132,21 +139,47 @@ function drawECI() {
 }
 
 /* Test-time scaling: FECI when every run stops at a US$ budget (SCALE, from bin/fcs2_runs_from_db.py).
-   Values below 0 leave the plot through its bottom edge. */
+   Every model's curve is drawn in its colour, with no band: eight 90% bands on one plot read as mud (owner, 2026-10-13).
+   The legend is the control: hovering a name shows that model alone with its band, the others in light grey; a click takes
+   a model off (grey) or puts it back. On first view the curves draw one after another, from the cheapest model to the
+   dearest. Values below 0 leave the plot through its bottom edge. */
+// A curve through every point with no overshoot (monotone cubic, Fritsch-Carlson, as d3's curveMonotoneX): between two
+// samples it never goes above the higher or below the lower, so the smoothing adds no value the data does not have.
+function smooth(P) {
+  const n = P.length; if (n < 3) return P.map((p, i) => `${i ? 'L' : 'M'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join('');
+  const dx = [], sl = []; for (let i = 0; i < n - 1; i++) { dx.push(P[i + 1][0] - P[i][0]); sl.push((P[i + 1][1] - P[i][1]) / (dx[i] || 1)); }
+  const t = [sl[0]]; for (let i = 1; i < n - 1; i++) t.push(sl[i - 1] * sl[i] <= 0 ? 0 : 3 * (dx[i - 1] + dx[i]) / ((2 * dx[i] + dx[i - 1]) / sl[i - 1] + (dx[i] + 2 * dx[i - 1]) / sl[i]));
+  t.push(sl[n - 2]);
+  let d = `M${P[0][0].toFixed(1)},${P[0][1].toFixed(1)}`;
+  for (let i = 0; i < n - 1; i++) { const h = dx[i] / 3;
+    d += `C${(P[i][0] + h).toFixed(1)},${(P[i][1] + h * t[i]).toFixed(1)} ${(P[i + 1][0] - h).toFixed(1)},${(P[i + 1][1] - h * t[i + 1]).toFixed(1)} ${P[i + 1][0].toFixed(1)},${P[i + 1][1].toFixed(1)}`; }
+  return d;
+}
+// The curves plotted are the running maximum of SCALE over the budget (value and both ends of its interval): the best level a
+// model has reached by that budget. The converter already holds each run at its best development score so far, capped
+// at its hidden final score; the running maximum here only removes what little the capability fit can still wobble.
+const TTS = Object.fromEntries(Object.entries(SCALE).map(([id, c]) => { let v = -Infinity, lo = -Infinity, hi = -Infinity;
+  return [id, c.map(p => [p[0], v = Math.max(v, p[1]), lo = Math.max(lo, p[2]), hi = Math.max(hi, p[3]), p[4]])]; }));
+const TTS_Y0 = 40, ttsOn = new Set(RANKED.filter(m => SCALE[m.id]).map(m => m.id));
+let ttsHover = null;
 function drawTTS() {
   const svg = $('#ttssvg'), W = Math.max(300, $('#ttsplot').clientWidth), narrow = W < 560;
   const L = 34, R = narrow ? 12 : 24, T = 12, B = 46, H = CHART_H.tts || (narrow ? 300 : 380);
-  const all = Object.values(SCALE).flat();
-  // the axis starts half a decade before the first budget at which any model rises above 0
-  const x0 = Math.log10(Math.min(...all.filter(p => p[1] >= 0).map(p => p[0]))) - 0.5, x1 = Math.log10(Math.max(...all.map(p => p[0])));
-  const ymax = Math.ceil(Math.max(...all.map(p => p[3])) / 20) * 20;
-  const X = v => L + (Math.log10(v) - x0) / (x1 - x0) * (W - L - R), Y = v => T + (1 - v / ymax) * (H - T - B);
+  const all = Object.values(TTS).flat(), shown = m => ttsHover ? ttsHover === m.id : ttsOn.has(m.id), band1 = m => ttsHover === m.id || ttsOn.size === 1 && ttsOn.has(m.id);
+  // the axis starts a little before the first budget at which any model rises above 0
+  const x0 = Math.log10(Math.min(...all.filter(p => p[1] >= 0).map(p => p[0]))) - 0.3, x1 = Math.log10(Math.max(...all.map(p => p[0])));
+  const ymax = Math.max(65, Math.ceil((Math.max(...all.map(p => p[1])) + 2) / 5) * 5);
+  // the value axis widens as it goes up: 0 to 40 takes the bottom 10% of the plot, 40 to 50 the next 10%, 50 to 60 the next
+  // 26%, and 60 to the top the remaining 54%, since the curves finish and crowd between 50 and 70; each curve's climb
+  // from 0 still shows (owner, 2026-10-13)
+  const KN = [[0, 0], [TTS_Y0, .10], [50, .20], [60, .46], [ymax, 1]];
+  const yf = v => { let i = 1; while (i < KN.length - 1 && v > KN[i][0]) i++; const [a, fa] = KN[i - 1], [b, fb] = KN[i]; return fa + (v - a) / (b - a) * (fb - fa); };
+  const X = v => L + (Math.log10(v) - x0) / (x1 - x0) * (W - L - R), Y = v => T + (1 - yf(v)) * (H - T - B);
   const an = animates(svg);
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
-  const clip = sv('clipPath', {id:'ttsclip'}), cr = sv('rect', {x:L, y:T - 4, width:W - L - R + 8, height:H - T - B + 4}); clip.append(cr); svg.append(clip);
-  if (an) mark(cr, 'a-wipe');   // the curves and bands are uncovered left to right, along the budget axis
-  for (let v = 0; v <= ymax; v += 20) {
-    svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1}));
+  const clip = sv('clipPath', {id:'ttsclip'}), cr = sv('rect', {x:L, y:T - 4, width:W - L - R + 11, height:H - T - B + 5}); clip.append(cr); svg.append(clip);
+  for (const v of [0, 20, 40, ...Array.from({length:(ymax - 50) / 5 + 1}, (_, i) => 50 + i * 5)]) {
+    svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:v === 50 || v === 60 ? 'var(--line)' : 'var(--grid)', 'stroke-width':1}));
     svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, v));
   }
   for (let k = Math.ceil(x0); k <= Math.floor(x1); k++) {
@@ -155,22 +188,39 @@ function drawTTS() {
   }
   svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'Cost budget per run in US$, log scale'));
   const g = sv('g', {'clip-path':'url(#ttsclip)'}); svg.append(g);
-  const pts = [];
-  [...RANKED].reverse().filter(m => SCALE[m.id]).forEach(m => {   // a model with no reported spend has no curve
-    const c = SCALE[m.id], path = c.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join('');
-    const band = c.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[3]).toFixed(1)}`).join('')
-      + [...c].reverse().map(p => `L${X(p[0]).toFixed(1)},${Y(p[2]).toFixed(1)}`).join('') + 'Z';
-    const bp = sv('path', {d:band, fill:MCOL[m.id], opacity:.12});
-    const lp = sv('path', {d:path, fill:'none', stroke:MCOL[m.id], 'stroke-width':2.2, 'stroke-linejoin':'round'});
-    const e = c[c.length - 1], end = sv('circle', {cx:X(e[0]), cy:Y(e[1]), r:4.5, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':1.5});
-    g.append(bp, lp, end);
-    if (an) mark(end, 'a-fade', 1.3);
+  const pts = [], ms = [...RANKED].reverse().filter(m => SCALE[m.id]);   // a model with no reported spend has no curve
+  const ends = [];
+  const seq = [...ms].sort((p, q) => TTS[p.id].at(-1)[0] - TTS[q.id].at(-1)[0]).map(m => m.id);   // drawing order: by final spend
+  // the grey curves first, then the picked ones over them, the leader last
+  [...ms.filter(m => !shown(m)), ...ms.filter(shown)].forEach(m => {
+    const c = TTS[m.id], on = shown(m), path = smooth(c.map(p => [X(p[0]), Y(p[1])]));
+    const e = c[c.length - 1];
+    const focus = band1(m);
+    if (focus) {   // the band's edges take the same curve as the line
+      const hi = smooth(c.map(p => [X(p[0]), Y(p[3])])), lo = smooth([...c].reverse().map(p => [X(p[0]), Y(p[2])]));
+      g.append(sv('path', {d:hi + 'L' + lo.slice(1) + 'Z', fill:MCOL[m.id], opacity:.13}));
+    }
+    // a white casing under each line keeps crossings legible; the line itself has round ends and joins
+    const wd = !on ? 1.5 : focus ? 3.6 : 2.8;
+    if (on) g.append(mark(sv('path', {d:path, pathLength:1, fill:'none', stroke:'#fff', 'stroke-width':wd + 3, 'stroke-linejoin':'round', 'stroke-linecap':'round'}), 'a-draw', an ? .15 + seq.indexOf(m.id) * .42 : 0));
+    const lp = sv('path', {d:path, pathLength:1, fill:'none', stroke:on ? MCOL[m.id] : '#c9ccd1', 'stroke-width':wd, 'stroke-linejoin':'round', 'stroke-linecap':'round'});
+    // the end of a curve: the same white-ringed dot as on the pass-rate chart
+    const end = sv('circle', {cx:X(e[0]), cy:Y(e[1]), r:!on ? 3 : focus ? 7.5 : 6.5, fill:on ? MCOL[m.id] : '#c9ccd1', stroke:'#fff', 'stroke-width':on ? 2 : 1});
+    g.append(lp); ends.push(end);   // the dots go on last, over every line
+    if (an) { const t0 = .15 + seq.indexOf(m.id) * .42; mark(lp, 'a-draw', t0); mark(end, 'a-fade', t0 + .8); }   // one curve after another
     c.forEach(p => { if (p[1] >= 0) pts.push({x:X(p[0]), y:Y(p[1]), html:`<b>${esc(m.name)}</b><br>FECI <b>${f1(p[1])}</b> at ${usdfmt(p[0])} per run`
       + `<br>90% interval ${Math.round(Math.max(p[2], 0))}–${Math.round(p[3])}<br>${Math.round(p[4] * 100)}% of runs still going`}); });
   });
+  g.append(...ends);
   attachTip(svg, W, H, pts, $('#ttstip'));
+  $('#ttslegend').querySelectorAll('button').forEach(b => { const on = ttsOn.has(b.dataset.m); b.setAttribute('aria-pressed', on); b.classList.toggle('off', !on); });
 }
-$('#ttslegend').innerHTML = RANKED.map(m => `<span><i style="background:${MCOL[m.id]}"></i>${esc(m.name)}</span>`).join('');
+// the legend is the chart's control: a button per model, in its colour when picked
+$('#ttslegend').innerHTML = RANKED.filter(m => SCALE[m.id]).map(m => `<button type="button" data-m="${m.id}"><i style="background:${MCOL[m.id]}"></i>${esc(m.name)}</button>`).join('');
+$('#ttslegend').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; const id = b.dataset.m;
+  if (ttsOn.has(id)) ttsOn.delete(id); else ttsOn.add(id); ttsHover = null; drawTTS(); });
+$('#ttslegend').addEventListener('pointerover', e => { const b = e.target.closest('button'); if (!b || e.pointerType !== 'mouse' || ttsHover === b.dataset.m) return; ttsHover = b.dataset.m; drawTTS(); });
+$('#ttslegend').addEventListener('pointerleave', () => { if (ttsHover) { ttsHover = null; drawTTS(); } });
 
 const TASK_OF = Object.fromEntries(TASKS.map(t => [t.s, t]));
 const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -414,24 +464,49 @@ function startPlay(tile) {
   play = {tile, g:root, card, who, runs, k:0, x, y, w, h, back};
   if (runs.length) play.t = setTimeout(showRun, calm ? 0 : 200);
 }
+// The card plays every run of the task, two at a time: best development score so far against time since the run began,
+// both on one time axis so the pair can be compared, and each line ends in its run's verdict (a tick or a cross in a disc). Runs are ordered by
+// how much their curve moves (the most steps up in best score, then the largest climb, then the model's place on the
+// leaderboard) and taken in pairs; an odd run out plays alone (owner, 2026-10-13).
+function cardPairs(runs) {
+  const rank = Object.fromEntries(RANKED.map((m, i) => [m.id, i]));
+  const shape = r => { let best = -1, steps = 0, first = null; r[6].forEach(([, v]) => { if (v > best + .5) { if (best >= 0) steps++; best = v; } if (first === null && v > 0) first = v; }); return [steps, best - (first ?? best)]; };
+  const by = runs.map(r => [r, shape(r)]).sort((a, b) => b[1][0] - a[1][0] || b[1][1] - a[1][1] || rank[a[0][0]] - rank[b[0][0]]).map(x => x[0]);
+  const out = []; for (let i = 0; i < by.length; i += 2) out.push(by.slice(i, i + 2).sort((a, b) => rank[a[0]] - rank[b[0]]));
+  return out;
+}
 function showRun() {
-  const p = play, [m, , , , end, , seq] = p.runs[p.k], n = p.runs.length;
-  const PL = 24, PR = 24, PT = 44, PB = 44, sw = 4;
-  const x0 = seq[0][0], x1 = Math.max(end, ...seq.map(q => q[0]));
-  const X = v => p.x + PL + (v - x0) / (x1 - x0 || 1) * (p.w - PL - PR), Y = v => p.y + PT + (1 - v / 100) * (p.h - PT - PB);
-  let best = -1, d = '';
-  seq.forEach(([u, v], i) => { best = Math.max(best, v); d += i ? `H${X(u).toFixed(1)}V${Y(best).toFixed(1)}` : `M${X(u).toFixed(1)},${Y(best).toFixed(1)}`; });
-  d += `H${X(x1).toFixed(1)}`;
-  const line = sv('g', {class:'pline'}), path = sv('path', {d, pathLength:1, fill:'none', stroke:'#fff', 'stroke-width':sw, 'stroke-linejoin':'round', 'stroke-linecap':'round'});
-  const dot = sv('circle', {cx:X(x1), cy:Y(best), r:6.5, fill:'#fff', opacity:calm ? 1 : 0});
-  line.append(path, dot); p.card.querySelector('.pline')?.remove(); p.card.append(line);
-  p.who.textContent = MNAME[m];
-  const draw = calm ? 0 : 1100, hold = 1300;
-  if (!calm) {
-    path.setAttribute('stroke-dasharray', '1 1');
-    path.animate([{strokeDashoffset:1}, {strokeDashoffset:0}], {duration:draw, easing:'cubic-bezier(.6,0,.3,1)', fill:'forwards'});
-    dot.animate([{opacity:0}, {opacity:1}], {duration:200, delay:draw - 100, fill:'forwards'});
-  }
+  const p = play; p.pairs = p.pairs || cardPairs(p.runs);
+  const field = ART_FIELD[p.tile.dataset.k];
+  const two = p.pairs[p.k], n = p.pairs.length;
+  const PL = 24, PR = 24, PT = 44, PB = 62;
+  // hours into the run at each submission: the data stores spend, which the converter's source prorates by elapsed time,
+  // so spend / final spend is the share of the run's hours (a run with no spend spreads its submissions evenly)
+  const hrs = r => r[6].map(([u], i) => r[5] * (r[4] ? Math.min(1, u / r[4]) : (i + 1) / (r[6].length + 1)));
+  const x1 = Math.max(...two.map(r => r[5])) || 1;
+  const X = v => p.x + PL + v / x1 * (p.w - PL - PR), Y = v => p.y + PT + (1 - v / 100) * (p.h - PT - PB);
+  const line = sv('g', {class:'pline'}), draw = calm ? 0 : 1100, hold = 1600;
+  two.forEach((r, j) => {
+    const [m, , , ok, , xe, seq] = r, t = hrs(r), op = j ? .6 : 1; let best = -1, d = '';
+    seq.forEach(([, v], i) => { best = Math.max(best, v); d += i ? `H${X(t[i]).toFixed(1)}V${Y(best).toFixed(1)}` : `M${X(t[i]).toFixed(1)},${Y(best).toFixed(1)}`; });
+    d += `H${X(xe).toFixed(1)}`;
+    const path = sv('path', {d, pathLength:1, fill:'none', stroke:'#fff', 'stroke-opacity':op, 'stroke-width':j ? 3 : 4, 'stroke-linejoin':'round', 'stroke-linecap':'round'});
+    // the line ends in its verdict: a white disc holding a tick for a pass, a cross for a fail, in the field's colour
+    const ex = X(xe), ey = Y(best), R = j ? 8 : 9.5, dot = sv('g', {opacity:calm ? 1 : 0, 'aria-label':ok ? 'Pass' : 'Fail'});
+    dot.append(sv('circle', {cx:ex, cy:ey, r:R, fill:'#fff'}), sv('path', {d:ok ? `M${ex - R * .46},${ey + R * .04}l${R * .32},${R * .34}l${R * .6},${-R * .7}` : `M${ex - R * .36},${ey - R * .36}l${R * .72},${R * .72}M${ex + R * .36},${ey - R * .36}l${-R * .72},${R * .72}`,
+      fill:'none', stroke:field, 'stroke-width':2.2, 'stroke-linecap':'round', 'stroke-linejoin':'round'}));
+    // the legend sits along the bottom: a stroke sample in the line's own weight, then the model
+    const ly = p.y + p.h - 36 + j * 21;
+    line.append(path, dot, sv('line', {x1:p.x + 14, x2:p.x + 36, y1:ly - 4, y2:ly - 4, stroke:'#fff', 'stroke-opacity':op, 'stroke-width':j ? 3 : 4, 'stroke-linecap':'round'}),
+      sv('text', {x:p.x + 44, y:ly, 'font-size':13, 'font-weight':j ? 400 : 600, fill:'#fff'}, MNAME[m]));
+    if (!calm) {
+      path.setAttribute('stroke-dasharray', '1 1');
+      path.animate([{strokeDashoffset:1}, {strokeDashoffset:0}], {duration:draw, easing:'cubic-bezier(.6,0,.3,1)', fill:'forwards'});
+      dot.animate([{opacity:0}, {opacity:1}], {duration:200, delay:draw - 100, fill:'forwards'});
+    }
+  });
+  p.card.querySelector('.pline')?.remove(); p.card.append(line);
+  p.who.textContent = '';
   if (n > 1) p.t = setTimeout(() => {
     const go = () => { if (play !== p) return; p.k = (p.k + 1) % n; showRun(); };
     if (calm) go(); else line.animate([{opacity:1}, {opacity:0}], {duration:250, fill:'forwards'}).onfinish = go;
@@ -450,8 +525,17 @@ $('#mapsvg').addEventListener('pointermove', e => {
     wait = {tile:want, t:setTimeout(() => { wait = null; stopPlay(); if (want) startPlay(want); else veilTo(0); }, calm ? 0 : 100)};
   }
 });   // no box for a domain: its chip already names it and counts its tasks (owner, 2026-10-11)
-$('#mapsvg').addEventListener('pointerleave', () => { clearTimeout(wait?.t); wait = null; stopPlay(); veilTo(0); });
-$('#mapsvg').addEventListener('click', e => { if (play && e.target.closest('.play')) location.href = taskHref(play.tile.dataset.s); });
+$('#mapsvg').addEventListener('pointerleave', e => { if (e.pointerType !== 'mouse') return; clearTimeout(wait?.t); wait = null; stopPlay(); veilTo(0); });
+// touch and pen have no hover: a tap on a tile opens its card, a tap on the card opens the task, a tap anywhere else closes it
+let lastPointer = 'mouse';
+$('#mapsvg').addEventListener('pointerdown', e => { lastPointer = e.pointerType; });
+$('#mapsvg').addEventListener('click', e => {
+  if (play && e.target.closest('.play')) { location.href = taskHref(play.tile.dataset.s); return; }
+  if (lastPointer === 'mouse') return;
+  const tile = e.target.closest('svg.tile');
+  stopPlay(); if (tile) startPlay(tile); else veilTo(0);
+});
+document.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse' && play && !e.target.closest('#mapsvg')) { stopPlay(); veilTo(0); } });
 
 function drawRows() {
   const h = hits(); $('#fcount').textContent = picked.size ? `(${picked.size})` : '';
@@ -474,7 +558,9 @@ function drawPapers() {
   const card = t => `<a class="pg" href="${esc(taskHref(t.s))}" tabindex="-1"><img src="${PAPER_DIR}${slug(t.s)}.webp" alt="" decoding="async" width="150" height="194"></a>`;
   let h = '';
   for (let c = 0; c < cols; c++) {
-    let own = ts.filter((t, i) => i % cols === c); while (own.length < 8) own = own.concat(own);   // tall enough to cover the frame
+    // only about four neighbouring columns are in view at once, so the papers are dealt over four columns and the deal repeats:
+    // every paper passes through the frame, whichever columns it shows
+    let own = ts.filter((t, i) => i % 4 === c % 4); while (own.length < 8) own = own.concat(own);   // tall enough to cover the frame
     const list = own.map(card).join('');
     h += `<div class="pcol${c % 2 ? ' dn' : ''}" style="left:${(c - cols / 2) * (pw + gap)}px;top:${-(own.length * (pw * 1.3 + gap)) / 2 + (c % 3) * 40}px;animation-duration:${44 + (c % 4) * 7}s">${list}${list}</div>`;
   }
