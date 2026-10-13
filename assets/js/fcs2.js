@@ -61,7 +61,7 @@ function drawPassCost() {
   // the range loose); an edge dot whose label has no room on its outer side takes another spot
   // (on phones the right side keeps more, so the labels of the dots near the right edge fit on their right)
   const x0 = Math.log10(Math.min(...tx)) - .15, x1 = Math.log10(Math.max(...tx)) + (narrow ? .74 : .15);
-  const ymax = Math.min(100, Math.ceil((Math.max(...ms.map(m => PASS[m.id][0])) + 5) / 20) * 20);
+  const ymax = 100;   // the full scale, so the room left above the best model shows (owner, 2026-10-13)
   const X = v => L + (Math.log10(v) - x0) / (x1 - x0) * (W - L - R), Y = v => T + (1 - v / ymax) * (H - T - B);
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
   for (let v = 0; v <= ymax; v += 20) {
