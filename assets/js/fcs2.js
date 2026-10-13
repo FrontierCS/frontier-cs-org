@@ -165,7 +165,7 @@ function drawTTS() {
   const X = v => L + (Math.log10(v) - x0) / (x1 - x0) * (W - L - R), Y = v => T + (1 - yf(v)) * (H - T - B);
   const an = animates(svg);
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
-  const clip = sv('clipPath', {id:'ttsclip'}), cr = sv('rect', {x:L, y:T - 4, width:W - L - R + 8, height:H - T - B + 5}); clip.append(cr); svg.append(clip);
+  const clip = sv('clipPath', {id:'ttsclip'}), cr = sv('rect', {x:L, y:T - 4, width:W - L - R + 11, height:H - T - B + 5}); clip.append(cr); svg.append(clip);
   for (const v of [0, 20, ...Array.from({length:(ymax - TTS_Y0) / 10 + 1}, (_, i) => TTS_Y0 + i * 10)]) {
     svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:v === TTS_Y0 ? 'var(--line)' : 'var(--grid)', 'stroke-width':1}));
     svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, v));
@@ -177,23 +177,29 @@ function drawTTS() {
   svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'Cost budget per run in US$, log scale'));
   const g = sv('g', {'clip-path':'url(#ttsclip)'}); svg.append(g);
   const pts = [], ms = [...RANKED].reverse().filter(m => SCALE[m.id]);   // a model with no reported spend has no curve
+  const ends = [];
   const seq = [...ms].sort((p, q) => SCALE[p.id].at(-1)[0] - SCALE[q.id].at(-1)[0]).map(m => m.id);   // drawing order: by final spend
   // the grey curves first, then the picked ones over them, the leader last
   [...ms.filter(m => !shown(m)), ...ms.filter(shown)].forEach(m => {
     const c = SCALE[m.id], on = shown(m), path = smooth(c.map(p => [X(p[0]), Y(p[1])]));
     const e = c[c.length - 1];
-    if (band1(m)) {
-      const band = c.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[3]).toFixed(1)}`).join('')
-        + [...c].reverse().map(p => `L${X(p[0]).toFixed(1)},${Y(p[2]).toFixed(1)}`).join('') + 'Z';
-      g.append(sv('path', {d:band, fill:MCOL[m.id], opacity:.13}));
+    const focus = band1(m);
+    if (focus) {   // the band's edges take the same curve as the line
+      const hi = smooth(c.map(p => [X(p[0]), Y(p[3])])), lo = smooth([...c].reverse().map(p => [X(p[0]), Y(p[2])]));
+      g.append(sv('path', {d:hi + 'L' + lo.slice(1) + 'Z', fill:MCOL[m.id], opacity:.13}));
     }
-    const lp = sv('path', {d:path, pathLength:1, fill:'none', stroke:on ? MCOL[m.id] : '#c9ccd1', 'stroke-width':on ? 2.4 : 1.4, 'stroke-linejoin':'round'});
-    const end = sv('circle', {cx:X(e[0]), cy:Y(e[1]), r:on ? 4.5 : 2.8, fill:on ? MCOL[m.id] : '#c9ccd1', stroke:'#fff', 'stroke-width':on ? 1.5 : 1});
-    g.append(lp, end);
+    // a white casing under each line keeps crossings legible; the line itself has round ends and joins
+    const wd = !on ? 1.5 : focus ? 3.6 : 2.8;
+    if (on) g.append(mark(sv('path', {d:path, pathLength:1, fill:'none', stroke:'#fff', 'stroke-width':wd + 3, 'stroke-linejoin':'round', 'stroke-linecap':'round'}), 'a-draw', an ? .15 + seq.indexOf(m.id) * .42 : 0));
+    const lp = sv('path', {d:path, pathLength:1, fill:'none', stroke:on ? MCOL[m.id] : '#c9ccd1', 'stroke-width':wd, 'stroke-linejoin':'round', 'stroke-linecap':'round'});
+    // the end of a curve is the model's leaderboard value: the same white-ringed dot as on the pass-rate chart
+    const end = sv('circle', {cx:X(e[0]), cy:Y(e[1]), r:!on ? 3 : focus ? 7.5 : 6.5, fill:on ? MCOL[m.id] : '#c9ccd1', stroke:'#fff', 'stroke-width':on ? 2 : 1});
+    g.append(lp); ends.push(end);   // the dots go on last, over every line
     if (an) { const t0 = .15 + seq.indexOf(m.id) * .42; mark(lp, 'a-draw', t0); mark(end, 'a-fade', t0 + .8); }   // one curve after another
     c.forEach(p => { if (p[1] >= 0) pts.push({x:X(p[0]), y:Y(p[1]), html:`<b>${esc(m.name)}</b><br>FECI <b>${f1(p[1])}</b> at ${usdfmt(p[0])} per run`
       + `<br>90% interval ${Math.round(Math.max(p[2], 0))}–${Math.round(p[3])}<br>${Math.round(p[4] * 100)}% of runs still going`}); });
   });
+  g.append(...ends);
   attachTip(svg, W, H, pts, $('#ttstip'));
   $('#ttslegend').querySelectorAll('button').forEach(b => { const on = ttsOn.has(b.dataset.m); b.setAttribute('aria-pressed', on); b.classList.toggle('off', !on); });
 }
