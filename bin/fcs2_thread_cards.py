@@ -43,7 +43,7 @@ CSS = """
   font-family:'Hanken Grotesk',sans-serif; color:#1f1f1f}
 .tcard .tc-top{position:absolute; left:48px; right:48px; top:34px; display:flex; justify-content:space-between; align-items:center}
 .tcard .tc-brand{display:flex; align-items:center; gap:10px; font-size:20px; font-weight:500; letter-spacing:-.015em}
-.tcard .tc-brand svg{width:13px; height:13px; color:#0b57d0}
+.tcard .tc-brand svg{width:20px; height:20px}
 .tcard .tc-url{font-size:15px; font-weight:500; color:#0b57d0}
 .tcard .tc-h{font-size:34px; font-weight:600; line-height:1.12; letter-spacing:-.015em; margin:0 0 12px}
 .tcard .tc-sub{font-size:17px; line-height:1.4; color:#5f6368; margin:0}
@@ -74,7 +74,7 @@ SHELL = """
 window.card = (layout, h, sub, note) => {
   document.querySelectorAll('.tcard').forEach(e => e.remove());
   const c = document.createElement('div'); c.className = `tcard fcs2 ${layout}`;
-  c.innerHTML = `<div class="tc-top"><div class="tc-brand"><svg viewBox="49 47 81 100"><path d="M59.78 135.86 L75.94 71.24 A17.5 17.5 0 0 1 92.89 58 L118.5 58" fill="none" stroke="currentColor" stroke-width="21" stroke-linecap="round"/><circle cx="109" cy="97" r="10.5" fill="currentColor"/></svg>FrontierCS</div><div class="tc-url">frontier-cs.org</div></div>
+  c.innerHTML = `<div class="tc-top"><div class="tc-brand"><svg viewBox="4.5 14.44 81.06 81.06"><path d="M10 40 A50 50 0 0 1 60 90" fill="none" style="stroke:var(--mk-in,#1f1f1f)" stroke-width="11" stroke-linecap="round"/><path d="M50.45 19.94 A80.9 80.9 0 0 1 80.06 49.55" fill="none" style="stroke:var(--mk-out,#0b57d0)" stroke-width="11" stroke-linecap="round"/></svg>FrontierCS</div><div class="tc-url">frontier-cs.org</div></div>
     <div class="tc-body"><div class="tc-hd">${h ? `<div class="tc-h">${h}</div>` : ''}${sub ? `<p class="tc-sub">${sub}</p>` : ''}</div><div class="tc-vis"></div>${note && layout === 'stack' ? `<div class="tc-note">${note}</div>` : ''}</div>${note && layout === 'side' ? `<div class="tc-note">${note}</div>` : ''}`;
   document.body.append(c); return c.querySelector('.tc-vis');
 };
