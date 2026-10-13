@@ -351,17 +351,21 @@ function drawMap() {
       svg.append(g);
       // a white chip at the top left: name and count, then the name alone, lying flat, then standing up along the left edge
       const ink = AINK[a.k], meas = (str, fs) => { const t = sv('text', {x:-999, y:-999, 'font-size':fs, 'font-weight':600}, str); svg.append(t); const w = t.getComputedTextLength(); t.remove(); return w; };
+      // a block too small for its name takes a shorter one, so no domain goes unnamed
+      const SHORTER = {'Bioinformatics':'Bioinfo', 'Programming Languages':'PL', 'Machine Learning':'ML', 'Architecture':'Arch', 'Cryptography':'Crypto'};
+      let named = false;
+      for (const nm of [d, SHORTER[d]].filter(Boolean)) { if (named) break;
       for (const rot of [false, true]) { let done = false;
         for (const cnt of [true, false]) { for (const fs of narrow ? [13, 11, 10] : [15, 13, 11]) {
-          const pw = meas(cnt ? `${d}  ${n}` : d, fs) + fs * 1.2, ph = fs * 1.75, m = fs < 13 ? 4 : 8, along = rot ? bh : bw, across = rot ? bw : bh;
+          const pw = meas(cnt ? `${nm}  ${n}` : nm, fs) + fs * 1.2, ph = fs * 1.75, m = fs < 13 ? 4 : 8, along = rot ? bh : bw, across = rot ? bw : bh;
           if (pw + 2 * m > along || ph + 2 * m > across) continue;
           const ox = x0 + m, oy = rot ? y0 + bh - m : y0 + m, chip = sv('g', {'pointer-events':'none', transform:rot ? `rotate(-90 ${ox} ${oy})` : null});
           chip.append(sv('rect', {x:ox, y:oy, width:pw.toFixed(1), height:ph.toFixed(1), rx:(ph / 2).toFixed(1), fill:'#fff'}));
-          const t = sv('text', {x:(ox + fs * .6).toFixed(1), y:(oy + ph * .68).toFixed(1), 'font-size':fs, 'font-weight':600, fill:ink}, d);
+          const t = sv('text', {x:(ox + fs * .6).toFixed(1), y:(oy + ph * .68).toFixed(1), 'font-size':fs, 'font-weight':600, fill:ink}, nm);
           if (cnt) t.append(sv('tspan', {'font-weight':400, dx:fs * .45}, n));
-          chip.append(t); g.append(chip); done = true; break; }
+          chip.append(t); g.append(chip); done = named = true; break; }
           if (done) break; }
-        if (done) break; }
+        if (done) break; } }
     });
   });
 }
