@@ -81,10 +81,10 @@ function drawPassCost() {
   const front = [...ms].sort((p, q) => COST[p.id][0] - COST[q.id][0] || PASS[q.id][0] - PASS[p.id][0]).filter((m, i, a) => a.slice(0, i).every(o => PASS[o.id][0] < PASS[m.id][0]));
   order.forEach(m => {
     const [cx, cy] = at(m), name = narrow ? m.short : m.name;
-    // the frontier reads from the dots themselves, with no line: a model on it keeps a full dot and a bold name, a model
-    // under it a smaller, paler dot and a paler name (owner, 2026-10-13: keep the chart clean)
+    // the frontier reads from the dots themselves, with no line: a model on it has a larger dot and a bold name, a model
+    // under it a smaller dot and a regular name, both at full colour (owner, 2026-10-13: keep the chart clean)
     const lead = front.includes(m);
-    svg.append(sv('circle', {cx, cy, r:lead ? 7.5 : 5.5, fill:MCOL[m.id], 'fill-opacity':lead ? 1 : .45, stroke:'#fff', 'stroke-width':2, 'data-m':m.id}));
+    svg.append(sv('circle', {cx, cy, r:lead ? 7.5 : 5, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':2, 'data-m':m.id}));
     const lab = sv('text', {class:'lab halo', x:cx, y:cy}, name); svg.append(lab);
     const w = lab.getComputedTextLength() + 2;
     // right, left, above, below, the four diagonals, then the same one and two lines further out; the first spot clear of every dot and placed label wins
@@ -97,7 +97,7 @@ function drawPassCost() {
     const spot = spots.find(sp => !hit(box(sp)));
     if (spot) { boxes.push(box(spot)); lab.setAttribute('x', spot[0]); lab.setAttribute('y', spot[1]); lab.setAttribute('text-anchor', spot[2]);
       // a label wears its dot's colour, darkened to read on white, so a crowded patch still pairs each name with its dot
-      lab.style.fill = `color-mix(in srgb, ${MCOL[m.id]} 78%, #000)`; if (!lead) lab.style.fillOpacity = .62; else lab.style.fontWeight = 600; }
+      lab.style.fill = `color-mix(in srgb, ${MCOL[m.id]} 78%, #000)`; if (lead) lab.style.fontWeight = 600; }
     else lab.remove();
     const pct = PASS[m.id][0];
     pts.push({x:cx, y:cy, mean:true, html:`<b>${esc(m.name)}</b><br>Pass rate <b>${f1(pct)}%</b><br>${usdfmt(COST[m.id][0])} per run, mean`});
