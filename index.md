@@ -37,7 +37,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
   <figure class="chart" style="margin:0">
     <div class="chead"><span>Pass rate (over human)</span></div>
     <div class="plot" id="pcplot"><svg id="pcsvg" role="img" aria-label="Pass rate (over human) against cost per run"></svg><div class="tip" id="pctip" hidden></div></div>
-    <div class="cfoot">{% include chart_logo.html %}<span>Preliminary · a run passes only when its final submission beats the human baseline on every metric of every hidden workload, not on its total score · cost is the platform’s estimate, a lower bound for Kimi K3, DeepSeek V4.1 Flash and GLM 5.3</span></div>
+    <div class="cfoot">{% include chart_logo.html %}<span>Preliminary · a run passes only when its final submission beats the human baseline on every metric of every hidden workload, not on its total score · cost is the platform’s estimate, a lower bound for Kimi K3, DeepSeek V4.1 Flash, GLM 5.3, GLM 5.3 Flash and Qwen 3.8 Max</span></div>
   </figure>
 
   <details class="tbl-wrap fold" id="domains">
