@@ -1623,7 +1623,7 @@ footer.foot { margin-top: 120px; padding: 56px 0 28px; background: #202124; colo
 .ws2 .ppl b { font-size: 18px; font-weight: 500; } .ws2 .ppl b a { text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--line-2); } .ws2 .ppl b a:hover { color: var(--teal-d); }
 .ws2 .ppl span { font-size: 14.5px; color: var(--ink-2); } .ws2 .ppl i { font-style: normal; font-size: 13.5px; color: var(--muted); }
 .ws2 h2 .venue { margin-left: 10px; vertical-align: middle; }
-.ws2 .spk { list-style: none; margin: 8px 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px 24px; }
+.ws2 .spk { list-style: none; margin: 8px 0 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 32px 24px; }
 .ws2 .spk li { display: flex; flex-direction: column; gap: 3px; }
 .ws2 .spk img { width: 148px; height: 148px; object-fit: cover; object-position: center 20%; border-radius: 50%; background: var(--soft); margin-bottom: 16px; }
 .ws2 .spk b { font-size: 19px; font-weight: 500; } .ws2 .spk span { font-size: 14.5px; color: var(--ink-2); }
