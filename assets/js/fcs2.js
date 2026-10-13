@@ -363,7 +363,7 @@ function hits() {
   const w = q.toLowerCase().split(/\s+/).filter(Boolean);
   let h = TASKS.filter(t => (!picked.size || picked.has(t.d)) && w.every(x => (t.s + ' ' + t.name + ' ' + t.t + ' ' + t.n + ' ' + t.d).toLowerCase().includes(x)));
   // hardest first by the FECI fit's task difficulty (owner, 2026-10-11); tasks without runs have none and follow by domain
-  const dif = t => TFIT[t.s] ? TFIT[t.s][0] : null;
+  const dif = t => TDIFF[t.s] ? -TDIFF[t.s].rank : null;   // hardest first, by the pass/fail difficulty (TDIFF)
   return [...h].sort((a, b) => (dif(b) ?? -1e9) - (dif(a) ?? -1e9) || DOMAINS.indexOf(a.d) - DOMAINS.indexOf(b.d) || a.s.localeCompare(b.s));
 }
 function squarify(vals, x, y, w, h) {
@@ -465,7 +465,7 @@ function startPlay(tile) {
   play.t = setTimeout(showRun, calm ? 0 : 200);
 }
 // The card tells a task in three panels that follow one another: the paper and, in one sentence, what the agent has to
-// do; which models passed (a tick) and which failed (a cross); and the task's difficulty on the FECI scale, placed among
+// do; which models passed (a tick) and which failed (a cross); and where the task ranks by difficulty among
 // all tasks (owner, 2026-10-13: the run curves said too little for the room they took).
 function wrapText(svg, str, width, fs, weight) {   // greedy line breaking by measured width
   const probe = sv('text', {x:-999, y:-999, 'font-size':fs, 'font-weight':weight}); svg.append(probe);
@@ -480,9 +480,11 @@ function showRun() {
   const lines = (str, y, fs, weight, lh, max, op = 1) => { let L = wrapText(svg, str, inner, fs, weight);
     if (L.length > max) { L = L.slice(0, max); L[max - 1] = L[max - 1].replace(/[\s,;:.]*\S*$/, '') + '…'; }
     L.forEach((ln, i) => panel.append(sv('text', {x:p.x + PX, y:y + i * lh, 'font-size':fs, 'font-weight':weight, fill:'#fff', 'fill-opacity':op}, ln))); return y + L.length * lh; };
-  if (p.k === 0) {   // the paper, then the goal
-    const y = lines(t.t || t.name, top + 6, 17, 600, 22, 4);
-    lines(GOAL[s] || '', y + 10, 14, 400, 19.5, 5, .92);
+  if (p.k === 0) {   // the goal in large type, what the task is scored on, and the paper (or blog post) as a small line at the foot
+    let y = lines(GOAL[s] || t.n, top + 12, narrow ? 19 : 21, 600, narrow ? 25 : 27, 4);
+    if (KEYM[s]) { panel.append(sv('text', {x:p.x + PX, y:y + 12, 'font-size':11.5, 'font-weight':500, fill:'#fff', 'fill-opacity':.75, 'letter-spacing':'.04em'}, 'SCORED ON'));
+      y = lines(KEYM[s], y + 31, 14.5, 500, 19, 2) + 2; }
+    if (t.t) lines(t.t, p.y + p.h - 34 - (wrapText(svg, t.t, inner, 12.5, 400).length > 1 ? 17 : 0), 12.5, 400, 17, 2, .8);   // the source sits at the foot of the card
   } else if (p.k === 1) {   // every model: a tick or a cross in a disc, then its name; two columns, in leaderboard order
     const rs = RANKED.map(m => [m, p.runs.find(r => r.m === m.id)]).filter(x => x[1]), half = Math.ceil(rs.length / 2), lh = Math.min(30, (p.h - 96) / half);
     panel.append(sv('text', {x:p.x + PX, y:top + 4, 'font-size':13, 'font-weight':500, fill:'#fff', 'fill-opacity':.85}, `${rs.filter(x => x[1].p).length} of ${rs.length} models pass`));
@@ -491,16 +493,17 @@ function showRun() {
         sv('path', {d:r.p ? `M${cx - R * .46},${cy + R * .04}l${R * .32},${R * .34}l${R * .6},${-R * .7}` : `M${cx - R * .36},${cy - R * .36}l${R * .72},${R * .72}M${cx + R * .36},${cy - R * .36}l${-R * .72},${R * .72}`,
           fill:'none', stroke:r.p ? field : '#fff', 'stroke-width':2, 'stroke-linecap':'round', 'stroke-linejoin':'round', 'stroke-opacity':r.p ? 1 : .85}),
         sv('text', {x:cx + 17, y:cy + 4.5, 'font-size':13.5, 'font-weight':r.p ? 600 : 400, fill:'#fff', 'fill-opacity':r.p ? 1 : .85}, narrow ? m.short : m.name)); });
-  } else {   // difficulty: the number, its rank, and a strip with every task as a tick and this one as a disc
-    const all = Object.values(TFIT).map(v => v[0]), d = TFIT[s] ? TFIT[s][0] : null, lo = Math.min(...all), hi = Math.max(...all);
+  } else {   // difficulty by who passes (TDIFF): the rank, and a strip with every task in rank order and this one as a disc
+    const D = TDIFF[s], N = Object.keys(TDIFF).length;
     panel.append(sv('text', {x:p.x + PX, y:top + 4, 'font-size':13, 'font-weight':500, fill:'#fff', 'fill-opacity':.85}, 'Difficulty'));
-    if (d === null) panel.append(sv('text', {x:p.x + PX, y:top + 52, 'font-size':16, fill:'#fff'}, 'Not fitted yet'));
-    else { const rank = all.filter(v => v > d).length + 1, X = v => p.x + PX + (v - lo) / (hi - lo || 1) * inner, sy = p.y + p.h - 74;
-      panel.append(sv('text', {x:p.x + PX, y:top + 62, 'font-size':52, 'font-weight':600, fill:'#fff'}, String(Math.round(d))),
-        sv('text', {x:p.x + PX, y:top + 90, 'font-size':14, fill:'#fff', 'fill-opacity':.92}, rank === 1 ? `The hardest of ${all.length} tasks` : `${rank}${[, 'st', 'nd', 'rd'][rank % 100 > 10 && rank % 100 < 14 ? 0 : rank % 10] || 'th'} hardest of ${all.length} tasks`),
+    if (!D) panel.append(sv('text', {x:p.x + PX, y:top + 52, 'font-size':16, fill:'#fff'}, 'No runs yet'));
+    else { const rank = D.rank, X = r => p.x + PX + (N - r) / (N - 1 || 1) * inner, sy = p.y + p.h - 74;
+      const ord = `${rank}${[, 'st', 'nd', 'rd'][rank % 100 > 10 && rank % 100 < 14 ? 0 : rank % 10] || 'th'}`;
+      panel.append(sv('text', {x:p.x + PX, y:top + 62, 'font-size':52, 'font-weight':600, fill:'#fff'}, rank === 1 ? 'Hardest' : ord),
+        sv('text', {x:p.x + PX, y:top + 90, 'font-size':14, fill:'#fff', 'fill-opacity':.92}, `${rank === 1 ? '' : 'hardest '}of ${N} tasks · ${D.pass} of ${D.n} models pass`),
         sv('line', {x1:p.x + PX, x2:p.x + PX + inner, y1:sy, y2:sy, stroke:'#fff', 'stroke-opacity':.45, 'stroke-width':1.5}));
-      all.forEach(v => panel.append(sv('line', {x1:X(v), x2:X(v), y1:sy - 6, y2:sy + 6, stroke:'#fff', 'stroke-opacity':.5, 'stroke-width':1.5})));
-      panel.append(sv('circle', {cx:X(d), cy:sy, r:8, fill:'#fff'}),
+      for (let r = 1; r <= N; r++) panel.append(sv('line', {x1:X(r), x2:X(r), y1:sy - 5, y2:sy + 5, stroke:'#fff', 'stroke-opacity':.5, 'stroke-width':1.5}));
+      panel.append(sv('circle', {cx:X(rank), cy:sy, r:8, fill:'#fff'}),
         sv('text', {x:p.x + PX, y:sy + 26, 'font-size':12, fill:'#fff', 'fill-opacity':.85}, 'easier'), sv('text', {x:p.x + PX + inner, y:sy + 26, 'text-anchor':'end', 'font-size':12, fill:'#fff', 'fill-opacity':.85}, 'harder')); }
   }
   // which panel this is: three small dots at the bottom
@@ -540,7 +543,7 @@ document.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse' &&
 function drawRows() {
   const h = hits(); $('#fcount').textContent = picked.size ? `(${picked.size})` : '';
   $('#rows').innerHTML = h.slice(0, limit).map(t => `<article class="trow" data-s="${esc(t.s)}"><span class="tag">${esc(t.d)}</span>
-    <h3><a class="stretch" href="${esc(taskHref(t.s))}">${esc(t.name)}</a></h3><p>${esc(t.t)}</p><div class="lk">${t.p ? `<a href="${esc(t.p)}" target="_blank" rel="noopener">${t.t ? 'Paper' : 'Project'}</a>` : '<span>No paper link</span>'}${t.r ? `<a href="${esc(t.r)}" target="_blank" rel="noopener">Code</a>` : ''}</div></article>`).join('')
+    <h3><a class="stretch" href="${esc(taskHref(t.s))}">${esc(t.name)}</a></h3><p>${esc(t.t)}</p><div class="lk">${t.p ? `<a href="${esc(t.p)}" target="_blank" rel="noopener">${t.t ? t.src : 'Project'}</a>` : '<span>No paper link</span>'}${t.r ? `<a href="${esc(t.r)}" target="_blank" rel="noopener">Code</a>` : ''}</div></article>`).join('')
     || `<p class="empty">No task matches. Clear the filter or try another word.</p>`;
   $('#showmore').hidden = h.length <= limit;
   $('#showmore').textContent = `Show more (${h.length - limit} left)`;

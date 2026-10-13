@@ -19,59 +19,76 @@ const SHORT = {'Adaptive attacks':'Adaptive Attacks', 'Approximate-MIPS Query St
   'Persistent Treap Update Engine':'Persistent Treap', 'kmeans kernel':'FlashLib K-Means', 'dbscan kernel':'FlashLib DBSCAN', 'ivf_pq kernel':'FlashLib IVF-PQ', 'knn kernel':'FlashLib KNN',
   'Robust Image Tokenizer':'DeTok', 'Differentiable Population Statistics':'Representation Fréchet Loss', 'OCR Distillation Trajectory Sampling':'Flow-OPD', 'Residual State Advancement':'JoinBoost',
   'Exact Sequence Alignment':'Edlib', 'CKKS noise':'CKKS Noise', 'Binary Fuse Filter Construction and Lookup':'Binary Fuse Filter', 'Structured LWE':'Structured LWE'};
-const NO_PAPER = new Set(['Structured LWE', 'dbscan kernel', 'ivf_pq kernel', 'knn kernel']);   // no paper: shown by short name alone
+const NO_PAPER = new Set(['Structured LWE']);   // no paper: shown by short name alone
+const BLOG = new Set(['dbscan kernel', 'ivf_pq kernel', 'knn kernel']);   // FlashLib has a blog post in place of a paper; its title is shown the same way
 const NAME = s => SHORT[s] || s;
-const TASKS = TASKS_RAW.map(([d, s, t, p, r, n]) => ({d: SHOWN[d] || d, s, name: NAME(s), t: NO_PAPER.has(s) || t === NAME(s) ? '' : t, p, r: /^https?:/.test(r) && !/arxiv\.org/.test(r) ? r : '', n: n || s}));   // name: short name; t: the paper's title; n: the task's own name (search only)
-// One sentence per task on what the agent has to do, for the map card (written from the task descriptions and task names).
+const TASKS = TASKS_RAW.map(([d, s, t, p, r, n]) => ({d: SHOWN[d] || d, s, name: NAME(s), t: NO_PAPER.has(s) || t === NAME(s) ? '' : t, p, r: /^https?:/.test(r) && !/arxiv\.org/.test(r) ? r : '', n: n || s, src: BLOG.has(s) ? 'Blog' : 'Paper'}));   // name: short name; t: the paper's title; n: the task's own name (search only)
+// One short sentence per task on what the agent has to do, for the map card. Written from the task statements in
+// FrontierCS-2.0-Preview (agent-base/frontier/task/repo/README.md) and the descriptions below.
 const GOAL = {
-  'ScaleGPM':'Choose, for each graph-pattern query, whether to mine by sampling or by sparsifying the graph.',
-  'Yannakakis':'Rewrite optimizer join trees into two-phase semijoin plans that run faster in a column store.',
-  'SVG-EAR':'Rebuild sparse attention with error-aware routing for a video diffusion model.',
-  'BBQ':'Restore the bitmap enqueue and dequeue logic of a hardware priority queue for packet scheduling.',
-  'Adaptive attacks':'Build adaptive attacks that test how robust a prompt-injection defense really is.',
-  'Hygra':'Write the traversal primitives of a parallel hypergraph framework and compute core numbers with them.',
-  'Approximate-MIPS Query Stopping':'Decide when an approximate maximum-inner-product search can stop probing.',
-  'Spectrum':'Implement EVM stack checkpoints that are cheap to create and to roll back to.',
-  'Shockwave':'Allocate GPUs fairly and efficiently across ML jobs whose batch sizes change as they train.',
-  'BABBLE':'Find reusable library functions shared across a corpus of programs.',
-  'SCOPE':'Count local subgraph patterns for a batch of queries by sharing plans between them.',
-  'Structured LWE':'Recover the secret witnesses of structured-LWE instances from public data.',
-  'Diffusion Policy':'Sample a robot’s action sequences from a diffusion policy in closed loop.',
-  'Hacking Blind':'Exploit a remote stack overflow without ever seeing the binary.',
-  'LeJEPA':'Implement the LeJEPA objective so training recovers a world model’s latent variables.',
-  'Progent':'Enforce privilege rules on the arguments of an AI agent’s tool calls at run time.',
-  'egg':'Restore an e-graph’s invariants after merges with deferred rebuilding.',
-  'Spectre':'Rebuild the speculation gadget and cache probe of a Spectre proof of concept.',
-  'Opal':'Retrieve a personal AI’s memories inside an enclave without revealing what is accessed.',
-  'Clusterwise SpGEMM':'Multiply sparse matrices faster by grouping similar rows into clusters.',
-  'Persistent Treap Update Engine':'Apply batches of updates to a persistent treap concurrently.',
-  'Polygon':'Find database inputs on which two SQL queries give different answers.',
-  'FARGO paper-aligned query core':'Answer maximum-inner-product queries with global multi-probing.',
-  'KAMI':'Write communication-avoiding matrix-multiply kernels for small batched matrices on one GPU.',
-  'ParButterfly':'Count butterflies in a bipartite graph exactly and in parallel.',
-  'Parallel DBSCAN':'Cluster points with parallel DBSCAN and match the sequential result exactly.',
-  'RegionsSort':'Sort integers in place and in parallel with a radix sort.',
-  'Seer':'Predict the branches an EVM transaction will take so it can be executed ahead of time.',
-  'Polar Express':'Approximate a matrix’s orthogonal factor in a few polynomial iterations.',
-  'kmeans kernel':'Make one GPU k-means iteration as fast as possible without changing its result.',
-  'Robust Image Tokenizer':'Train an image tokenizer whose latents survive corruption.',
-  'Differentiable Population Statistics':'Turn a Fréchet distance between feature distributions into a training loss.',
-  'Glenside':'Write the access-pattern rewrite rules of a tensor-program IR.',
-  'MetaOpt':'Find the inputs on which a traffic-engineering heuristic falls furthest behind the optimum.',
-  'OCR Distillation Trajectory Sampling':'Distill a flow-matching image model on its own sampling trajectories.',
-  'MuJoCo Playground':'Write a quadruped’s simulation environment and train a policy that follows joystick commands.',
-  'Residual State Advancement':'Train gradient-boosted trees over joined tables without materialising the join.',
-  'QuarterPIR':'Rebuild the client of a private-information-retrieval scheme that uses no public-key cryptography.',
-  'dbscan kernel':'Make GPU DBSCAN as fast as possible without changing its clusters.',
-  'RAGEN':'Write a multi-turn reinforcement-learning trainer for LLM agents that stays stable.',
+  'ScaleGPM':'Pick sampling or sparsification for each graph-pattern query.',
+  'Yannakakis':'Rewrite join trees into faster two-phase semijoin plans.',
+  'SVG-EAR':'Rebuild sparse attention for a video diffusion model.',
+  'BBQ':'Generate the per-level logic of a hardware priority queue.',
+  'Hygra':'Compute core numbers of a hypergraph in parallel.',
+  'Approximate-MIPS Query Stopping':'Decide when an inner-product search can stop probing.',
+  'Spectrum':'Make EVM stack checkpoints cheap to create and restore.',
+  'Shockwave':'Share GPUs among ML jobs whose batch sizes keep changing.',
+  'BABBLE':'Find library functions shared across a corpus of programs.',
+  'SCOPE':'Count subgraph patterns for a batch of queries with shared plans.',
+  'Structured LWE':'Solve as many structured-LWE instances as possible.',
+  'Diffusion Policy':'Sample a robot’s actions from a diffusion policy.',
+  'LeJEPA':'Implement the loss that recovers a world model’s latents.',
+  'egg':'Restore an e-graph’s invariants with deferred rebuilding.',
+  'Clusterwise SpGEMM':'Speed up sparse matrix multiplication by clustering rows.',
+  'Persistent Treap Update Engine':'Apply concurrent updates to a persistent treap index.',
+  'Polygon':'Find inputs on which two SQL queries disagree.',
+  'FARGO paper-aligned query core':'Write the multi-probing query core of an inner-product search.',
+  'KAMI':'Write the double-precision block matrix-multiply kernel for one GPU.',
+  'ParButterfly':'Count butterflies in a bipartite graph in parallel.',
+  'Parallel DBSCAN':'Cluster points with DBSCAN in parallel, exactly.',
+  'RegionsSort':'Sort integers in place and in parallel.',
+  'Seer':'Predict the branches an EVM transaction will take.',
+  'Polar Express':'Approximate a matrix’s orthogonal factor in a few iterations.',
+  'kmeans kernel':'Make a GPU k-means step as fast as possible.',
+  'Robust Image Tokenizer':'Restore the corruption training that makes an image tokenizer robust.',
+  'Differentiable Population Statistics':'Keep population statistics differentiable for a Fréchet-distance loss.',
+  'Glenside':'Write the access-pattern rewrite rules of a tensor IR.',
+  'MetaOpt':'Find traffic matrices on which a combined heuristic does worst.',
+  'OCR Distillation Trajectory Sampling':'Sample the student’s trajectories to distil a text-rendering image model.',
+  'MuJoCo Playground':'Train a quadruped to follow joystick commands.',
+  'Residual State Advancement':'Train boosted trees over joined tables without joining them.',
+  'QuarterPIR':'Decode a private-retrieval client’s stored set lists efficiently.',
+  'dbscan kernel':'Make GPU DBSCAN as fast as possible.',
+  'RAGEN':'Turn multi-turn agent trajectories into training batches.',
   'DyT':'Replace a Transformer’s normalization layers with a learned tanh.',
-  'Nano World Model':'Implement diffusion forcing to train and sample a video world model.',
-  'ivf_pq kernel':'Make GPU IVF-PQ nearest-neighbour search as fast as possible at the same recall.',
-  'Exact Sequence Alignment':'Align long sequences exactly by edit distance, fast and in little memory.',
-  'CKKS noise':'Track how noise grows through CKKS homomorphic operations.',
-  'knn kernel':'Make brute-force GPU k-nearest-neighbour search as fast as possible.',
-  'Binary Fuse Filter Construction and Lookup':'Build and query a binary fuse filter, a smaller and faster alternative to a Bloom filter.',
-  'RUNLTS':'Predict branches more accurately by using register values.',
+  'Nano World Model':'Sample future video frames from a world model.',
+  'ivf_pq kernel':'Make GPU IVF-PQ search as fast as possible.',
+  'Exact Sequence Alignment':'Recover exact alignment paths in linear memory, fast.',
+  'CKKS noise':'Predict the precision of CKKS computations, faster than the reference.',
+  'knn kernel':'Make brute-force GPU k-NN as fast as possible.',
+  'Binary Fuse Filter Construction and Lookup':'Write the construction of a binary fuse filter.',
+  'RUNLTS':'Predict conditional branches with fewer mistakes.',
+};
+// What each task is scored on, in plain words, for the map card: the metrics it optimises, not the guards (correctness
+// and validity checks) a submission must also satisfy. Chosen by hand from the judge's metrics (CHECKS); no raw metric names.
+// Security tasks have no entry here or in GOAL: their cards show the task's own name.
+const KEYM = {
+  'ScaleGPM':'Running time', 'Yannakakis':'Query latency', 'SVG-EAR':'Latency and pixel fidelity', 'BBQ':'Throughput and latency',
+  'Hygra':'Running time', 'Approximate-MIPS Query Stopping':'Query time and result quality',
+  'Spectrum':'Transactions per second and checkpoint cost', 'Shockwave':'Job completion time and fairness', 'BABBLE':'How much the programs shrink',
+  'SCOPE':'Time per batch of queries', 'Structured LWE':'Instances solved', 'Diffusion Policy':'Task success and time per action',
+  'LeJEPA':'How well the latents are recovered', 'egg':'Rebuild time', 'Clusterwise SpGEMM':'Multiplication speed',
+  'Persistent Treap Update Engine':'Update throughput, query time and memory', 'Polygon':'Query pairs told apart, and time',
+  'FARGO paper-aligned query core':'Query time and result quality', 'KAMI':'Floating-point throughput', 'ParButterfly':'Counting time',
+  'Parallel DBSCAN':'Running time', 'RegionsSort':'Sorting time and extra memory', 'Seer':'Prediction accuracy', 'Polar Express':'Approximation error',
+  'kmeans kernel':'Time per iteration', 'Robust Image Tokenizer':'Reconstruction quality and training time',
+  'Differentiable Population Statistics':'Image quality across six feature models', 'Glenside':'Rewrite time and search size', 'MetaOpt':'Size of the gap found',
+  'OCR Distillation Trajectory Sampling':'How legible the rendered text is', 'MuJoCo Playground':'How well it tracks the commanded velocity',
+  'Residual State Advancement':'Training time and prediction error', 'QuarterPIR':'Online time, communication and storage', 'dbscan kernel':'Running time',
+  'RAGEN':'Task success and reward', 'DyT':'Accuracy and speed', 'Nano World Model':'How close predicted frames are to the real ones',
+  'ivf_pq kernel':'Search time', 'Exact Sequence Alignment':'CPU time and peak memory', 'CKKS noise':'Estimator speed and prediction error',
+  'knn kernel':'Search time', 'Binary Fuse Filter Construction and Lookup':'Build time, lookup time and size', 'RUNLTS':'Mispredictions and wasted cycles',
 };
 const N_IN = d => TASKS.filter(t => t.d === d).length;
 
@@ -115,6 +132,27 @@ const DESC = {"dbscan kernel": "FlashML flashlib supplies the tuned GPU DBSCAN r
 
 const RAN = new Set(RUNS.map(r => r.t));
 const mean = a => a.reduce((x, y) => x + y, 0) / a.length;
+
+/* Task difficulty from who passes (owner, 2026-10-13). The FECI fit's own task difficulty follows the task's raw score
+   scale: a task scored around 10 looks hard and one scored around 80 looks easy, whoever passes it. This one uses only
+   pass and fail. Each model gets a strength and each task a difficulty, fitted together so that
+   P(model passes task) = 1 / (1 + exp(difficulty - strength)), the Rasch model, which is the ECI idea run on pass/fail
+   and read from the task's side. A light pull towards 0 keeps a task nobody passes, or everybody passes, finite.
+   With every model on every task the fit orders tasks by how many pass; ties are then broken by who passes (stronger
+   passers, harder task) and, where nobody passes, by how far the runs fall short of the human baseline.
+   TDIFF[task] = {b: difficulty, rank: 1 for the hardest, pass, n}. */
+const TDIFF = (() => {
+  const ms = [...new Set(RUNS.map(r => r.m))], ts = [...new Set(RUNS.map(r => r.t))], th = Object.fromEntries(ms.map(m => [m, 0])), b = Object.fromEntries(ts.map(t => [t, 0]));
+  const sig = x => 1 / (1 + Math.exp(-x)), LAM = .35;
+  for (let it = 0; it < 80; it++) {   // one Newton step per parameter in turn; the penalised likelihood is concave
+    for (const m of ms) { let g = -LAM * th[m], h = LAM; for (const r of RUNS) if (r.m === m) { const q = sig(th[m] - b[r.t]); g += r.p - q; h += q * (1 - q); } th[m] += g / h; }
+    for (const t of ts) { let g = -LAM * b[t], h = LAM; for (const r of RUNS) if (r.t === t) { const q = sig(th[r.m] - b[t]); g += q - r.p; h += q * (1 - q); } b[t] += g / h; }
+  }
+  const info = Object.fromEntries(ts.map(t => { const rs = RUNS.filter(r => r.t === t), ps = rs.filter(r => r.p), ref = REF[t];
+    return [t, {b:b[t], pass:ps.length, n:rs.length, who:ps.length ? mean(ps.map(r => th[r.m])) : 0, gap:ref ? mean(rs.map(r => (r.s - ref) / ref)) : 0}]; }));
+  [...ts].sort((x, y) => info[y].b - info[x].b || info[y].who - info[x].who || info[x].gap - info[y].gap || x.localeCompare(y)).forEach((t, i) => { info[t].rank = i + 1; });
+  return info;
+})();
 const f1 = x => x.toFixed(1);
 
 
