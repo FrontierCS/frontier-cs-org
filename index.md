@@ -16,7 +16,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
   <div class="hero">
   <div class="hero-text">
   <p class="upd"><i></i><span>Last updated: {{ site.time | date: "%B %-d, %Y" }}</span></p>
-  <h1>FrontierCS 2: A benchmark for agentic computer-science R&amp;D</h1>
+  <h1>FrontierCS 2: A benchmark for computer-science R&amp;D</h1>
   <p class="lead">Each task deletes a published paper’s contribution from the repository its authors released. The agent writes it back, and the authors’ own code is the reference it must beat.</p>
 
   <div class="links"><a class="pill lg" id="paperlink" aria-disabled="true">Paper (coming soon)</a></div>
