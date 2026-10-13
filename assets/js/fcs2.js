@@ -50,7 +50,7 @@ $('#showruns').addEventListener('change', e => { showRuns = e.target.checked; dr
 $('#custom').addEventListener('click', () => { const s = $('#settings'); const o = !s.classList.contains('open'); s.classList.toggle('open', o); $('#custom').setAttribute('aria-expanded', String(o)); });
 $('#lblegend').innerHTML = RANKED.map(m => `<span><i style="background:${MCOL[m.id]}"></i>${esc(m.name)}</span>`).join('');
 
-/* Main chart: pass rate against mean cost per run in US$, one dot per model (PASS, COST). Each label takes the first
+/* Main chart: pass rate against mean cost per run in US$, one dot per model (PASS, COST), over a dotted Pareto frontier. Each label takes the first
    spot right, left, above or below its dot that clears every dot, every placed label and the edges; a dot with no free
    spot keeps no label (the tooltip still names it). No legend: the labels name the dots. */
 function drawPassCost() {
@@ -77,6 +77,10 @@ function drawPassCost() {
   const pts = [], order = [...ms].sort((a, b) => PASS[b.id][0] - PASS[a.id][0]);
   const at = m => [X(COST[m.id][0]), Y(PASS[m.id][0])];
   const boxes = order.map(m => { const [cx, cy] = at(m); return {x:cx - 9, y:cy - 9, w:18, h:18}; });
+  // the Pareto frontier: the models no other model beats on both pass rate and cost, joined from the cheapest to the dearest
+  // (as Artificial Analysis draws it); a model under the line is matched or beaten by a cheaper one
+  const front = [...ms].sort((p, q) => COST[p.id][0] - COST[q.id][0] || PASS[q.id][0] - PASS[p.id][0]).filter((m, i, a) => a.slice(0, i).every(o => PASS[o.id][0] < PASS[m.id][0]));
+  if (front.length > 1) svg.append(sv('path', {d:front.map((m, i) => `${i ? 'L' : 'M'}${at(m).map(v => v.toFixed(1)).join(',')}`).join(''), fill:'none', stroke:'var(--line)', 'stroke-width':2, 'stroke-dasharray':'2 6', 'stroke-linecap':'round'}));
   order.forEach(m => {
     const [cx, cy] = at(m), name = narrow ? m.short : m.name;
     svg.append(sv('circle', {cx, cy, r:7, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':2, 'data-m':m.id}));
@@ -158,16 +162,18 @@ function drawTTS() {
   const all = Object.values(SCALE).flat(), shown = m => ttsHover ? ttsHover === m.id : ttsOn.has(m.id), band1 = m => ttsHover === m.id || ttsOn.size === 1 && ttsOn.has(m.id);
   // the axis starts a little before the first budget at which any model rises above 0
   const x0 = Math.log10(Math.min(...all.filter(p => p[1] >= 0).map(p => p[0]))) - 0.3, x1 = Math.log10(Math.max(...all.map(p => p[0])));
-  const ymax = Math.ceil((Math.max(...all.map(p => p[1])) + 4) / 10) * 10;
-  // the value axis is in two pieces: 0 to TTS_Y0 takes the bottom fifth, TTS_Y0 to the top takes the rest, so the band where
-  // the curves crowd gets most of the height and each curve's climb from 0 still shows (owner, 2026-10-13)
-  const LOW = .2, yf = v => v <= TTS_Y0 ? v / TTS_Y0 * LOW : LOW + (v - TTS_Y0) / (ymax - TTS_Y0) * (1 - LOW);
+  const ymax = Math.max(65, Math.ceil((Math.max(...all.map(p => p[1])) + 2) / 5) * 5);
+  // the value axis is in three pieces, each wider than the one below: 0 to 40 takes the bottom 14% of the plot, 40 to 60
+  // the next 28%, and 60 to the top the remaining 58%, since that is where the leading curves finish and crowd; each
+  // curve's climb from 0 still shows (owner, 2026-10-13)
+  const KN = [[0, 0], [TTS_Y0, .14], [60, .42], [ymax, 1]];
+  const yf = v => { let i = 1; while (i < KN.length - 1 && v > KN[i][0]) i++; const [a, fa] = KN[i - 1], [b, fb] = KN[i]; return fa + (v - a) / (b - a) * (fb - fa); };
   const X = v => L + (Math.log10(v) - x0) / (x1 - x0) * (W - L - R), Y = v => T + (1 - yf(v)) * (H - T - B);
   const an = animates(svg);
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
   const clip = sv('clipPath', {id:'ttsclip'}), cr = sv('rect', {x:L, y:T - 4, width:W - L - R + 11, height:H - T - B + 5}); clip.append(cr); svg.append(clip);
-  for (const v of [0, 20, ...Array.from({length:(ymax - TTS_Y0) / 10 + 1}, (_, i) => TTS_Y0 + i * 10)]) {
-    svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:v === TTS_Y0 ? 'var(--line)' : 'var(--grid)', 'stroke-width':1}));
+  for (const v of [0, 20, 40, 50, ...Array.from({length:(ymax - 60) / 5 + 1}, (_, i) => 60 + i * 5)]) {
+    svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:v === TTS_Y0 || v === 60 ? 'var(--line)' : 'var(--grid)', 'stroke-width':1}));
     svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, v));
   }
   for (let k = Math.ceil(x0); k <= Math.floor(x1); k++) {
