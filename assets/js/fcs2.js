@@ -59,8 +59,8 @@ function drawPassCost() {
   const ms = MODELS.filter(m => COST[m.id]), tx = ms.map(m => COST[m.id][0]);
   // the axis runs 0.15 decade past the outermost dots and no further (owner, 2026-10-10: half-decade rounding left
   // the range loose); an edge dot whose label has no room on its outer side takes another spot
-  // (on phones the right side keeps a little more, so the label of the right-most dot in the $9 cluster still fits)
-  const x0 = Math.log10(Math.min(...tx)) - .15, x1 = Math.log10(Math.max(...tx)) + (narrow ? .3 : .15);
+  // (on phones the right side keeps more, so the labels of the dots near the right edge fit on their right)
+  const x0 = Math.log10(Math.min(...tx)) - .15, x1 = Math.log10(Math.max(...tx)) + (narrow ? .74 : .15);
   const ymax = Math.min(100, Math.ceil((Math.max(...ms.map(m => PASS[m.id][0])) + 5) / 20) * 20);
   const X = v => L + (Math.log10(v) - x0) / (x1 - x0) * (W - L - R), Y = v => T + (1 - v / ymax) * (H - T - B);
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
