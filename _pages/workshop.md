@@ -47,7 +47,7 @@ page_css: fcs2
   <ul class="spk">
     <li><img src="{{ '/assets/img/workshop/alex-dimakis.jpg' | relative_url }}" alt="" width="240" height="240" loading="lazy"><b>Alex Dimakis</b><span>UC Berkeley · Bespoke Labs</span></li>
     <li><img src="{{ '/assets/img/workshop/azalia-mirhoseini.jpg' | relative_url }}" alt="" width="240" height="240" loading="lazy"><b>Azalia Mirhoseini</b><span>Stanford · Ricursive Intelligence</span></li>
-    <li><img src="{{ '/assets/img/workshop/ofir-press.jpg' | relative_url }}" alt="" width="240" height="240" loading="lazy"><b>Ofir Press</b></li>
+    <li><img src="{{ '/assets/img/workshop/ofir-press.jpg' | relative_url }}" alt="" width="240" height="240" loading="lazy"><b>Ofir Press</b><span>SWE-bench · ProgramBench</span></li>
     <li><img src="{{ '/assets/img/workshop/yuandong-tian.png' | relative_url }}" alt="" width="240" height="240" loading="lazy"><b>Yuandong Tian</b><span>Recursive Superintelligence</span></li>
     <li><img src="{{ '/assets/img/workshop/matei-zaharia.jpg' | relative_url }}" alt="" width="240" height="240" loading="lazy"><b>Matei Zaharia</b><span>UC Berkeley · Databricks</span></li>
   </ul>
