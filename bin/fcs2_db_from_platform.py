@@ -4,7 +4,7 @@
 usage: python3 bin/fcs2_db_from_platform.py out.db [--api=http://127.0.0.1:18080/api/v1/] [--min-scored=40]
 
 Takes every formal 47-task evaluation that is not archived and has at least --min-scored scored runs (one per model;
-the newest wins; the API lists at most the newest 200 evaluations), and writes the tables the converter queries: release, candidates, tasks, cells, runs, submissions,
+the newest wins), and writes the tables the converter queries: release, candidates, tasks, cells, runs, submissions,
 score_points. Only GET requests are made.
 
 What the API does not give, and what stands in for it:
@@ -39,7 +39,15 @@ def get(path):
 
 ts = lambda s: datetime.fromisoformat(s[:19]).replace(tzinfo=timezone.utc).timestamp()
 evs = {}
-for e in sorted(get('evaluations?limit=200'), key=lambda e: e['created_at']):
+def evaluations():
+    """Every evaluation: the list is paged, 200 at a time, with the next page's cursor in the x-next-cursor header."""
+    out, cursor = [], None
+    while True:
+        r = urllib.request.urlopen(API + 'evaluations?limit=200' + (f'&cursor={cursor}' if cursor else ''), timeout=30)
+        out += json.load(r); cursor = r.headers.get('x-next-cursor')
+        if not cursor: return out
+
+for e in sorted(evaluations(), key=lambda e: e['created_at']):
     if e['is_formal'] and e['total_runs'] == 47 and not e['archived_at'] and e['candidate_name'] in CACHE: evs[e['candidate_name']] = e
 items = {c: get('evaluations/' + e['id'])['items'] for c, e in evs.items()}
 done = lambda i: i['score'] is not None or i['run_state'] == 'TIMED_OUT'   # a timeout is a result: it scores 0
