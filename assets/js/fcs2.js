@@ -138,6 +138,18 @@ function drawECI() {
    The legend is the control: hovering a name shows that model alone with its band, the others in light grey; a click takes
    a model off (grey) or puts it back. On first view the curves draw one after another, from the cheapest model to the
    dearest. Values below 0 leave the plot through its bottom edge. */
+// A curve through every point with no overshoot (monotone cubic, Fritsch-Carlson, as d3's curveMonotoneX): between two
+// samples it never goes above the higher or below the lower, so the smoothing adds no value the data does not have.
+function smooth(P) {
+  const n = P.length; if (n < 3) return P.map((p, i) => `${i ? 'L' : 'M'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join('');
+  const dx = [], sl = []; for (let i = 0; i < n - 1; i++) { dx.push(P[i + 1][0] - P[i][0]); sl.push((P[i + 1][1] - P[i][1]) / (dx[i] || 1)); }
+  const t = [sl[0]]; for (let i = 1; i < n - 1; i++) t.push(sl[i - 1] * sl[i] <= 0 ? 0 : 3 * (dx[i - 1] + dx[i]) / ((2 * dx[i] + dx[i - 1]) / sl[i - 1] + (dx[i] + 2 * dx[i - 1]) / sl[i]));
+  t.push(sl[n - 2]);
+  let d = `M${P[0][0].toFixed(1)},${P[0][1].toFixed(1)}`;
+  for (let i = 0; i < n - 1; i++) { const h = dx[i] / 3;
+    d += `C${(P[i][0] + h).toFixed(1)},${(P[i][1] + h * t[i]).toFixed(1)} ${(P[i + 1][0] - h).toFixed(1)},${(P[i + 1][1] - h * t[i + 1]).toFixed(1)} ${P[i + 1][0].toFixed(1)},${P[i + 1][1].toFixed(1)}`; }
+  return d;
+}
 const TTS_Y0 = 40, ttsOn = new Set(RANKED.filter(m => SCALE[m.id]).map(m => m.id));
 let ttsHover = null;
 function drawTTS() {
@@ -168,7 +180,7 @@ function drawTTS() {
   const seq = [...ms].sort((p, q) => SCALE[p.id].at(-1)[0] - SCALE[q.id].at(-1)[0]).map(m => m.id);   // drawing order: by final spend
   // the grey curves first, then the picked ones over them, the leader last
   [...ms.filter(m => !shown(m)), ...ms.filter(shown)].forEach(m => {
-    const c = SCALE[m.id], on = shown(m), path = c.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join('');
+    const c = SCALE[m.id], on = shown(m), path = smooth(c.map(p => [X(p[0]), Y(p[1])]));
     const e = c[c.length - 1];
     if (band1(m)) {
       const band = c.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[3]).toFixed(1)}`).join('')
