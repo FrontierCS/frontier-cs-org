@@ -3,7 +3,7 @@
    then chart + settings panel, an activity list, a filterable task index, questions, deep-teal footer.
    Single light theme on purpose (the reference site has none). */
 [hidden]{display:none!important}
-html{scroll-padding-top:84px}
+html{scroll-padding-top:28px}
 @media (prefers-reduced-motion: no-preference){ html{scroll-behavior:smooth} }
 .fcs2{padding-inline:var(--gutter)}
 a{color:inherit}
