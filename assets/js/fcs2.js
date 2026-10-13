@@ -84,10 +84,13 @@ function drawPassCost() {
   // (not on phones, where there is no room to spare and a label's white halo carries it over the line)
   if (!narrow) for (let i = 1; i < front.length; i++) { const [ax, ay] = at(front[i - 1]), [bx, by] = at(front[i]), n = Math.ceil(Math.hypot(bx - ax, by - ay) / 8);
     for (let k = 1; k < n; k++) boxes.push({x:ax + (bx - ax) * k / n - 3, y:ay + (by - ay) * k / n - 3, w:6, h:6}); }
-  if (front.length > 1) svg.append(sv('path', {d:front.map((m, i) => `${i ? 'L' : 'M'}${at(m).map(v => v.toFixed(1)).join(',')}`).join(''), fill:'none', stroke:'#80868b', 'stroke-width':2.2, 'stroke-dasharray':'7 6', 'stroke-linecap':'round', 'stroke-linejoin':'round'}));
+  if (front.length > 1) svg.append(sv('path', {d:front.map((m, i) => `${i ? 'L' : 'M'}${at(m).map(v => v.toFixed(1)).join(',')}`).join(''), fill:'none', stroke:'var(--line)', 'stroke-width':1.5, 'stroke-linecap':'round', 'stroke-linejoin':'round'}));
   order.forEach(m => {
     const [cx, cy] = at(m), name = narrow ? m.short : m.name;
-    svg.append(sv('circle', {cx, cy, r:7, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':2, 'data-m':m.id}));
+    // the frontier reads from the dots themselves: a model on it keeps a full dot and a full-strength name, a model under it
+    // a smaller, paler dot and a paler name; the line joining the frontier is a hairline
+    const lead = front.includes(m);
+    svg.append(sv('circle', {cx, cy, r:lead ? 7.5 : 5.5, fill:MCOL[m.id], 'fill-opacity':lead ? 1 : .45, stroke:'#fff', 'stroke-width':2, 'data-m':m.id}));
     const lab = sv('text', {class:'lab halo', x:cx, y:cy}, name); svg.append(lab);
     const w = lab.getComputedTextLength() + 2;
     // right, left, above, below, the four diagonals, then the same one and two lines further out; the first spot clear of every dot and placed label wins
@@ -100,7 +103,7 @@ function drawPassCost() {
     const spot = spots.find(sp => !hit(box(sp)));
     if (spot) { boxes.push(box(spot)); lab.setAttribute('x', spot[0]); lab.setAttribute('y', spot[1]); lab.setAttribute('text-anchor', spot[2]);
       // a label wears its dot's colour, darkened to read on white, so a crowded patch still pairs each name with its dot
-      lab.style.fill = `color-mix(in srgb, ${MCOL[m.id]} 78%, #000)`; }
+      lab.style.fill = `color-mix(in srgb, ${MCOL[m.id]} 78%, #000)`; if (!lead) lab.style.fillOpacity = .62; else lab.style.fontWeight = 600; }
     else lab.remove();
     const pct = PASS[m.id][0];
     pts.push({x:cx, y:cy, mean:true, html:`<b>${esc(m.name)}</b><br>Pass rate <b>${f1(pct)}%</b><br>${usdfmt(COST[m.id][0])} per run, mean`});
