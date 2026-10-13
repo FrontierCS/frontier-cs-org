@@ -108,7 +108,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
       <div class="chead"><span>Test-time scaling: FECI against cost budget per run</span></div>
       <div class="plot" id="ttsplot"><svg id="ttssvg" role="img" aria-label="Test-time scaling chart"></svg><div class="tip" id="ttstip" hidden></div></div>
       <div class="legend" id="ttslegend"></div>
-      <div class="cfoot">{% include chart_logo.html %}<span>Preliminary · within a budget, a run counts its latest valid submission, scored on the development workloads and calibrated to the hidden suite · bands are 90% intervals</span></div>
+      <div class="cfoot">{% include chart_logo.html %}<span>Preliminary · within a budget, a run counts its latest valid submission, scored on the development workloads · each curve is the best level reached by that budget · bands are 90% intervals</span></div>
     </figure>
   </div>
 </section>

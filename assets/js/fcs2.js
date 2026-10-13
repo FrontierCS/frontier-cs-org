@@ -154,12 +154,17 @@ function smooth(P) {
     d += `C${(P[i][0] + h).toFixed(1)},${(P[i][1] + h * t[i]).toFixed(1)} ${(P[i + 1][0] - h).toFixed(1)},${(P[i + 1][1] - h * t[i + 1]).toFixed(1)} ${P[i + 1][0].toFixed(1)},${P[i + 1][1].toFixed(1)}`; }
   return d;
 }
+// The curves plotted are the running maximum of SCALE over the budget (value and both ends of its interval): the best level a
+// model has reached by that budget. The raw value can dip when a later submission scores below an earlier one, or when a
+// finished run's development score gives way to its hidden score (owner, 2026-10-13).
+const TTS = Object.fromEntries(Object.entries(SCALE).map(([id, c]) => { let v = -Infinity, lo = -Infinity, hi = -Infinity;
+  return [id, c.map(p => [p[0], v = Math.max(v, p[1]), lo = Math.max(lo, p[2]), hi = Math.max(hi, p[3]), p[4]])]; }));
 const TTS_Y0 = 40, ttsOn = new Set(RANKED.filter(m => SCALE[m.id]).map(m => m.id));
 let ttsHover = null;
 function drawTTS() {
   const svg = $('#ttssvg'), W = Math.max(300, $('#ttsplot').clientWidth), narrow = W < 560;
   const L = 34, R = narrow ? 12 : 24, T = 12, B = 46, H = CHART_H.tts || (narrow ? 300 : 380);
-  const all = Object.values(SCALE).flat(), shown = m => ttsHover ? ttsHover === m.id : ttsOn.has(m.id), band1 = m => ttsHover === m.id || ttsOn.size === 1 && ttsOn.has(m.id);
+  const all = Object.values(TTS).flat(), shown = m => ttsHover ? ttsHover === m.id : ttsOn.has(m.id), band1 = m => ttsHover === m.id || ttsOn.size === 1 && ttsOn.has(m.id);
   // the axis starts a little before the first budget at which any model rises above 0
   const x0 = Math.log10(Math.min(...all.filter(p => p[1] >= 0).map(p => p[0]))) - 0.3, x1 = Math.log10(Math.max(...all.map(p => p[0])));
   const ymax = Math.max(65, Math.ceil((Math.max(...all.map(p => p[1])) + 2) / 5) * 5);
@@ -184,10 +189,10 @@ function drawTTS() {
   const g = sv('g', {'clip-path':'url(#ttsclip)'}); svg.append(g);
   const pts = [], ms = [...RANKED].reverse().filter(m => SCALE[m.id]);   // a model with no reported spend has no curve
   const ends = [];
-  const seq = [...ms].sort((p, q) => SCALE[p.id].at(-1)[0] - SCALE[q.id].at(-1)[0]).map(m => m.id);   // drawing order: by final spend
+  const seq = [...ms].sort((p, q) => TTS[p.id].at(-1)[0] - TTS[q.id].at(-1)[0]).map(m => m.id);   // drawing order: by final spend
   // the grey curves first, then the picked ones over them, the leader last
   [...ms.filter(m => !shown(m)), ...ms.filter(shown)].forEach(m => {
-    const c = SCALE[m.id], on = shown(m), path = smooth(c.map(p => [X(p[0]), Y(p[1])]));
+    const c = TTS[m.id], on = shown(m), path = smooth(c.map(p => [X(p[0]), Y(p[1])]));
     const e = c[c.length - 1];
     const focus = band1(m);
     if (focus) {   // the band's edges take the same curve as the line
