@@ -501,8 +501,13 @@ function showRun() {
           sv('text', {x:ix + 16, y:cy + 5, 'font-size':14.5, 'font-weight':500, fill:'#fff'}, label)); });
       foot = y + 33 + (KEYM[s].length - 1) * 22 + 12; }
     // the source sits at the foot of the card, on as many lines as the room above leaves: two, one, or none
-    if (t.t) { const base = p.y + p.h - 34, two = wrapText(svg, t.t, inner, 12.5, 400).length > 1, room = base - foot;
-      if (two && room >= 17 + 18) lines(t.t, base - 17, 12.5, 400, 17, 2, .8); else if (room >= 18) lines(t.t, base, 12.5, 400, 17, 1, .8); }
+    const ttl = t.t || (VENUE[s] ? t.name : '');   // a paper whose title is the task's short name still shows, with its venue
+    if (ttl) { const v = VENUE[s], src = v ? `${v} · ${ttl}` : ttl, base = p.y + p.h - 34, two = wrapText(svg, src, inner, 12.5, 400).length > 1, room = base - foot, n0 = panel.childNodes.length;
+      if (two && room >= 17 + 18) lines(src, base - 17, 12.5, 400, 17, 2, .8); else if (room >= 18) lines(src, base, 12.5, 400, 17, 1, .8);
+      // the venue leads the source line in bold
+      const first = panel.childNodes[n0];
+      if (v && first && first.textContent.startsWith(v)) { const rest = first.textContent.slice(v.length); first.textContent = '';
+        first.append(sv('tspan', {'font-weight':600, 'fill-opacity':1}, v), sv('tspan', {}, rest)); } }
   } else if (p.k === 1) {   // every model: a tick or a cross in a disc, then its name; two columns, in leaderboard order
     const rs = RANKED.map(m => [m, p.runs.find(r => r.m === m.id)]).filter(x => x[1]), half = Math.ceil(rs.length / 2), lh = Math.min(30, (p.h - 96) / half);
     panel.append(sv('text', {x:p.x + PX, y:top + 4, 'font-size':13, 'font-weight':500, fill:'#fff', 'fill-opacity':.85}, `${rs.filter(x => x[1].p).length} of ${rs.length} models pass`));
