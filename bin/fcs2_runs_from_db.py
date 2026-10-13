@@ -56,6 +56,7 @@ TASK = {
     'Exact Sequence Alignment': ('Bioinformatics', None),
     'Go1 Joystick Policy Training': ('Robotics', 'MuJoCo Playground'),
     'Private Set List Decoding': ('Crypto', 'QuarterPIR'),
+    'Register-aware Branch Prediction': ('Arch', 'RUNLTS'),
     'Adaptive Robustness Evaluation for Prompt-Injection Defense': ('Security', 'Adaptive attacks'),
     'Approximate-MIPS Query Stopping': ('Database', None),
     'Argument-aware runtime privilege control': ('Security', 'Progent'),
@@ -112,6 +113,7 @@ MODEL = {
     'DeepSeek V4.1 Flash (DSH)': ('ds', 'DeepSeek V4.1 Flash', 'DeepSeek V4.1 Flash', 'DSH', 'DeepSeek'),
     'GLM 5.3 (ZCode)': ('glm', 'GLM 5.3', 'GLM 5.3', 'ZCode', 'Z.ai'),
     'Claude Code · Opus 5.5 (Subscription, max effort)': ('opus', 'Claude Opus 5.5', 'Opus 5.5', 'Claude Code', 'Anthropic'),
+    'Muse Code · Muse Wonder 1.0': ('wonder', 'Muse Wonder 1.0', 'Muse Wonder', 'Muse Code', 'Meta'),
 }
 
 HUMAN_VALUE = 60                               # owner's choice, 2026-10-09 (tried 100 and 25; K2.7 was 20)

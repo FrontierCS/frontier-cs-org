@@ -3,7 +3,7 @@
 
 usage: python3 bin/fcs2_db_from_platform.py out.db [--api=http://127.0.0.1:18080/api/v1/] [--min-scored=40] [--claude-usage=recovered.json]
 
-Takes every formal 47-task evaluation that is not archived and has at least --min-scored scored runs (one per model;
+Takes every formal evaluation of the full task set (47 tasks or more) that is not archived and has at least --min-scored scored runs (one per model;
 the newest wins), and writes the tables the converter queries: release, candidates, tasks, cells, runs, submissions,
 score_points. Only GET requests are made.
 
@@ -28,7 +28,7 @@ for a in sys.argv[2:]:
     if a.startswith('--min-scored='): MIN = int(a[13:])
 # cache-read US$ per million tokens, as PRICE in the converter, keyed by the platform's candidate name
 CACHE = {'GPT-6 Astra': 1.00, 'GPT-6.1 Sol': 0.10, 'Kimi K3 (Modal)': 0.30, 'DeepSeek V4.1 Flash (DSH)': 0.003, 'Muse Code - Muse Spark 1.3': 0.15, 'GLM 5.3 (ZCode)': 0.26,
-         'Claude Code · Opus 5.5 (Subscription, max effort)': None, 'Kimi K2.7 Code': None}   # None: run on a subscription, the platform reports no usage
+         'Claude Code · Opus 5.5 (Subscription, max effort)': None, 'Kimi K2.7 Code': None, 'Muse Code · Muse Wonder 1.0': None}   # None: run on a subscription, the platform reports no usage
 
 
 def get(path):
@@ -48,7 +48,7 @@ def evaluations():
         if not cursor: return out
 
 for e in sorted(evaluations(), key=lambda e: e['created_at']):
-    if e['is_formal'] and e['total_runs'] == 47 and not e['archived_at'] and e['candidate_name'] in CACHE: evs[e['candidate_name']] = e
+    if e['is_formal'] and e['total_runs'] >= 47 and not e['archived_at'] and e['candidate_name'] in CACHE: evs[e['candidate_name']] = e
 items = {c: get('evaluations/' + e['id'])['items'] for c, e in evs.items()}
 done = lambda i: i['score'] is not None or i['run_state'] == 'TIMED_OUT'   # a timeout is a result: it scores 0
 items = {c: v for c, v in items.items() if sum(map(done, v)) >= MIN}

@@ -1,7 +1,7 @@
 ---
 layout: default
 title: FrontierCS 2
-description: A benchmark of 47 open-ended computer-science R&D tasks built from published papers, where the authors’ own code is the reference to beat.
+description: A benchmark of 48 open-ended computer-science R&D tasks built from published papers, where the authors’ own code is the reference to beat.
 permalink: /
 page_css: fcs2
 og_image: assets/img/fcs2-card.png   # share card for X and other link previews, drawn by bin/fcs2_card.py
@@ -28,7 +28,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
 
   <figure class="chart" id="teaser">
     <div class="chead"><span>Tasks</span></div>
-    <div class="map" id="map"><svg id="mapsvg" aria-label="The 47 tasks by domain"></svg></div>
+    <div class="map" id="map"><svg id="mapsvg" aria-label="The 48 tasks by domain"></svg></div>
   </figure>
 </section>
 
