@@ -446,14 +446,14 @@ function stopPlay(fade = true) {
   p.card.animate([{transform:'none', opacity:1}, {transform:p.back, opacity:0}], {duration:200, easing:'cubic-bezier(.3,0,.8,.15)', fill:'forwards'}).onfinish = () => p.g.remove();
 }
 function startPlay(tile) {
-  const s = tile.dataset.s, k = tile.dataset.k, runs = TRAJ.filter(r => r[1] === s && r[6].length), svg = $('#mapsvg');
+  const s = tile.dataset.s, k = tile.dataset.k, runs = RUNS.filter(r => r.t === s), svg = $('#mapsvg'), narrow = $('#map').clientWidth < 640;
   const [tx, ty, tw, th] = ['x', 'y', 'width', 'height'].map(a => +tile.getAttribute(a)), [, , W, H] = svg.getAttribute('viewBox').split(' ').map(Number);
-  const w = Math.min(W - 8, Math.max(260, tw * 1.7)), h = w / 1.5, x = Math.min(W - w - 4, Math.max(4, tx + tw / 2 - w / 2)), y = Math.min(H - h - 4, Math.max(4, ty + th / 2 - h / 2));
+  const w = Math.min(W - 8, narrow ? 340 : 440), h = Math.min(H - 8, narrow ? 250 : 290), x = Math.min(W - w - 4, Math.max(4, tx + tw / 2 - w / 2)), y = Math.min(H - h - 4, Math.max(4, ty + th / 2 - h / 2));
   const root = sv('g', {class:'play', style:'cursor:pointer'}), card = sv('g'), cid = `playclip${++playN}`;   // own id: the leaving card keeps its clip for 0.2 s
   card.innerHTML = `<clipPath id="${cid}"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="10"/></clipPath>`
     + `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="10" fill="#fff" filter="drop-shadow(0 6px 16px rgba(32,33,36,.35))"/>`
     + `<g clip-path="url(#${cid})">${taskArt(s, k).replace('<svg class="art"', `<svg x="${x}" y="${y}" width="${w}" height="${h}" preserveAspectRatio="xMidYMid slice"`)}`
-    + `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${ART_FIELD[k]}" opacity="${runs.length ? .7 : .35}"/></g>`;
+    + `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${ART_FIELD[k]}" opacity=".88"/></g>`;
   const who = sv('text', {x:x + w - 14, y:y + h - 14, 'text-anchor':'end', 'font-size':14, 'font-weight':600, fill:'#fff'});
   card.append(sv('text', {x:x + 14, y:y + 26, 'font-size':14, 'font-weight':600, fill:'#fff'}, NAME(s)), who);
   // the rest of the map fades behind the card; the veil lets the pointer through to the other tiles
@@ -461,56 +461,56 @@ function startPlay(tile) {
   card.style.transformOrigin = `${x + w / 2}px ${y + h / 2}px`;
   const back = `translate(${tx + tw / 2 - x - w / 2}px,${ty + th / 2 - y - h / 2}px) scale(${tw / w})`;   // the card's size and place as its tile
   if (!calm) card.animate([{transform:back, opacity:.6}, {transform:'none', opacity:1}], {duration:220, easing:'cubic-bezier(.2,0,0,1)', fill:'forwards'});
-  play = {tile, g:root, card, who, runs, k:0, x, y, w, h, back};
-  if (runs.length) play.t = setTimeout(showRun, calm ? 0 : 200);
+  play = {tile, g:root, card, who, runs, k:0, x, y, w, h, back, narrow};
+  play.t = setTimeout(showRun, calm ? 0 : 200);
 }
-// The card plays every run of the task, two at a time: best development score so far against time since the run began,
-// both on one time axis so the pair can be compared, and each line ends in its run's verdict (a tick or a cross in a disc). Runs are ordered by
-// how much their curve moves (the most steps up in best score, then the largest climb, then the model's place on the
-// leaderboard) and taken in pairs; an odd run out plays alone (owner, 2026-10-13).
-function cardPairs(runs) {
-  const rank = Object.fromEntries(RANKED.map((m, i) => [m.id, i]));
-  const shape = r => { let best = -1, steps = 0, first = null; r[6].forEach(([, v]) => { if (v > best + .5) { if (best >= 0) steps++; best = v; } if (first === null && v > 0) first = v; }); return [steps, best - (first ?? best)]; };
-  const by = runs.map(r => [r, shape(r)]).sort((a, b) => b[1][0] - a[1][0] || b[1][1] - a[1][1] || rank[a[0][0]] - rank[b[0][0]]).map(x => x[0]);
-  const out = []; for (let i = 0; i < by.length; i += 2) out.push(by.slice(i, i + 2).sort((a, b) => rank[a[0]] - rank[b[0]]));
-  return out;
+// The card tells a task in three panels that follow one another: the paper and, in one sentence, what the agent has to
+// do; which models passed (a tick) and which failed (a cross); and the task's difficulty on the FECI scale, placed among
+// all tasks (owner, 2026-10-13: the run curves said too little for the room they took).
+function wrapText(svg, str, width, fs, weight) {   // greedy line breaking by measured width
+  const probe = sv('text', {x:-999, y:-999, 'font-size':fs, 'font-weight':weight}); svg.append(probe);
+  const lines = []; let cur = '';
+  for (const word of str.split(' ')) { probe.textContent = cur ? cur + ' ' + word : word;
+    if (cur && probe.getComputedTextLength() > width) { lines.push(cur); cur = word; } else cur = probe.textContent; }
+  if (cur) lines.push(cur); probe.remove(); return lines;
 }
 function showRun() {
-  const p = play; p.pairs = p.pairs || cardPairs(p.runs);
-  const field = ART_FIELD[p.tile.dataset.k];
-  const two = p.pairs[p.k], n = p.pairs.length;
-  const PL = 24, PR = 24, PT = 44, PB = 62;
-  // hours into the run at each submission: the data stores spend, which the converter's source prorates by elapsed time,
-  // so spend / final spend is the share of the run's hours (a run with no spend spreads its submissions evenly)
-  const hrs = r => r[6].map(([u], i) => r[5] * (r[4] ? Math.min(1, u / r[4]) : (i + 1) / (r[6].length + 1)));
-  const x1 = Math.max(...two.map(r => r[5])) || 1;
-  const X = v => p.x + PL + v / x1 * (p.w - PL - PR), Y = v => p.y + PT + (1 - v / 100) * (p.h - PT - PB);
-  const line = sv('g', {class:'pline'}), draw = calm ? 0 : 1100, hold = 1600;
-  two.forEach((r, j) => {
-    const [m, , , ok, , xe, seq] = r, t = hrs(r), op = j ? .6 : 1; let best = -1, d = '';
-    seq.forEach(([, v], i) => { best = Math.max(best, v); d += i ? `H${X(t[i]).toFixed(1)}V${Y(best).toFixed(1)}` : `M${X(t[i]).toFixed(1)},${Y(best).toFixed(1)}`; });
-    d += `H${X(xe).toFixed(1)}`;
-    const path = sv('path', {d, pathLength:1, fill:'none', stroke:'#fff', 'stroke-opacity':op, 'stroke-width':j ? 3 : 4, 'stroke-linejoin':'round', 'stroke-linecap':'round'});
-    // the line ends in its verdict: a white disc holding a tick for a pass, a cross for a fail, in the field's colour
-    const ex = X(xe), ey = Y(best), R = j ? 8 : 9.5, dot = sv('g', {opacity:calm ? 1 : 0, 'aria-label':ok ? 'Pass' : 'Fail'});
-    dot.append(sv('circle', {cx:ex, cy:ey, r:R, fill:'#fff'}), sv('path', {d:ok ? `M${ex - R * .46},${ey + R * .04}l${R * .32},${R * .34}l${R * .6},${-R * .7}` : `M${ex - R * .36},${ey - R * .36}l${R * .72},${R * .72}M${ex + R * .36},${ey - R * .36}l${-R * .72},${R * .72}`,
-      fill:'none', stroke:field, 'stroke-width':2.2, 'stroke-linecap':'round', 'stroke-linejoin':'round'}));
-    // the legend sits along the bottom: a stroke sample in the line's own weight, then the model
-    const ly = p.y + p.h - 36 + j * 21;
-    line.append(path, dot, sv('line', {x1:p.x + 14, x2:p.x + 36, y1:ly - 4, y2:ly - 4, stroke:'#fff', 'stroke-opacity':op, 'stroke-width':j ? 3 : 4, 'stroke-linecap':'round'}),
-      sv('text', {x:p.x + 44, y:ly, 'font-size':13, 'font-weight':j ? 400 : 600, fill:'#fff'}, MNAME[m]));
-    if (!calm) {
-      path.setAttribute('stroke-dasharray', '1 1');
-      path.animate([{strokeDashoffset:1}, {strokeDashoffset:0}], {duration:draw, easing:'cubic-bezier(.6,0,.3,1)', fill:'forwards'});
-      dot.animate([{opacity:0}, {opacity:1}], {duration:200, delay:draw - 100, fill:'forwards'});
-    }
-  });
-  p.card.querySelector('.pline')?.remove(); p.card.append(line);
-  p.who.textContent = '';
-  if (n > 1) p.t = setTimeout(() => {
+  const p = play, s = p.tile.dataset.s, t = TASK_OF[s], svg = $('#mapsvg'), field = ART_FIELD[p.tile.dataset.k];
+  const PX = 18, top = p.y + 48, inner = p.w - 2 * PX, n = 3, panel = sv('g', {class:'pline'}), narrow = p.narrow;
+  const lines = (str, y, fs, weight, lh, max, op = 1) => { let L = wrapText(svg, str, inner, fs, weight);
+    if (L.length > max) { L = L.slice(0, max); L[max - 1] = L[max - 1].replace(/[\s,;:.]*\S*$/, '') + '…'; }
+    L.forEach((ln, i) => panel.append(sv('text', {x:p.x + PX, y:y + i * lh, 'font-size':fs, 'font-weight':weight, fill:'#fff', 'fill-opacity':op}, ln))); return y + L.length * lh; };
+  if (p.k === 0) {   // the paper, then the goal
+    const y = lines(t.t || t.name, top + 6, 17, 600, 22, 4);
+    lines(GOAL[s] || '', y + 10, 14, 400, 19.5, 5, .92);
+  } else if (p.k === 1) {   // every model: a tick or a cross in a disc, then its name; two columns, in leaderboard order
+    const rs = RANKED.map(m => [m, p.runs.find(r => r.m === m.id)]).filter(x => x[1]), half = Math.ceil(rs.length / 2), lh = Math.min(30, (p.h - 96) / half);
+    panel.append(sv('text', {x:p.x + PX, y:top + 4, 'font-size':13, 'font-weight':500, fill:'#fff', 'fill-opacity':.85}, `${rs.filter(x => x[1].p).length} of ${rs.length} models pass`));
+    rs.forEach(([m, r], i) => { const cx = p.x + PX + 9 + (i >= half ? inner / 2 + 6 : 0), cy = top + 30 + (i % half) * lh, R = 8.5;
+      panel.append(sv('circle', {cx, cy, r:R, fill:r.p ? '#fff' : 'none', stroke:'#fff', 'stroke-width':1.6, 'stroke-opacity':r.p ? 1 : .8}),
+        sv('path', {d:r.p ? `M${cx - R * .46},${cy + R * .04}l${R * .32},${R * .34}l${R * .6},${-R * .7}` : `M${cx - R * .36},${cy - R * .36}l${R * .72},${R * .72}M${cx + R * .36},${cy - R * .36}l${-R * .72},${R * .72}`,
+          fill:'none', stroke:r.p ? field : '#fff', 'stroke-width':2, 'stroke-linecap':'round', 'stroke-linejoin':'round', 'stroke-opacity':r.p ? 1 : .85}),
+        sv('text', {x:cx + 17, y:cy + 4.5, 'font-size':13.5, 'font-weight':r.p ? 600 : 400, fill:'#fff', 'fill-opacity':r.p ? 1 : .85}, narrow ? m.short : m.name)); });
+  } else {   // difficulty: the number, its rank, and a strip with every task as a tick and this one as a disc
+    const all = Object.values(TFIT).map(v => v[0]), d = TFIT[s] ? TFIT[s][0] : null, lo = Math.min(...all), hi = Math.max(...all);
+    panel.append(sv('text', {x:p.x + PX, y:top + 4, 'font-size':13, 'font-weight':500, fill:'#fff', 'fill-opacity':.85}, 'Difficulty'));
+    if (d === null) panel.append(sv('text', {x:p.x + PX, y:top + 52, 'font-size':16, fill:'#fff'}, 'Not fitted yet'));
+    else { const rank = all.filter(v => v > d).length + 1, X = v => p.x + PX + (v - lo) / (hi - lo || 1) * inner, sy = p.y + p.h - 74;
+      panel.append(sv('text', {x:p.x + PX, y:top + 62, 'font-size':52, 'font-weight':600, fill:'#fff'}, String(Math.round(d))),
+        sv('text', {x:p.x + PX, y:top + 90, 'font-size':14, fill:'#fff', 'fill-opacity':.92}, rank === 1 ? `The hardest of ${all.length} tasks` : `${rank}${[, 'st', 'nd', 'rd'][rank % 100 > 10 && rank % 100 < 14 ? 0 : rank % 10] || 'th'} hardest of ${all.length} tasks`),
+        sv('line', {x1:p.x + PX, x2:p.x + PX + inner, y1:sy, y2:sy, stroke:'#fff', 'stroke-opacity':.45, 'stroke-width':1.5}));
+      all.forEach(v => panel.append(sv('line', {x1:X(v), x2:X(v), y1:sy - 6, y2:sy + 6, stroke:'#fff', 'stroke-opacity':.5, 'stroke-width':1.5})));
+      panel.append(sv('circle', {cx:X(d), cy:sy, r:8, fill:'#fff'}),
+        sv('text', {x:p.x + PX, y:sy + 26, 'font-size':12, fill:'#fff', 'fill-opacity':.85}, 'easier'), sv('text', {x:p.x + PX + inner, y:sy + 26, 'text-anchor':'end', 'font-size':12, fill:'#fff', 'fill-opacity':.85}, 'harder')); }
+  }
+  // which panel this is: three small dots at the bottom
+  for (let i = 0; i < n; i++) panel.append(sv('circle', {cx:p.x + p.w / 2 + (i - 1) * 14, cy:p.y + p.h - 16, r:3.2, fill:'#fff', 'fill-opacity':i === p.k ? 1 : .4}));
+  p.card.querySelector('.pline')?.remove(); p.card.append(panel); p.who.textContent = '';
+  if (!calm) panel.animate([{opacity:0, transform:'translateY(6px)'}, {opacity:1, transform:'none'}], {duration:280, easing:'cubic-bezier(.2,0,0,1)', fill:'both'});
+  p.t = setTimeout(() => {
     const go = () => { if (play !== p) return; p.k = (p.k + 1) % n; showRun(); };
-    if (calm) go(); else line.animate([{opacity:1}, {opacity:0}], {duration:250, fill:'forwards'}).onfinish = go;
-  }, draw + hold);
+    if (calm) go(); else panel.animate([{opacity:1}, {opacity:0}], {duration:220, fill:'forwards'}).onfinish = go;
+  }, p.k === 0 ? 4200 : 3200);
 }
 $('#mapsvg').addEventListener('pointermove', e => {
   if (e.pointerType !== 'mouse') return;
