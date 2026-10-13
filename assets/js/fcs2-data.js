@@ -72,23 +72,30 @@ const GOAL = {
 };
 // What each task is scored on, in plain words, for the map card: the metrics it optimises, not the guards (correctness
 // and validity checks) a submission must also satisfy. Chosen by hand from the judge's metrics (CHECKS); no raw metric names.
+// Each item is [icon, label]; the icons (fcs2.js, KEY_ICON) are time, speed, quality, size, count and balance.
 // Security tasks have no entry here or in GOAL: their cards show the task's own name.
 const KEYM = {
-  'ScaleGPM':'Running time', 'Yannakakis':'Query latency', 'SVG-EAR':'Latency and pixel fidelity', 'BBQ':'Throughput and latency',
-  'Hygra':'Running time', 'Approximate-MIPS Query Stopping':'Query time and result quality',
-  'Spectrum':'Transactions per second and checkpoint cost', 'Shockwave':'Job completion time and fairness', 'BABBLE':'How much the programs shrink',
-  'SCOPE':'Time per batch of queries', 'Structured LWE':'Instances solved', 'Diffusion Policy':'Task success and time per action',
-  'LeJEPA':'How well the latents are recovered', 'egg':'Rebuild time', 'Clusterwise SpGEMM':'Multiplication speed',
-  'Persistent Treap Update Engine':'Update throughput, query time and memory', 'Polygon':'Query pairs told apart, and time',
-  'FARGO paper-aligned query core':'Query time and result quality', 'KAMI':'Floating-point throughput', 'ParButterfly':'Counting time',
-  'Parallel DBSCAN':'Running time', 'RegionsSort':'Sorting time and extra memory', 'Seer':'Prediction accuracy', 'Polar Express':'Approximation error',
-  'kmeans kernel':'Time per iteration', 'Robust Image Tokenizer':'Reconstruction quality and training time',
-  'Differentiable Population Statistics':'Image quality across six feature models', 'Glenside':'Rewrite time and search size', 'MetaOpt':'Size of the gap found',
-  'OCR Distillation Trajectory Sampling':'How legible the rendered text is', 'MuJoCo Playground':'How well it tracks the commanded velocity',
-  'Residual State Advancement':'Training time and prediction error', 'QuarterPIR':'Online time, communication and storage', 'dbscan kernel':'Running time',
-  'RAGEN':'Task success and reward', 'DyT':'Accuracy and speed', 'Nano World Model':'How close predicted frames are to the real ones',
-  'ivf_pq kernel':'Search time', 'Exact Sequence Alignment':'CPU time and peak memory', 'CKKS noise':'Estimator speed and prediction error',
-  'knn kernel':'Search time', 'Binary Fuse Filter Construction and Lookup':'Build time, lookup time and size', 'RUNLTS':'Mispredictions and wasted cycles',
+  'ScaleGPM':[['time', 'Running time']], 'Yannakakis':[['time', 'Query latency']], 'SVG-EAR':[['time', 'Latency'], ['quality', 'Pixel fidelity']],
+  'BBQ':[['speed', 'Throughput'], ['time', 'Latency']], 'Hygra':[['time', 'Running time']],
+  'Approximate-MIPS Query Stopping':[['time', 'Query time'], ['quality', 'Result quality']],
+  'Spectrum':[['speed', 'Transactions per second'], ['time', 'Checkpoint cost']], 'Shockwave':[['time', 'Job completion time'], ['balance', 'Fairness']],
+  'BABBLE':[['size', 'How much the programs shrink']], 'SCOPE':[['time', 'Time per batch of queries']], 'Structured LWE':[['count', 'Instances solved']],
+  'Diffusion Policy':[['quality', 'Task success'], ['time', 'Time per action']], 'LeJEPA':[['quality', 'How well the latents are recovered']],
+  'egg':[['time', 'Rebuild time']], 'Clusterwise SpGEMM':[['speed', 'Multiplication speed']],
+  'Persistent Treap Update Engine':[['speed', 'Update throughput'], ['time', 'Query time'], ['size', 'Memory']],
+  'Polygon':[['count', 'Query pairs told apart'], ['time', 'Time']], 'FARGO paper-aligned query core':[['time', 'Query time'], ['quality', 'Result quality']],
+  'KAMI':[['speed', 'Floating-point throughput']], 'ParButterfly':[['time', 'Counting time']], 'Parallel DBSCAN':[['time', 'Running time']],
+  'RegionsSort':[['time', 'Sorting time'], ['size', 'Extra memory']], 'Seer':[['quality', 'Prediction accuracy']], 'Polar Express':[['quality', 'Approximation error']],
+  'kmeans kernel':[['time', 'Time per iteration']], 'Robust Image Tokenizer':[['quality', 'Reconstruction quality'], ['time', 'Training time']],
+  'Differentiable Population Statistics':[['quality', 'Image quality across six feature models']], 'Glenside':[['time', 'Rewrite time'], ['size', 'Search size']],
+  'MetaOpt':[['count', 'Size of the gap found']], 'OCR Distillation Trajectory Sampling':[['quality', 'How legible the rendered text is']],
+  'MuJoCo Playground':[['quality', 'How well it tracks the commanded velocity']], 'Residual State Advancement':[['time', 'Training time'], ['quality', 'Prediction error']],
+  'QuarterPIR':[['time', 'Online time'], ['size', 'Communication'], ['size', 'Storage']], 'dbscan kernel':[['time', 'Running time']],
+  'RAGEN':[['quality', 'Task success and reward']], 'DyT':[['quality', 'Accuracy'], ['speed', 'Speed']],
+  'Nano World Model':[['quality', 'How close predicted frames are to the real ones']], 'ivf_pq kernel':[['time', 'Search time']],
+  'Exact Sequence Alignment':[['time', 'CPU time'], ['size', 'Peak memory']], 'CKKS noise':[['speed', 'Estimator speed'], ['quality', 'Prediction error']],
+  'knn kernel':[['time', 'Search time']], 'Binary Fuse Filter Construction and Lookup':[['time', 'Build time'], ['time', 'Lookup time'], ['size', 'Size']],
+  'RUNLTS':[['quality', 'Mispredictions'], ['time', 'Wasted cycles']],
 };
 const N_IN = d => TASKS.filter(t => t.d === d).length;
 
