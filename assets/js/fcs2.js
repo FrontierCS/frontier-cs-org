@@ -50,7 +50,7 @@ $('#showruns').addEventListener('change', e => { showRuns = e.target.checked; dr
 $('#custom').addEventListener('click', () => { const s = $('#settings'); const o = !s.classList.contains('open'); s.classList.toggle('open', o); $('#custom').setAttribute('aria-expanded', String(o)); });
 $('#lblegend').innerHTML = RANKED.map(m => `<span><i style="background:${MCOL[m.id]}"></i>${esc(m.name)}</span>`).join('');
 
-/* Main chart: pass rate against mean cost per run in US$, one dot per model (PASS, COST), over a dotted Pareto frontier. Each label takes the first
+/* Main chart: pass rate against mean cost per run in US$, one dot per model (PASS, COST); the dots on the Pareto frontier are emphasised. Each label takes the first
    spot right, left, above or below its dot that clears every dot, every placed label and the edges; a dot with no free
    spot keeps no label (the tooltip still names it). No legend: the labels name the dots. */
 function drawPassCost() {
@@ -77,18 +77,12 @@ function drawPassCost() {
   const pts = [], order = [...ms].sort((a, b) => PASS[b.id][0] - PASS[a.id][0]);
   const at = m => [X(COST[m.id][0]), Y(PASS[m.id][0])];
   const boxes = order.map(m => { const [cx, cy] = at(m); return {x:cx - 9, y:cy - 9, w:18, h:18}; });
-  // the Pareto frontier: the models no other model beats on both pass rate and cost, joined from the cheapest to the dearest
-  // (as Artificial Analysis draws it); a model under the line is matched or beaten by a cheaper one
+  // the Pareto frontier: the models no cheaper model matches or beats on pass rate
   const front = [...ms].sort((p, q) => COST[p.id][0] - COST[q.id][0] || PASS[q.id][0] - PASS[p.id][0]).filter((m, i, a) => a.slice(0, i).every(o => PASS[o.id][0] < PASS[m.id][0]));
-  // labels keep off the frontier line: it is sampled into small boxes the label placement treats as taken
-  // (not on phones, where there is no room to spare and a label's white halo carries it over the line)
-  if (!narrow) for (let i = 1; i < front.length; i++) { const [ax, ay] = at(front[i - 1]), [bx, by] = at(front[i]), n = Math.ceil(Math.hypot(bx - ax, by - ay) / 8);
-    for (let k = 1; k < n; k++) boxes.push({x:ax + (bx - ax) * k / n - 3, y:ay + (by - ay) * k / n - 3, w:6, h:6}); }
-  if (front.length > 1) svg.append(sv('path', {d:front.map((m, i) => `${i ? 'L' : 'M'}${at(m).map(v => v.toFixed(1)).join(',')}`).join(''), fill:'none', stroke:'var(--line)', 'stroke-width':1.5, 'stroke-linecap':'round', 'stroke-linejoin':'round'}));
   order.forEach(m => {
     const [cx, cy] = at(m), name = narrow ? m.short : m.name;
-    // the frontier reads from the dots themselves: a model on it keeps a full dot and a full-strength name, a model under it
-    // a smaller, paler dot and a paler name; the line joining the frontier is a hairline
+    // the frontier reads from the dots themselves, with no line: a model on it keeps a full dot and a bold name, a model
+    // under it a smaller, paler dot and a paler name (owner, 2026-10-13: keep the chart clean)
     const lead = front.includes(m);
     svg.append(sv('circle', {cx, cy, r:lead ? 7.5 : 5.5, fill:MCOL[m.id], 'fill-opacity':lead ? 1 : .45, stroke:'#fff', 'stroke-width':2, 'data-m':m.id}));
     const lab = sv('text', {class:'lab halo', x:cx, y:cy}, name); svg.append(lab);
