@@ -134,16 +134,16 @@ function drawECI() {
 }
 
 /* Test-time scaling: FECI when every run stops at a US$ budget (SCALE, from bin/fcs2_runs_from_db.py).
-   Every model's curve is drawn in light grey; the picked ones (the top three at first) are in their colour with their 90%
-   band and an end dot. The legend picks: hovering a name shows that model alone, a click keeps it on or takes it off
-   (owner, 2026-10-13: eight coloured bands on one plot read as mud). The value axis starts at TTS_Y0; a curve below it
+   Every model's curve is drawn in its colour, with no band: eight 90% bands on one plot read as mud (owner, 2026-10-13).
+   The legend is the control: hovering a name shows that model alone with its band, the others in light grey; a click takes
+   a model off (grey) or puts it back. The value axis starts at TTS_Y0; a curve below it
    leaves through the bottom edge. */
-const TTS_Y0 = 40, ttsOn = new Set(RANKED.filter(m => SCALE[m.id]).slice(0, 3).map(m => m.id));
+const TTS_Y0 = 40, ttsOn = new Set(RANKED.filter(m => SCALE[m.id]).map(m => m.id));
 let ttsHover = null;
 function drawTTS() {
   const svg = $('#ttssvg'), W = Math.max(300, $('#ttsplot').clientWidth), narrow = W < 560;
   const L = 34, R = narrow ? 12 : 24, T = 12, B = 46, H = CHART_H.tts || (narrow ? 300 : 380);
-  const all = Object.values(SCALE).flat(), shown = m => ttsHover ? ttsHover === m.id : ttsOn.has(m.id);
+  const all = Object.values(SCALE).flat(), shown = m => ttsHover ? ttsHover === m.id : ttsOn.has(m.id), band1 = m => ttsHover === m.id || ttsOn.size === 1 && ttsOn.has(m.id);
   // the axis starts half a decade before the first budget at which any model reaches the bottom of the value axis
   const x0 = Math.log10(Math.min(...all.filter(p => p[1] >= TTS_Y0).map(p => p[0]))) - 0.5, x1 = Math.log10(Math.max(...all.map(p => p[0])));
   const ymax = Math.ceil((Math.max(...all.map(p => p[1])) + 4) / 10) * 10;
@@ -167,7 +167,7 @@ function drawTTS() {
   [...ms.filter(m => !shown(m)), ...ms.filter(shown)].forEach(m => {
     const c = SCALE[m.id], on = shown(m), path = c.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join('');
     const e = c[c.length - 1];
-    if (on) {
+    if (band1(m)) {
       const band = c.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[3]).toFixed(1)}`).join('')
         + [...c].reverse().map(p => `L${X(p[0]).toFixed(1)},${Y(p[2]).toFixed(1)}`).join('') + 'Z';
       g.append(sv('path', {d:band, fill:MCOL[m.id], opacity:.13}));
