@@ -475,8 +475,17 @@ $('#mapsvg').addEventListener('pointermove', e => {
     wait = {tile:want, t:setTimeout(() => { wait = null; stopPlay(); if (want) startPlay(want); else veilTo(0); }, calm ? 0 : 100)};
   }
 });   // no box for a domain: its chip already names it and counts its tasks (owner, 2026-10-11)
-$('#mapsvg').addEventListener('pointerleave', () => { clearTimeout(wait?.t); wait = null; stopPlay(); veilTo(0); });
-$('#mapsvg').addEventListener('click', e => { if (play && e.target.closest('.play')) location.href = taskHref(play.tile.dataset.s); });
+$('#mapsvg').addEventListener('pointerleave', e => { if (e.pointerType !== 'mouse') return; clearTimeout(wait?.t); wait = null; stopPlay(); veilTo(0); });
+// touch and pen have no hover: a tap on a tile opens its card, a tap on the card opens the task, a tap anywhere else closes it
+let lastPointer = 'mouse';
+$('#mapsvg').addEventListener('pointerdown', e => { lastPointer = e.pointerType; });
+$('#mapsvg').addEventListener('click', e => {
+  if (play && e.target.closest('.play')) { location.href = taskHref(play.tile.dataset.s); return; }
+  if (lastPointer === 'mouse') return;
+  const tile = e.target.closest('svg.tile');
+  stopPlay(); if (tile) startPlay(tile); else veilTo(0);
+});
+document.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse' && play && !e.target.closest('#mapsvg')) { stopPlay(); veilTo(0); } });
 
 function drawRows() {
   const h = hits(); $('#fcount').textContent = picked.size ? `(${picked.size})` : '';
