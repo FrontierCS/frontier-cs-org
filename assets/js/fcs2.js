@@ -155,8 +155,8 @@ function smooth(P) {
   return d;
 }
 // The curves plotted are the running maximum of SCALE over the budget (value and both ends of its interval): the best level a
-// model has reached by that budget. The raw value can dip when a later submission scores below an earlier one, or when a
-// finished run's development score gives way to its hidden score (owner, 2026-10-13).
+// model has reached by that budget. The converter already holds each run at its best development score so far, capped
+// at its hidden final score; the running maximum here only removes what little the capability fit can still wobble.
 const TTS = Object.fromEntries(Object.entries(SCALE).map(([id, c]) => { let v = -Infinity, lo = -Infinity, hi = -Infinity;
   return [id, c.map(p => [p[0], v = Math.max(v, p[1]), lo = Math.max(lo, p[2]), hi = Math.max(hi, p[3]), p[4]])]; }));
 const TTS_Y0 = 40, ttsOn = new Set(RANKED.filter(m => SCALE[m.id]).map(m => m.id));
@@ -203,7 +203,7 @@ function drawTTS() {
     const wd = !on ? 1.5 : focus ? 3.6 : 2.8;
     if (on) g.append(mark(sv('path', {d:path, pathLength:1, fill:'none', stroke:'#fff', 'stroke-width':wd + 3, 'stroke-linejoin':'round', 'stroke-linecap':'round'}), 'a-draw', an ? .15 + seq.indexOf(m.id) * .42 : 0));
     const lp = sv('path', {d:path, pathLength:1, fill:'none', stroke:on ? MCOL[m.id] : '#c9ccd1', 'stroke-width':wd, 'stroke-linejoin':'round', 'stroke-linecap':'round'});
-    // the end of a curve is the model's leaderboard value: the same white-ringed dot as on the pass-rate chart
+    // the end of a curve: the same white-ringed dot as on the pass-rate chart
     const end = sv('circle', {cx:X(e[0]), cy:Y(e[1]), r:!on ? 3 : focus ? 7.5 : 6.5, fill:on ? MCOL[m.id] : '#c9ccd1', stroke:'#fff', 'stroke-width':on ? 2 : 1});
     g.append(lp); ends.push(end);   // the dots go on last, over every line
     if (an) { const t0 = .15 + seq.indexOf(m.id) * .42; mark(lp, 'a-draw', t0); mark(end, 'a-fade', t0 + .8); }   // one curve after another
