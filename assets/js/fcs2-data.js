@@ -72,29 +72,29 @@ const GOAL = {
 };
 // What each task is scored on, in plain words, for the map card: the metrics it optimises, not the guards (correctness
 // and validity checks) a submission must also satisfy. Chosen by hand from the judge's metrics (CHECKS); no raw metric names.
-// Each item is [icon, label]; the icons (fcs2.js, KEY_ICON) are time, speed, quality, size, count and balance.
+// Time metrics are all called latency, qualified where a task has more than one. Each item is [icon, label]; the icons (fcs2.js, KEY_ICON) are time, speed, quality, size, count and balance.
 // Security tasks have no entry here or in GOAL: their cards show the task's own name.
 const KEYM = {
-  'ScaleGPM':[['time', 'Running time']], 'Yannakakis':[['time', 'Query latency']], 'SVG-EAR':[['time', 'Latency'], ['quality', 'Pixel fidelity']],
-  'BBQ':[['speed', 'Throughput'], ['time', 'Latency']], 'Hygra':[['time', 'Running time']],
-  'Approximate-MIPS Query Stopping':[['time', 'Query time'], ['quality', 'Result quality']],
-  'Spectrum':[['speed', 'Transactions per second'], ['time', 'Checkpoint cost']], 'Shockwave':[['time', 'Job completion time'], ['balance', 'Fairness']],
-  'BABBLE':[['size', 'How much the programs shrink']], 'SCOPE':[['time', 'Time per batch of queries']], 'Structured LWE':[['count', 'Instances solved']],
-  'Diffusion Policy':[['quality', 'Task success'], ['time', 'Time per action']], 'LeJEPA':[['quality', 'How well the latents are recovered']],
-  'egg':[['time', 'Rebuild time']], 'Clusterwise SpGEMM':[['speed', 'Multiplication speed']],
-  'Persistent Treap Update Engine':[['speed', 'Update throughput'], ['time', 'Query time'], ['size', 'Memory']],
-  'Polygon':[['count', 'Query pairs told apart'], ['time', 'Time']], 'FARGO paper-aligned query core':[['time', 'Query time'], ['quality', 'Result quality']],
-  'KAMI':[['speed', 'Floating-point throughput']], 'ParButterfly':[['time', 'Counting time']], 'Parallel DBSCAN':[['time', 'Running time']],
-  'RegionsSort':[['time', 'Sorting time'], ['size', 'Extra memory']], 'Seer':[['quality', 'Prediction accuracy']], 'Polar Express':[['quality', 'Approximation error']],
-  'kmeans kernel':[['time', 'Time per iteration']], 'Robust Image Tokenizer':[['quality', 'Reconstruction quality'], ['time', 'Training time']],
-  'Differentiable Population Statistics':[['quality', 'Image quality across six feature models']], 'Glenside':[['time', 'Rewrite time'], ['size', 'Search size']],
+  'ScaleGPM':[['time', 'Latency']], 'Yannakakis':[['time', 'Query latency']], 'SVG-EAR':[['time', 'Latency'], ['quality', 'Pixel fidelity']],
+  'BBQ':[['speed', 'Throughput'], ['time', 'Latency']], 'Hygra':[['time', 'Latency']],
+  'Approximate-MIPS Query Stopping':[['time', 'Query latency'], ['quality', 'Result quality']],
+  'Spectrum':[['speed', 'Transactions per second'], ['time', 'Checkpoint latency']], 'Shockwave':[['time', 'Job completion time'], ['balance', 'Fairness']],
+  'BABBLE':[['size', 'How much the programs shrink']], 'SCOPE':[['time', 'Batch latency']], 'Structured LWE':[['count', 'Instances solved']],
+  'Diffusion Policy':[['quality', 'Task success'], ['time', 'Action latency']], 'LeJEPA':[['quality', 'How well the latents are recovered']],
+  'egg':[['time', 'Rebuild latency']], 'Clusterwise SpGEMM':[['speed', 'Multiplication speed']],
+  'Persistent Treap Update Engine':[['speed', 'Update throughput'], ['time', 'Query latency'], ['size', 'Memory']],
+  'Polygon':[['count', 'Query pairs told apart'], ['time', 'Latency']], 'FARGO paper-aligned query core':[['time', 'Query latency'], ['quality', 'Result quality']],
+  'KAMI':[['speed', 'Floating-point throughput']], 'ParButterfly':[['time', 'Latency']], 'Parallel DBSCAN':[['time', 'Latency']],
+  'RegionsSort':[['time', 'Latency'], ['size', 'Extra memory']], 'Seer':[['quality', 'Prediction accuracy']], 'Polar Express':[['quality', 'Approximation error']],
+  'kmeans kernel':[['time', 'Iteration latency']], 'Robust Image Tokenizer':[['quality', 'Reconstruction quality'], ['time', 'Training latency']],
+  'Differentiable Population Statistics':[['quality', 'Image quality across six feature models']], 'Glenside':[['time', 'Rewrite latency'], ['size', 'Search size']],
   'MetaOpt':[['count', 'Size of the gap found']], 'OCR Distillation Trajectory Sampling':[['quality', 'How legible the rendered text is']],
-  'MuJoCo Playground':[['quality', 'How well it tracks the commanded velocity']], 'Residual State Advancement':[['time', 'Training time'], ['quality', 'Prediction error']],
-  'QuarterPIR':[['time', 'Online time'], ['size', 'Communication'], ['size', 'Storage']], 'dbscan kernel':[['time', 'Running time']],
-  'RAGEN':[['quality', 'Task success and reward']], 'DyT':[['quality', 'Accuracy'], ['speed', 'Speed']],
-  'Nano World Model':[['quality', 'How close predicted frames are to the real ones']], 'ivf_pq kernel':[['time', 'Search time']],
-  'Exact Sequence Alignment':[['time', 'CPU time'], ['size', 'Peak memory']], 'CKKS noise':[['speed', 'Estimator speed'], ['quality', 'Prediction error']],
-  'knn kernel':[['time', 'Search time']], 'Binary Fuse Filter Construction and Lookup':[['time', 'Build time'], ['time', 'Lookup time'], ['size', 'Size']],
+  'MuJoCo Playground':[['quality', 'How well it tracks the commanded velocity']], 'Residual State Advancement':[['time', 'Training latency'], ['quality', 'Prediction error']],
+  'QuarterPIR':[['time', 'Online latency'], ['size', 'Communication'], ['size', 'Storage']], 'dbscan kernel':[['time', 'Latency']],
+  'RAGEN':[['quality', 'Task success and reward']], 'DyT':[['quality', 'Accuracy'], ['time', 'Latency']],
+  'Nano World Model':[['quality', 'How close predicted frames are to the real ones']], 'ivf_pq kernel':[['time', 'Search latency']],
+  'Exact Sequence Alignment':[['time', 'Latency'], ['size', 'Peak memory']], 'CKKS noise':[['time', 'Estimator latency'], ['quality', 'Prediction error']],
+  'knn kernel':[['time', 'Search latency']], 'Binary Fuse Filter Construction and Lookup':[['time', 'Build latency'], ['time', 'Lookup latency'], ['size', 'Size']],
   'RUNLTS':[['quality', 'Mispredictions'], ['time', 'Wasted cycles']],
 };
 const N_IN = d => TASKS.filter(t => t.d === d).length;
