@@ -134,20 +134,25 @@ function drawECI() {
 }
 
 /* Test-time scaling: FECI when every run stops at a US$ budget (SCALE, from bin/fcs2_runs_from_db.py).
-   Values below 0 leave the plot through its bottom edge. */
+   Every model's curve is drawn in light grey; the picked ones (the top three at first) are in their colour with their 90%
+   band and an end dot. The legend picks: hovering a name shows that model alone, a click keeps it on or takes it off
+   (owner, 2026-10-13: eight coloured bands on one plot read as mud). The value axis starts at TTS_Y0; a curve below it
+   leaves through the bottom edge. */
+const TTS_Y0 = 40, ttsOn = new Set(RANKED.filter(m => SCALE[m.id]).slice(0, 3).map(m => m.id));
+let ttsHover = null;
 function drawTTS() {
   const svg = $('#ttssvg'), W = Math.max(300, $('#ttsplot').clientWidth), narrow = W < 560;
   const L = 34, R = narrow ? 12 : 24, T = 12, B = 46, H = CHART_H.tts || (narrow ? 300 : 380);
-  const all = Object.values(SCALE).flat();
-  // the axis starts half a decade before the first budget at which any model rises above 0
-  const x0 = Math.log10(Math.min(...all.filter(p => p[1] >= 0).map(p => p[0]))) - 0.5, x1 = Math.log10(Math.max(...all.map(p => p[0])));
-  const ymax = Math.ceil(Math.max(...all.map(p => p[3])) / 20) * 20;
-  const X = v => L + (Math.log10(v) - x0) / (x1 - x0) * (W - L - R), Y = v => T + (1 - v / ymax) * (H - T - B);
+  const all = Object.values(SCALE).flat(), shown = m => ttsHover ? ttsHover === m.id : ttsOn.has(m.id);
+  // the axis starts half a decade before the first budget at which any model reaches the bottom of the value axis
+  const x0 = Math.log10(Math.min(...all.filter(p => p[1] >= TTS_Y0).map(p => p[0]))) - 0.5, x1 = Math.log10(Math.max(...all.map(p => p[0])));
+  const ymax = Math.ceil((Math.max(...all.map(p => p[1])) + 4) / 10) * 10;
+  const X = v => L + (Math.log10(v) - x0) / (x1 - x0) * (W - L - R), Y = v => T + (1 - (v - TTS_Y0) / (ymax - TTS_Y0)) * (H - T - B);
   const an = animates(svg);
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
   const clip = sv('clipPath', {id:'ttsclip'}), cr = sv('rect', {x:L, y:T - 4, width:W - L - R + 8, height:H - T - B + 4}); clip.append(cr); svg.append(clip);
   if (an) mark(cr, 'a-wipe');   // the curves and bands are uncovered left to right, along the budget axis
-  for (let v = 0; v <= ymax; v += 20) {
+  for (let v = TTS_Y0; v <= ymax; v += 10) {
     svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1}));
     svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, v));
   }
@@ -157,22 +162,32 @@ function drawTTS() {
   }
   svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'Cost budget per run in US$, log scale'));
   const g = sv('g', {'clip-path':'url(#ttsclip)'}); svg.append(g);
-  const pts = [];
-  [...RANKED].reverse().filter(m => SCALE[m.id]).forEach(m => {   // a model with no reported spend has no curve
-    const c = SCALE[m.id], path = c.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join('');
-    const band = c.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[3]).toFixed(1)}`).join('')
-      + [...c].reverse().map(p => `L${X(p[0]).toFixed(1)},${Y(p[2]).toFixed(1)}`).join('') + 'Z';
-    const bp = sv('path', {d:band, fill:MCOL[m.id], opacity:.12});
-    const lp = sv('path', {d:path, fill:'none', stroke:MCOL[m.id], 'stroke-width':2.2, 'stroke-linejoin':'round'});
-    const e = c[c.length - 1], end = sv('circle', {cx:X(e[0]), cy:Y(e[1]), r:4.5, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':1.5});
-    g.append(bp, lp, end);
+  const pts = [], ms = [...RANKED].reverse().filter(m => SCALE[m.id]);   // a model with no reported spend has no curve
+  // the grey curves first, then the picked ones over them, the leader last
+  [...ms.filter(m => !shown(m)), ...ms.filter(shown)].forEach(m => {
+    const c = SCALE[m.id], on = shown(m), path = c.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join('');
+    const e = c[c.length - 1];
+    if (on) {
+      const band = c.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[3]).toFixed(1)}`).join('')
+        + [...c].reverse().map(p => `L${X(p[0]).toFixed(1)},${Y(p[2]).toFixed(1)}`).join('') + 'Z';
+      g.append(sv('path', {d:band, fill:MCOL[m.id], opacity:.13}));
+    }
+    g.append(sv('path', {d:path, fill:'none', stroke:on ? MCOL[m.id] : '#c9ccd1', 'stroke-width':on ? 2.4 : 1.4, 'stroke-linejoin':'round'}));
+    const end = sv('circle', {cx:X(e[0]), cy:Y(e[1]), r:on ? 4.5 : 2.8, fill:on ? MCOL[m.id] : '#c9ccd1', stroke:'#fff', 'stroke-width':on ? 1.5 : 1});
+    g.append(end);
     if (an) mark(end, 'a-fade', 1.3);
-    c.forEach(p => { if (p[1] >= 0) pts.push({x:X(p[0]), y:Y(p[1]), html:`<b>${esc(m.name)}</b><br>FECI <b>${f1(p[1])}</b> at ${usdfmt(p[0])} per run`
+    c.forEach(p => { if (p[1] >= TTS_Y0) pts.push({x:X(p[0]), y:Y(p[1]), html:`<b>${esc(m.name)}</b><br>FECI <b>${f1(p[1])}</b> at ${usdfmt(p[0])} per run`
       + `<br>90% interval ${Math.round(Math.max(p[2], 0))}–${Math.round(p[3])}<br>${Math.round(p[4] * 100)}% of runs still going`}); });
   });
   attachTip(svg, W, H, pts, $('#ttstip'));
+  $('#ttslegend').querySelectorAll('button').forEach(b => { const on = ttsOn.has(b.dataset.m); b.setAttribute('aria-pressed', on); b.classList.toggle('off', !on); });
 }
-$('#ttslegend').innerHTML = RANKED.map(m => `<span><i style="background:${MCOL[m.id]}"></i>${esc(m.name)}</span>`).join('');
+// the legend is the chart's control: a button per model, in its colour when picked
+$('#ttslegend').innerHTML = RANKED.filter(m => SCALE[m.id]).map(m => `<button type="button" data-m="${m.id}"><i style="background:${MCOL[m.id]}"></i>${esc(m.name)}</button>`).join('');
+$('#ttslegend').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; const id = b.dataset.m;
+  if (ttsOn.has(id)) ttsOn.delete(id); else ttsOn.add(id); ttsHover = null; drawTTS(); });
+$('#ttslegend').addEventListener('pointerover', e => { const b = e.target.closest('button'); if (!b || e.pointerType !== 'mouse' || ttsHover === b.dataset.m) return; ttsHover = b.dataset.m; drawTTS(); });
+$('#ttslegend').addEventListener('pointerleave', () => { if (ttsHover) { ttsHover = null; drawTTS(); } });
 
 const TASK_OF = Object.fromEntries(TASKS.map(t => [t.s, t]));
 const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
