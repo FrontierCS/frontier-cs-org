@@ -316,3 +316,5 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 .anim.pre .a-pop{transform:scale(0); opacity:0}
 .anim .a-wipe{transform-box:fill-box; transform-origin:left center; transition:transform 1.4s cubic-bezier(.45,0,.25,1) var(--d,0s)}
 .anim.pre .a-wipe{transform:scaleX(0)}
+.anim .a-draw{stroke-dasharray:1; stroke-dashoffset:0; transition:stroke-dashoffset .9s cubic-bezier(.5,0,.3,1) var(--d,0s)}
+.anim.pre .a-draw{stroke-dashoffset:1}
