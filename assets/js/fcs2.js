@@ -163,17 +163,17 @@ function drawTTS() {
   // the axis starts a little before the first budget at which any model rises above 0
   const x0 = Math.log10(Math.min(...all.filter(p => p[1] >= 0).map(p => p[0]))) - 0.3, x1 = Math.log10(Math.max(...all.map(p => p[0])));
   const ymax = Math.max(65, Math.ceil((Math.max(...all.map(p => p[1])) + 2) / 5) * 5);
-  // the value axis is in three pieces, each wider than the one below: 0 to 40 takes the bottom 14% of the plot, 40 to 60
-  // the next 28%, and 60 to the top the remaining 58%, since that is where the leading curves finish and crowd; each
-  // curve's climb from 0 still shows (owner, 2026-10-13)
-  const KN = [[0, 0], [TTS_Y0, .14], [60, .42], [ymax, 1]];
+  // the value axis widens as it goes up: 0 to 40 takes the bottom 10% of the plot, 40 to 50 the next 10%, 50 to 60 the next
+  // 26%, and 60 to the top the remaining 54%, since the curves finish and crowd between 50 and 70; each curve's climb
+  // from 0 still shows (owner, 2026-10-13)
+  const KN = [[0, 0], [TTS_Y0, .10], [50, .20], [60, .46], [ymax, 1]];
   const yf = v => { let i = 1; while (i < KN.length - 1 && v > KN[i][0]) i++; const [a, fa] = KN[i - 1], [b, fb] = KN[i]; return fa + (v - a) / (b - a) * (fb - fa); };
   const X = v => L + (Math.log10(v) - x0) / (x1 - x0) * (W - L - R), Y = v => T + (1 - yf(v)) * (H - T - B);
   const an = animates(svg);
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
   const clip = sv('clipPath', {id:'ttsclip'}), cr = sv('rect', {x:L, y:T - 4, width:W - L - R + 11, height:H - T - B + 5}); clip.append(cr); svg.append(clip);
-  for (const v of [0, 20, 40, 50, ...Array.from({length:(ymax - 60) / 5 + 1}, (_, i) => 60 + i * 5)]) {
-    svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:v === TTS_Y0 || v === 60 ? 'var(--line)' : 'var(--grid)', 'stroke-width':1}));
+  for (const v of [0, 20, 40, ...Array.from({length:(ymax - 50) / 5 + 1}, (_, i) => 50 + i * 5)]) {
+    svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:v === 50 || v === 60 ? 'var(--line)' : 'var(--grid)', 'stroke-width':1}));
     svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, v));
   }
   for (let k = Math.ceil(x0); k <= Math.floor(x1); k++) {
