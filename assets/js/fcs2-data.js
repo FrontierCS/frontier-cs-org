@@ -70,33 +70,21 @@ const GOAL = {
   'Binary Fuse Filter Construction and Lookup':'Write the construction of a binary fuse filter.',
   'RUNLTS':'Predict conditional branches with fewer mistakes.',
 };
-// What each task is scored on, in plain words, for the map card: the metrics it optimises, not the guards (correctness
-// and validity checks) a submission must also satisfy. Chosen by hand from the judge's metrics (CHECKS); no raw metric names.
-// Time metrics are all called latency, qualified where a task has more than one. Each item is [icon, label]; the icons (fcs2.js, KEY_ICON) are time, speed, quality, size, count and balance.
+// What each task is scored on, for the map card: the metrics it optimises, not the guards (correctness and validity
+// checks) a submission must also satisfy. Chosen by hand from the judge's metrics (CHECKS) and named from one small
+// vocabulary, so the cards read alike (owner, 2026-10-13): Latency, Throughput, Accuracy, Quality, Success rate, Reward,
+// Memory, Size, Compression, Communication, Fairness. KEY_ICON (fcs2.js) gives each its icon.
 // Security tasks have no entry here or in GOAL: their cards show the task's own name.
-const KEYM = {
-  'ScaleGPM':[['time', 'Latency']], 'Yannakakis':[['time', 'Query latency']], 'SVG-EAR':[['time', 'Latency'], ['quality', 'Pixel fidelity']],
-  'BBQ':[['speed', 'Throughput'], ['time', 'Latency']], 'Hygra':[['time', 'Latency']],
-  'Approximate-MIPS Query Stopping':[['time', 'Query latency'], ['quality', 'Result quality']],
-  'Spectrum':[['speed', 'Transactions per second'], ['time', 'Checkpoint latency']], 'Shockwave':[['time', 'Job completion time'], ['balance', 'Fairness']],
-  'BABBLE':[['size', 'How much the programs shrink']], 'SCOPE':[['time', 'Batch latency']], 'Structured LWE':[['count', 'Instances solved']],
-  'Diffusion Policy':[['quality', 'Task success'], ['time', 'Action latency']], 'LeJEPA':[['quality', 'How well the latents are recovered']],
-  'egg':[['time', 'Rebuild latency']], 'Clusterwise SpGEMM':[['speed', 'Multiplication speed']],
-  'Persistent Treap Update Engine':[['speed', 'Update throughput'], ['time', 'Query latency'], ['size', 'Memory']],
-  'Polygon':[['count', 'Query pairs told apart'], ['time', 'Latency']], 'FARGO paper-aligned query core':[['time', 'Query latency'], ['quality', 'Result quality']],
-  'KAMI':[['speed', 'Floating-point throughput']], 'ParButterfly':[['time', 'Latency']], 'Parallel DBSCAN':[['time', 'Latency']],
-  'RegionsSort':[['time', 'Latency'], ['size', 'Extra memory']], 'Seer':[['quality', 'Prediction accuracy']], 'Polar Express':[['quality', 'Approximation error']],
-  'kmeans kernel':[['time', 'Iteration latency']], 'Robust Image Tokenizer':[['quality', 'Reconstruction quality'], ['time', 'Training latency']],
-  'Differentiable Population Statistics':[['quality', 'Image quality across six feature models']], 'Glenside':[['time', 'Rewrite latency'], ['size', 'Search size']],
-  'MetaOpt':[['count', 'Size of the gap found']], 'OCR Distillation Trajectory Sampling':[['quality', 'How legible the rendered text is']],
-  'MuJoCo Playground':[['quality', 'How well it tracks the commanded velocity']], 'Residual State Advancement':[['time', 'Training latency'], ['quality', 'Prediction error']],
-  'QuarterPIR':[['time', 'Online latency'], ['size', 'Communication'], ['size', 'Storage']], 'dbscan kernel':[['time', 'Latency']],
-  'RAGEN':[['quality', 'Task success and reward']], 'DyT':[['quality', 'Accuracy'], ['time', 'Latency']],
-  'Nano World Model':[['quality', 'How close predicted frames are to the real ones']], 'ivf_pq kernel':[['time', 'Search latency']],
-  'Exact Sequence Alignment':[['time', 'Latency'], ['size', 'Peak memory']], 'CKKS noise':[['time', 'Estimator latency'], ['quality', 'Prediction error']],
-  'knn kernel':[['time', 'Search latency']], 'Binary Fuse Filter Construction and Lookup':[['time', 'Build latency'], ['time', 'Lookup latency'], ['size', 'Size']],
-  'RUNLTS':[['quality', 'Mispredictions'], ['time', 'Wasted cycles']],
-};
+const KEYM = (() => { const L = 'Latency', TP = 'Throughput', ACC = 'Accuracy', Q = 'Quality', SR = 'Success rate', MEM = 'Memory'; return {
+  'ScaleGPM':[L], 'Yannakakis':[L], 'SVG-EAR':[L, Q], 'BBQ':[TP, L], 'Hygra':[L], 'Approximate-MIPS Query Stopping':[L, ACC],
+  'Spectrum':[TP, L], 'Shockwave':[L, 'Fairness'], 'BABBLE':['Compression'], 'SCOPE':[L], 'Structured LWE':[SR], 'Diffusion Policy':[SR, L],
+  'LeJEPA':[ACC], 'egg':[L], 'Clusterwise SpGEMM':[TP], 'Persistent Treap Update Engine':[TP, L, MEM], 'Polygon':[SR, L],
+  'FARGO paper-aligned query core':[L, ACC], 'KAMI':[TP], 'ParButterfly':[L], 'Parallel DBSCAN':[L], 'RegionsSort':[L, MEM], 'Seer':[ACC],
+  'Polar Express':[ACC], 'kmeans kernel':[L], 'Robust Image Tokenizer':[Q, L], 'Differentiable Population Statistics':[Q], 'Glenside':[L, 'Size'],
+  'MetaOpt':[Q], 'OCR Distillation Trajectory Sampling':[Q], 'MuJoCo Playground':['Reward'], 'Residual State Advancement':[L, ACC],
+  'QuarterPIR':[L, 'Communication', MEM], 'dbscan kernel':[L], 'RAGEN':[SR, 'Reward'], 'DyT':[ACC, L], 'Nano World Model':[Q], 'ivf_pq kernel':[L],
+  'Exact Sequence Alignment':[L, MEM], 'CKKS noise':[L, ACC], 'knn kernel':[L], 'Binary Fuse Filter Construction and Lookup':[L, 'Size'], 'RUNLTS':[ACC],
+}; })();
 const N_IN = d => TASKS.filter(t => t.d === d).length;
 
 // BEGIN converter block (bin/fcs2_runs_from_db.py writes everything up to END)

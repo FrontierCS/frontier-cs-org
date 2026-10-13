@@ -468,6 +468,8 @@ function startPlay(tile) {
 // do; which models passed (a tick) and which failed (a cross); and where the task ranks by difficulty among
 // all tasks (owner, 2026-10-13: the run curves said too little for the room they took).
 // Icons for the kinds of metric a task is scored on (KEYM), each a path in a 14 px box centred on (x, y).
+const KEY_KIND = {Latency:'time', Throughput:'speed', Accuracy:'quality', Quality:'quality', 'Success rate':'quality', Reward:'quality',
+  Memory:'size', Size:'size', Compression:'size', Communication:'size', Fairness:'balance'};
 const KEY_ICON = {
   time:(x, y) => `M${x - 6.5},${y}a6.5,6.5 0 1,0 13,0a6.5,6.5 0 1,0 -13,0M${x},${y - 3.6}V${y}l2.6,1.8`,                    // a clock
   speed:(x, y) => `M${x + 1.5},${y - 7}l-5.5,8h4l-1.5,6l5.5,-8h-4z`,                                                        // a bolt
@@ -491,12 +493,16 @@ function showRun() {
     L.forEach((ln, i) => panel.append(sv('text', {x:p.x + PX, y:y + i * lh, 'font-size':fs, 'font-weight':weight, fill:'#fff', 'fill-opacity':op}, ln))); return y + L.length * lh; };
   if (p.k === 0) {   // the goal in large type, what the task is scored on, and the paper (or blog post) as a small line at the foot
     let y = lines(GOAL[s] || t.n, top + 12, narrow ? 19 : 21, 600, narrow ? 25 : 27, 4);
+    let foot = y;   // where the text above the source line ends
     if (KEYM[s]) { panel.append(sv('text', {x:p.x + PX, y:y + 12, 'font-size':11.5, 'font-weight':500, fill:'#fff', 'fill-opacity':.75, 'letter-spacing':'.04em'}, 'SCORED ON'));
-      // one row per metric: a small line icon for its kind, then its plain name
-      KEYM[s].forEach(([ic, label], i) => { const cy = y + 33 + i * 22, ix = p.x + PX + 8;
+      // one row per metric: a small line icon for its kind, then its name
+      KEYM[s].forEach((label, i) => { const cy = y + 33 + i * 22, ix = p.x + PX + 8, ic = KEY_KIND[label] || 'quality';
         panel.append(sv('path', {d:KEY_ICON[ic](ix, cy), fill:'none', stroke:'#fff', 'stroke-width':1.6, 'stroke-linecap':'round', 'stroke-linejoin':'round'}),
-          sv('text', {x:ix + 16, y:cy + 5, 'font-size':14.5, 'font-weight':500, fill:'#fff'}, label)); }); }
-    if (t.t) lines(t.t, p.y + p.h - 34 - (wrapText(svg, t.t, inner, 12.5, 400).length > 1 ? 17 : 0), 12.5, 400, 17, 2, .8);   // the source sits at the foot of the card
+          sv('text', {x:ix + 16, y:cy + 5, 'font-size':14.5, 'font-weight':500, fill:'#fff'}, label)); });
+      foot = y + 33 + (KEYM[s].length - 1) * 22 + 12; }
+    // the source sits at the foot of the card, on as many lines as the room above leaves: two, one, or none
+    if (t.t) { const base = p.y + p.h - 34, two = wrapText(svg, t.t, inner, 12.5, 400).length > 1, room = base - foot;
+      if (two && room >= 17 + 18) lines(t.t, base - 17, 12.5, 400, 17, 2, .8); else if (room >= 18) lines(t.t, base, 12.5, 400, 17, 1, .8); }
   } else if (p.k === 1) {   // every model: a tick or a cross in a disc, then its name; two columns, in leaderboard order
     const rs = RANKED.map(m => [m, p.runs.find(r => r.m === m.id)]).filter(x => x[1]), half = Math.ceil(rs.length / 2), lh = Math.min(30, (p.h - 96) / half);
     panel.append(sv('text', {x:p.x + PX, y:top + 4, 'font-size':13, 'font-weight':500, fill:'#fff', 'fill-opacity':.85}, `${rs.filter(x => x[1].p).length} of ${rs.length} models pass`));
