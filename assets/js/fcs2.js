@@ -80,7 +80,11 @@ function drawPassCost() {
   // the Pareto frontier: the models no other model beats on both pass rate and cost, joined from the cheapest to the dearest
   // (as Artificial Analysis draws it); a model under the line is matched or beaten by a cheaper one
   const front = [...ms].sort((p, q) => COST[p.id][0] - COST[q.id][0] || PASS[q.id][0] - PASS[p.id][0]).filter((m, i, a) => a.slice(0, i).every(o => PASS[o.id][0] < PASS[m.id][0]));
-  if (front.length > 1) svg.append(sv('path', {d:front.map((m, i) => `${i ? 'L' : 'M'}${at(m).map(v => v.toFixed(1)).join(',')}`).join(''), fill:'none', stroke:'var(--line)', 'stroke-width':2, 'stroke-dasharray':'2 6', 'stroke-linecap':'round'}));
+  // labels keep off the frontier line: it is sampled into small boxes the label placement treats as taken
+  // (not on phones, where there is no room to spare and a label's white halo carries it over the line)
+  if (!narrow) for (let i = 1; i < front.length; i++) { const [ax, ay] = at(front[i - 1]), [bx, by] = at(front[i]), n = Math.ceil(Math.hypot(bx - ax, by - ay) / 8);
+    for (let k = 1; k < n; k++) boxes.push({x:ax + (bx - ax) * k / n - 3, y:ay + (by - ay) * k / n - 3, w:6, h:6}); }
+  if (front.length > 1) svg.append(sv('path', {d:front.map((m, i) => `${i ? 'L' : 'M'}${at(m).map(v => v.toFixed(1)).join(',')}`).join(''), fill:'none', stroke:'#80868b', 'stroke-width':2.2, 'stroke-dasharray':'7 6', 'stroke-linecap':'round', 'stroke-linejoin':'round'}));
   order.forEach(m => {
     const [cx, cy] = at(m), name = narrow ? m.short : m.name;
     svg.append(sv('circle', {cx, cy, r:7, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':2, 'data-m':m.id}));
