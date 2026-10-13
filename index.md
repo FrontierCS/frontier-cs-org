@@ -17,7 +17,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
   <div class="hero-text">
   <p class="upd"><i></i><span>Last updated: {{ site.time | date: "%B %-d, %Y" }}</span></p>
   <h1>FrontierCS 2: A benchmark for computer-science R&amp;D</h1>
-  <p class="lead">Our tasks challenge agents to re-implement entire research papers. They must beat the original authors’ implementation to complete the task.</p>
+  <p class="lead">Each task removes the key contribution from the code behind a published paper. To pass, an agent must rebuild it and beat the authors’ own implementation.</p>
 
   <div class="links"><a class="pill lg" id="paperlink" aria-disabled="true">Paper (coming soon)</a></div>
   <a id="taskbase" href="{{ '/task/' | relative_url }}" hidden></a>
