@@ -8,7 +8,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
 ---
 <div class="fcs2">
 <nav class="sub" aria-label="Sections"><div class="col" id="subnav">
-  <a href="#overview" class="on">Overview</a><a href="#leaderboard">Leaderboard</a><a href="#tasks">Tasks</a><a href="#cases">Case studies</a><a href="#private">Private set</a><a href="#sponsors">Sponsors</a><a href="#questions">Questions</a>
+  <a href="#overview" class="on"><span>Overview</span></a><a href="#leaderboard"><span>Leaderboard</span></a><a href="#tasks"><span>Tasks</span></a><a href="#cases"><span>Case studies</span></a><a href="#private"><span>Private set</span></a><a href="#sponsors"><span>Sponsors</span></a><a href="#questions"><span>Questions</span></a>
 </div></nav>
 
 <div class="col" id="main" tabindex="-1">
@@ -17,7 +17,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
   <div class="hero-text">
   <p class="upd"><i></i><span>Last updated: {{ site.time | date: "%B %-d, %Y" }}</span></p>
   <h1>FrontierCS 2: A benchmark for computer-science R&amp;D</h1>
-  <p class="lead">Each task deletes a published paper’s contribution from the repository its authors released. The agent writes it back, and the authors’ own code is the reference it must beat.</p>
+  <p class="lead">Our tasks challenge agents to re-implement entire research papers. They must beat the original authors’ implementation to complete the task.</p>
 
   <div class="links"><a class="pill lg" id="paperlink" aria-disabled="true">Paper (coming soon)</a></div>
   <a id="taskbase" href="{{ '/task/' | relative_url }}" hidden></a>
