@@ -110,12 +110,12 @@ const RUNS = [["glm", "Programming Languages", "Glenside", 90.49, 1], ["glm", "S
 const MODELS = [
   {id:'astra', name:'GPT-6 Astra', short:'GPT-6 Astra', h:'Codex CLI', lab:'OpenAI'},
   {id:'sol', name:'GPT-6.1 Sol', short:'GPT-6.1 Sol', h:'Codex CLI', lab:'OpenAI'},
-  {id:'muse', name:'Muse Spark 1.3', short:'Muse Spark', h:'Muse Code', lab:'Meta'},
+  {id:'muse', name:'Muse Spark 1.3', short:'Muse Spark 1.3', h:'Muse Code', lab:'Meta'},
   {id:'k3', name:'Kimi K3', short:'Kimi K3', h:'Kimi Code', lab:'Kimi'},
   {id:'ds', name:'DeepSeek V4.1 Flash', short:'DeepSeek V4.1 Flash', h:'DSH', lab:'DeepSeek'},
   {id:'glm', name:'GLM 5.3', short:'GLM 5.3', h:'ZCode', lab:'Z.ai'},
   {id:'opus', name:'Claude Opus 5.5', short:'Opus 5.5', h:'Claude Code', lab:'Anthropic'},
-  {id:'wonder', name:'Muse Wonder 1.0', short:'Muse Wonder', h:'Muse Code', lab:'Meta'},
+  {id:'wonder', name:'Muse Wonder 1.0', short:'Muse Wonder 1.0', h:'Muse Code', lab:'Meta'},
   {id:'qwen', name:'Qwen 3.8 Max', short:'Qwen 3.8 Max', h:'Codex CLI', lab:'Qwen'},
   {id:'glmf', name:'GLM 5.3 Flash', short:'GLM 5.3 Flash', h:'ZCode', lab:'Z.ai'},
 ];

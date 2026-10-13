@@ -86,7 +86,7 @@ function drawPassCost() {
     const lead = front.includes(m);
     svg.append(sv('circle', {cx, cy, r:lead ? 7.5 : 5, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':2, 'data-m':m.id}));
     const lab = sv('text', {class:'lab halo', x:cx, y:cy}, name); svg.append(lab);
-    const w = lab.getComputedTextLength() + 2;
+    let w = lab.getComputedTextLength() + 2;
     // right, left, above, below, the four diagonals, then the same one and two lines further out; the first spot clear of every dot and placed label wins
     const spots = [[cx + 12, cy + 4.5, 'start'], [cx - 12, cy + 4.5, 'end'], [cx, cy - 13, 'middle'], [cx, cy + 22, 'middle'],
       [cx + 8, cy - 11, 'start'], [cx - 8, cy - 11, 'end'], [cx + 8, cy + 20, 'start'], [cx - 8, cy + 20, 'end'],
@@ -94,7 +94,12 @@ function drawPassCost() {
       [cx, cy - 49, 'middle'], [cx, cy + 58, 'middle'], [cx - 6, cy - 47, 'end'], [cx - 6, cy + 56, 'end']];
     const box = ([x, y, an]) => ({x:an === 'start' ? x : an === 'end' ? x - w : x - w / 2, y:y - 11, w, h:14});   // the glyphs' own height, so a label can sit beside its dot in a tight cluster
     const hit = q => boxes.some(o => q.x < o.x + o.w && o.x < q.x + q.w && q.y < o.y + o.h && o.y < q.y + q.h) || q.x < L || q.x + q.w > W || q.y < 0;
-    const spot = spots.find(sp => !hit(box(sp)));
+    // a name with no spot next to its dot sheds its brand word ("Muse Wonder 1.0" becomes "Wonder 1.0", as Claude Opus 5.5 is "Opus 5.5")
+    // before it moves a line or two away; a label is dropped only when neither form fits anywhere
+    const tight = /^\S+ (\S+ \d[\d.]*)$/.exec(name), forms = tight ? [name, tight[1]] : [name];
+    let spot;
+    for (const [str, from] of [...forms.map(f => [f, spots.slice(0, 8)]), ...forms.map(f => [f, spots])]) {
+      lab.textContent = str; w = lab.getComputedTextLength() + 2; spot = from.find(sp => !hit(box(sp))); if (spot) break; }
     if (spot) { boxes.push(box(spot)); lab.setAttribute('x', spot[0]); lab.setAttribute('y', spot[1]); lab.setAttribute('text-anchor', spot[2]);
       // a label wears its dot's colour, darkened to read on white, so a crowded patch still pairs each name with its dot
       lab.style.fill = `color-mix(in srgb, ${MCOL[m.id]} 78%, #000)`; if (lead) lab.style.fontWeight = 600; }
