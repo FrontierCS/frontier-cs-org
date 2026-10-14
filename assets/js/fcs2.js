@@ -369,9 +369,21 @@ $('#ftoggle').addEventListener('click', () => { const f = $('#filter'), o = !f.c
 $('#q').addEventListener('input', e => { q = e.target.value; again(); });
 // the list scrolls in its own box, all tasks in it (owner, 2026-10-14: no Show more button); the foot fades until the end is reached
 const atEnd = () => { const r = $('#rows'); r.classList.toggle('at-end', r.scrollTop + r.clientHeight >= r.scrollHeight - 2);
-  // the head line ends where the rows do: past them sit the list's own padding and its scroll bar, whatever width the browser gives it
-  $('#lhead').style.paddingRight = `${r.offsetWidth - r.clientWidth + parseFloat(getComputedStyle(r).paddingRight)}px`; };
+  // the page's own scroll bar: the thumb's height is the visible share of the list, its top the share scrolled
+  const rail = $('#rail'), th = rail.firstElementChild, over = r.scrollHeight > r.clientHeight + 1; rail.hidden = !over;
+  if (over) { const h = Math.max(36, r.clientHeight * r.clientHeight / r.scrollHeight); th.style.height = `${h}px`;
+    th.style.top = `${(r.clientHeight - h) * r.scrollTop / (r.scrollHeight - r.clientHeight)}px`; }
+  // the head line ends where the rows do: past them is the list's own padding, which holds the scroll rail
+  $('#lhead').style.paddingRight = getComputedStyle(r).paddingRight; };
 $('#rows').addEventListener('scroll', atEnd, {passive:true}); addEventListener('resize', atEnd);
+// dragging the thumb scrolls the list in step; a press on the rail away from the thumb centres the thumb there first
+$('#rail').addEventListener('pointerdown', e => { const r = $('#rows'), rail = $('#rail'), th = rail.firstElementChild, box = rail.getBoundingClientRect();
+  const span = r.clientHeight - th.offsetHeight, per = (r.scrollHeight - r.clientHeight) / (span || 1);
+  if (e.target !== th) r.scrollTop = (e.clientY - box.top - th.offsetHeight / 2) * per;
+  const y0 = e.clientY, s0 = r.scrollTop; rail.classList.add('drag'); rail.setPointerCapture(e.pointerId); e.preventDefault();
+  const move = ev => { r.scrollTop = s0 + (ev.clientY - y0) * per; };
+  const up = () => { rail.classList.remove('drag'); rail.removeEventListener('pointermove', move); rail.removeEventListener('pointerup', up); rail.removeEventListener('pointercancel', up); };
+  rail.addEventListener('pointermove', move); rail.addEventListener('pointerup', up); rail.addEventListener('pointercancel', up); });
 function hits() {
   const w = q.toLowerCase().split(/\s+/).filter(Boolean);
   const hay = t => [t.s, t.name, t.t, t.n, t.d, GOAL[t.s] || '', VENUE[t.s] || ''].join(' ').toLowerCase();

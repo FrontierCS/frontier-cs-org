@@ -133,7 +133,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
         </div>
       </div>
       <div class="lhead" id="lhead"></div>
-      <div class="rows" id="rows" role="region" aria-label="Task list" tabindex="0"></div>
+      <div class="rwrap"><div class="rows" id="rows" role="region" aria-label="Problem list" tabindex="0"></div><div class="rail" id="rail" aria-hidden="true"><i></i></div></div>
     </div>
   </div>
 </section>

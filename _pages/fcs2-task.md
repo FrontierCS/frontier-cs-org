@@ -15,6 +15,7 @@ page_css: fcs2
       <p class="tgoal" id="tgoal" hidden></p>
       <p class="ptitle" id="tpaper"></p>
       <div class="tkeys" id="tkeys"></div>
+      <p class="tfedi" id="tfedi" data-how="{{ '/#feci-how' | relative_url }}"></p>
       <div class="links" id="tlinks"></div>
     </header>
     <figure class="tfig" id="tfig" hidden></figure>
@@ -22,7 +23,8 @@ page_css: fcs2
   <div id="tbody"></div>
 </div>
 </div>
-<script>window.PATCH_DIR = "{{ '/assets/patches/' | relative_url }}"; window.FIG_DIR = "{{ '/assets/img/fcs2-tasks/' | relative_url }}";</script>
+<script>window.FIG_DIR = "{{ '/assets/img/fcs2-tasks/' | relative_url }}";</script>
 <script defer src="{{ '/assets/js/fcs2-data.js' | relative_url }}"></script>
 <script defer src="{{ '/assets/js/fcs2-checks.js' | relative_url }}"></script>
+<script defer src="{{ '/assets/js/fcs2-solutions.js' | relative_url }}"></script>
 <script defer src="{{ '/assets/js/fcs2-task.js' | relative_url }}"></script>
