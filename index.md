@@ -147,7 +147,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
   <h2>Private set</h2>
   <p class="tbd">Problems we don’t release.</p>
   <div class="locked" id="locked" aria-hidden="true"></div>
-  <p class="pcontact">Questions about the private set: write to Qiuyang Mang at <a href="mailto:qmang@berkeley.edu">qmang@berkeley.edu</a> or Wenhao Chai at <a href="mailto:wenhao.chai@princeton.edu">wenhao.chai@princeton.edu</a>.</p>
+  <p class="pcontact">For questions about the private set, email both <a class="mail" href="mailto:qmang@berkeley.edu,wenhao.chai@princeton.edu">qmang@berkeley.edu</a> and <a class="mail" href="mailto:qmang@berkeley.edu,wenhao.chai@princeton.edu">wenhao.chai@princeton.edu</a>.</p>
 </section>
 
 <section class="sec" id="sponsors">
