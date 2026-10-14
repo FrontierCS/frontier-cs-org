@@ -213,23 +213,20 @@ OVERVIEW = {
         '');   /* the axis title already says what the score is */
       CHART_H.lbLane = Math.floor((v.clientHeight - 54) / MODELS.length); v.append(document.getElementById('lbplot')); drawLB(); oneLine(document.getElementById('lbsvg')); sideVals(document.getElementById('lbsvg'));
     }""",
-    # FECI: the overview's chart; the headline counts the models whose whole 90% interval is above Human, the line under
-    # it names them and any whose whole interval is below
+    # FECI: the overview's chart; the line under the headline names the model with the highest FECI and its value (the
+    # human reference has no FECI on the pass-based scale, so the old count of models above it is gone; Qiuyang, 2026-10-14)
     '05-feci': """() => {
-      const above = RANKED.filter(m => ECI[m.id][1] > ECI_HUMAN).map(m => m.name), below = RANKED.filter(m => ECI[m.id][2] < ECI_HUMAN).map(m => m.name);
-      const NUM = ['No', 'One', 'Two', 'Three', 'Four', 'Five', 'Six'], and = a => a.length < 3 ? a.join(' and ') : a.slice(0, -1).join(', ') + ' and ' + a.at(-1);
-      console.assert(above.length >= 1 && above.length < NUM.length, 'FECI wording', above, below);
+      const top = RANKED[0];
+      console.assert(fe(ECI[top.id][0]) !== fe(ECI[RANKED[1].id][0]), 'FECI wording: a tie at the top', top.id, RANKED[1].id);
       const v = card('stack', 'FECI (FrontierCS Epoch Capabilities Index)',   // owner, 2026-10-13: the index's name as the headline
-        `${and(above)} clear${above.length > 1 ? '' : 's'} the human reference.${below.length ? ` ${and(below)} fall${below.length > 1 ? '' : 's'} short.` : ''} The rest are within noise.`,
-        'FECI, fitted with the ECI code of Epoch AI. Human = 25, Kimi K2.7 = 0.');
+        `${top.name} is highest, at ${fe(ECI[top.id][0])}.`,
+        `FECI, fitted on pass verdicts. ${ECI_LOW_NAME} = ${ECI_LOW_VALUE}.`);
       CHART_H.eciLane = Math.floor((v.clientHeight - 60) / MODELS.length); v.append(document.getElementById('eciplot')); drawECI(); oneLine(document.getElementById('ecisvg')); sideVals(document.getElementById('ecisvg'));
     }""",
-    # test-time scaling: the overview's chart; budgets where two models come within 1 point of their final FECI
+    # test-time scaling: the overview's chart
     '06-scaling': """() => {
-      const reach = id => { const c = SCALE[id], f = c.at(-1)[1]; return c.find(p => p[1] >= f - 1)[0]; };
-      const ds = reach('ds'), astra = reach('astra'); console.assert(ds < 1 && astra > 5, 'scaling wording', ds, astra);
       const v = card('stack', 'FECI vs. budget per run',
-        'Each run counts its latest valid submission at the budget.',
+        'A run counts as passed once it has ended with a pass within the budget.',
         'One curve per lab, its model with the highest FECI, as on the site.');
       fit(v, 'tts', 62); v.append(document.getElementById('ttsplot'), document.getElementById('ttslegend')); drawTTS();
       document.querySelectorAll('#ttslegend button[aria-pressed="false"]').forEach(b => b.remove());   // a still card: the hidden models leave the legend
