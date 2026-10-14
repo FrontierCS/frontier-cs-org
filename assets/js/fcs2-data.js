@@ -216,41 +216,15 @@ function labelDot(svg, boxes, cx, cy, name, frame, fill, bold) {
     [cx, cy - 31, 'middle'], [cx, cy + 40, 'middle'], [cx + 6, cy - 29, 'start'], [cx - 6, cy - 29, 'end'], [cx + 6, cy + 38, 'start'], [cx - 6, cy + 38, 'end'],
     [cx, cy - 49, 'middle'], [cx, cy + 58, 'middle'], [cx - 6, cy - 47, 'end'], [cx - 6, cy + 56, 'end']];
   const box = ([x, y, an]) => ({x:an === 'start' ? x : an === 'end' ? x - w : x - w / 2, y:y - 11, w, h:14});   // the glyphs' own height, so a label can sit beside its dot in a tight cluster
-  // a soft box (along the frontier line) is cleared when it can be; a name lies across the line only when it fits nowhere else
-  const hit = (q, soft) => boxes.some(o => (soft || !o.soft) && q.x < o.x + o.w && o.x < q.x + q.w && q.y < o.y + o.h && o.y < q.y + q.h) || q.x < frame.l || q.x + q.w > frame.r || q.y < frame.t || q.y + q.h > frame.b;
+  const hit = q => boxes.some(o => q.x < o.x + o.w && o.x < q.x + q.w && q.y < o.y + o.h && o.y < q.y + q.h) || q.x < frame.l || q.x + q.w > frame.r || q.y < frame.t || q.y + q.h > frame.b;
   const tight = /^\S+ (\S+ \d[\d.]*)$/.exec(name), forms = tight ? [name, tight[1]] : [name];
   let spot;
-  for (const soft of boxes.some(o => o.soft) ? [true, false] : [true]) {
-    for (const [str, from] of [...forms.map(f => [f, spots.slice(0, 8)]), ...forms.map(f => [f, spots])]) {
-      lab.textContent = str; w = lab.getComputedTextLength() + 2; spot = from.find(sp => !hit(box(sp), soft)); if (spot) break; }
-    if (spot) break;
-  }
+  for (const [str, from] of [...forms.map(f => [f, spots.slice(0, 8)]), ...forms.map(f => [f, spots])]) {
+    lab.textContent = str; w = lab.getComputedTextLength() + 2; spot = from.find(sp => !hit(box(sp))); if (spot) break; }
   if (!spot) { lab.remove(); return false; }
   boxes.push(box(spot)); lab.setAttribute('x', spot[0]); lab.setAttribute('y', spot[1]); lab.setAttribute('text-anchor', spot[2]);
   lab.style.fill = fill; if (bold) lab.style.fontWeight = 600;
   return true;
-}
-/* The Pareto frontier as a soft straight line through its runs, for the cost charts' "Pareto frontier" box (Qiuyang,
-   2026-10-14: ticked, it draws this line and leaves the runs off the frontier unnamed). P: the frontier's points in pixels,
-   cheapest first. Returns small soft boxes along the line, so labelDot keeps names off it wherever they fit elsewhere. */
-function frontierLine(svg, P) {
-  if (P.length < 2) return [];
-  svg.append(sv('path', {d:P.map((p, i) => `${i ? 'L' : 'M'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(''), fill:'none', stroke:'var(--ink-2)',
-    'stroke-width':1.25, 'stroke-linejoin':'round', 'stroke-linecap':'round', opacity:.4}));
-  const out = [];
-  P.slice(1).forEach((b, k) => { const a = P[k], n = Math.max(1, Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) / 5));
-    for (let i = 0; i <= n; i++) out.push({x:a[0] + (b[0] - a[0]) * i / n - 2, y:a[1] + (b[1] - a[1]) * i / n - 2, w:4, h:4, soft:true}); });
-  return out;
-}
-// the "Pareto frontier" item in a cost chart's head: pointing at it or focusing it shows the frontier, a click or tap keeps
-// it until the next one; redraw draws the chart, which reads the item's "on" class
-function frontierItem(btn, redraw) {
-  if (btn.dataset.wired) return; btn.dataset.wired = '1';
-  let pin = false;
-  const set = on => { if (btn.classList.contains('on') !== on) { btn.classList.toggle('on', on); redraw(); } };
-  btn.addEventListener('mouseenter', () => set(true)); btn.addEventListener('mouseleave', () => set(pin));
-  btn.addEventListener('focus', () => set(true)); btn.addEventListener('blur', () => set(pin));
-  btn.addEventListener('click', () => { pin = !pin; btn.setAttribute('aria-pressed', String(pin)); set(pin || (!isTouch && btn.matches(':hover'))); });
 }
 const AFILL = {sys:'#D2E3FC', ml:'#CEEAD6', pl:'#E9D2FD', sec:'#FAD2CF', db:'#FEEFC3', rb:'#E8EAED'};
 const AINK = {sys:'#174EA6', ml:'#0D652D', pl:'#681DA8', sec:'#A50E0E', db:'#E37400', rb:'#202124'};

@@ -49,7 +49,6 @@ $('#groupby').addEventListener('click', e => { const b = e.target.closest('.chip
   [...$('#groupby').children].forEach(c => c.setAttribute('aria-pressed', String(c === b))); drawLB(); });
 $('#showruns').addEventListener('change', e => { showRuns = e.target.checked; drawLB(); });
 $('#custom').addEventListener('click', () => { const s = $('#settings'); const o = !s.classList.contains('open'); s.classList.toggle('open', o); $('#custom').setAttribute('aria-expanded', String(o)); });
-frontierItem($('#pcfront'), drawPassCost);
 $('#lblegend').innerHTML = RANKED.map(m => `<span><i style="background:${MCOL[m.id]}"></i>${esc(m.name)}</span>`).join('');
 
 /* Main chart: pass rate against mean cost per run in US$, one dot per model (PASS, COST); the dots on the Pareto frontier are emphasised. Each label takes the first
@@ -76,20 +75,18 @@ function drawPassCost() {
     svg.append(sv('line', {x1:X(v), x2:X(v), y1:T, y2:H - B, stroke:'var(--grid)', 'stroke-width':1}));
     svg.append(sv('text', {x:X(v), y:H - B + 20, 'text-anchor':'middle'}, usdfmt(v))); });
   svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'Cost per run in US$, mean, log scale'));
-  const pts = [], order = [...ms].sort((a, b) => PASS[b.id][0] - PASS[a.id][0]), fr = $('#pcfront').classList.contains('on');
+  const pts = [], order = [...ms].sort((a, b) => PASS[b.id][0] - PASS[a.id][0]);
   const at = m => [X(COST[m.id][0]), Y(PASS[m.id][0])];
   const boxes = order.map(m => { const [cx, cy] = at(m); return {x:cx - 9, y:cy - 9, w:18, h:18}; });
   // the Pareto frontier: the models no cheaper model matches or beats on pass rate
   const front = [...ms].sort((p, q) => COST[p.id][0] - COST[q.id][0] || PASS[q.id][0] - PASS[p.id][0]).filter((m, i, a) => a.slice(0, i).every(o => PASS[o.id][0] < PASS[m.id][0]));
-  // "Pareto frontier" in the head, pointed at or kept: a soft line through the frontier, and the models off it unnamed (the tooltip still names them)
-  if (fr) boxes.push(...frontierLine(svg, front.map(at)));
   order.forEach(m => {
     const [cx, cy] = at(m), name = narrow ? m.short : m.name;
     // the frontier reads from the dots themselves, with no line: a model on it has a larger dot and a bold name, a model
     // under it a smaller dot and a regular name, both at full colour (owner, 2026-10-13: keep the chart clean)
     const lead = front.includes(m);
     svg.append(sv('circle', {cx, cy, r:lead ? 7.5 : 5, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':2, 'data-m':m.id}));
-    if (!fr || lead) labelDot(svg, boxes, cx, cy, name, {l:L, r:W, t:T, b:H - B}, MTXT(m.id), lead);   // fcs2-data.js
+    labelDot(svg, boxes, cx, cy, name, {l:L, r:W, t:T, b:H - B}, MTXT(m.id), lead);   // fcs2-data.js
     const pct = PASS[m.id][0];
     pts.push({x:cx, y:cy, mean:true, html:`<b>${esc(m.name)}</b><br>Pass rate <b>${f1(pct)}%</b><br>${usdfmt(COST[m.id][0])} per run, mean`});
   });

@@ -50,7 +50,7 @@ function drawPage() {
     + `<section class="tres"><h2 class="th2">Results</h2><p class="tsum">${sum.join(' · ')}</p><div class="res-scroll"><table class="res rtab" id="rtbl"></table></div></section>`
     + (CHECKS[t.s] ? `<section class="tcrit"><h2 class="th2">Pass criteria</h2><p>A run passes only if its final submission beats the human reference on every metric, on every hidden workload. Each cell counts the hidden workloads on which it did.</p>`
       + `<div class="res-scroll"><table class="res ctab" id="ctbl"></table></div></section>` : '')   // no general submission note (owner audit, 2026-10-14)
-    + figure('sc', 'Final score against cost', '<button type="button" class="fhov" id="scfront" aria-pressed="false"><i></i>Pareto frontier</button>')
+    + figure('sc', 'Final score against cost')
     + (TFIT[t.s] ? figure('fc', 'Expected score by FECI') : '')
     + solutionHTML(t, runs);   // the solution last (owner, 2026-10-14)
   drawResults(); if (CHECKS[t.s]) drawCriteria(); drawCharts(); loadPatches(t); loadFig(t); drawPager(t);
@@ -131,8 +131,7 @@ function drawCharts() {
    pass rate chart): one dot per run, a model's one run on the task, its final score against its cost in US$ on a log
    scale. The runs no cheaper run matches or beats on final score have a larger dot and a bold name; labels sit beside the
    dots (labelDot, fcs2-data.js), and the Human reference is a dashed line named in the legend, not among the runs' names
-   (Qiuyang, 2026-10-14). Pointing at "Pareto frontier" in the head (a click keeps it) draws a soft line through the
-   frontier and leaves the runs off it unnamed. */
+   (Qiuyang, 2026-10-14). */
 function drawScore() {
   const {t, runs} = cur, ref = REF[t.s], rs = runs.filter(r => r[4] > 0);
   const svg = $('#scsvg'), W = Math.max(300, $('#scplot').clientWidth), narrow = W < 560;
@@ -154,8 +153,7 @@ function drawScore() {
     svg.append(sv('line', {x1:X(v), x2:X(v), y1:T, y2:H - B, stroke:'var(--grid)', 'stroke-width':1}));
     svg.append(sv('text', {x:X(v), y:H - B + 20, 'text-anchor':'middle'}, usdfmt(v))); });
   svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'Cost of the run in US$, log scale'));
-  const at = r => [X(r[4]), Y(r[2])], order = [...rs].sort((a, b) => b[2] - a[2]), fi = $('#scfront'), fr = fi.classList.contains('on');
-  frontierItem(fi, drawScore);
+  const at = r => [X(r[4]), Y(r[2])], order = [...rs].sort((a, b) => b[2] - a[2]);
   const boxes = order.map(r => { const [cx, cy] = at(r); return {x:cx - 9, y:cy - 9, w:18, h:18}; });
   // the Human reference: a dashed line, named in the legend; no run's name is written across it
   if (ref != null) {
@@ -165,13 +163,11 @@ function drawScore() {
   $('#sclegend').innerHTML = ref != null ? '<span><i class="dash"></i>Human reference</span>' : '';
   // the frontier: the runs no cheaper run matches or beats on final score
   const front = [...rs].sort((p, q) => p[4] - q[4] || q[2] - p[2]).filter((r, i, a) => a.slice(0, i).every(o => o[2] < r[2]));
-  // "Pareto frontier" in the head, pointed at or kept: a soft line through the frontier, and the runs off it unnamed (the tooltip still names them)
-  if (fr) boxes.push(...frontierLine(svg, front.map(at)));
   const pts = [];
   order.forEach(r => {
     const [cx, cy] = at(r), m = MODELS.find(x => x.id === r[0]), lead = front.includes(r);
     svg.append(sv('circle', {cx, cy, r:lead ? 7.5 : 5, fill:MCOL[r[0]], stroke:'#fff', 'stroke-width':2}));
-    if (!fr || lead) labelDot(svg, boxes, cx, cy, narrow ? m.short : m.name, {l:L, r:W, t:T, b:H - B}, MTXT(r[0]), lead);
+    labelDot(svg, boxes, cx, cy, narrow ? m.short : m.name, {l:L, r:W, t:T, b:H - B}, MTXT(r[0]), lead);
     pts.push({x:cx, y:cy, mean:true, html:`<b>${esc(m.name)}</b><br>Final score <b>${f1(r[2])}</b>, ${r[3] ? 'passes' : 'does not pass'}<br>${money(r[4])}`});
   });
   attachTip(svg, W, H, pts, $('#sctip'));

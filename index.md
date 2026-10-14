@@ -35,7 +35,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
 <section class="sec" id="leaderboard">
   <h2>Leaderboard</h2>
   <figure class="chart" style="margin:0">
-    <div class="chead"><span>Pass rate (over human)</span><button type="button" class="fhov" id="pcfront" aria-pressed="false"><i></i>Pareto frontier</button></div>
+    <div class="chead"><span>Pass rate (over human)</span></div>
     <div class="plot" id="pcplot"><svg id="pcsvg" role="img" aria-label="Pass rate (over human) against cost per run"></svg><div class="tip" id="pctip" hidden></div></div>
     <div class="cfoot">{% include chart_logo.html %}</div>
   </figure>
