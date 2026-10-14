@@ -54,7 +54,7 @@ const GOAL = {
   'Differentiable Population Statistics':'Keep population statistics differentiable for a Fréchet-distance loss.',
   'Glenside':'Write the analysis that tracks tensor shapes through Glenside’s rewrites.',
   'MetaOpt':'Find traffic matrices on which a combined heuristic does worst.',
-  'OCR Distillation Trajectory Sampling':'Sample the student’s trajectories to distil a text-rendering image model.',
+  'OCR Distillation Trajectory Sampling':'Sample the student’s trajectories to distill a text-rendering image model.',
   'MuJoCo Playground':'Train a quadruped to follow joystick commands.',
   'Residual State Advancement':'Train boosted trees over joined tables without joining them.',
   'QuarterPIR':'Make each private lookup send fewer bytes and run faster.',
