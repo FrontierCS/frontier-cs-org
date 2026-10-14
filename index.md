@@ -46,29 +46,6 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
     <p class="cfoot" style="border-top:0; margin-top:10px; padding-top:0">Bold marks the best in a row.</p>
   </details>
 
-  <div class="tbl-wrap" id="meanscore">
-    <h3>Mean score</h3>
-  <div class="cgrid">
-    <figure class="chart" style="margin:0">
-      <div class="chead"><span id="ylab">Final score, mean over runs</span></div>
-      <div class="plot" id="lbplot"><svg id="lbsvg" role="img" aria-label="Leaderboard chart"></svg><div class="tip" id="lbtip" hidden></div></div>
-      <div class="legend" id="lblegend" hidden></div>
-      <button class="pill lg custom" id="custom" type="button" aria-expanded="false" aria-controls="settings">
-        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3M5.5 5.5l2.1 2.1M16.4 16.4l2.1 2.1M5.5 18.5l2.1-2.1M16.4 7.6l2.1-2.1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-        Customize graph</button>
-      <div class="cfoot">{% include chart_logo.html %}<span id="lbnote">scores on each task’s own 0–100 scale</span></div>
-    </figure>
-    <aside class="settings" id="settings" aria-label="Graph settings">
-      <h3>Settings</h3>
-      <label class="toggle"><input type="checkbox" id="showruns" checked> Show individual runs</label>
-      <h4>Group by</h4>
-      <div class="chips" id="groupby"><button class="chip" type="button" data-g="model" aria-pressed="true">Model</button><button class="chip" type="button" data-g="task" aria-pressed="false">Task</button></div>
-      <h4>Domain</h4>
-      <div class="radios" id="domradios"></div>
-    </aside>
-  </div>
-  </div>
-
   <div class="tbl-wrap" id="eci">
     <h3>FECI</h3>
     <figure class="chart" style="margin:0">
@@ -108,8 +85,30 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
       <div class="chead"><span>Test-time scaling: FECI against cost budget per run</span></div>
       <div class="plot" id="ttsplot"><svg id="ttssvg" role="img" aria-label="Test-time scaling chart"></svg><div class="tip" id="ttstip" hidden></div></div>
       <div class="legend" id="ttslegend"></div>
-      <div class="cfoot">{% include chart_logo.html %}<span>one model per lab, its highest FECI · point at a curve or pick a model below to see its 90% interval</span></div>
+      <div class="cfoot">{% include chart_logo.html %}<span>at first one model per lab, its highest FECI · click a model below to show or hide it · point at a curve to see its 90% interval</span></div>
     </figure>
+  </div>
+  <div class="tbl-wrap" id="meanscore">
+    <h3>Mean score</h3>
+  <div class="cgrid">
+    <figure class="chart" style="margin:0">
+      <div class="chead"><span id="ylab">Final score, mean over runs</span></div>
+      <div class="plot" id="lbplot"><svg id="lbsvg" role="img" aria-label="Leaderboard chart"></svg><div class="tip" id="lbtip" hidden></div></div>
+      <div class="legend" id="lblegend" hidden></div>
+      <button class="pill lg custom" id="custom" type="button" aria-expanded="false" aria-controls="settings">
+        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3M5.5 5.5l2.1 2.1M16.4 16.4l2.1 2.1M5.5 18.5l2.1-2.1M16.4 7.6l2.1-2.1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Customize graph</button>
+      <div class="cfoot">{% include chart_logo.html %}<span id="lbnote">scores on each task’s own 0–100 scale</span></div>
+    </figure>
+    <aside class="settings" id="settings" aria-label="Graph settings">
+      <h3>Settings</h3>
+      <label class="toggle"><input type="checkbox" id="showruns" checked> Show individual runs</label>
+      <h4>Group by</h4>
+      <div class="chips" id="groupby"><button class="chip" type="button" data-g="model" aria-pressed="true">Model</button><button class="chip" type="button" data-g="task" aria-pressed="false">Task</button></div>
+      <h4>Domain</h4>
+      <div class="radios" id="domradios"></div>
+    </aside>
+  </div>
   </div>
 </section>
 

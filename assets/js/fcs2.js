@@ -150,16 +150,17 @@ function drawECI() {
 /* Test-time scaling: FECI when every run stops at a US$ budget (SCALE, from bin/fcs2_runs_from_db.py).
    Values below 0 leave the plot through its bottom edge. The drawing is that of 2026-10-12: straight segments, one legend
    (owner, 2026-10-13: back to it). A run stopped at a budget counts its latest valid submission, so a curve can dip.
-   A model's 90% band shows only while the pointer is on its curve or its legend entry, or while its legend entry is
-   picked; a click picks it, a second click drops it (owner, 2026-10-13: no bands otherwise). */
-let ttsPick = null, ttsHover = null;
-// one curve per lab, its model with the highest FECI (owner, 2026-10-14); a model with no reported spend has no curve
-const TTSM = RANKED.filter(m => SCALE[m.id]).filter((m, i, a) => a.findIndex(o => o.lab === m.lab) === i);
-const ttsBands = () => document.querySelectorAll('#ttssvg .tband').forEach(b => b.setAttribute('opacity', b.dataset.m === (ttsHover || ttsPick) ? .12 : 0));
+   Every model with reported spend is in the legend; at first only each lab's model with the highest FECI is drawn and the
+   others are greyed in the legend; a click on an entry shows or hides its curve (owner, 2026-10-14). A model's 90% band
+   shows only while the pointer is on its curve or its legend entry (owner, 2026-10-13: no bands otherwise). */
+let ttsHover = null;
+const TTSM = RANKED.filter(m => SCALE[m.id]);   // a model with no reported spend has no curve
+const ttsOn = new Set(TTSM.filter((m, i, a) => a.findIndex(o => o.lab === m.lab) === i).map(m => m.id));
+const ttsBands = () => document.querySelectorAll('#ttssvg .tband').forEach(b => b.setAttribute('opacity', b.dataset.m === ttsHover ? .12 : 0));
 function drawTTS() {
   const svg = $('#ttssvg'), W = Math.max(300, $('#ttsplot').clientWidth), narrow = W < 560;
   const L = 34, R = narrow ? 12 : 24, T = 12, B = 46, H = CHART_H.tts || (narrow ? 300 : 380);
-  const all = TTSM.flatMap(m => SCALE[m.id]);
+  const all = TTSM.flatMap(m => SCALE[m.id]);   // the axes hold every model, so showing one moves nothing
   // the axis starts half a decade before the first budget at which any model rises above 0
   const x0 = Math.log10(Math.min(...all.filter(p => p[1] >= 0).map(p => p[0]))) - 0.5, x1 = Math.log10(Math.max(...all.map(p => p[0])));
   const ytop = Math.max(...all.map(p => p[3])), ystep = ytop > 60 ? 20 : 10, ymax = Math.ceil(ytop / ystep) * ystep;   // grid every 10 on the Human = 25 scale
@@ -179,7 +180,7 @@ function drawTTS() {
   svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'Cost budget per run in US$, log scale'));
   const g = sv('g', {'clip-path':'url(#ttsclip)'}), gb = sv('g'), gl = sv('g'); g.append(gb, gl); svg.append(g);   // bands under every line
   const pts = [];
-  [...TTSM].reverse().forEach(m => {
+  [...TTSM].reverse().filter(m => ttsOn.has(m.id)).forEach(m => {
     const c = SCALE[m.id], path = c.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join('');
     const band = c.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[3]).toFixed(1)}`).join('')
       + [...c].reverse().map(p => `L${X(p[0]).toFixed(1)},${Y(p[2]).toFixed(1)}`).join('') + 'Z';
@@ -192,17 +193,18 @@ function drawTTS() {
       + `<br>90% interval ${Math.round(Math.max(p[2], 0))}–${Math.round(p[3])}<br>${Math.round(p[4] * 100)}% of runs still going`}); });
   });
   attachTip(svg, W, H, pts, $('#ttstip'));
-  // the curve under the pointer: the nearest point within 28 px, as the tooltip picks it
-  svg.addEventListener('pointermove', ev => { const rc = svg.getBoundingClientRect(), px = (ev.clientX - rc.left) * W / rc.width, py = (ev.clientY - rc.top) * H / rc.height;
+  // the curve under the pointer: the nearest point within 28 px, as the tooltip picks it; set as properties, so a redraw replaces them
+  const tipMove = svg.onpointermove, tipLeave = svg.onpointerleave;
+  svg.onpointermove = svg.onpointerdown = ev => { tipMove(ev); const rc = svg.getBoundingClientRect(), px = (ev.clientX - rc.left) * W / rc.width, py = (ev.clientY - rc.top) * H / rc.height;
     let best = null, bd = 28; pts.forEach(p => { const d = Math.hypot(p.x - px, p.y - py); if (d < bd) { bd = d; best = p; } });
-    const m = best ? best.m : null; if (m !== ttsHover) { ttsHover = m; ttsBands(); } });
-  svg.addEventListener('pointerleave', () => { ttsHover = null; ttsBands(); });
+    const m = best ? best.m : null; if (m !== ttsHover) { ttsHover = m; ttsBands(); } };
+  svg.onpointerleave = ev => { tipLeave(ev); ttsHover = null; ttsBands(); };
+  $('#ttslegend').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', ttsOn.has(x.dataset.m)));
   ttsBands();
 }
 $('#ttslegend').innerHTML = TTSM.map(m => `<button type="button" data-m="${m.id}" aria-pressed="false"><i style="background:${MCOL[m.id]}"></i>${esc(m.name)}</button>`).join('');
 $('#ttslegend').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return;
-  ttsPick = ttsPick === b.dataset.m ? null : b.dataset.m;
-  $('#ttslegend').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x.dataset.m === ttsPick)); ttsBands(); });
+  const m = b.dataset.m; ttsOn.has(m) ? ttsOn.delete(m) : ttsOn.add(m); drawTTS(); });
 $('#ttslegend').addEventListener('pointerover', e => { const b = e.target.closest('button'); if (b && e.pointerType === 'mouse') { ttsHover = b.dataset.m; ttsBands(); } });
 $('#ttslegend').addEventListener('pointerleave', () => { ttsHover = null; ttsBands(); });
 
