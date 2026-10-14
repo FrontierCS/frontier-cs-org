@@ -123,7 +123,7 @@ function drawECI() {
   const L = narrow ? nameCol(svg) : 190, R = 34, T = 14, B = 46, lane = CHART_H.eciLane || (narrow ? 56 : 64);
   // grid every 10 on the Human = 25 scale (owner, 2026-10-13); every 20 or 40 if the scale is ever wider
   const top = Math.max(...MODELS.map(m => ECI[m.id][2])), step = top > 120 ? (narrow ? 40 : 20) : top > 60 ? 20 : 10, xmax = Math.ceil(top / step) * step;
-  const H = T + order.length * lane + B, an = animates(svg), bh = narrow ? 16 : 18;
+  const H = T + order.length * lane + B, an = animates(svg), bh = narrow ? 24 : 28;   // bars near half the lane (owner, 2026-10-14: 18 px read too thin)
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
   const X = v => L + v / xmax * (W - L - R);
   for (let v = 0; v <= xmax; v += step) {
@@ -138,7 +138,7 @@ function drawECI() {
     svg.append(sv('text', {class:'lab', x:0, y:yc + (m.h ? -3 : 4)}, narrow ? m.short : m.name));
     if (m.h) svg.append(sv('text', {x:0, y:yc + 14, 'font-size':12}, m.h));
     const bar = sv('rect', {class:'ebar', x:X(0), y:yc - bh / 2, width:Math.max(0, X(e) - X(0)), height:bh, fill:MCOL[m.id], 'data-m':m.id});
-    const wk = sv('path', {class:'ewhisk', d:`M${X(lo)},${yc}H${X(hi)}M${X(lo)},${yc - 5}v10M${X(hi)},${yc - 5}v10`, fill:'none', stroke:'var(--ink)', 'stroke-width':1.5});
+    const wk = sv('path', {class:'ewhisk', d:`M${X(lo)},${yc}H${X(hi)}M${X(lo)},${yc - 7}v14M${X(hi)},${yc - 7}v14`, fill:'none', stroke:'var(--ink)', 'stroke-width':1.5});
     const val = sv('text', {class:'val halo', x:X(e), y:yc - bh / 2 - 6, fill:MTXT(m.id), 'text-anchor':'middle'}, f1(e));   // one decimal: on this scale whole numbers tie
     svg.append(bar, wk, val);
     if (an) { mark(bar, 'a-bar', i * .07); mark(wk, 'a-fade', .55 + i * .07); mark(val, 'a-fade', .55 + i * .07); }
