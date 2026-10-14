@@ -8,7 +8,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
 ---
 <div class="fcs2">
 <nav class="sub" aria-label="Sections"><div class="col" id="subnav">
-  <a href="#overview" class="on">Overview</a><a href="#leaderboard">Leaderboard</a><a href="#tasks">Tasks</a><a href="#cases">Case studies</a><a href="#private">Private set</a><a href="#sponsors">Sponsors</a><a href="#questions">Questions</a>
+  <a href="#overview" class="on"><span>Overview</span></a><a href="#leaderboard"><span>Leaderboard</span></a><a href="#tasks"><span>Tasks</span></a><a href="#cases"><span>Case studies</span></a><a href="#private"><span>Private set</span></a><a href="#sponsors"><span>Sponsors</span></a><a href="#questions"><span>Questions</span></a>
 </div></nav>
 
 <div class="col" id="main" tabindex="-1">
@@ -17,7 +17,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
   <div class="hero-text">
   <p class="upd"><i></i><span>Last updated: {{ site.time | date: "%B %-d, %Y" }}</span></p>
   <h1>FrontierCS 2: A benchmark for computer-science R&amp;D</h1>
-  <p class="lead">Each task deletes a published paper’s contribution from the repository its authors released. The agent writes it back, and the authors’ own code is the reference it must beat.</p>
+  <p class="lead">Each task removes the key contribution from the code behind a published paper. To pass, an agent must rebuild it and beat the authors’ own implementation.</p>
 
   <div class="links"><a class="pill lg" id="paperlink" aria-disabled="true">Paper (coming soon)</a></div>
   <a id="taskbase" href="{{ '/task/' | relative_url }}" hidden></a>
@@ -37,7 +37,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
   <figure class="chart" style="margin:0">
     <div class="chead"><span>Pass rate (over human)</span></div>
     <div class="plot" id="pcplot"><svg id="pcsvg" role="img" aria-label="Pass rate (over human) against cost per run"></svg><div class="tip" id="pctip" hidden></div></div>
-    <div class="cfoot">{% include chart_logo.html %}<span>Preliminary · a run passes only when its final submission beats the human baseline on every metric of every hidden workload, not on its total score · cost is the platform’s estimate, a lower bound for Kimi K3, DeepSeek V4.1 Flash, GLM 5.3, GLM 5.3 Flash and Qwen 3.8 Max</span></div>
+    <div class="cfoot">{% include chart_logo.html %}<span>Preliminary · a run passes only when its final submission beats the human baseline on every metric of every hidden workload, not on its total score · cost is the platform’s estimate</span></div>
   </figure>
 
   <details class="tbl-wrap fold" id="domains">

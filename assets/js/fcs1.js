@@ -153,9 +153,9 @@ const tabs = [...document.querySelectorAll('#lbtabs .chip')];
 tabs.forEach(t => t.onclick = () => { tabs.forEach(x => x.setAttribute('aria-pressed', x === t ? 'true' : 'false'));
   document.querySelectorAll('[data-panel]').forEach(p => p.hidden = p.dataset.panel !== t.dataset.t); });
 
-// sub-nav scrollspy, as on the FrontierCS 2 page
+// section rail scrollspy, as on the FrontierCS 2 page: the section on screen is the last one whose top has come within 120px of the top of the window (or of the header, while it shows)
 const links = [...document.querySelectorAll('#subnav a')], secs = links.map(a => document.querySelector(a.getAttribute('href')));
-const spy = () => { const bar = document.querySelector('.sub').getBoundingClientRect().bottom + 24, end = innerHeight + scrollY >= document.documentElement.scrollHeight - 2;
+const spy = () => { const bar = Math.max(0, document.querySelector('.topbar')?.getBoundingClientRect().bottom || 0) + 120, end = innerHeight + scrollY >= document.documentElement.scrollHeight - 2;
   const cur = end ? secs[secs.length - 1] : secs.filter(e => e.getBoundingClientRect().top <= bar).pop() || secs[0];
   links.forEach((a, i) => a.classList.toggle('on', secs[i] === cur)); };
 addEventListener('scroll', spy, {passive: true}); spy();

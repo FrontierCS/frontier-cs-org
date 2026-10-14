@@ -20,7 +20,7 @@ function drawPage() {
   $('#tmeta').innerHTML = `<span class="tag">${esc(t.d)}</span>`;
   $('#tname').textContent = t.name;
   $('#tpaper').textContent = t.t;
-  $('#tlinks').innerHTML = (t.p ? `<a class="pill" href="${esc(t.p)}" target="_blank" rel="noopener">${t.t ? 'Paper' : 'Project'}</a>` : '')
+  $('#tlinks').innerHTML = (t.p ? `<a class="pill" href="${esc(t.p)}" target="_blank" rel="noopener">${t.t ? t.src : 'Project'}</a>` : '')
     + (t.r ? `<a class="pill" href="${esc(t.r)}" target="_blank" rel="noopener">Code</a>` : '');
   const desc = DESC[t.s] ? `<p class="tdesc">${esc(DESC[t.s])}</p>` : '<p class="tdesc tbd">A description of this task will appear here.</p>';
   if (!runs.length) { $('#tbody').innerHTML = desc + '<p class="tbd">No runs on this task yet.</p>'; scrollTo(0, 0); return; }

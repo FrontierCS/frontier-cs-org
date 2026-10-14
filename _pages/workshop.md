@@ -7,7 +7,7 @@ page_css: fcs2
 ---
 <div class="fcs2 ws2">
 <nav class="sub" aria-label="Sections"><div class="col" id="subnav">
-  <a href="#overview" class="on">Overview</a><a href="#speakers">Speakers</a><a href="#topics">Topics</a><a href="#challenge">Challenge</a><a href="#organizers">Organizers</a>
+  <a href="#overview" class="on"><span>Overview</span></a><a href="#speakers"><span>Speakers</span></a><a href="#topics"><span>Topics</span></a><a href="#challenge"><span>Challenge</span></a><a href="#organizers"><span>Organizers</span></a>
 </div></nav>
 
 <div class="col" id="main" tabindex="-1">
@@ -92,7 +92,7 @@ page_css: fcs2
 </div>
 <script>
 (() => { const links = [...document.querySelectorAll('#subnav a')], secs = links.map(a => document.querySelector(a.getAttribute('href')));
-  const spy = () => { const bar = document.querySelector('.sub').getBoundingClientRect().bottom + 24, end = innerHeight + scrollY >= document.documentElement.scrollHeight - 2;
+  const spy = () => { const bar = Math.max(0, document.querySelector('.topbar')?.getBoundingClientRect().bottom || 0) + 120, end = innerHeight + scrollY >= document.documentElement.scrollHeight - 2;
     const cur = end ? secs[secs.length - 1] : secs.filter(e => e.getBoundingClientRect().top <= bar).pop() || secs[0];
     links.forEach((a, i) => a.classList.toggle('on', secs[i] === cur)); };
   addEventListener('scroll', spy, {passive: true}); spy(); })();
