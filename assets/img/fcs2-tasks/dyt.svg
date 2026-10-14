@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 270" role="img" aria-label="A Transformer block: DyT, attention, add, DyT, MLP, add. Both DyT layers replace LayerNorm and are the part the agent writes, with the conversion that puts DyT at every LayerNorm site. DyT computes gamma times tanh of alpha x, plus beta.">
+<defs><marker id="dyt-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker></defs>
+<text x="20" y="24" font-size="12.5" fill="#5f6368">One Transformer block, repeated through the model</text>
+<text x="24" y="117" font-size="14" font-style="italic" fill="#1f1f1f">x</text>
+<line x1="38" y1="112" x2="64" y2="112" stroke="#3c4043" stroke-width="1.3" marker-end="url(#dyt-ar)"/>
+<rect x="66" y="90" width="84" height="44" rx="8" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
+<text x="108.0" y="117" font-size="14" font-weight="600" text-anchor="middle" fill="#0b57d0">DyT</text>
+<text x="108.0" y="82" font-size="11.5" text-anchor="middle" fill="#9aa0a6" text-decoration="line-through">LayerNorm</text>
+<line x1="150" y1="112" x2="180" y2="112" stroke="#3c4043" stroke-width="1.3" marker-end="url(#dyt-ar)"/>
+<rect x="182" y="90" width="110" height="44" rx="8" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
+<text x="237.0" y="117" font-size="14" text-anchor="middle" fill="#1f1f1f">Attention</text>
+<line x1="292" y1="112" x2="320" y2="112" stroke="#3c4043" stroke-width="1.3" marker-end="url(#dyt-ar)"/>
+<circle cx="334" cy="112" r="12" fill="#fff" stroke="#3c4043" stroke-width="1.3"/><path d="M328 112h12M334 106v12" stroke="#3c4043" stroke-width="1.5"/>
+<line x1="346" y1="112" x2="380" y2="112" stroke="#3c4043" stroke-width="1.3" marker-end="url(#dyt-ar)"/>
+<rect x="382" y="90" width="84" height="44" rx="8" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
+<text x="424.0" y="117" font-size="14" font-weight="600" text-anchor="middle" fill="#0b57d0">DyT</text>
+<text x="424.0" y="82" font-size="11.5" text-anchor="middle" fill="#9aa0a6" text-decoration="line-through">LayerNorm</text>
+<line x1="466" y1="112" x2="496" y2="112" stroke="#3c4043" stroke-width="1.3" marker-end="url(#dyt-ar)"/>
+<rect x="498" y="90" width="90" height="44" rx="8" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
+<text x="543.0" y="117" font-size="14" text-anchor="middle" fill="#1f1f1f">MLP</text>
+<line x1="588" y1="112" x2="616" y2="112" stroke="#3c4043" stroke-width="1.3" marker-end="url(#dyt-ar)"/>
+<circle cx="630" cy="112" r="12" fill="#fff" stroke="#3c4043" stroke-width="1.3"/><path d="M624 112h12M630 106v12" stroke="#3c4043" stroke-width="1.5"/>
+<line x1="642" y1="112" x2="674" y2="112" stroke="#3c4043" stroke-width="1.3" marker-end="url(#dyt-ar)"/>
+<text x="684" y="117" font-size="14" font-style="italic" fill="#1f1f1f">y</text>
+<path d="M48 112 V50 H334 V98" fill="none" stroke="#9aa0a6" stroke-width="1.2" marker-end="url(#dyt-ar)"/>
+<path d="M360 112 V50 H630 V98" fill="none" stroke="#9aa0a6" stroke-width="1.2" marker-end="url(#dyt-ar)"/>
+<line x1="66" y1="210" x2="246" y2="210" stroke="#dadce0"/><line x1="156.0" y1="180" x2="156.0" y2="240" stroke="#dadce0"/>
+<polyline points="66,234.0 72,234.0 78,233.9 84,233.9 90,233.8 96,233.7 102,233.5 108,233.2 114,232.6 120,231.8 126,230.4 132,228.4 138,225.4 144,221.2 150,215.9 156,210.0 162,204.1 168,198.8 174,194.6 180,191.6 186,189.6 192,188.2 198,187.4 204,186.8 210,186.5 216,186.3 222,186.2 228,186.1 234,186.1 240,186.0 246,186.0" fill="none" stroke="#0b57d0" stroke-width="2.2"/>
+<text x="276" y="206" font-size="15" fill="#1f1f1f">DyT(x) = γ · tanh(α x) + β</text>
+<text x="276" y="228" font-size="12.5" fill="#5f6368">α, γ and β are learned, separately at every site</text>
+<text x="276" y="250" font-size="12.5" fill="#0b57d0">The agent writes the DyT layer and the step that swaps it in for every LayerNorm.</text>
+</svg>

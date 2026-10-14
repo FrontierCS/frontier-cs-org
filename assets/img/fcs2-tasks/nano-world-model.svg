@@ -1,0 +1,148 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 300" role="img" aria-label="Sampling three future frames from one real frame. Frame f0 is the encoded real frame and f1 to f3 start as noise; actions a1 to a3 link consecutive frames. A fixed trained model reads the noisy frames, their noise levels and the actions, and makes a prediction. The part the agent writes is the noise schedule, a matrix of noise levels per frame and step, here sequential so f1 finishes before f2 and f2 before f3 while f0 stays at 0.02, and the update that moves the frames from one row of the schedule to the next.">
+<defs><marker id="nano-world-model-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker></defs>
+<text x="20" y="22" font-size="12.5" fill="#5f6368">Three future frames sampled from one real frame and its actions</text>
+<rect x="20" y="40" width="44" height="44" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
+<path d="M30 48V70M30 70H46M54 54V76M40 54H54" stroke="#5f6368" stroke-width="2" fill="none"/>
+<circle cx="42" cy="63" r="3.5" fill="#1f1f1f"/>
+<rect x="86" y="40" width="11" height="11" fill="#dadce0"/>
+<rect x="86" y="51" width="11" height="11" fill="#9aa0a6"/>
+<rect x="86" y="62" width="11" height="11" fill="#fff"/>
+<rect x="86" y="73" width="11" height="11" fill="#5f6368"/>
+<rect x="97" y="40" width="11" height="11" fill="#5f6368"/>
+<rect x="97" y="51" width="11" height="11" fill="#5f6368"/>
+<rect x="97" y="62" width="11" height="11" fill="#dadce0"/>
+<rect x="97" y="73" width="11" height="11" fill="#5f6368"/>
+<rect x="108" y="40" width="11" height="11" fill="#9aa0a6"/>
+<rect x="108" y="51" width="11" height="11" fill="#5f6368"/>
+<rect x="108" y="62" width="11" height="11" fill="#5f6368"/>
+<rect x="108" y="73" width="11" height="11" fill="#fff"/>
+<rect x="119" y="40" width="11" height="11" fill="#fff"/>
+<rect x="119" y="51" width="11" height="11" fill="#5f6368"/>
+<rect x="119" y="62" width="11" height="11" fill="#9aa0a6"/>
+<rect x="119" y="73" width="11" height="11" fill="#5f6368"/>
+<rect x="86" y="40" width="44" height="44" fill="none" stroke="#3c4043" stroke-width="1.3"/>
+<rect x="152" y="40" width="11" height="11" fill="#fff"/>
+<rect x="152" y="51" width="11" height="11" fill="#5f6368"/>
+<rect x="152" y="62" width="11" height="11" fill="#5f6368"/>
+<rect x="152" y="73" width="11" height="11" fill="#9aa0a6"/>
+<rect x="163" y="40" width="11" height="11" fill="#5f6368"/>
+<rect x="163" y="51" width="11" height="11" fill="#fff"/>
+<rect x="163" y="62" width="11" height="11" fill="#5f6368"/>
+<rect x="163" y="73" width="11" height="11" fill="#9aa0a6"/>
+<rect x="174" y="40" width="11" height="11" fill="#5f6368"/>
+<rect x="174" y="51" width="11" height="11" fill="#9aa0a6"/>
+<rect x="174" y="62" width="11" height="11" fill="#dadce0"/>
+<rect x="174" y="73" width="11" height="11" fill="#fff"/>
+<rect x="185" y="40" width="11" height="11" fill="#9aa0a6"/>
+<rect x="185" y="51" width="11" height="11" fill="#5f6368"/>
+<rect x="185" y="62" width="11" height="11" fill="#dadce0"/>
+<rect x="185" y="73" width="11" height="11" fill="#9aa0a6"/>
+<rect x="152" y="40" width="44" height="44" fill="none" stroke="#3c4043" stroke-width="1.3"/>
+<rect x="218" y="40" width="11" height="11" fill="#5f6368"/>
+<rect x="218" y="51" width="11" height="11" fill="#9aa0a6"/>
+<rect x="218" y="62" width="11" height="11" fill="#dadce0"/>
+<rect x="218" y="73" width="11" height="11" fill="#5f6368"/>
+<rect x="229" y="40" width="11" height="11" fill="#5f6368"/>
+<rect x="229" y="51" width="11" height="11" fill="#5f6368"/>
+<rect x="229" y="62" width="11" height="11" fill="#9aa0a6"/>
+<rect x="229" y="73" width="11" height="11" fill="#fff"/>
+<rect x="240" y="40" width="11" height="11" fill="#fff"/>
+<rect x="240" y="51" width="11" height="11" fill="#dadce0"/>
+<rect x="240" y="62" width="11" height="11" fill="#fff"/>
+<rect x="240" y="73" width="11" height="11" fill="#fff"/>
+<rect x="251" y="40" width="11" height="11" fill="#dadce0"/>
+<rect x="251" y="51" width="11" height="11" fill="#dadce0"/>
+<rect x="251" y="62" width="11" height="11" fill="#9aa0a6"/>
+<rect x="251" y="73" width="11" height="11" fill="#9aa0a6"/>
+<rect x="218" y="40" width="44" height="44" fill="none" stroke="#3c4043" stroke-width="1.3"/>
+<text x="42" y="102" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">f0</text>
+<text x="108" y="102" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">f1</text>
+<text x="174" y="102" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">f2</text>
+<text x="240" y="102" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">f3</text>
+<text x="75" y="66" font-size="12" text-anchor="middle" fill="#5f6368">a₁</text>
+<text x="141" y="66" font-size="12" text-anchor="middle" fill="#5f6368">a₂</text>
+<text x="207" y="66" font-size="12" text-anchor="middle" fill="#5f6368">a₃</text>
+<text x="20" y="126" font-size="11.5" fill="#5f6368">f0: the real frame, encoded</text>
+<text x="20" y="143" font-size="11.5" fill="#5f6368">f1 to f3: start as pure noise</text>
+<rect x="20" y="164" width="242" height="64" rx="8" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
+<text x="34" y="186" font-size="13" fill="#1f1f1f">trained model, fixed</text>
+<text x="34" y="204" font-size="11.5" fill="#5f6368">reads the noisy frames, their noise</text>
+<text x="34" y="220" font-size="11.5" fill="#5f6368">levels and the actions</text>
+<text x="20" y="262" font-size="12" fill="#3c4043">Finished frames are decoded and compared</text>
+<text x="20" y="280" font-size="12" fill="#3c4043">with the recorded ones.</text>
+<rect x="284" y="36" width="460" height="254" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
+<text x="300" y="60" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: the noise schedule and the update</text>
+<text x="300" y="79" font-size="12.5" fill="#3c4043">sequential mode: finish f1, then f2, then f3</text>
+<line x1="336" y1="186" x2="266" y2="186" stroke="#3c4043" stroke-width="1.3" marker-end="url(#nano-world-model-ar)"/>
+<line x1="266" y1="210" x2="336" y2="210" stroke="#3c4043" stroke-width="1.3" marker-end="url(#nano-world-model-ar)"/>
+<text x="363" y="102" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">f0</text>
+<text x="409" y="102" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">f1</text>
+<text x="455" y="102" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">f2</text>
+<text x="501" y="102" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">f3</text>
+<rect x="340" y="110" width="46" height="20" fill="#fff" stroke="#3c4043" stroke-width="1"/>
+<text x="363" y="124" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">.02</text>
+<rect x="386" y="110" width="46" height="20" fill="#9aa0a6" stroke="#3c4043" stroke-width="1"/>
+<text x="409" y="124" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
+<rect x="432" y="110" width="46" height="20" fill="#9aa0a6" stroke="#3c4043" stroke-width="1"/>
+<text x="455" y="124" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
+<rect x="478" y="110" width="46" height="20" fill="#9aa0a6" stroke="#3c4043" stroke-width="1"/>
+<text x="501" y="124" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
+<rect x="340" y="130" width="46" height="20" fill="#fff" stroke="#3c4043" stroke-width="1"/>
+<text x="363" y="144" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">.02</text>
+<rect x="386" y="130" width="46" height="20" fill="#dadce0" stroke="#3c4043" stroke-width="1"/>
+<text x="409" y="144" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">.5</text>
+<rect x="432" y="130" width="46" height="20" fill="#9aa0a6" stroke="#3c4043" stroke-width="1"/>
+<text x="455" y="144" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
+<rect x="478" y="130" width="46" height="20" fill="#9aa0a6" stroke="#3c4043" stroke-width="1"/>
+<text x="501" y="144" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
+<rect x="340" y="150" width="46" height="20" fill="#fff" stroke="#3c4043" stroke-width="1"/>
+<text x="363" y="164" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">.02</text>
+<rect x="386" y="150" width="46" height="20" fill="#fff" stroke="#3c4043" stroke-width="1"/>
+<text x="409" y="164" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0</text>
+<rect x="432" y="150" width="46" height="20" fill="#9aa0a6" stroke="#3c4043" stroke-width="1"/>
+<text x="455" y="164" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
+<rect x="478" y="150" width="46" height="20" fill="#9aa0a6" stroke="#3c4043" stroke-width="1"/>
+<text x="501" y="164" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
+<rect x="340" y="170" width="46" height="20" fill="#fff" stroke="#3c4043" stroke-width="1"/>
+<text x="363" y="184" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">.02</text>
+<rect x="386" y="170" width="46" height="20" fill="#fff" stroke="#3c4043" stroke-width="1"/>
+<text x="409" y="184" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0</text>
+<rect x="432" y="170" width="46" height="20" fill="#dadce0" stroke="#3c4043" stroke-width="1"/>
+<text x="455" y="184" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">.5</text>
+<rect x="478" y="170" width="46" height="20" fill="#9aa0a6" stroke="#3c4043" stroke-width="1"/>
+<text x="501" y="184" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
+<rect x="340" y="190" width="46" height="20" fill="#fff" stroke="#3c4043" stroke-width="1"/>
+<text x="363" y="204" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">.02</text>
+<rect x="386" y="190" width="46" height="20" fill="#fff" stroke="#3c4043" stroke-width="1"/>
+<text x="409" y="204" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0</text>
+<rect x="432" y="190" width="46" height="20" fill="#fff" stroke="#3c4043" stroke-width="1"/>
+<text x="455" y="204" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0</text>
+<rect x="478" y="190" width="46" height="20" fill="#9aa0a6" stroke="#3c4043" stroke-width="1"/>
+<text x="501" y="204" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
+<rect x="340" y="210" width="46" height="20" fill="#fff" stroke="#3c4043" stroke-width="1"/>
+<text x="363" y="224" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">.02</text>
+<rect x="386" y="210" width="46" height="20" fill="#fff" stroke="#3c4043" stroke-width="1"/>
+<text x="409" y="224" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0</text>
+<rect x="432" y="210" width="46" height="20" fill="#fff" stroke="#3c4043" stroke-width="1"/>
+<text x="455" y="224" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0</text>
+<rect x="478" y="210" width="46" height="20" fill="#dadce0" stroke="#3c4043" stroke-width="1"/>
+<text x="501" y="224" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">.5</text>
+<rect x="340" y="230" width="46" height="20" fill="#fff" stroke="#3c4043" stroke-width="1"/>
+<text x="363" y="244" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">.02</text>
+<rect x="386" y="230" width="46" height="20" fill="#fff" stroke="#3c4043" stroke-width="1"/>
+<text x="409" y="244" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0</text>
+<rect x="432" y="230" width="46" height="20" fill="#fff" stroke="#3c4043" stroke-width="1"/>
+<text x="455" y="244" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0</text>
+<rect x="478" y="230" width="46" height="20" fill="#fff" stroke="#3c4043" stroke-width="1"/>
+<text x="501" y="244" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0</text>
+<text x="332" y="124" font-size="11.5" text-anchor="end" fill="#5f6368">step 1</text>
+<text x="332" y="244" font-size="11.5" text-anchor="end" fill="#5f6368">250</text>
+<text x="340" y="274" font-size="11.5" fill="#5f6368">noise level: 1 is pure noise, 0 is clean</text>
+<text x="548" y="118" font-size="12" fill="#1f1f1f">one update per row:</text>
+<text x="548" y="138" font-size="12" fill="#3c4043">ask the model for a prediction,</text>
+<text x="548" y="156" font-size="12" fill="#3c4043">estimate each clean frame,</text>
+<text x="548" y="174" font-size="12" fill="#3c4043">move each frame to its</text>
+<text x="548" y="192" font-size="12" fill="#3c4043">next noise level</text>
+<text x="548" y="226" font-size="12" fill="#5f6368">f0 stays at .02 to keep</text>
+<text x="548" y="244" font-size="12" fill="#5f6368">the history steady</text>
+</svg>
