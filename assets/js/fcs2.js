@@ -352,7 +352,7 @@ addEventListener('hashchange', fqHash); fqHash();
    reads goals and venues; the order is the reader's choice, hardest first to begin with. */
 let picked = new Set(), q = '', order = 'hard';
 // the domain filter: checkboxes drawn as Material 3 ones, any number checked (owner, design audit: chips did not look good, 4B)
-$('#checks').innerHTML = DOMAINS.map(d => `<label><input type="checkbox" value="${esc(d)}">${esc(d)} <span class="cn">${N_IN(d)}</span></label>`).join('');
+$('#checks').innerHTML = DOMAINS.map(d => `<label><input type="checkbox" value="${esc(d)}"><span>${esc(d)} <span class="cn">${N_IN(d)}</span></span></label>`).join('');
 $('#q').placeholder = `Search ${TASKS.length} problems`;
 const again = () => { drawRows(); $('#rows').scrollTop = 0; atEnd(); };
 $('#checks').addEventListener('change', e => { e.target.checked ? picked.add(e.target.value) : picked.delete(e.target.value); again(); });
