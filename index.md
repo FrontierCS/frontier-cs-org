@@ -17,7 +17,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
   <div class="hero-text">
   <p class="upd"><i></i><span>Last updated: {{ site.time | date: "%B %-d, %Y" }}</span></p>
   <h1>FrontierCS 2: A Benchmark for Computer Science R&amp;D</h1>
-  <p class="lead">FrontierCS 2 evaluates AI agents on computer science research. Its <span data-fill="ntasks">48</span> problems come from published papers in <span data-fill="ndomains">12</span> fields, from machine learning and ML systems to databases, security and theory. Each problem removes the key contribution of a paper from the code released with it. An agent passes only if its own version beats the human reference, the original implementation, on every metric of every hidden workload, so each result is measured against published work.</p>
+  <p class="lead">FrontierCS 2 evaluates AI agents on their ability to do CS research. Each problem removes the key contribution of a paper from the code released with it. An agent passes a problem only if its implementation beats the original one on all metrics of our hidden workloads.</p>
 
   <div class="links"><a class="pill lg" id="paperlink" aria-disabled="true">Paper (coming soon)</a></div>
   <a id="taskbase" href="{{ '/task/' | relative_url }}" hidden></a>
