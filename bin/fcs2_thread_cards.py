@@ -75,7 +75,7 @@ window.card = (layout, h, sub, note) => {
   console.assert(![h, sub, note].some(t => /[’']/.test(t || '')), 'no apostrophes on a card (owner, 2026-10-13)', h, sub, note);
   document.querySelectorAll('.tcard').forEach(e => e.remove());
   const c = document.createElement('div'); c.className = `tcard fcs2 ${layout}`;
-  c.innerHTML = `<div class="tc-top"><div class="tc-brand"><svg viewBox="0 -7 87 87"><g style="fill:var(--mk-in,#1f1f1f)"><rect width="24" height="24" rx="5.5"/><rect x="28" width="24" height="24" rx="5.5"/><rect y="28" width="24" height="24" rx="5.5"/><rect x="28" y="28" width="24" height="24" rx="5.5"/><rect y="56" width="24" height="24" rx="5.5"/></g><rect class="mk-piece" x="63" y="-7" width="24" height="24" rx="5.5" style="fill:var(--mk-out,#0b57d0)"/></svg>FrontierCS</div><div class="tc-url">frontier-cs.org</div></div>
+  c.innerHTML = `<div class="tc-top"><div class="tc-brand"><svg viewBox="-5.5 -69.2 74.7 74.7"><path d="M0 -50 A50 50 0 0 1 50 0" fill="none" style="stroke:var(--mk-in,#1f1f1f)" stroke-width="11" stroke-linecap="round"/><rect class="mk-piece" x="45.2" y="-69.2" width="24" height="24" rx="5.5" style="fill:var(--mk-out,#0b57d0)"/></svg>FrontierCS</div><div class="tc-url">frontier-cs.org</div></div>
     <div class="tc-body"><div class="tc-hd">${h ? `<div class="tc-h">${h}</div>` : ''}${sub ? `<p class="tc-sub">${sub}</p>` : ''}</div><div class="tc-vis"></div>${note && layout === 'stack' ? `<div class="tc-note">${note}</div>` : ''}</div>${note && layout === 'side' ? `<div class="tc-note">${note}</div>` : ''}`;
   document.body.append(c); return c.querySelector('.tc-vis');
 };
