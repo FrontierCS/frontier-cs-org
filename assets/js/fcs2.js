@@ -335,19 +335,31 @@ redraws.push(drawHow);
 const fqHash = () => { const d = document.getElementById(location.hash.slice(1)); if (d && d.tagName === 'DETAILS') { d.open = true; d.scrollIntoView({block:'start'}); } };
 addEventListener('hashchange', fqHash); fqHash();
 
-/* ---------- task index ---------- */
-let picked = new Set(), q = '', limit = 5;
+/* ---------- task index ----------
+   One compact row per task: its name over its domain, what the agent must do (GOAL) over the paper it comes from, a dot
+   per model in leaderboard order (filled: the model passes) over the pass rate, and the links. The filter is by domain; the search also
+   reads goals and venues; the order is the reader's choice, hardest first to begin with. */
+let picked = new Set(), q = '', order = 'hard';
+// what each model did on a task, in leaderboard order: 1 pass, 0 fail, null no run
+const DID = Object.fromEntries(TASKS.map(t => [t.s, RANKED.map(m => { const r = RUNS.find(r => r.t === t.s && r.m === m.id); return r ? r.p : null; })]));
 $('#checks').innerHTML = DOMAINS.map(d => `<label><input type="checkbox" value="${esc(d)}"> ${esc(d)} (${N_IN(d)})</label>`).join('');
-$('#checks').addEventListener('change', e => { e.target.checked ? picked.add(e.target.value) : picked.delete(e.target.value); limit = 5; drawRows(); });
+$('#q').placeholder = `Search ${TASKS.length} problems`;
+const again = () => { drawRows(); $('#rows').scrollTop = 0; atEnd(); };
+$('#checks').addEventListener('change', e => { e.target.checked ? picked.add(e.target.value) : picked.delete(e.target.value); again(); });
+$('#tsort').addEventListener('change', e => { order = e.target.value; again(); });
 $('#ftoggle').addEventListener('click', () => { const f = $('#filter'), o = !f.classList.contains('open'); f.classList.toggle('open', o); $('#ftoggle').setAttribute('aria-expanded', String(o)); });
-$('#q').addEventListener('input', e => { q = e.target.value; limit = 5; drawRows(); });
-$('#showmore').addEventListener('click', () => { limit += 20; drawRows(); });
+$('#q').addEventListener('input', e => { q = e.target.value; again(); });
+// the list scrolls in its own box, all tasks in it (owner, 2026-10-14: no Show more button); the foot fades until the end is reached
+const atEnd = () => { const r = $('#rows'); r.classList.toggle('at-end', r.scrollTop + r.clientHeight >= r.scrollHeight - 2); };
+$('#rows').addEventListener('scroll', atEnd, {passive:true}); addEventListener('resize', atEnd);
 function hits() {
   const w = q.toLowerCase().split(/\s+/).filter(Boolean);
-  let h = TASKS.filter(t => (!picked.size || picked.has(t.d)) && w.every(x => (t.s + ' ' + t.name + ' ' + t.t + ' ' + t.n + ' ' + t.d).toLowerCase().includes(x)));
-  // hardest first by the FECI fit's task difficulty (owner, 2026-10-11); tasks without runs have none and follow by domain
-  const dif = t => TDIFF[t.s] ? -TDIFF[t.s].rank : null;   // hardest first, by the pass/fail difficulty (TDIFF)
-  return [...h].sort((a, b) => (dif(b) ?? -1e9) - (dif(a) ?? -1e9) || DOMAINS.indexOf(a.d) - DOMAINS.indexOf(b.d) || a.s.localeCompare(b.s));
+  const hay = t => [t.s, t.name, t.t, t.n, t.d, GOAL[t.s] || '', VENUE[t.s] || ''].join(' ').toLowerCase();
+  const h = TASKS.filter(t => (!picked.size || picked.has(t.d)) && w.every(x => hay(t).includes(x)));
+  // difficulty is the pass/fail fit's rank (TDIFF, 1 = hardest); a task without runs has none and comes last either way
+  const rank = t => TDIFF[t.s] ? TDIFF[t.s].rank : null, dom = (a, b) => DOMAINS.indexOf(a.d) - DOMAINS.indexOf(b.d), nm = (a, b) => a.name.localeCompare(b.name);
+  const hard = (a, b) => (rank(a) ?? 1e9) - (rank(b) ?? 1e9) || dom(a, b) || nm(a, b), easy = (a, b) => (rank(b) ?? -1) - (rank(a) ?? -1) || dom(a, b) || nm(a, b);
+  return [...h].sort({hard, easy, domain:(a, b) => dom(a, b) || hard(a, b), name:nm}[order]);
 }
 function squarify(vals, x, y, w, h) {
   const tot = vals.reduce((a, b) => a + b, 0), areas = vals.map(v => v * w * h / tot), out = [];
@@ -548,11 +560,18 @@ document.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse' &&
 
 function drawRows() {
   const h = hits(); $('#fcount').textContent = picked.size ? `(${picked.size})` : '';
-  $('#rows').innerHTML = h.slice(0, limit).map(t => `<article class="trow" data-s="${esc(t.s)}"><span class="tag">${esc(t.d)}</span>
-    <h3><a class="stretch" href="${esc(taskHref(t.s))}">${esc(t.name)}</a></h3><p>${esc(t.t)}</p><div class="lk">${t.p ? `<a href="${esc(t.p)}" target="_blank" rel="noopener">${t.t ? t.src : 'Project'}</a>` : ''}${t.r ? `<a href="${esc(t.r)}" target="_blank" rel="noopener">Code</a>` : ''}</div></article>`).join('')
-    || `<p class="empty">No task matches. Clear the filter or try another word.</p>`;
-  $('#showmore').hidden = h.length <= limit;
-  $('#showmore').textContent = `Show more (${h.length - limit} left)`;
+  $('#lhead').innerHTML = `<span>${h.length === TASKS.length ? `${TASKS.length} problems` : `${h.length} of ${TASKS.length} problems`}</span><span></span>`
+    + `<span title="The share of the ten models that pass. One dot per model, in leaderboard order; a filled dot passes.">Pass rate</span><span></span>`;
+  $('#rows').innerHTML = h.map(t => { const s = t.s, v = VENUE[s], goal = GOAL[s], ttl = t.t || (v ? t.name : '');
+    // with a goal, the source is the small line under it (venue in bold, then the title); without one (Security), the title is the main line
+    const main = goal || ttl, small = goal ? (v && ttl ? `<b>${esc(v)}</b> · ${esc(ttl)}` : esc(v || ttl)) : v ? `<b>${esc(v)}</b>` : '';
+    const did = DID[s], nr = did.filter(x => x !== null).length, who = RANKED.filter((m, i) => did[i] === 1).map(m => m.name);
+    const pass = nr ? `<a class="tp" href="${esc(taskHref(s))}" tabindex="-1" title="${esc(who.length ? 'Passed by ' + who.join(', ') : 'No model passes')}"><span class="dots" aria-hidden="true">${did.map(x => `<i class="${x === 1 ? 'y' : x === 0 ? 'n' : 'x'}"></i>`).join('')}</span><span class="pr${who.length ? '' : ' none'}">${who.length ? `${Math.round(100 * who.length / nr)}%<span class="vh"> of models pass</span>` : 'None pass'}</span></a>` : '<span></span>';
+    return `<article class="trow" data-s="${esc(s)}"><div class="tn"><h3><a class="stretch" href="${esc(taskHref(s))}">${esc(t.name)}</a></h3><span class="td" style="--a:${AINK[AREA_OF[t.d].k]}">${esc(t.d)}</span></div>
+    <div class="tx">${main ? `<p>${esc(main)}</p>` : ''}${small ? `<p class="src">${small}</p>` : ''}</div>${pass}
+    <div class="lk">${t.p ? `<a href="${esc(t.p)}" target="_blank" rel="noopener">${t.t ? t.src : 'Project'}</a>` : ''}${t.r ? `<a href="${esc(t.r)}" target="_blank" rel="noopener">Code</a>` : ''}</div></article>`; }).join('')
+    || `<p class="empty">No problem matches. Clear the filter or try another word.</p>`;
+  atEnd();
 }
 
 /* Beside the title (under it on narrow screens): the first pages of the tasks' papers laid on a tilted plane, in columns that drift up and down and
