@@ -2,8 +2,8 @@
 // Data and shared helpers are in fcs2-data.js, loaded first; assets/css/fcs2.css holds the styles.
 /* numbers in the page text come from the data, so they cannot drift from the chart */
 document.querySelectorAll('[data-fill]').forEach(el => { el.textContent = {updated:`Last updated: ${UPDATED}`, runs:String(RUNS.length),
-  runtasks:`on ${NTASK(RUNS)} tasks`, models:`${MODELS.length} models from ${new Set(MODELS.map(m => m.lab)).size} labs have run so far.`,
-  summary:`${RUNS.length} runs on ${NTASK(RUNS)} tasks by ${MODELS.length} models`,
+  runtasks:`on ${NTASK(RUNS)} problems`, models:`${MODELS.length} models from ${new Set(MODELS.map(m => m.lab)).size} labs have run so far.`,
+  summary:`${RUNS.length} runs on ${NTASK(RUNS)} problems by ${MODELS.length} models`,
   ntasks:String(TASKS.length), ndomains:String(new Set(TASKS.map(t => t.d)).size)}[el.dataset.fill]; });
 // text in a model's colour, 22% darker: GPT-6.1 Sol, Qwen 3.8 Max and GLM 5.3 Flash are under 3:1 on white at full colour
 const MTXT = id => `color-mix(in srgb, ${MCOL[id]} 78%, #000)`;
@@ -287,12 +287,12 @@ function drawLB() {
 
 /* ---------- results by domain ---------- */
 function drawTable() {
-  const head = `<tr><th>Domain</th><th class="tk">Tasks</th>${RANKED.map(m => `<th><span class="mn" style="background:${MCOL[m.id]}"></span><span class="full">${m.name}</span><span class="short">${m.short}</span></th>`).join('')}</tr>`;
+  const head = `<tr><th>Domain</th><th class="tk">Problems</th>${RANKED.map(m => `<th><span class="mn" style="background:${MCOL[m.id]}"></span><span class="full">${m.name}</span><span class="short">${m.short}</span></th>`).join('')}</tr>`;
   const line = (d, cls) => {
     const vals = RANKED.map(m => { const s = RUNS.filter(r => r.m === m.id && (d === 'All' || r.d === d)).map(r => r.p * 100); return s.length ? mean(s) : null; });
     const best = Math.max(...vals.filter(v => v != null));
     const n = NTASK(RUNS.filter(r => d === 'All' || r.d === d));
-    return `<tr class="${cls || ''}"><td>${d === 'All' ? 'All tasks' : esc(d)}</td><td class="tk">${n}</td>${vals.map(v => v == null ? '<td class="e">–</td>' : `<td class="${v === best && vals.filter(x => x != null).length > 1 ? 'best' : ''}">${Math.round(v)}%</td>`).join('')}</tr>`;
+    return `<tr class="${cls || ''}"><td>${d === 'All' ? 'All problems' : esc(d)}</td><td class="tk">${n}</td>${vals.map(v => v == null ? '<td class="e">–</td>' : `<td class="${v === best && vals.filter(x => x != null).length > 1 ? 'best' : ''}">${Math.round(v)}%</td>`).join('')}</tr>`;
   };
   $('#restbl').innerHTML = head + DOMS_WITH_RUNS.map(d => line(d)).join('') + line('All', 'all');
 }
@@ -374,7 +374,7 @@ function drawMap() {
     squarify(doms.map(N_IN), ...ar).forEach(([x, y, w, h], j) => {
       const d = doms[j], n = N_IN(d);
       const x0 = x + (x > tol ? G / 2 : 0), y0 = y + (y > tol ? G / 2 : 0), x1 = x + w - (x + w < W - tol ? G / 2 : 0), y1 = y + h - (y + h < H - tol ? G / 2 : 0), bw = x1 - x0, bh = y1 - y0;
-      const g = sv('g', {class:'blk', 'aria-label':`${d}, ${n} task${n > 1 ? 's' : ''}`, 'data-d':d});
+      const g = sv('g', {class:'blk', 'aria-label':`${d}, ${n} problem${n > 1 ? 's' : ''}`, 'data-d':d});
       // the block holds one illustration per task (fcs2-art.js), in rows that keep each tile closest to 3:2, framed by thin white seams
       const ts = TASKS.filter(t => t.d === d), gap = 2, cid = `mapclip${k}_${j}`;
       let rows = 1, sc = 1e9; for (let r = 1; r <= n; r++) { const c = Math.ceil(n / r), v = Math.abs(Math.log((bw / c) / (bh / r) / 1.5)); if (v < sc) { sc = v; rows = r; } }
@@ -506,7 +506,7 @@ function showRun() {
     else { const rank = D.rank, X = r => p.x + PX + (N - r) / (N - 1 || 1) * inner, sy = p.y + p.h - 74;
       const ord = `${rank}${[, 'st', 'nd', 'rd'][rank % 100 > 10 && rank % 100 < 14 ? 0 : rank % 10] || 'th'}`;
       panel.append(sv('text', {x:p.x + PX, y:top + 62, 'font-size':52, 'font-weight':600, fill:'#fff'}, rank === 1 ? 'Hardest' : ord),
-        sv('text', {x:p.x + PX, y:top + 90, 'font-size':14, fill:'#fff', 'fill-opacity':.92}, `${rank === 1 ? '' : 'hardest '}of ${N} tasks · ${D.pass} of ${D.n} models pass`),
+        sv('text', {x:p.x + PX, y:top + 90, 'font-size':14, fill:'#fff', 'fill-opacity':.92}, `${rank === 1 ? '' : 'hardest '}of ${N} problems · ${D.pass} of ${D.n} models pass`),
         sv('line', {x1:p.x + PX, x2:p.x + PX + inner, y1:sy, y2:sy, stroke:'#fff', 'stroke-opacity':.45, 'stroke-width':1.5}));
       for (let r = 1; r <= N; r++) panel.append(sv('line', {x1:X(r), x2:X(r), y1:sy - 5, y2:sy + 5, stroke:'#fff', 'stroke-opacity':.5, 'stroke-width':1.5}));
       panel.append(sv('circle', {cx:X(rank), cy:sy, r:8, fill:'#fff'}),
