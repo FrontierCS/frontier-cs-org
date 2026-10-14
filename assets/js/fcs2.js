@@ -132,7 +132,7 @@ function drawECI() {
    Every model with reported spend is in the legend; at first only each lab's model with the highest FCI is drawn and the
    others are greyed in the legend; a click on an entry shows or hides its curve (owner, 2026-10-14). A model's 90% band
    shows only while the pointer is on its curve or its legend entry (owner, 2026-10-13: no bands otherwise).
-   Each curve starts at its first budget on the scale, FCI 0 or more, marked by an open dot (Qiuyang, 2026-10-14: the
+   Each curve starts at its first budget on the scale, FCI 0 or more, as a plain line with no start mark (owner, 2026-10-14; Qiuyang: the
    values under 0 drew every curve in from the bottom edge as a comb of near-vertical strokes). When the chart first comes
    into view a moving focus plays (Melissa's and Qiuyang's idea, 2026-10-14): a budget cursor sweeps right, slow where
    curves start or rise and quick across empty stretches; the view follows it, zoomed in on cheap budgets first and
@@ -211,7 +211,6 @@ function drawTTS(t) {
       d:c.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[3]).toFixed(1)}`).join('') + [...c].reverse().map(p => `L${X(p[0]).toFixed(1)},${Y(p[2]).toFixed(1)}`).join('') + 'Z'}));
     const e = vis[vis.length - 1];
     gl.append(sv('path', {d:path, fill:'none', stroke:MCOL[m.id], 'stroke-width':2.2, 'stroke-linejoin':'round', opacity:op}),
-      sv('circle', {cx:X(c[0][0]), cy:Y(c[0][1]), r:2.6, fill:'#fff', stroke:MCOL[m.id], 'stroke-width':1.5, opacity:op}),   // where it starts
       sv('circle', {cx:X(e[0]), cy:Y(e[1]), r:4.5, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':1.5, opacity:op}));
     if (play && anyRising && lit) tips.push({m, e});
     if (!play) c.forEach(p => pts.push({x:X(p[0]), y:Y(p[1]), m:m.id, html:`<b>${esc(m.name)}</b><br>FCI <b>${f1(p[1])}</b> at ${usdfmt(p[0])} per run`
