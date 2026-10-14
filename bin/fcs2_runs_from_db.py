@@ -236,6 +236,14 @@ def scaling(db, curves):
     return out['usd']
 
 
+def hidden_json(generated, hidden):   # one run per line, so a refresh diffs by run
+    head = {'note': 'Runs of models kept off the site (HIDDEN in bin/fcs2_runs_from_db.py), in the columns of RUNS in assets/js/fcs2-data.js. '
+            'Timeouts score 0; unscored runs are left out. Not shown on any page.',
+            'generated_at': generated, 'models': {MODEL[c][0]: MODEL[c][1] for c in MODEL if c in HIDDEN},
+            'columns': ['model', 'domain', 'task', 'score', 'passed']}
+    return json.dumps(head, ensure_ascii=False, indent=1)[:-2] + ',\n "runs": [\n' + ',\n'.join('  ' + json.dumps(r, ensure_ascii=False) for r in hidden) + '\n ]\n}\n'
+
+
 db = sqlite3.connect(sys.argv[1])
 generated = db.execute('select generated_at from release').fetchone()[0]
 rows = db.execute('''select c.name, t.name, r.display_score, r.state, r.display_verdict from cells ce
@@ -252,6 +260,10 @@ for cand, task, score, state, verdict in rows:
     folder, short = TASK[task]
     runs.append([MODEL[cand][0], SHOWN.get(folder, folder), short or task.split(' — ')[0], round(score, 2), int(verdict == 'PASS')])
 dropped = Counter(r[3] for r in rows if r[2] is None and r[0] not in HIDDEN)
+# the hidden models' runs in RUNS's columns, for fits made outside this script: Kimi K2.7 is the FECI 0 point but not on the
+# site (Qiuyang, 2026-10-14). _data/ is never published as a file, and no page reads this one.
+hidden = [[MODEL[c][0], SHOWN.get(TASK[t][0], TASK[t][0]), TASK[t][1] or t.split(' — ')[0], round(s, 2), int(v == 'PASS')]
+          for c, t, s, st, v in rows if s is not None and c in HIDDEN]
 
 
 def trajectories(db):
@@ -342,6 +354,8 @@ BEGIN, END = '// BEGIN converter block (bin/fcs2_runs_from_db.py writes everythi
 assert js.count(BEGIN) == 1 and js.count(END) == 1, 'converter markers not found'
 js = js[:js.index(BEGIN) + len(BEGIN)] + block + js[js.index(END):]
 open(js_path, 'w', encoding='utf-8').write(js)
+hid_path = '_data/fcs2_runs_hidden.json'
+open(hid_path, 'w', encoding='utf-8').write(hidden_json(generated, hidden))
 print('PASS', pass_rate(runs))
 print('ECI', eci_js, 'reference tasks', E['reference'][3])
 print(f'{len(runs)} runs, {len({r[2] for r in runs})} tasks, {len(models)} models; dropped {dict(dropped)}; generated {generated}')
