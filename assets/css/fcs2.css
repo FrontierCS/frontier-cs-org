@@ -306,6 +306,7 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 .crumbs .trail{display:flex; align-items:baseline; gap:10px; min-width:0; color:var(--faint)}
 .crumbs .trail a{color:var(--muted); text-decoration:none; white-space:nowrap}
 .crumbs .here{color:var(--ink-2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+@media (max-width:640px){ .crumbs .home{display:none} }   /* phones: Problems / the problem, beside the pager */
 /* previous and next problem: beside the back link, and at the foot of the page */
 .pager{display:flex; align-items:center; gap:10px; color:var(--muted)}
 .pbtn{display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; border:1px solid var(--line); border-radius:50%; color:var(--ink-2); background:var(--bg)}

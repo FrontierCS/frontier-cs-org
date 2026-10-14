@@ -7,7 +7,7 @@ page_css: fcs2
 ---
 <div class="fcs2 taskpage">
 <div class="col" id="main" tabindex="-1">
-  <nav class="crumbs" aria-label="Breadcrumb"><span class="trail"><a href="{{ '/' | relative_url }}">FrontierCS 2</a><span class="sep">/</span><a href="{{ '/' | relative_url }}#tasks">Problems</a><span class="sep" id="tcsep">/</span><span class="here" id="tcrumb"></span></span><span class="pager" id="tpager"></span></nav>
+  <nav class="crumbs" aria-label="Breadcrumb"><span class="trail"><a class="home" href="{{ '/' | relative_url }}">FrontierCS 2</a><span class="sep home">/</span><a href="{{ '/' | relative_url }}#tasks">Problems</a><span class="sep" id="tcsep">/</span><span class="here" id="tcrumb"></span></span><span class="pager" id="tpager"></span></nav>
   <div class="thero nofig" id="thero">
     <header class="thead">
       <div class="meta" id="tmeta"></div>
