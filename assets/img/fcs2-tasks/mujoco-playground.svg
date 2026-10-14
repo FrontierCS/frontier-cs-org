@@ -1,9 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 22 760 182" role="img" aria-label="The training procedure runs many simulated Go1 robots in parallel and updates the policy from their experience; its rewards, commands, pushes, terrain, network and algorithm are the agent’s choice. This training procedure is the part the agent writes. The trained policy maps 48 sensor and command values to 12 joint targets and is then tested on flat ground, under pushes and on rough terrain.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 18 760 282" role="img" aria-label="The training procedure runs many simulated Go1 robots in parallel and updates the policy from their experience; its rewards, commands, pushes, terrain, network and algorithm are the agent’s choice. This training procedure is the part the agent writes. The trained policy maps 48 sensor and command values to 12 joint targets and is then tested on flat ground, under pushes and on rough terrain.">
 <defs><marker id="mujoco-playground-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker></defs>
 
-<rect x="20" y="36" width="318" height="154" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
+<rect x="20" y="36" width="318" height="250" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
 <text x="36" y="60" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: the training procedure</text>
-<g transform="translate(0 -16)">
+<text x="36" y="79" font-size="12.5" fill="#3c4043">from scratch, in the authors’ training time</text>
 <polyline points="60.6,111.6 56.1,117.9 60.6,125.1" fill="none" stroke="#9aa0a6" stroke-width="1.3" stroke-linejoin="round"/>
 <polyline points="78.6,111.6 74.1,117.9 78.6,125.1" fill="none" stroke="#9aa0a6" stroke-width="1.3" stroke-linejoin="round"/>
 <polyline points="57.9,111.6 53.4,117.9 57.9,125.1" fill="none" stroke="#3c4043" stroke-width="1.6" stroke-linejoin="round"/>
@@ -40,18 +40,25 @@
 <polyline points="163.9,153.6 159.4,159.9 163.9,167.1" fill="none" stroke="#3c4043" stroke-width="1.6" stroke-linejoin="round"/>
 <rect x="139.6" y="145.5" width="28.8" height="9.0" rx="2.7" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
 <rect x="168.4" y="142.8" width="5.4" height="6.3" rx="1.4" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="44" y="190" font-size="12" fill="#5f6368">simulated Go1s</text>
+<text x="44" y="188" font-size="12" fill="#5f6368">thousands of simulated</text>
+<text x="44" y="204" font-size="12" fill="#5f6368">Go1s, run in parallel</text>
 <rect x="226" y="112" width="96" height="50" rx="8" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="274.0" y="141.5" font-size="12.5" text-anchor="middle" fill="#1f1f1f">update policy</text>
+<text x="274.0" y="133" font-size="12.5" text-anchor="middle" fill="#1f1f1f">update the</text>
+<text x="274.0" y="150" font-size="12.5" text-anchor="middle" fill="#1f1f1f">policy</text>
 <path d="M192 100 C 206 90, 216 100, 224 120" fill="none" stroke="#3c4043" stroke-width="1.2" marker-end="url(#mujoco-playground-ar)"/>
 <path d="M224 154 C 216 172, 206 180, 192 172" fill="none" stroke="#3c4043" stroke-width="1.2" marker-end="url(#mujoco-playground-ar)"/>
+<line x1="36" y1="226" x2="322" y2="226" stroke="#9aa0a6" stroke-width="1"/>
+<text x="36" y="248" font-size="12" fill="#3c4043">its choice: rewards, commands, pushes,</text>
+<text x="36" y="266" font-size="12" fill="#3c4043">terrain, network, learning algorithm</text>
 <line x1="338" y1="138.0" x2="370" y2="138.0" stroke="#3c4043" stroke-width="1.3" marker-end="url(#mujoco-playground-ar)"/>
 <rect x="372" y="104" width="112" height="68" rx="8" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
 <text x="428.0" y="132" font-size="13" text-anchor="middle" fill="#1f1f1f">trained policy</text>
 <text x="428.0" y="152" font-size="11.5" text-anchor="middle" fill="#5f6368">48 in · 12 out</text>
+<text x="372" y="194" font-size="12" fill="#5f6368">in: body sensing and</text>
+<text x="372" y="210" font-size="12" fill="#5f6368">the joystick command</text>
+<text x="372" y="232" font-size="12" fill="#5f6368">out: 12 joint targets</text>
 <line x1="484" y1="138.0" x2="522" y2="138.0" stroke="#3c4043" stroke-width="1.3" marker-end="url(#mujoco-playground-ar)"/>
-</g>
-<g transform="translate(0 -12)">
+<text x="528" y="44" font-size="12.5" fill="#5f6368">tested on three grounds</text>
 <line x1="598" y1="82" x2="742" y2="82" stroke="#3c4043" stroke-width="1.3"/>
 <polyline points="652.0,67.0 647.0,74.0 652.0,82.0" fill="none" stroke="#9aa0a6" stroke-width="1.3" stroke-linejoin="round"/>
 <polyline points="672.0,67.0 667.0,74.0 672.0,82.0" fill="none" stroke="#9aa0a6" stroke-width="1.3" stroke-linejoin="round"/>
@@ -77,5 +84,7 @@
 <rect x="642.0" y="169.0" width="32.0" height="10.0" rx="3.0" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
 <rect x="674.0" y="166.0" width="6.0" height="7.0" rx="1.5" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
 <text x="528" y="196" font-size="12.5" fill="#1f1f1f">rough</text>
-</g>
+
+
+
 </svg>

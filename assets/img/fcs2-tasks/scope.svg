@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 26 760 244" role="img" aria-label="A data graph feeds a batch of small query patterns, each with one marked orbit vertex. The batch mode, which the agent writes, plans all queries together so that shared pieces such as a wedge or a triangle are counted once and reused. The output is one exact count per data vertex for every query, for example 37589, 342369 and 81862 for the first three vertices.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 26 760 262" role="img" aria-label="A data graph feeds a batch of small query patterns, each with one marked orbit vertex. The batch mode, which the agent writes, plans all queries together so that shared pieces such as a wedge or a triangle are counted once and reused. The output is one exact count per data vertex for every query, for example 37589, 342369 and 81862 for the first three vertices.">
 <defs><marker id="scope-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker><marker id="scope-up" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#9aa0a6"/></marker></defs>
 
 <g stroke="#9aa0a6" stroke-width="1.2">
@@ -10,49 +10,53 @@
 <text x="56" y="77" font-size="12" text-anchor="middle" fill="#1f1f1f">0</text>
 <text x="122" y="57" font-size="12" text-anchor="middle" fill="#1f1f1f">1</text>
 <text x="181" y="108" font-size="12" text-anchor="middle" fill="#1f1f1f">2</text>
-<text x="104" y="238" font-size="13" text-anchor="middle" fill="#1f1f1f">data graph</text>
-<line x1="196" y1="148" x2="226" y2="148" stroke="#3c4043" stroke-width="1.3" marker-end="url(#scope-ar)"/>
-<rect x="230" y="40" width="316" height="216" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
+<text x="104" y="244" font-size="13" text-anchor="middle" fill="#1f1f1f">data graph</text>
+<text x="104" y="262" font-size="12" text-anchor="middle" fill="#5f6368">thousands of vertices</text>
+<line x1="196" y1="150" x2="226" y2="150" stroke="#3c4043" stroke-width="1.3" marker-end="url(#scope-ar)"/>
+<rect x="230" y="40" width="316" height="234" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
 <text x="246" y="64" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: shared batch counting</text>
+<text x="246" y="83" font-size="12.5" fill="#3c4043">one plan for the batch, shared pieces counted once</text>
 <g stroke="#3c4043" stroke-width="1.3">
-<line x1="250" y1="106" x2="330" y2="106"/>
-<line x1="372" y1="92" x2="404" y2="92"/><line x1="404" y1="92" x2="404" y2="122"/><line x1="404" y1="122" x2="372" y2="122"/><line x1="372" y1="122" x2="372" y2="92"/>
-<line x1="466" y1="122" x2="494" y2="122"/><line x1="494" y1="122" x2="480" y2="96"/><line x1="480" y1="96" x2="466" y2="122"/><line x1="494" y1="122" x2="522" y2="122"/>
+<line x1="250" y1="124" x2="330" y2="124"/>
+<line x1="372" y1="110" x2="404" y2="110"/><line x1="404" y1="110" x2="404" y2="140"/><line x1="404" y1="140" x2="372" y2="140"/><line x1="372" y1="140" x2="372" y2="110"/>
+<line x1="466" y1="140" x2="494" y2="140"/><line x1="494" y1="140" x2="480" y2="114"/><line x1="480" y1="114" x2="466" y2="140"/><line x1="494" y1="140" x2="522" y2="140"/>
 </g>
 <g fill="#fff" stroke="#3c4043" stroke-width="1.3">
-<circle cx="250" cy="106" r="5"/><circle cx="270" cy="106" r="5"/><circle cx="290" cy="106" r="5"/><circle cx="310" cy="106" r="5"/>
-<circle cx="404" cy="92" r="5"/><circle cx="404" cy="122" r="5"/><circle cx="372" cy="92" r="5"/>
-<circle cx="466" cy="122" r="5"/><circle cx="494" cy="122" r="5"/><circle cx="480" cy="96" r="5"/>
+<circle cx="250" cy="124" r="5"/><circle cx="270" cy="124" r="5"/><circle cx="290" cy="124" r="5"/><circle cx="310" cy="124" r="5"/>
+<circle cx="404" cy="110" r="5"/><circle cx="404" cy="140" r="5"/><circle cx="372" cy="110" r="5"/>
+<circle cx="466" cy="140" r="5"/><circle cx="494" cy="140" r="5"/><circle cx="480" cy="114" r="5"/>
 </g>
-<g fill="#1f1f1f"><circle cx="330" cy="106" r="5.5"/><circle cx="372" cy="122" r="5.5"/><circle cx="522" cy="122" r="5.5"/></g>
-<text x="290" y="142" font-size="12" text-anchor="middle" fill="#5f6368">q1</text>
-<text x="388" y="142" font-size="12" text-anchor="middle" fill="#5f6368">q2</text>
-<text x="494" y="142" font-size="12" text-anchor="middle" fill="#5f6368">q3</text>
-<rect x="282" y="180" width="72" height="40" rx="7" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<g stroke="#3c4043" stroke-width="1.2"><line x1="300" y1="210" x2="318" y2="190"/><line x1="318" y1="190" x2="336" y2="210"/></g>
-<g fill="#fff" stroke="#3c4043" stroke-width="1.2"><circle cx="300" cy="210" r="4.5"/><circle cx="318" cy="190" r="4.5"/><circle cx="336" cy="210" r="4.5"/></g>
-<rect x="430" y="180" width="72" height="40" rx="7" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<g stroke="#3c4043" stroke-width="1.2"><line x1="448" y1="210" x2="484" y2="210"/><line x1="484" y1="210" x2="466" y2="190"/><line x1="466" y1="190" x2="448" y2="210"/></g>
-<g fill="#fff" stroke="#3c4043" stroke-width="1.2"><circle cx="448" cy="210" r="4.5"/><circle cx="466" cy="190" r="4.5"/><circle cx="484" cy="210" r="4.5"/></g>
-<text x="318" y="238" font-size="12" text-anchor="middle" fill="#5f6368">wedge</text>
-<text x="466" y="238" font-size="12" text-anchor="middle" fill="#5f6368">triangle</text>
+<g fill="#1f1f1f"><circle cx="330" cy="124" r="5.5"/><circle cx="372" cy="140" r="5.5"/><circle cx="522" cy="140" r="5.5"/></g>
+<text x="290" y="160" font-size="12" text-anchor="middle" fill="#5f6368">q1</text>
+<text x="388" y="160" font-size="12" text-anchor="middle" fill="#5f6368">q2</text>
+<text x="494" y="160" font-size="12" text-anchor="middle" fill="#5f6368">q3</text>
+<rect x="282" y="198" width="72" height="40" rx="7" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<g stroke="#3c4043" stroke-width="1.2"><line x1="300" y1="228" x2="318" y2="208"/><line x1="318" y1="208" x2="336" y2="228"/></g>
+<g fill="#fff" stroke="#3c4043" stroke-width="1.2"><circle cx="300" cy="228" r="4.5"/><circle cx="318" cy="208" r="4.5"/><circle cx="336" cy="228" r="4.5"/></g>
+<rect x="430" y="198" width="72" height="40" rx="7" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<g stroke="#3c4043" stroke-width="1.2"><line x1="448" y1="228" x2="484" y2="228"/><line x1="484" y1="228" x2="466" y2="208"/><line x1="466" y1="208" x2="448" y2="228"/></g>
+<g fill="#fff" stroke="#3c4043" stroke-width="1.2"><circle cx="448" cy="228" r="4.5"/><circle cx="466" cy="208" r="4.5"/><circle cx="484" cy="228" r="4.5"/></g>
+<text x="318" y="256" font-size="12" text-anchor="middle" fill="#5f6368">wedge</text>
+<text x="466" y="256" font-size="12" text-anchor="middle" fill="#5f6368">triangle</text>
 <g fill="none" stroke="#9aa0a6" stroke-width="1.2">
-<line x1="306" y1="178" x2="292" y2="156" marker-end="url(#scope-up)"/>
-<line x1="330" y1="178" x2="378" y2="156" marker-end="url(#scope-up)"/>
-<line x1="350" y1="182" x2="480" y2="156" marker-end="url(#scope-up)"/>
-<line x1="472" y1="178" x2="490" y2="156" marker-end="url(#scope-up)"/>
+<line x1="306" y1="196" x2="292" y2="174" marker-end="url(#scope-up)"/>
+<line x1="330" y1="196" x2="378" y2="174" marker-end="url(#scope-up)"/>
+<line x1="350" y1="200" x2="480" y2="174" marker-end="url(#scope-up)"/>
+<line x1="472" y1="196" x2="490" y2="174" marker-end="url(#scope-up)"/>
 </g>
-<line x1="548" y1="148" x2="572" y2="148" stroke="#3c4043" stroke-width="1.3" marker-end="url(#scope-ar)"/>
-<rect x="578" y="72" width="160" height="136" rx="6" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="592" y="94" font-size="12" fill="#5f6368">vertex</text>
-<text x="724" y="94" font-size="12" text-anchor="end" fill="#5f6368">q1 count</text>
-<line x1="586" y1="102" x2="730" y2="102" stroke="#dadce0"/>
+<line x1="548" y1="150" x2="572" y2="150" stroke="#3c4043" stroke-width="1.3" marker-end="url(#scope-ar)"/>
+<rect x="578" y="64" width="160" height="136" rx="6" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
+<text x="592" y="86" font-size="12" fill="#5f6368">vertex</text>
+<text x="724" y="86" font-size="12" text-anchor="end" fill="#5f6368">q1 count</text>
+<line x1="586" y1="94" x2="730" y2="94" stroke="#dadce0"/>
 <g font-size="12.5" font-family="ui-monospace,Menlo,monospace" fill="#1f1f1f">
-<text x="592" y="124">0</text><text x="724" y="124" text-anchor="end">37589</text>
-<text x="592" y="146">1</text><text x="724" y="146" text-anchor="end">342369</text>
-<text x="592" y="168">2</text><text x="724" y="168" text-anchor="end">81862</text>
-<text x="592" y="190">⋮</text><text x="724" y="190" text-anchor="end">⋮</text>
+<text x="592" y="116">0</text><text x="724" y="116" text-anchor="end">37589</text>
+<text x="592" y="138">1</text><text x="724" y="138" text-anchor="end">342369</text>
+<text x="592" y="160">2</text><text x="724" y="160" text-anchor="end">81862</text>
+<text x="592" y="182">⋮</text><text x="724" y="182" text-anchor="end">⋮</text>
 </g>
-<circle cx="618" cy="230" r="5.5" fill="#1f1f1f"/>
-<text x="630" y="234" font-size="12" fill="#5f6368">orbit vertex</text>
+<text x="658" y="222" font-size="12" text-anchor="middle" fill="#5f6368">one exact count per vertex,</text>
+<text x="658" y="240" font-size="12" text-anchor="middle" fill="#5f6368">for every query</text>
+<circle cx="612" cy="263" r="5.5" fill="#1f1f1f"/>
+<text x="624" y="267" font-size="12" fill="#5f6368">orbit vertex</text>
 </svg>

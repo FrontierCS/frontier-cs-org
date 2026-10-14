@@ -1,6 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 22 760 232" role="img" aria-label="Predicting a branch at address 0x1004 that tests register r3. Decode and execute events arrive out of order. The part the agent writes keeps a register table: r3 holds 42 from instruction 0 and is ready, r5 waits for instruction 4, and r7 holds 9 from instruction 5 but is stale because instruction 6 will replace it. A hash of the branch address and the value 42 picks a counter, +5, which is the register vote. The given statistical corrector adds it to the TAGE guess and other tables, minus 4 and plus 1, for a sum of plus 2: taken.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 300" role="img" aria-label="Predicting a branch at address 0x1004 that tests register r3. Decode and execute events arrive out of order. The part the agent writes keeps a register table: r3 holds 42 from instruction 0 and is ready, r5 waits for instruction 4, and r7 holds 9 from instruction 5 but is stale because instruction 6 will replace it. A hash of the branch address and the value 42 picks a counter, +5, which is the register vote. The given statistical corrector adds it to the TAGE guess and other tables, minus 4 and plus 1, for a sum of plus 2: taken.">
 <defs><marker id="runlts-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker></defs>
-<text x="20" y="54" font-size="12" fill="#5f6368">events</text>
+<text x="20" y="22" font-size="12.5" fill="#5f6368">Predicting the branch at 0x1004, which tests register r3</text>
+<text x="20" y="54" font-size="12" fill="#5f6368">events, in simulator order</text>
 <text x="20" y="76" font-size="11.5" fill="#5f6368" font-family="ui-monospace,Menlo,monospace">decode</text>
 <text x="86" y="76" font-size="11.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">#0 r3</text>
 <text x="20" y="95" font-size="11.5" fill="#5f6368" font-family="ui-monospace,Menlo,monospace">execute</text>
@@ -15,10 +16,12 @@
 <text x="86" y="171" font-size="11.5" fill="#c5221f" font-family="ui-monospace,Menlo,monospace">#5 r7 = 9</text>
 <text x="20" y="190" font-size="11.5" fill="#5f6368" font-family="ui-monospace,Menlo,monospace">predict</text>
 <text x="86" y="190" font-size="11.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">#7 0x1004</text>
-<rect x="214" y="36" width="350" height="204" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
+<text x="20" y="226" font-size="11.5" fill="#5f6368">instructions execute out of order;</text>
+<text x="20" y="242" font-size="11.5" fill="#5f6368">#5 runs after #6 has claimed r7</text>
+<rect x="214" y="36" width="350" height="252" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
 <line x1="176" y1="124" x2="226" y2="124" stroke="#3c4043" stroke-width="1.3" marker-end="url(#runlts-ar)"/>
 <text x="230" y="60" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: the register-value vote</text>
-<g transform="translate(0 -16)">
+<text x="230" y="79" font-size="12.5" fill="#3c4043">track values as they execute, vote, train</text>
 <rect x="232" y="92" width="36" height="18" fill="#fff" stroke="#3c4043" stroke-width="1"/>
 <text x="238" y="105" font-size="11.5" fill="#5f6368">reg</text>
 <rect x="232" y="110" width="36" height="18" fill="#fff" stroke="#3c4043" stroke-width="1"/>
@@ -51,8 +54,6 @@
 <text x="274" y="159" font-size="11.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">9</text>
 <text x="326" y="159" font-size="11.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">#5</text>
 <text x="368" y="159" font-size="11.5" fill="#c5221f" >replaced by #6</text>
-</g>
-<g transform="translate(0 -48)">
 <text x="484" y="176" font-size="11.5" fill="#5f6368">counters</text>
 <rect x="484" y="184" width="46" height="18" fill="#fff" stroke="#3c4043" stroke-width="1"/>
 <text x="507" y="197" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">−3</text>
@@ -64,12 +65,12 @@
 <text x="507" y="251" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0</text>
 <rect x="484" y="256" width="46" height="18" fill="#fff" stroke="#3c4043" stroke-width="1"/>
 <text x="507" y="269" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">−2</text>
-</g>
-<text x="232" y="185" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">hash(0x1004, 42)</text>
-<line x1="364" y1="181" x2="478" y2="181" stroke="#3c4043" stroke-width="1.3" marker-end="url(#runlts-ar)"/>
-<line x1="532" y1="181" x2="590" y2="181" stroke="#3c4043" stroke-width="1.3" marker-end="url(#runlts-ar)"/>
-<g transform="translate(0 -46)">
-<text x="598" y="140" font-size="12" fill="#5f6368">corrector sum</text>
+<text x="232" y="231" font-size="12" fill="#1f1f1f">index: hash of 0x1004 and r3 = 42</text>
+<line x1="440" y1="227" x2="478" y2="227" stroke="#3c4043" stroke-width="1.3" marker-end="url(#runlts-ar)"/>
+<text x="232" y="186" font-size="11.5" fill="#5f6368">stale or waiting values are not used</text>
+<text x="232" y="264" font-size="11.5" fill="#5f6368">train the counter when the branch resolves</text>
+<line x1="532" y1="227" x2="590" y2="227" stroke="#3c4043" stroke-width="1.3" marker-end="url(#runlts-ar)"/>
+<text x="598" y="140" font-size="12" fill="#5f6368">corrector sum, given</text>
 <text x="598" y="166" font-size="12" fill="#1f1f1f">TAGE guess</text>
 <text x="740" y="166" font-size="12" text-anchor="end" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">−4</text>
 <text x="598" y="190" font-size="12" fill="#1f1f1f">other tables</text>
@@ -78,5 +79,4 @@
 <text x="740" y="231" font-size="12" text-anchor="end" fill="#0b57d0" font-family="ui-monospace,Menlo,monospace">+5</text>
 <line x1="598" y1="244" x2="740" y2="244" stroke="#9aa0a6" stroke-width="1"/>
 <text x="598" y="264" font-size="12" font-weight="600" fill="#1f1f1f">sum +2: taken</text>
-</g>
 </svg>

@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 18 760 266" role="img" aria-label="A fixed IVF-PQ index stores each database vector in one of 8,192 lists as its id and 16 short codes, for example vector 1043 with codes 17, 201, 3 and so on up to 88. The agent writes the whole search: probe the nearest lists for query q, build the query’s distance table with one row per sub-space, add up one table entry per code to get each vector’s distance, such as 41230, and keep the best k.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 18 760 278" role="img" aria-label="A fixed IVF-PQ index stores each database vector in one of 8,192 lists as its id and 16 short codes, for example vector 1043 with codes 17, 201, 3 and so on up to 88. The agent writes the whole search: probe the nearest lists for query q, build the query’s distance table with one row per sub-space, add up one table entry per code to get each vector’s distance, such as 41230, and keep the best k.">
 <defs><marker id="ivf-pq-kernel-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker></defs>
 
-<text x="20" y="52" font-size="12.5" fill="#1f1f1f">list 4071</text>
+<text x="20" y="52" font-size="12.5" fill="#1f1f1f">list 4071 of the index</text>
 <rect x="20" y="62" width="212" height="100" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
 <text x="30" y="77" font-size="11.5" fill="#5f6368">id</text><text x="88" y="77" font-size="11.5" fill="#5f6368">16 codes</text>
 <line x1="20" y1="82" x2="232" y2="82" stroke="#dadce0"/>
@@ -40,26 +40,28 @@
 <text x="209" y="136.5" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">150</text>
 <text x="30" y="155" font-size="12" fill="#5f6368">⋮</text>
 <rect x="22" y="83" width="208" height="19" fill="none" stroke="#1f1f1f" stroke-width="1.6"/>
-<rect x="250" y="32" width="494" height="238" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
+<text x="20" y="186" font-size="12" fill="#5f6368">8,192 lists, each around a centroid;</text>
+<text x="20" y="203" font-size="12" fill="#5f6368">a code names one codebook entry</text>
+<rect x="250" y="32" width="494" height="258" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
 <text x="266" y="56" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: the search, from probing lists to top-k</text>
 <line x1="234" y1="92" x2="262" y2="99" stroke="#3c4043" stroke-width="1.3" marker-end="url(#ivf-pq-kernel-ar)"/>
-<text x="268" y="84" font-size="12" fill="#5f6368">scan</text>
+<text x="268" y="84" font-size="12" fill="#5f6368">scan: add one table entry per code</text>
 <text x="268" y="104" font-size="12.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">d = T[1][17] + T[2][201]</text>
 <text x="283" y="124" font-size="12.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">+ T[3][3] + ⋯ + T[16][88]</text>
 <text x="283" y="144" font-size="12.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">= 41230</text>
-<text x="268" y="172" font-size="12" fill="#5f6368">top-k</text>
-<rect x="268" y="180" width="150" height="20" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<text x="278" y="194.5" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">77801</text>
-<text x="408" y="194.5" font-size="12" text-anchor="end" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">39870</text>
-<rect x="268" y="200" width="150" height="20" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<text x="278" y="214.5" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1043</text>
-<text x="408" y="214.5" font-size="12" text-anchor="end" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">41230</text>
-<rect x="268" y="220" width="150" height="20" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<text x="278" y="234.5" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">5520</text>
-<text x="408" y="234.5" font-size="12" text-anchor="end" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">44115</text>
-<rect x="269" y="201" width="148" height="18" fill="none" stroke="#1f1f1f" stroke-width="1.6"/>
-<text x="278" y="256" font-size="12" fill="#5f6368">⋮</text>
-<text x="490" y="84" font-size="12" fill="#5f6368">probed lists</text>
+<text x="268" y="180" font-size="12" fill="#5f6368">keep the best k, sorted</text>
+<rect x="268" y="188" width="150" height="20" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
+<text x="278" y="202.5" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">77801</text>
+<text x="408" y="202.5" font-size="12" text-anchor="end" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">39870</text>
+<rect x="268" y="208" width="150" height="20" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
+<text x="278" y="222.5" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1043</text>
+<text x="408" y="222.5" font-size="12" text-anchor="end" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">41230</text>
+<rect x="268" y="228" width="150" height="20" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
+<text x="278" y="242.5" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">5520</text>
+<text x="408" y="242.5" font-size="12" text-anchor="end" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">44115</text>
+<rect x="269" y="209" width="148" height="18" fill="none" stroke="#1f1f1f" stroke-width="1.6"/>
+<text x="278" y="264" font-size="12" fill="#5f6368">⋮</text>
+<text x="490" y="84" font-size="12" fill="#5f6368">probe the nearest 32 to 128 lists</text>
 <rect x="490" y="92" width="48" height="20" rx="4" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
 <text x="514.0" y="106.5" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">4071</text>
 <rect x="544" y="92" width="40" height="20" rx="4" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
@@ -68,7 +70,7 @@
 <text x="614.0" y="106.5" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">7730</text>
 <rect x="644" y="92" width="30" height="20" rx="4" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
 <text x="659.0" y="106.5" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">⋯</text>
-<text x="490" y="140" font-size="12" fill="#5f6368">distance table T</text>
+<text x="490" y="140" font-size="12" fill="#5f6368">build the distance table T for q</text>
 <text x="506" y="163" font-size="11.5" text-anchor="end" fill="#5f6368" font-family="ui-monospace,Menlo,monospace">1</text>
 <rect x="512" y="150" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
 <rect x="529" y="150" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
@@ -126,5 +128,6 @@
 <rect x="682" y="222" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
 <rect x="699" y="222" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
 <rect x="618.5" y="227" width="8" height="8" fill="#3c4043"/>
-<text x="614" y="257" font-size="12" text-anchor="middle" fill="#5f6368">code value</text>
+<text x="512" y="254" font-size="12" fill="#5f6368">row: one of 16 vector parts</text>
+<text x="512" y="270" font-size="12" fill="#5f6368">column: code value</text>
 </svg>

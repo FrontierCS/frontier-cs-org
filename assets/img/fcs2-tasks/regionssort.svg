@@ -1,5 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 20 760 279" role="img" aria-label="Twelve keys, shown by bucket, must end in three bucket intervals. At the start, region 0 holds 2 keys of bucket 1, region 1 holds 2 of bucket 2 and region 2 holds 2 of bucket 0, a cycle in the region graph. Round 1 swaps positions 2–3 with 6–7, leaving a two-way cycle between regions 0 and 2; round 2 swaps 2–3 with 10–11 and the graph is empty. Planning these swaps and updating the graph is what the agent writes.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 296" role="img" aria-label="Twelve keys, shown by bucket, must end in three bucket intervals. At the start, region 0 holds 2 keys of bucket 1, region 1 holds 2 of bucket 2 and region 2 holds 2 of bucket 0, a cycle in the region graph. Round 1 swaps positions 2–3 with 6–7, leaving a two-way cycle between regions 0 and 2; round 2 swaps 2–3 with 10–11 and the graph is empty. Planning these swaps and updating the graph is what the agent writes.">
 <defs><marker id="regionssort-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker></defs>
+<text x="24" y="22" font-size="12.5" fill="#5f6368">Each cell shows its key’s bucket</text>
 <text x="24" y="86" font-size="12.5" fill="#5f6368">start</text>
 <rect x="116" y="70" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
 <text x="126" y="85.5" font-size="12.5" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
@@ -105,7 +106,7 @@
 <text x="236" y="281" font-size="12.5" text-anchor="middle" fill="#5f6368">bucket 1</text>
 <path d="M279 258V264H353V258" fill="none" stroke="#9aa0a6" stroke-width="1"/>
 <text x="316" y="281" font-size="12.5" text-anchor="middle" fill="#5f6368">bucket 2</text>
-<rect x="380" y="34" width="356" height="250" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
+<rect x="380" y="34" width="356" height="256" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
 <text x="396" y="58" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: swap planning and graph updates</text>
 <line x1="431" y1="90" x2="507" y2="90" stroke="#3c4043" stroke-width="1.2" marker-end="url(#regionssort-ar)"/>
 <line x1="512" y1="101" x2="485" y2="133" stroke="#3c4043" stroke-width="1.2" marker-end="url(#regionssort-ar)"/>
@@ -130,5 +131,6 @@
 <text x="469" y="186" font-size="11.5" text-anchor="middle" fill="#5f6368">2 keys each way</text>
 <text x="562" y="208" font-size="13" font-weight="600" fill="#1f1f1f">round 2</text>
 <text x="562" y="228" font-size="12.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">swap 2–3 ↔ 10–11</text>
-<text x="396" y="262" font-size="12.5" fill="#5f6368">edge i → j: region i holds bucket-j keys</text>
+<text x="396" y="252" font-size="12.5" fill="#3c4043">edge i → j: region i holds keys of bucket j</text>
+<text x="396" y="274" font-size="12.5" fill="#3c4043">swaps in one round run at once and must not overlap</text>
 </svg>

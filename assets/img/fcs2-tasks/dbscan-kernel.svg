@@ -78,5 +78,6 @@
 <circle cx="572" cy="219.5" r="4" fill="#fff" stroke="#9aa0a6" stroke-width="1.4"/>
 <text x="584" y="224" font-size="12.5" fill="#1f1f1f">noise</text>
 <text x="680" y="224" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">−1</text>
+<text x="400" y="246" font-size="12.5" fill="#5f6368">core: at least 4 points within eps, itself included</text>
 
 </svg>

@@ -327,9 +327,9 @@ a.pbtn:hover{border-color:var(--teal); color:var(--teal-d)}
 .thero{display:grid; grid-template-columns:minmax(0,5fr) minmax(0,7fr); gap:28px 56px; align-items:center}
 .thero.nofig{grid-template-columns:minmax(0,1fr)}
 .thero .ptitle{font-size:15.5px; margin-top:12px}
-.thero .tfig{margin:36px 0 0}   /* no frame around the diagram (Qiuyang, 2026-10-14) */
+.thero .tfig{margin:36px 0 0; padding:16px 18px; border:1px solid var(--line); border-radius:10px; background:#fff}
 @media (max-width:900px){ .thero{grid-template-columns:minmax(0,1fr)} .thero .tfig{margin:4px 0 0} }
-@media (max-width:640px){ .thero .tfig{overflow-x:auto} .thero .tfig svg{min-width:620px} }   /* labels stay readable; the figure scrolls sideways */
+@media (max-width:640px){ .thero .tfig{overflow-x:auto; padding:12px} .thero .tfig svg{min-width:620px} }   /* labels stay readable; the figure scrolls sideways */
 .tgoal{font-size:clamp(20px,2vw,24px); line-height:1.35; color:var(--ink); max-width:30em; margin:16px 0 0; text-wrap:pretty}
 .tkeys{display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:16px 0 0}
 .tkeys:empty{display:none}

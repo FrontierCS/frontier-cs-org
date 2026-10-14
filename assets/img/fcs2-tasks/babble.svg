@@ -1,7 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 46 760 220" role="img" aria-label="Two program fragments, (+ (car l) 1) and (+ (car m) 5), are crossed node by node into pairs of e-classes. Where the pair agrees the operator is kept, where it differs a hole is placed, giving the pattern (+ (car ?a) ?b). That pattern becomes the library function f a b, and the programs become (f l 1) and (f m 5). The crossing and candidate search are the part the agent writes.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 26 760 249" role="img" aria-label="Two program fragments, (+ (car l) 1) and (+ (car m) 5), are crossed node by node into pairs of e-classes. Where the pair agrees the operator is kept, where it differs a hole is placed, giving the pattern (+ (car ?a) ?b). That pattern becomes the library function f a b, and the programs become (f l 1) and (f m 5). The crossing and candidate search are the part the agent writes.">
 <defs><marker id="babble-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker></defs>
 
-<g transform="translate(0 15)">
 <g stroke="#3c4043" stroke-width="1.2">
 <line x1="70" y1="90" x2="42" y2="116"/><line x1="70" y1="90" x2="100" y2="116"/><line x1="42" y1="140" x2="42" y2="166"/>
 <line x1="190" y1="90" x2="162" y2="116"/><line x1="190" y1="90" x2="220" y2="116"/><line x1="162" y1="140" x2="162" y2="166"/>
@@ -16,9 +15,11 @@
 </g>
 <text x="70" y="212" font-size="12" text-anchor="middle" fill="#5f6368">fragment A</text>
 <text x="190" y="212" font-size="12" text-anchor="middle" fill="#5f6368">fragment B</text>
-</g>
-<rect x="262" y="60" width="338" height="192" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
-<text x="278" y="84" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: the candidate search</text>
+<text x="20" y="242" font-size="11.5" fill="#5f6368">each e-class also holds equal forms,</text>
+<text x="20" y="258" font-size="11.5" fill="#5f6368">such as <tspan font-family="ui-monospace,Menlo,monospace">(+ 1 (car l))</tspan></text>
+<rect x="262" y="40" width="338" height="212" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
+<text x="278" y="64" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: the candidate search</text>
+<text x="278" y="83" font-size="12.5" fill="#3c4043">cross e-classes in pairs; put a hole where they differ</text>
 <line x1="250" y1="143" x2="296" y2="143" stroke="#3c4043" stroke-width="1.3" marker-end="url(#babble-ar)"/>
 <g stroke="#3c4043" stroke-width="1.2">
 <line x1="360" y1="130" x2="318" y2="156"/><line x1="360" y1="130" x2="408" y2="156"/><line x1="318" y1="180" x2="318" y2="206"/>

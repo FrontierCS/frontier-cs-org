@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 274" role="img" aria-label="Left, the optimizer’s binary plan joins u and p on key 1, then c on key 0; its top join fails the shape rule because its leftmost table u lacks key 0. Middle, the rewrite the agent writes puts p first, so every join’s keys are in the leftmost table of both sides. Right, fixed code lowers it to a two-phase plan: semijoins on keys 1 and 0 first drop rows of p that cannot match, then the joins run.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 300" role="img" aria-label="Left, the optimizer’s binary plan joins u and p on key 1, then c on key 0; its top join fails the shape rule because its leftmost table u lacks key 0. Middle, the rewrite the agent writes puts p first, so every join’s keys are in the leftmost table of both sides. Right, fixed code lowers it to a two-phase plan: semijoins on keys 1 and 0 first drop rows of p that cannot match, then the joins run.">
 <defs><marker id="yannakakis-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker></defs>
-<text x="24" y="22" font-size="12.5" fill="#5f6368">u: users, p: posts, c: comments; {0}, {1}: join keys</text>
+<text x="24" y="22" font-size="12.5" fill="#5f6368">u = users, p = posts, c = comments; key 1: u.Id = p.OwnerUserId, key 0: p.Id = c.PostId</text>
 <text x="24" y="54" font-size="12.5" fill="#5f6368">optimizer’s binary plan</text>
 <line x1="138" y1="104" x2="88" y2="164" stroke="#3c4043" stroke-width="1.2"/>
 <line x1="138" y1="104" x2="188" y2="151" stroke="#3c4043" stroke-width="1.2"/>
@@ -18,17 +18,19 @@
 <text x="56" y="229" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace"><tspan font-weight="700">u</tspan> {1}</text>
 <rect x="91.0" y="211" width="62" height="26" rx="5" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
 <text x="122" y="229" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace"><tspan font-weight="700">p</tspan> {0,1}</text>
-<text x="24" y="258" font-size="12.5" fill="#c5221f">fails the shape rule</text>
+<text x="24" y="262" font-size="12.5" fill="#c5221f">top join is on key 0, but its</text>
+<text x="24" y="279" font-size="12.5" fill="#c5221f">leftmost table u lacks key 0</text>
 <line x1="218" y1="164" x2="242" y2="164" stroke="#3c4043" stroke-width="1.3" marker-end="url(#yannakakis-ar)"/>
-<rect x="248" y="34" width="268" height="224" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
+<rect x="248" y="34" width="268" height="254" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
 <text x="264" y="58" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: the tree rewrite</text>
-<line x1="382" y1="104" x2="330" y2="164" stroke="#3c4043" stroke-width="1.2"/>
-<line x1="382" y1="104" x2="432" y2="151" stroke="#3c4043" stroke-width="1.2"/>
+<text x="264" y="77" font-size="12.5" fill="#3c4043">same tables and join keys, new shape</text>
+<line x1="382" y1="110" x2="330" y2="164" stroke="#3c4043" stroke-width="1.2"/>
+<line x1="382" y1="110" x2="432" y2="151" stroke="#3c4043" stroke-width="1.2"/>
 <line x1="330" y1="164" x2="296" y2="211" stroke="#3c4043" stroke-width="1.2"/>
 <line x1="330" y1="164" x2="362" y2="211" stroke="#3c4043" stroke-width="1.2"/>
-<circle cx="382" cy="104" r="14" fill="#fff" stroke="#3c4043" stroke-width="1.4"/>
-<path d="M375 99L389 109V99L375 109Z" fill="none" stroke="#3c4043" stroke-width="1.3" stroke-linejoin="round"/>
-<text x="400" y="97" font-size="12.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">{0}</text>
+<circle cx="382" cy="110" r="14" fill="#fff" stroke="#3c4043" stroke-width="1.4"/>
+<path d="M375 105L389 115V105L375 115Z" fill="none" stroke="#3c4043" stroke-width="1.3" stroke-linejoin="round"/>
+<text x="400" y="103" font-size="12.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">{0}</text>
 <circle cx="330" cy="164" r="14" fill="#fff" stroke="#3c4043" stroke-width="1.4"/>
 <path d="M323 159L337 169V159L323 169Z" fill="none" stroke="#3c4043" stroke-width="1.3" stroke-linejoin="round"/>
 <text x="348" y="157" font-size="12.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">{1}</text>
@@ -38,16 +40,21 @@
 <text x="296" y="229" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace"><tspan font-weight="700">p</tspan> {0,1}</text>
 <rect x="337.0" y="211" width="50" height="26" rx="5" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
 <text x="362" y="229" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace"><tspan font-weight="700">u</tspan> {1}</text>
+<text x="264" y="262" font-size="12.5" fill="#3c4043">every join’s keys are in the leftmost</text>
+<text x="264" y="279" font-size="12.5" fill="#3c4043">table on both of its sides</text>
 <line x1="520" y1="164" x2="544" y2="164" stroke="#3c4043" stroke-width="1.3" marker-end="url(#yannakakis-ar)"/>
-<text x="552" y="54" font-size="12.5" fill="#5f6368">phase 1: semijoins</text>
-<rect x="615.0" y="91" width="62" height="26" rx="5" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="646" y="109" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace"><tspan font-weight="700">p</tspan> {0,1}</text>
-<rect x="573.0" y="211" width="50" height="26" rx="5" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="598" y="229" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace"><tspan font-weight="700">u</tspan> {1}</text>
-<rect x="669.0" y="211" width="50" height="26" rx="5" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="694" y="229" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace"><tspan font-weight="700">c</tspan> {0}</text>
-<line x1="606" y1="209" x2="634" y2="120" stroke="#3c4043" stroke-width="1.3" marker-end="url(#yannakakis-ar)"/>
-<line x1="686" y1="209" x2="658" y2="120" stroke="#3c4043" stroke-width="1.3" marker-end="url(#yannakakis-ar)"/>
-<text x="609" y="168" font-size="12.5" text-anchor="end" fill="#5f6368">key 1</text>
-<text x="683" y="168" font-size="12.5" fill="#5f6368">key 0</text>
+<text x="552" y="54" font-size="12.5" fill="#5f6368">lowered to a two-phase plan</text>
+<rect x="615.0" y="97" width="62" height="26" rx="5" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<text x="646" y="115" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace"><tspan font-weight="700">p</tspan> {0,1}</text>
+<rect x="573.0" y="177" width="50" height="26" rx="5" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<text x="598" y="195" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace"><tspan font-weight="700">u</tspan> {1}</text>
+<rect x="669.0" y="177" width="50" height="26" rx="5" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<text x="694" y="195" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace"><tspan font-weight="700">c</tspan> {0}</text>
+<line x1="604" y1="176" x2="628" y2="126" stroke="#3c4043" stroke-width="1.3" marker-end="url(#yannakakis-ar)"/>
+<line x1="688" y1="176" x2="664" y2="126" stroke="#3c4043" stroke-width="1.3" marker-end="url(#yannakakis-ar)"/>
+<text x="604" y="150" font-size="12.5" text-anchor="end" fill="#5f6368">key 1</text>
+<text x="688" y="150" font-size="12.5" fill="#5f6368">key 0</text>
+<text x="552" y="236" font-size="12.5" fill="#3c4043">phase 1: semijoins drop rows</text>
+<text x="552" y="253" font-size="12.5" fill="#3c4043">of p that cannot match</text>
+<text x="552" y="275" font-size="12.5" fill="#3c4043">phase 2: join what is left</text>
 </svg>
