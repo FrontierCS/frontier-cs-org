@@ -280,7 +280,7 @@ function fileHTML(f, i, all) {
     : [f.add ? `Added ${lines(f.add)}` : '', f.del ? `${f.add ? 'removed' : 'Removed'} ${lines(f.del)}` : ''].filter(Boolean).join(', ');
   const nw = String(Math.max(1, ...f.rows.map(r => r.n || 0))).length;
   const rows = f.rows.map(r => r.t === 'g' ? '<div class="r g"><span class="n"></span><span class="s"></span><span class="c">…</span></div>'
-    : `<div class="r ${w ? 'c' : r.t}"><span class="n">${r.n}</span><span class="s">${w ? '' : r.t === 'a' ? '+' : r.t === 'd' ? '-' : ''}</span>`
+    : `<div class="r ${r.t}"><span class="n">${r.n}</span><span class="s">${r.t === 'a' ? '+' : r.t === 'd' ? '-' : ''}</span>`
       + `<span class="c">${r.h != null ? r.h : cut(r.s)}</span></div>`).join('');
   const head = `<span class="cct"><b>${f.kind}</b>(${esc(f.path)})</span><span class="ccs">${sum}</span>`;
   if (!f.rows.length) return `<div class="ccf"><span class="cch">${head}</span></div>`;   // nothing to unfold: a binary file
