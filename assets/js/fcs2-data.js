@@ -112,7 +112,7 @@ const MODELS = [
   {id:'sol', name:'GPT-6.1 Sol', short:'GPT-6.1 Sol', h:'Codex CLI', lab:'OpenAI'},
   {id:'muse', name:'Muse Spark 1.3', short:'Muse Spark 1.3', h:'Muse Code', lab:'Meta'},
   {id:'k3', name:'Kimi K3', short:'Kimi K3', h:'Kimi Code', lab:'Kimi'},
-  {id:'ds', name:'DeepSeek V4.1 Flash', short:'DeepSeek V4.1 Flash', h:'DSH', lab:'DeepSeek'},
+  {id:'ds', name:'DeepSeek V4.1 Flash', short:'DeepSeek V4.1 Flash', h:'DeepSeek Harness', lab:'DeepSeek'},
   {id:'glm', name:'GLM 5.3', short:'GLM 5.3', h:'ZCode', lab:'Z.ai'},
   {id:'opus', name:'Claude Opus 5.5', short:'Opus 5.5', h:'Claude Code', lab:'Anthropic'},
   {id:'wonder', name:'Muse Wonder 1.0', short:'Muse Wonder 1.0', h:'Muse Code', lab:'Meta'},
