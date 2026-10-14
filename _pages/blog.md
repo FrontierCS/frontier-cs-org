@@ -1,6 +1,8 @@
 ---
 layout: default
 title: Blog
+description: Research notes, benchmark releases and agent evaluations from the FrontierCS team.
+og_image: assets/img/cards/blog.png
 permalink: /blog/
 nav: true
 nav_order: 1

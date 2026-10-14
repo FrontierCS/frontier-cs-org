@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Team
+og_image: assets/img/cards/team.png
 description: The authors of FrontierCS, the institutions they come from, and the sponsors who support the project.
 permalink: /team/
 ---
