@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 20 760 264" role="img" aria-label="Left, a 6 by 6 Sokoban view given to the model. Right, the context manager the agent writes: it parses a reply such as Right, Up, Left into at most two moves, and packs one game into a left-padded token row with instructions, views and replies; the mask is 1 only on the model’s replies and the reward of 10.8 sits on the last reply token. Four games from the same start stay one group.">
+<defs><marker id="ragen-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker></defs>
+
+<rect x="36" y="48" width="16" height="16" fill="#dadce0" stroke="#9aa0a6" stroke-width="0.8"/>
+<rect x="52" y="48" width="16" height="16" fill="#dadce0" stroke="#9aa0a6" stroke-width="0.8"/>
+<rect x="68" y="48" width="16" height="16" fill="#dadce0" stroke="#9aa0a6" stroke-width="0.8"/>
+<rect x="84" y="48" width="16" height="16" fill="#dadce0" stroke="#9aa0a6" stroke-width="0.8"/>
+<rect x="100" y="48" width="16" height="16" fill="#dadce0" stroke="#9aa0a6" stroke-width="0.8"/>
+<rect x="116" y="48" width="16" height="16" fill="#dadce0" stroke="#9aa0a6" stroke-width="0.8"/>
+<rect x="36" y="64" width="16" height="16" fill="#dadce0" stroke="#9aa0a6" stroke-width="0.8"/>
+<rect x="52" y="64" width="16" height="16" fill="#fff" stroke="#dadce0" stroke-width="0.8"/>
+<rect x="68" y="64" width="16" height="16" fill="#fff" stroke="#dadce0" stroke-width="0.8"/>
+<rect x="84" y="64" width="16" height="16" fill="#fff" stroke="#dadce0" stroke-width="0.8"/>
+<rect x="100" y="64" width="16" height="16" fill="#fff" stroke="#dadce0" stroke-width="0.8"/>
+<rect x="116" y="64" width="16" height="16" fill="#dadce0" stroke="#9aa0a6" stroke-width="0.8"/>
+<rect x="36" y="80" width="16" height="16" fill="#dadce0" stroke="#9aa0a6" stroke-width="0.8"/>
+<rect x="52" y="80" width="16" height="16" fill="#fff" stroke="#dadce0" stroke-width="0.8"/>
+<rect x="68" y="80" width="16" height="16" fill="#fff" stroke="#dadce0" stroke-width="0.8"/>
+<rect x="84" y="80" width="16" height="16" fill="#fff" stroke="#dadce0" stroke-width="0.8"/>
+<rect x="100" y="80" width="16" height="16" fill="#fff" stroke="#dadce0" stroke-width="0.8"/>
+<rect x="116" y="80" width="16" height="16" fill="#dadce0" stroke="#9aa0a6" stroke-width="0.8"/>
+<rect x="36" y="96" width="16" height="16" fill="#dadce0" stroke="#9aa0a6" stroke-width="0.8"/>
+<rect x="52" y="96" width="16" height="16" fill="#fff" stroke="#dadce0" stroke-width="0.8"/>
+<rect x="68" y="96" width="16" height="16" fill="#fff" stroke="#dadce0" stroke-width="0.8"/>
+<rect x="84" y="96" width="16" height="16" fill="#fff" stroke="#dadce0" stroke-width="0.8"/>
+<rect x="100" y="96" width="16" height="16" fill="#fff" stroke="#dadce0" stroke-width="0.8"/>
+<rect x="116" y="96" width="16" height="16" fill="#dadce0" stroke="#9aa0a6" stroke-width="0.8"/>
+<rect x="36" y="112" width="16" height="16" fill="#dadce0" stroke="#9aa0a6" stroke-width="0.8"/>
+<rect x="52" y="112" width="16" height="16" fill="#fff" stroke="#dadce0" stroke-width="0.8"/>
+<rect x="68" y="112" width="16" height="16" fill="#fff" stroke="#dadce0" stroke-width="0.8"/>
+<rect x="84" y="112" width="16" height="16" fill="#fff" stroke="#dadce0" stroke-width="0.8"/>
+<rect x="100" y="112" width="16" height="16" fill="#fff" stroke="#dadce0" stroke-width="0.8"/>
+<rect x="116" y="112" width="16" height="16" fill="#dadce0" stroke="#9aa0a6" stroke-width="0.8"/>
+<rect x="36" y="128" width="16" height="16" fill="#dadce0" stroke="#9aa0a6" stroke-width="0.8"/>
+<rect x="52" y="128" width="16" height="16" fill="#dadce0" stroke="#9aa0a6" stroke-width="0.8"/>
+<rect x="68" y="128" width="16" height="16" fill="#dadce0" stroke="#9aa0a6" stroke-width="0.8"/>
+<rect x="84" y="128" width="16" height="16" fill="#dadce0" stroke="#9aa0a6" stroke-width="0.8"/>
+<rect x="100" y="128" width="16" height="16" fill="#dadce0" stroke="#9aa0a6" stroke-width="0.8"/>
+<rect x="116" y="128" width="16" height="16" fill="#dadce0" stroke="#9aa0a6" stroke-width="0.8"/>
+<circle cx="60.0" cy="72.0" r="4.5" fill="#3c4043"/>
+<rect x="71.0" y="83.0" width="10" height="10" fill="#fff" stroke="#3c4043" stroke-width="1.4"/>
+<path d="M71.0 83.0L81.0 93.0M81.0 83.0L71.0 93.0" stroke="#3c4043" stroke-width="1"/>
+<circle cx="92.0" cy="104.0" r="4" fill="none" stroke="#3c4043" stroke-width="1.4"/>
+<circle cx="41" cy="162" r="4.5" fill="#3c4043"/>
+<text x="50" y="166" font-size="12" fill="#5f6368">player</text>
+<rect x="92" y="157" width="10" height="10" fill="#fff" stroke="#3c4043" stroke-width="1.4"/>
+<path d="M92 157L102 167M102 157L92 167" stroke="#3c4043" stroke-width="1"/>
+<text x="107" y="166" font-size="12" fill="#5f6368">box</text>
+<circle cx="140" cy="162" r="4" fill="none" stroke="#3c4043" stroke-width="1.4"/>
+<text x="149" y="166" font-size="12" fill="#5f6368">goal</text>
+<text x="24" y="200" font-size="12.5" fill="#5f6368">Given: the game, the</text>
+<text x="24" y="218" font-size="12.5" fill="#5f6368">model that replies, and</text>
+<text x="24" y="236" font-size="12.5" fill="#5f6368">the trainer</text>
+<rect x="200" y="34" width="536" height="236" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
+<text x="216" y="58" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: the context manager that builds prompts and batches</text>
+<text x="216" y="90" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">&lt;answer&gt;Right || Up || Left&lt;/answer&gt;</text>
+<line x1="484" y1="86" x2="514" y2="86" stroke="#3c4043" stroke-width="1.2" marker-end="url(#ragen-ar)"/>
+<text x="522" y="90" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">[Right, Up]</text>
+<text x="216" y="111" font-size="12.5" fill="#5f6368">a reply parsed into moves, with a two-move limit</text>
+<text x="216" y="142" font-size="12.5" fill="#5f6368">one game packed into a left-padded row</text>
+<rect x="216" y="152" width="30" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
+<text x="231.0" y="169" font-size="12" text-anchor="middle" fill="#9aa0a6">pad</text>
+<rect x="246" y="152" width="30" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
+<text x="261.0" y="169" font-size="12" text-anchor="middle" fill="#9aa0a6">pad</text>
+<rect x="276" y="152" width="132" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
+<text x="342.0" y="169" font-size="12" text-anchor="middle" fill="#1f1f1f">instructions, view 1</text>
+<rect x="408" y="152" width="78" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.6"/>
+<text x="447.0" y="169" font-size="12" text-anchor="middle" fill="#1f1f1f">reply 1</text>
+<rect x="486" y="152" width="64" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
+<text x="518.0" y="169" font-size="12" text-anchor="middle" fill="#1f1f1f">view 2</text>
+<rect x="550" y="152" width="78" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.6"/>
+<text x="589.0" y="169" font-size="12" text-anchor="middle" fill="#1f1f1f">reply 2</text>
+<text x="231.0" y="200" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0</text>
+<text x="231.0" y="222" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0</text>
+<text x="261.0" y="200" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0</text>
+<text x="261.0" y="222" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0</text>
+<text x="342.0" y="200" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0</text>
+<text x="342.0" y="222" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0</text>
+<text x="447.0" y="200" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
+<text x="447.0" y="222" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0</text>
+<text x="518.0" y="200" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0</text>
+<text x="518.0" y="222" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0</text>
+<text x="589.0" y="200" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
+<text x="566" y="222" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0</text>
+<text x="626" y="222" font-size="12.5" font-weight="700" text-anchor="end" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">10.8</text>
+<text x="642" y="170" font-size="12.5" fill="#5f6368">tokens</text>
+<text x="642" y="200" font-size="12.5" fill="#5f6368">mask</text>
+<text x="642" y="222" font-size="12.5" fill="#5f6368">reward</text>
+<line x1="216" y1="232" x2="628" y2="232" stroke="#dadce0" stroke-width="1"/>
+<text x="216" y="254" font-size="12.5" fill="#3c4043">four games from the same start stay one group</text>
+</svg>

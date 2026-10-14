@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 22 760 258" role="img" aria-label="A hypergraph with vertices 0 to 5 and hyperedges e0 = {0,1,2}, e1 = {1,2,3}, e2 = {0,1,2,3} and e3 = {3,4}, stored both ways round. The core-number computation, the part the agent writes, is shown as peeling: vertices sit in buckets by degree; round k = 0 peels 5, k = 1 peels 4 and drops e3, k = 2 peels the rest. The core numbers are 2, 2, 2, 2, 1, 0.">
+
+<g stroke="#9aa0a6" stroke-width="1.2">
+<line x1="40" y1="83" x2="70" y2="167"/><line x1="90" y1="83" x2="70" y2="167"/><line x1="140" y1="83" x2="70" y2="167"/>
+<line x1="90" y1="83" x2="135" y2="167"/><line x1="140" y1="83" x2="135" y2="167"/><line x1="190" y1="83" x2="135" y2="167"/>
+<line x1="40" y1="83" x2="200" y2="167"/><line x1="90" y1="83" x2="200" y2="167"/><line x1="140" y1="83" x2="200" y2="167"/><line x1="190" y1="83" x2="200" y2="167"/>
+<line x1="190" y1="83" x2="262" y2="167"/><line x1="240" y1="83" x2="262" y2="167"/>
+</g>
+<g fill="#fff" stroke="#3c4043" stroke-width="1.3">
+<circle cx="40" cy="70" r="13"/><circle cx="90" cy="70" r="13"/><circle cx="140" cy="70" r="13"/><circle cx="190" cy="70" r="13"/><circle cx="240" cy="70" r="13"/><circle cx="290" cy="70" r="13"/>
+<rect x="55" y="167" width="30" height="26" rx="4"/><rect x="120" y="167" width="30" height="26" rx="4"/><rect x="185" y="167" width="30" height="26" rx="4"/><rect x="247" y="167" width="30" height="26" rx="4"/>
+</g>
+<g font-size="12.5" text-anchor="middle" fill="#1f1f1f">
+<text x="40" y="74.5">0</text><text x="90" y="74.5">1</text><text x="140" y="74.5">2</text><text x="190" y="74.5">3</text><text x="240" y="74.5">4</text><text x="290" y="74.5">5</text>
+<text x="70" y="184.5">e0</text><text x="135" y="184.5">e1</text><text x="200" y="184.5">e2</text><text x="262" y="184.5">e3</text>
+</g>
+<text x="20" y="222" font-size="11.5" fill="#5f6368">each vertex lists its hyperedges: 3 is in e1, e2, e3</text>
+<text x="20" y="240" font-size="11.5" fill="#5f6368">each hyperedge lists its vertices: e3 holds 3, 4</text>
+<text x="20" y="258" font-size="11.5" fill="#5f6368">vertex 5 is in none</text>
+<rect x="340" y="36" width="404" height="232" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
+<text x="356" y="60" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: the core-number computation</text>
+<text x="356" y="79" font-size="12.5" fill="#3c4043">for example, peel vertices by degree, level by level</text>
+<g fill="#fff" stroke="#3c4043" stroke-width="1.2">
+<rect x="356" y="96" width="86" height="40" rx="6"/><rect x="450" y="96" width="86" height="40" rx="6"/><rect x="544" y="96" width="86" height="40" rx="6"/><rect x="638" y="96" width="86" height="40" rx="6"/>
+</g>
+<g font-size="11.5" text-anchor="middle" fill="#5f6368">
+<text x="399" y="111">degree 0</text><text x="493" y="111">degree 1</text><text x="587" y="111">degree 2</text><text x="681" y="111">degree 3</text>
+</g>
+<g font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">
+<text x="399" y="129">5</text><text x="493" y="129">4</text><text x="587" y="129">0</text><text x="681" y="129">1 2 3</text>
+</g>
+<g font-size="12" fill="#1f1f1f">
+<text x="356" y="156">k = 0: peel 5</text>
+<text x="356" y="178">k = 1: peel 4 and drop e3; vertex 3 falls to degree 2</text>
+<text x="356" y="200">k = 2: peel 0 and 3, drop e0, e1, e2; then 1 and 2</text>
+</g>
+<text x="356" y="244" font-size="12" fill="#5f6368">core numbers</text>
+<g font-size="11.5" text-anchor="middle" fill="#5f6368">
+<text x="467" y="222">0</text><text x="501" y="222">1</text><text x="535" y="222">2</text><text x="569" y="222">3</text><text x="603" y="222">4</text><text x="637" y="222">5</text>
+</g>
+<g fill="#fff" stroke="#3c4043" stroke-width="1.2">
+<rect x="450" y="228" width="34" height="26"/><rect x="484" y="228" width="34" height="26"/><rect x="518" y="228" width="34" height="26"/><rect x="552" y="228" width="34" height="26"/><rect x="586" y="228" width="34" height="26"/><rect x="620" y="228" width="34" height="26"/>
+</g>
+<g font-size="13" text-anchor="middle" fill="#0b57d0" font-family="ui-monospace,Menlo,monospace">
+<text x="467" y="245.5">2</text><text x="501" y="245.5">2</text><text x="535" y="245.5">2</text><text x="569" y="245.5">2</text><text x="603" y="245.5">1</text><text x="637" y="245.5">0</text>
+</g>
+</svg>

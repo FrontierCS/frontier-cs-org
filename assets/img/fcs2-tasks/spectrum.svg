@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 312" role="img" aria-label="One transaction runs opcode by opcode. Checkpoints c1, c2 and c3 save the program position and the operand stack. A conflict rolls the transaction back to c2. The checkpointed stack is the part the agent writes.">
+<defs><marker id="spx-ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#c5221f"/></marker></defs>
+<rect x="146" y="22" width="440" height="196" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
+<text x="164" y="46" font-size="14" font-weight="600" fill="#0b57d0">The agent writes this: the checkpointed stack</text>
+<text x="164" y="65" font-size="12.5" fill="#3c4043">save, restore, and keep many checkpoints alive at once</text>
+<rect x="192" y="163" width="56" height="21" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<text x="220" y="178" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">10</text>
+<rect x="192" y="142" width="56" height="21" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<text x="220" y="157" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">20</text>
+<text x="220" y="203" font-size="12" text-anchor="middle" fill="#5f6368">pc 7</text>
+<line x1="220" y1="210" x2="220" y2="232" stroke="#0b57d0" stroke-width="1.2" stroke-dasharray="2 3"/>
+<rect x="337" y="163" width="56" height="21" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<text x="365" y="178" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">10</text>
+<rect x="337" y="142" width="56" height="21" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<text x="365" y="157" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">20</text>
+<rect x="337" y="121" width="56" height="21" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<text x="365" y="136" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">30</text>
+<text x="365" y="203" font-size="12" text-anchor="middle" fill="#5f6368">pc 12</text>
+<line x1="365" y1="210" x2="365" y2="232" stroke="#0b57d0" stroke-width="1.2" stroke-dasharray="2 3"/>
+<rect x="482" y="163" width="56" height="21" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<text x="510" y="178" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">10</text>
+<rect x="482" y="142" width="56" height="21" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<text x="510" y="157" font-size="12" text-anchor="middle" fill="#c5221f" font-family="ui-monospace,Menlo,monospace">99</text>
+<rect x="482" y="121" width="56" height="21" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<text x="510" y="136" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">30</text>
+<rect x="482" y="100" width="56" height="21" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<text x="510" y="115" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">7</text>
+<text x="510" y="203" font-size="12" text-anchor="middle" fill="#5f6368">pc 19</text>
+<line x1="510" y1="210" x2="510" y2="232" stroke="#0b57d0" stroke-width="1.2" stroke-dasharray="2 3"/>
+<line x1="40" y1="240" x2="720" y2="240" stroke="#3c4043" stroke-width="1.5"/>
+<line x1="50" y1="236" x2="50" y2="244" stroke="#9aa0a6" stroke-width="1"/>
+<line x1="68" y1="236" x2="68" y2="244" stroke="#9aa0a6" stroke-width="1"/>
+<line x1="86" y1="236" x2="86" y2="244" stroke="#9aa0a6" stroke-width="1"/>
+<line x1="104" y1="236" x2="104" y2="244" stroke="#9aa0a6" stroke-width="1"/>
+<line x1="122" y1="236" x2="122" y2="244" stroke="#9aa0a6" stroke-width="1"/>
+<line x1="140" y1="236" x2="140" y2="244" stroke="#9aa0a6" stroke-width="1"/>
+<line x1="158" y1="236" x2="158" y2="244" stroke="#9aa0a6" stroke-width="1"/>
+<line x1="176" y1="236" x2="176" y2="244" stroke="#9aa0a6" stroke-width="1"/>
+<line x1="194" y1="236" x2="194" y2="244" stroke="#9aa0a6" stroke-width="1"/>
+<line x1="212" y1="236" x2="212" y2="244" stroke="#9aa0a6" stroke-width="1"/>
+<line x1="230" y1="236" x2="230" y2="244" stroke="#9aa0a6" stroke-width="1"/>
+<line x1="248" y1="236" x2="248" y2="244" stroke="#9aa0a6" stroke-width="1"/>
+<line x1="266" y1="236" x2="266" y2="244" stroke="#9aa0a6" stroke-width="1"/>
+<line x1="284" y1="236" x2="284" y2="244" stroke="#9aa0a6" stroke-width="1"/>
+<line x1="302" y1="236" x2="302" y2="244" stroke="#9aa0a6" stroke-width="1"/>
+<line x1="320" y1="236" x2="320" y2="244" stroke="#9aa0a6" stroke-width="1"/>
+<line x1="338" y1="236" x2="338" y2="244" stroke="#9aa0a6" stroke-width="1"/>
+<line x1="356" y1="236" x2="356" y2="244" stroke="#9aa0a6" stroke-width="1"/>
+<line x1="374" y1="236" x2="374" y2="244" stroke="#9aa0a6" stroke-width="1"/>
+<line x1="392" y1="236" x2="392" y2="244" stroke="#9aa0a6" stroke-width="1"/>
+<line x1="410" y1="236" x2="410" y2="244" stroke="#9aa0a6" stroke-width="1"/>
+<line x1="428" y1="236" x2="428" y2="244" stroke="#9aa0a6" stroke-width="1"/>
+<line x1="446" y1="236" x2="446" y2="244" stroke="#9aa0a6" stroke-width="1"/>
+<line x1="464" y1="236" x2="464" y2="244" stroke="#9aa0a6" stroke-width="1"/>
+<line x1="482" y1="236" x2="482" y2="244" stroke="#9aa0a6" stroke-width="1"/>
+<line x1="500" y1="236" x2="500" y2="244" stroke="#9aa0a6" stroke-width="1"/>
+<line x1="518" y1="236" x2="518" y2="244" stroke="#9aa0a6" stroke-width="1"/>
+<line x1="536" y1="236" x2="536" y2="244" stroke="#9aa0a6" stroke-width="1"/>
+<line x1="554" y1="236" x2="554" y2="244" stroke="#9aa0a6" stroke-width="1"/>
+<line x1="572" y1="236" x2="572" y2="244" stroke="#9aa0a6" stroke-width="1"/>
+<line x1="590" y1="236" x2="590" y2="244" stroke="#9aa0a6" stroke-width="1"/>
+<line x1="608" y1="236" x2="608" y2="244" stroke="#9aa0a6" stroke-width="1"/>
+<line x1="626" y1="236" x2="626" y2="244" stroke="#9aa0a6" stroke-width="1"/>
+<line x1="644" y1="236" x2="644" y2="244" stroke="#9aa0a6" stroke-width="1"/>
+<line x1="662" y1="236" x2="662" y2="244" stroke="#9aa0a6" stroke-width="1"/>
+<line x1="680" y1="236" x2="680" y2="244" stroke="#9aa0a6" stroke-width="1"/>
+<line x1="698" y1="236" x2="698" y2="244" stroke="#9aa0a6" stroke-width="1"/>
+<line x1="716" y1="236" x2="716" y2="244" stroke="#9aa0a6" stroke-width="1"/>
+<circle cx="220" cy="240" r="6.5" fill="#0b57d0"/><text x="220" y="262" font-size="13" font-weight="600" text-anchor="middle" fill="#0b57d0">c1</text>
+<circle cx="365" cy="240" r="6.5" fill="#0b57d0"/><text x="365" y="262" font-size="13" font-weight="600" text-anchor="middle" fill="#0b57d0">c2</text>
+<circle cx="510" cy="240" r="6.5" fill="#0b57d0"/><text x="510" y="262" font-size="13" font-weight="600" text-anchor="middle" fill="#0b57d0">c3</text>
+<path d="M643 233l14 14M657 233l-14 14" stroke="#c5221f" stroke-width="2.5" stroke-linecap="round"/>
+<text x="650" y="222" font-size="12.5" font-weight="600" text-anchor="middle" fill="#c5221f">conflict</text>
+<path d="M646 254 C 610 292, 430 292, 384 270" fill="none" stroke="#c5221f" stroke-width="1.6" marker-end="url(#spx-ar)"/>
+<text x="515" y="304" font-size="12.5" text-anchor="middle" fill="#c5221f">roll back to c2 and run on from there</text>
+<text x="40" y="282" font-size="12.5" fill="#5f6368">one transaction, opcode by opcode</text>
+</svg>

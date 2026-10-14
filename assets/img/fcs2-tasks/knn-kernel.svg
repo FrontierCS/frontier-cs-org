@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 22 760 278" role="img" aria-label="Brute-force k-nearest-neighbor search. Each of 1,024 queries is compared with every one of 500,000 database rows, giving a table of squared distances. For one query the row reads 41.2, 7.5, 88.0, 3.1, 19.6, 5.4 and so on, and the k = 3 smallest are rows 3, 5 and 1 at distances 3.1, 5.4 and 7.5. The whole search, distances and selection, is the part the agent writes.">
+<defs><marker id="knn-kernel-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker></defs>
+
+<rect x="120" y="36" width="400" height="28" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
+<g stroke="#dadce0" stroke-width="1">
+<line x1="160" y1="36" x2="160" y2="64"/><line x1="200" y1="36" x2="200" y2="64"/><line x1="240" y1="36" x2="240" y2="64"/><line x1="280" y1="36" x2="280" y2="64"/><line x1="320" y1="36" x2="320" y2="64"/><line x1="360" y1="36" x2="360" y2="64"/><line x1="400" y1="36" x2="400" y2="64"/><line x1="440" y1="36" x2="440" y2="64"/><line x1="480" y1="36" x2="480" y2="64"/>
+</g>
+<g font-size="11.5" text-anchor="middle" fill="#5f6368" font-family="ui-monospace,Menlo,monospace">
+<text x="140" y="54">0</text><text x="180" y="54">1</text><text x="220" y="54">2</text><text x="260" y="54">3</text><text x="300" y="54">4</text><text x="340" y="54">5</text><text x="380" y="54">6</text><text x="420" y="54">7</text><text x="460" y="54">8</text><text x="500" y="54">…</text>
+</g>
+<text x="534" y="55" font-size="12" fill="#5f6368">500,000 database rows</text>
+<text x="20" y="104" font-size="12" fill="#5f6368">1,024</text>
+<text x="20" y="120" font-size="12" fill="#5f6368">queries</text>
+<rect x="20" y="132" width="36" height="144" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
+<g stroke="#dadce0" stroke-width="1">
+<line x1="20" y1="156" x2="56" y2="156"/><line x1="20" y1="228" x2="56" y2="228"/><line x1="20" y1="252" x2="56" y2="252"/>
+</g>
+<rect x="20" y="180" width="36" height="24" fill="#fff" stroke="#3c4043" stroke-width="1.8"/>
+<text x="38" y="196" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">q</text>
+<rect x="80" y="76" width="664" height="214" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
+<text x="96" y="100" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: the whole search</text>
+<text x="96" y="119" font-size="12.5" fill="#3c4043">every squared distance, then the k smallest per query, in order</text>
+<rect x="120" y="132" width="400" height="144" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
+<g stroke="#dadce0" stroke-width="1">
+<line x1="160" y1="132" x2="160" y2="276"/><line x1="200" y1="132" x2="200" y2="276"/><line x1="240" y1="132" x2="240" y2="276"/><line x1="280" y1="132" x2="280" y2="276"/><line x1="320" y1="132" x2="320" y2="276"/><line x1="360" y1="132" x2="360" y2="276"/><line x1="400" y1="132" x2="400" y2="276"/><line x1="440" y1="132" x2="440" y2="276"/><line x1="480" y1="132" x2="480" y2="276"/>
+<line x1="120" y1="156" x2="520" y2="156"/><line x1="120" y1="228" x2="520" y2="228"/><line x1="120" y1="252" x2="520" y2="252"/>
+</g>
+<rect x="120" y="180" width="400" height="24" fill="#fff" stroke="#3c4043" stroke-width="1.8"/>
+<g stroke="#dadce0" stroke-width="1">
+<line x1="160" y1="180" x2="160" y2="204"/><line x1="200" y1="180" x2="200" y2="204"/><line x1="240" y1="180" x2="240" y2="204"/><line x1="280" y1="180" x2="280" y2="204"/><line x1="320" y1="180" x2="320" y2="204"/><line x1="360" y1="180" x2="360" y2="204"/><line x1="400" y1="180" x2="400" y2="204"/><line x1="440" y1="180" x2="440" y2="204"/><line x1="480" y1="180" x2="480" y2="204"/>
+</g>
+<g font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">
+<text x="140" y="196">41.2</text><text x="220" y="196">88.0</text><text x="300" y="196">19.6</text><text x="380" y="196">63.0</text><text x="420" y="196">12.9</text><text x="460" y="196">50.3</text><text x="500" y="196">…</text>
+</g>
+<g font-size="11.5" font-weight="700" text-anchor="middle" fill="#0b57d0" font-family="ui-monospace,Menlo,monospace">
+<text x="180" y="196">7.5</text><text x="260" y="196">3.1</text><text x="340" y="196">5.4</text>
+</g>
+<line x1="56" y1="192" x2="116" y2="192" stroke="#3c4043" stroke-width="1.3" marker-end="url(#knn-kernel-ar)"/>
+<line x1="524" y1="192" x2="556" y2="192" stroke="#3c4043" stroke-width="1.3" marker-end="url(#knn-kernel-ar)"/>
+<text x="566" y="152" font-size="12" fill="#1f1f1f">k = 3 nearest to q</text>
+<rect x="566" y="164" width="150" height="84" rx="6" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<text x="580" y="182" font-size="11.5" fill="#5f6368">row</text>
+<text x="640" y="182" font-size="11.5" fill="#5f6368">distance</text>
+<line x1="566" y1="189" x2="716" y2="189" stroke="#dadce0" stroke-width="1"/>
+<g font-size="12" fill="#0b57d0" font-family="ui-monospace,Menlo,monospace">
+<text x="580" y="205">3</text><text x="640" y="205">3.1</text>
+<text x="580" y="222">5</text><text x="640" y="222">5.4</text>
+<text x="580" y="239">1</text><text x="640" y="239">7.5</text>
+</g>
+<text x="566" y="272" font-size="11.5" fill="#5f6368">one such list per query</text>
+</svg>

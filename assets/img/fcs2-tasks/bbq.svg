@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 20 760 265" role="img" aria-label="A bitmap tree of width 4 over 16 priority buckets. A set bit marks a subtree that still holds packets. Dequeue-min follows the first set bit at each level to priority 6; dequeue-max follows the last set bit to priority 11. The logic of the bitmap levels, generated as hardware, is the part the agent writes; the buckets below are given.">
+
+<rect x="24" y="34" width="480" height="142" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
+<text x="40" y="58" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: each bitmap level’s enqueue and dequeue logic</text>
+<line x1="262" y1="96" x2="136" y2="138" stroke="#9aa0a6" stroke-width="1"/>
+<line x1="322" y1="96" x2="448" y2="138" stroke="#9aa0a6" stroke-width="1"/>
+<line x1="106" y1="160" x2="106" y2="200" stroke="#dadce0" stroke-width="1"/>
+<line x1="126" y1="160" x2="126" y2="200" stroke="#dadce0" stroke-width="1"/>
+<line x1="146" y1="160" x2="146" y2="200" stroke="#dadce0" stroke-width="1"/>
+<line x1="166" y1="160" x2="166" y2="200" stroke="#dadce0" stroke-width="1"/>
+<line x1="210" y1="160" x2="210" y2="200" stroke="#dadce0" stroke-width="1"/>
+<line x1="230" y1="160" x2="230" y2="200" stroke="#dadce0" stroke-width="1"/>
+<line x1="270" y1="160" x2="270" y2="200" stroke="#dadce0" stroke-width="1"/>
+<line x1="314" y1="160" x2="314" y2="200" stroke="#dadce0" stroke-width="1"/>
+<line x1="334" y1="160" x2="334" y2="200" stroke="#dadce0" stroke-width="1"/>
+<line x1="354" y1="160" x2="354" y2="200" stroke="#dadce0" stroke-width="1"/>
+<line x1="418" y1="160" x2="418" y2="200" stroke="#dadce0" stroke-width="1"/>
+<line x1="438" y1="160" x2="438" y2="200" stroke="#dadce0" stroke-width="1"/>
+<line x1="458" y1="160" x2="458" y2="200" stroke="#dadce0" stroke-width="1"/>
+<line x1="478" y1="160" x2="478" y2="200" stroke="#dadce0" stroke-width="1"/>
+<path d="M282 96 L240 138" stroke="#3c4043" stroke-width="2" fill="none"/>
+<path d="M250 160 V200" stroke="#3c4043" stroke-width="2" fill="none"/>
+<path d="M302 96 L344 138" stroke="#3c4043" stroke-width="1.6" stroke-dasharray="4 3" fill="none"/>
+<path d="M374 160 V200" stroke="#3c4043" stroke-width="1.6" stroke-dasharray="4 3" fill="none"/>
+<rect x="252" y="74" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<text x="262" y="90" font-size="12.5" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
+<rect x="272" y="74" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<text x="282" y="90" font-size="12.5" font-weight="600" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
+<rect x="292" y="74" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<text x="302" y="90" font-size="12.5" font-weight="600" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
+<rect x="312" y="74" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<text x="322" y="90" font-size="12.5" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
+<rect x="96" y="138" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<text x="106" y="154" font-size="12.5" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
+<rect x="116" y="138" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<text x="126" y="154" font-size="12.5" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
+<rect x="136" y="138" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<text x="146" y="154" font-size="12.5" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
+<rect x="156" y="138" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<text x="166" y="154" font-size="12.5" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
+<rect x="200" y="138" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<text x="210" y="154" font-size="12.5" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
+<rect x="220" y="138" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<text x="230" y="154" font-size="12.5" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
+<rect x="240" y="138" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<text x="250" y="154" font-size="12.5" font-weight="600" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
+<rect x="260" y="138" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<text x="270" y="154" font-size="12.5" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
+<rect x="304" y="138" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<text x="314" y="154" font-size="12.5" font-weight="600" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
+<rect x="324" y="138" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<text x="334" y="154" font-size="12.5" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
+<rect x="344" y="138" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<text x="354" y="154" font-size="12.5" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
+<rect x="364" y="138" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<text x="374" y="154" font-size="12.5" font-weight="600" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
+<rect x="408" y="138" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<text x="418" y="154" font-size="12.5" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
+<rect x="428" y="138" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<text x="438" y="154" font-size="12.5" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
+<rect x="448" y="138" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<text x="458" y="154" font-size="12.5" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
+<rect x="468" y="138" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<text x="478" y="154" font-size="12.5" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
+<text x="40" y="90" font-size="12.5" fill="#5f6368">level 1</text>
+<text x="40" y="154" font-size="12.5" fill="#5f6368">level 2</text>
+<text x="40" y="229" font-size="12.5" fill="#5f6368">buckets</text>
+<rect x="99" y="200" width="14" height="50" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
+<text x="106" y="268" font-size="11.5" text-anchor="middle" fill="#5f6368">0</text>
+<rect x="119" y="200" width="14" height="50" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
+<text x="126" y="268" font-size="11.5" text-anchor="middle" fill="#5f6368">1</text>
+<rect x="139" y="200" width="14" height="50" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
+<text x="146" y="268" font-size="11.5" text-anchor="middle" fill="#5f6368">2</text>
+<rect x="159" y="200" width="14" height="50" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
+<text x="166" y="268" font-size="11.5" text-anchor="middle" fill="#5f6368">3</text>
+<rect x="203" y="200" width="14" height="50" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
+<text x="210" y="268" font-size="11.5" text-anchor="middle" fill="#5f6368">4</text>
+<rect x="223" y="200" width="14" height="50" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
+<text x="230" y="268" font-size="11.5" text-anchor="middle" fill="#5f6368">5</text>
+<rect x="243" y="200" width="14" height="50" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
+<rect x="245.5" y="240" width="9" height="7" fill="#5f6368"/>
+<rect x="245.5" y="229" width="9" height="7" fill="#5f6368"/>
+<text x="250" y="268" font-size="11.5" text-anchor="middle" fill="#5f6368">6</text>
+<rect x="263" y="200" width="14" height="50" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
+<text x="270" y="268" font-size="11.5" text-anchor="middle" fill="#5f6368">7</text>
+<rect x="307" y="200" width="14" height="50" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
+<rect x="309.5" y="240" width="9" height="7" fill="#5f6368"/>
+<text x="314" y="268" font-size="11.5" text-anchor="middle" fill="#5f6368">8</text>
+<rect x="327" y="200" width="14" height="50" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
+<text x="334" y="268" font-size="11.5" text-anchor="middle" fill="#5f6368">9</text>
+<rect x="347" y="200" width="14" height="50" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
+<text x="354" y="268" font-size="11.5" text-anchor="middle" fill="#5f6368">10</text>
+<rect x="367" y="200" width="14" height="50" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
+<rect x="369.5" y="240" width="9" height="7" fill="#5f6368"/>
+<rect x="369.5" y="229" width="9" height="7" fill="#5f6368"/>
+<rect x="369.5" y="218" width="9" height="7" fill="#5f6368"/>
+<text x="374" y="268" font-size="11.5" text-anchor="middle" fill="#5f6368">11</text>
+<rect x="411" y="200" width="14" height="50" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
+<text x="418" y="268" font-size="11.5" text-anchor="middle" fill="#5f6368">12</text>
+<rect x="431" y="200" width="14" height="50" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
+<text x="438" y="268" font-size="11.5" text-anchor="middle" fill="#5f6368">13</text>
+<rect x="451" y="200" width="14" height="50" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
+<text x="458" y="268" font-size="11.5" text-anchor="middle" fill="#5f6368">14</text>
+<rect x="471" y="200" width="14" height="50" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
+<text x="478" y="268" font-size="11.5" text-anchor="middle" fill="#5f6368">15</text>
+<line x1="528" y1="70" x2="552" y2="70" stroke="#3c4043" stroke-width="2"/>
+<text x="560" y="75" font-size="13" font-weight="600" fill="#1f1f1f">dequeue-min</text>
+<text x="528" y="94" font-size="12.5" fill="#5f6368">follows the first set bit down</text>
+<line x1="528" y1="118" x2="552" y2="118" stroke="#3c4043" stroke-width="1.6" stroke-dasharray="4 3"/>
+<text x="560" y="123" font-size="13" font-weight="600" fill="#1f1f1f">dequeue-max</text>
+<text x="528" y="142" font-size="12.5" fill="#5f6368">follows the last set bit down</text>
+<text x="528" y="171" font-size="13" font-weight="600" fill="#1f1f1f">enqueue</text>
+<text x="528" y="190" font-size="12.5" fill="#5f6368">sets the bits along its path</text>
+<text x="528" y="222" font-size="13" font-weight="600" fill="#1f1f1f">throughput</text>
+<text x="528" y="241" font-size="12.5" fill="#5f6368">operations per cycle × clock rate;</text>
+<text x="528" y="259" font-size="12.5" fill="#5f6368">the longest logic path sets the clock</text>
+</svg>
