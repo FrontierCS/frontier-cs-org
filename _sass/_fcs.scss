@@ -1434,9 +1434,9 @@ body { background: #fff; line-height: 1.5; }
    radius r*phi = 80.9, 30 degrees centred on 45, blue; both strokes 11 wide with round ends. The viewBox is the stroked
    bounding box, a square, so the mark is drawn square. */
 .brand .brand-mark { width: 24px; height: 24px; }
-/* The mark is an F built of pieces, the last one (blue) resting a step up and out; on hover it slides home. */
+/* The mark is an arc, the frontier, and a blue tile a step beyond it; on hover the tile moves in toward the arc. */
 .brand .mk-piece { transition: transform .28s cubic-bezier(.2, 0, 0, 1); }
-.brand:hover .mk-piece, .brand:focus-visible .mk-piece { transform: translate(-7px, 7px); }
+.brand:hover .mk-piece, .brand:focus-visible .mk-piece { transform: translate(-4px, 4px); }
 @media (prefers-reduced-motion: reduce) { .brand .mk-piece { transition: none; } }
 .nav a { font-family: var(--font-sans); }
 .nav-main { gap: 32px; }
