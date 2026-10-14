@@ -38,7 +38,7 @@ function drawPage() {
   // agent writes, how it is judged; an older one stays folded (open when there is no goal line, as on Security problems)
   const parts = NEWDESC(t.s) ? DESC[t.s].split(/\s*¶\s*/) : [];
   const lead = parts.length ? `<section class="tabout">${parts.map((p, i) => `<div><h3>${['The idea', 'What the agent writes', 'How it is judged'][i] || ''}</h3><p>${esc(p)}</p></div>`).join('')}</section>`
-    : DESC[t.s] ? `<details class="tdet"${goal ? '' : ' open'}><summary>Problem details</summary><p>${esc(DESC[t.s])}</p></details>` : '';
+    : DESC[t.s] ? `<details class="fold tdet"${goal ? '' : ' open'}><summary><h3>Problem details</h3></summary><p>${esc(DESC[t.s])}</p></details>` : '';
   if (!runs.length) { $('#tbody').innerHTML = lead + '<p class="tbd">No runs on this problem yet.</p>'; loadFig(t); drawPager(t); scrollTo(0, 0); return; }
   const ref = REF[t.s], ms = new Set(runs.map(r => r[0])), np = new Set(runs.filter(r => r[3]).map(r => r[0])).size;
   const best = runs.reduce((a, r) => r[2] > a[2] ? r : a);
