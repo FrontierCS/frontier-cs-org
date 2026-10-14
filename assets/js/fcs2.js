@@ -462,6 +462,7 @@ const CHIP_SHORT = {'Programming Languages':'Languages', 'Machine Learning':'ML'
 function drawMap() {
   stopPlay(false);
   const svg = $('#mapsvg'), W = $('#map').clientWidth, narrow = W < 640, H = narrow ? Math.round(W * 1.15) : Math.round(W * 0.36);
+  svg.setAttribute('aria-label', `The ${TASKS.length} tasks by domain`);   // the count from the data, not the markup
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
   const byArea = AREAS.map(a => ({a, n:a.d.reduce((s, d) => s + N_IN(d), 0)})).sort((p, q) => q.n - p.n), G = narrow ? 4 : 6, tol = .5;
   squarify(byArea.map(x => x.n), 0, 0, W, H).forEach((ar, k) => {
