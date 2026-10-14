@@ -302,8 +302,10 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 /* task pages (_pages/fcs2-task.md, assets/js/fcs2-task.js) */
 .taskpage .col{padding-bottom:100px}
 .crumbs{display:flex; justify-content:space-between; align-items:center; gap:16px; padding-top:48px; font-size:14px}
-.crumbs a{display:inline-flex; align-items:center; gap:6px; color:var(--muted); text-decoration:none}
-.crumbs a.back::before{content:"←"}
+/* a breadcrumb, FrontierCS 2 / Problems / the problem, with "/" as on the blog's (owner, 2026-10-14: no arrow link) */
+.crumbs .trail{display:flex; align-items:baseline; gap:10px; min-width:0; color:var(--faint)}
+.crumbs .trail a{color:var(--muted); text-decoration:none; white-space:nowrap}
+.crumbs .here{color:var(--ink-2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 /* previous and next problem: beside the back link, and at the foot of the page */
 .pager{display:flex; align-items:center; gap:10px; color:var(--muted)}
 .pbtn{display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; border:1px solid var(--line); border-radius:50%; color:var(--ink-2); background:var(--bg)}
@@ -313,7 +315,7 @@ a.pbtn:hover{border-color:var(--teal); color:var(--teal-d)}
 .pager .pos{min-width:3.6em; text-align:center; font-variant-numeric:tabular-nums; color:var(--muted)}
 .tfoot{display:flex; justify-content:space-between; gap:16px; margin:64px 0 0; padding-top:20px; border-top:1px solid var(--line); font-size:15px}
 .tfoot a{color:var(--ink-2); text-decoration:none} .tfoot a:hover{color:var(--teal-d)}
-.crumbs a:hover{color:var(--teal-d)}
+.crumbs .trail a:hover{color:var(--teal-d)}
 .tdom{display:inline-flex; align-items:center; gap:7px; font-size:14px; font-weight:500; color:var(--ink-2)}
 .tdom::before{content:""; width:9px; height:9px; border-radius:2px; background:var(--a)}
 .thead .meta{margin:36px 0 10px}

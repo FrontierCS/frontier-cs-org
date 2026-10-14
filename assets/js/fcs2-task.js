@@ -17,7 +17,7 @@ function drawPage() {
   document.title = `${t.name} · FrontierCS 2`;
   // the domain above the name, with its square in the map's colour, as in the task list; a back link replaces the breadcrumb
   $('#tmeta').innerHTML = `<span class="tdom" style="--a:${AINK[AREA_OF[t.d].k]}">${esc(t.d)}</span>`;
-  $('#tname').textContent = t.name;
+  $('#tname').textContent = t.name; $('#tcrumb').textContent = t.name; $('#tcsep').hidden = false;
   // the source as the task list gives it: venue in bold, then the title
   const v = VENUE[t.s], ttl = t.t || (v ? t.name : '');
   $('#tpaper').innerHTML = v && ttl ? `<b>${esc(v)}</b> · ${esc(ttl)}` : esc(v || ttl);
@@ -127,7 +127,7 @@ function drawIndex() {
   document.title = 'Problems · FrontierCS 2';
   $('#tmeta').innerHTML = ''; $('#tlinks').innerHTML = ''; $('#tkeys').innerHTML = ''; $('#tfedi').innerHTML = ''; $('#tgoal').hidden = true; $('#tpager').innerHTML = '';
   $('#tfig').hidden = true; $('#tfig').innerHTML = ''; $('#thero').classList.add('nofig');
-  $('#tname').textContent = 'Problems';
+  $('#tname').textContent = 'Problems'; $('#tcrumb').textContent = ''; $('#tcsep').hidden = true;
   $('#tpaper').textContent = `${TASKS.length} problems in ${DOMAINS.filter(d => N_IN(d)).length} domains. Select a problem for its description and results.`;
   $('#tbody').innerHTML = DOMAINS.filter(d => N_IN(d)).map(d => `<section class="tgroup"><h2>${esc(d)}</h2><ul>`
     + TASKS.filter(t => t.d === d).map(t => `<li><a href="#${slug(t.s)}">${esc(t.name)}</a></li>`).join('')
