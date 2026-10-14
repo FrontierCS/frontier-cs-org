@@ -126,8 +126,6 @@ h2{font-weight:600; font-size:clamp(25px,2.4vw,30px); line-height:1.2; margin:0}
 .how-body > .how-step{padding-top:24px; border-top:1px solid var(--line); margin-bottom:16px}
 .how-body p{margin:0 0 14px; line-height:1.6; color:var(--ink-2)}
 .how-body p.how-step{color:var(--ink)}
-.how-eq{border-left:3px solid #d2e3fc; padding:2px 0 2px 18px; margin:22px 0 0; max-width:100%; overflow-x:auto; font-size:15px}
-.how-eq mjx-container[display="true"]{text-align:left !important; margin:0 !important}
 .how-fig{margin:0}
 .how-fig .chead{margin-top:0}
 .how-why{margin:0; padding:0; list-style:none; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:22px 56px; line-height:1.6; color:var(--ink-2)}

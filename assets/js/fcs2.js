@@ -315,7 +315,7 @@ function drawTable() {
 const redraws = [];
 
 /* ---------- How FECI works: a fold under the FECI chart (owner, 2026-10-11) ----------
-   Three tasks' pass curves from TFIT, P(pass) = 1 / (1 + exp(-k (FECI - FEDI))) with the same k on every task: an easy,
+   Three tasks' pass curves from TFIT, P(pass) = 1 / (1 + exp(-k (FECI - FEDI))) with the task's own k: an easy,
    a middle and a hard one, the tasks a sixth, a half and five sixths of the way up the FEDI order, so the picture
    follows the data (Qiuyang, 2026-10-14). A dashed line marks the scale's fixed point, Kimi K2.7 = 0. */
 function drawHow() {

@@ -60,9 +60,8 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
         <div class="how-row">
           <div class="how-txt">
             <p class="how-step"><span>1</span>One curve per task</p>
-            <p>FECI is fitted on pass verdicts. Each task gets an S-shaped curve: the chance that a model passes it rises from 0 to 100% as the model’s FECI passes the task’s FEDI, with the same slope on every task. Kimi K2.7 is the 0 point. The human reference has no FECI: a pass means beating its code, and its code cannot beat itself.</p>
-            <p><b>FEDI</b>, the FrontierCS Epoch Difficulty Index, is the FECI at which a model passes the task half the time. It is estimated from the passes; final scores against the human reference’s enter only as a prior, which orders the tasks nobody passes. Each FEDI has a 90% interval, shown on its task’s page.</p>
-            <div class="how-eq">\[P(\text{pass}) = \frac{1}{1 + e^{-k\,(\text{FECI} - \text{FEDI})}}\]</div>
+            <p>FECI is fitted on pass verdicts. Each task gets an S-shaped curve: the chance that a model passes it rises from 0 to 100% as the model’s FECI passes the task’s FEDI. Kimi K2.7 is the 0 point. The human reference has no FECI: a pass means beating its code, and its code cannot beat itself.</p>
+            <p><b>FEDI</b>, the FrontierCS Epoch Difficulty Index, is the FECI at which a model passes the task half the time. Each of a task’s metrics has its own difficulty, fitted from which runs beat the human reference on every hidden workload of that metric, and a task passes when every metric does. A run’s final score against the human reference’s only helps place metrics that no model beats. Each FEDI has a 90% interval, shown on its task’s page.</p>
           </div>
           <figure class="chart how-fig">
             <div class="chead"><span>Chance of passing on three tasks</span></div>
