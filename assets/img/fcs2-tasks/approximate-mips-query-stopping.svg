@@ -1,102 +1,114 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 22 760 278" role="img" aria-label="One query probes one norm partition held in five hash tables. It first reads its own bucket in each table, then further buckets in one global order across the tables. After each bucket, a stopping rule reads the result heap and the search state and decides whether to stop the partition or probe the next bucket. The stopping rule is the part the agent writes.">
-<defs><marker id="approximate-mips-query-stopping-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker><marker id="approximate-mips-query-stopping-arb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#0b57d0"/></marker></defs>
-
-<text x="48.0" y="54" font-size="12.5" text-anchor="middle" fill="#1f1f1f">T1</text>
-<rect x="30" y="64" width="36" height="22" fill="#fff" stroke="#dadce0" stroke-width="1"/>
-<rect x="30" y="86" width="36" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.4"/>
-<text x="48.0" y="101.5" font-size="12.5" font-weight="600" text-anchor="middle" fill="#1f1f1f">3</text>
-<rect x="30" y="108" width="36" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.4"/>
-<text x="48.0" y="123.5" font-size="12.5" text-anchor="middle" fill="#5f6368" font-style="italic">q</text>
-<rect x="30" y="130" width="36" height="22" fill="#fff" stroke="#dadce0" stroke-width="1"/>
-<rect x="30" y="152" width="36" height="22" fill="#fff" stroke="#dadce0" stroke-width="1"/>
-<rect x="30" y="174" width="36" height="22" fill="#fff" stroke="#dadce0" stroke-width="1"/>
-<rect x="30" y="196" width="36" height="22" fill="#fff" stroke="#dadce0" stroke-width="1"/>
-<text x="92.0" y="54" font-size="12.5" text-anchor="middle" fill="#1f1f1f">T2</text>
-<rect x="74" y="64" width="36" height="22" fill="#fff" stroke="#dadce0" stroke-width="1"/>
-<rect x="74" y="86" width="36" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.4"/>
-<text x="92.0" y="101.5" font-size="12.5" text-anchor="middle" fill="#5f6368" font-style="italic">q</text>
-<rect x="74" y="108" width="36" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.4"/>
-<text x="92.0" y="123.5" font-size="12.5" font-weight="600" text-anchor="middle" fill="#1f1f1f">1</text>
-<rect x="74" y="130" width="36" height="22" fill="#fff" stroke="#dadce0" stroke-width="1"/>
-<rect x="74" y="152" width="36" height="22" fill="#fff" stroke="#dadce0" stroke-width="1"/>
-<rect x="74" y="174" width="36" height="22" fill="#fff" stroke="#dadce0" stroke-width="1"/>
-<rect x="74" y="196" width="36" height="22" fill="#fff" stroke="#dadce0" stroke-width="1"/>
-<text x="136.0" y="54" font-size="12.5" text-anchor="middle" fill="#1f1f1f">T3</text>
-<rect x="118" y="64" width="36" height="22" fill="#fff" stroke="#dadce0" stroke-width="1"/>
-<rect x="118" y="86" width="36" height="22" fill="#fff" stroke="#dadce0" stroke-width="1"/>
-<rect x="118" y="108" width="36" height="22" fill="#fff" stroke="#dadce0" stroke-width="1"/>
-<rect x="118" y="130" width="36" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.4"/>
-<text x="136.0" y="145.5" font-size="12.5" text-anchor="middle" fill="#5f6368" font-style="italic">q</text>
-<rect x="118" y="152" width="36" height="22" fill="#fff" stroke="#9aa0a6" stroke-width="1.2" stroke-dasharray="3 3"/>
-<text x="136.0" y="167.5" font-size="12.5" text-anchor="middle" fill="#5f6368">5</text>
-<rect x="118" y="174" width="36" height="22" fill="#fff" stroke="#dadce0" stroke-width="1"/>
-<rect x="118" y="196" width="36" height="22" fill="#fff" stroke="#dadce0" stroke-width="1"/>
-<text x="180.0" y="54" font-size="12.5" text-anchor="middle" fill="#1f1f1f">T4</text>
-<rect x="162" y="64" width="36" height="22" fill="#fff" stroke="#dadce0" stroke-width="1"/>
-<rect x="162" y="86" width="36" height="22" fill="#fff" stroke="#dadce0" stroke-width="1"/>
-<rect x="162" y="108" width="36" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.4"/>
-<text x="180.0" y="123.5" font-size="12.5" text-anchor="middle" fill="#5f6368" font-style="italic">q</text>
-<rect x="162" y="130" width="36" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.4"/>
-<text x="180.0" y="145.5" font-size="12.5" font-weight="600" text-anchor="middle" fill="#1f1f1f">2</text>
-<rect x="162" y="152" width="36" height="22" fill="#fff" stroke="#dadce0" stroke-width="1"/>
-<rect x="162" y="174" width="36" height="22" fill="#fff" stroke="#dadce0" stroke-width="1"/>
-<rect x="162" y="196" width="36" height="22" fill="#fff" stroke="#dadce0" stroke-width="1"/>
-<text x="224.0" y="54" font-size="12.5" text-anchor="middle" fill="#1f1f1f">T5</text>
-<rect x="206" y="64" width="36" height="22" fill="#fff" stroke="#dadce0" stroke-width="1"/>
-<rect x="206" y="86" width="36" height="22" fill="#fff" stroke="#dadce0" stroke-width="1"/>
-<rect x="206" y="108" width="36" height="22" fill="#fff" stroke="#dadce0" stroke-width="1"/>
-<rect x="206" y="130" width="36" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.4"/>
-<text x="224.0" y="145.5" font-size="12.5" font-weight="600" text-anchor="middle" fill="#1f1f1f">4</text>
-<rect x="206" y="152" width="36" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.4"/>
-<text x="224.0" y="167.5" font-size="12.5" text-anchor="middle" fill="#5f6368" font-style="italic">q</text>
-<rect x="206" y="174" width="36" height="22" fill="#fff" stroke="#dadce0" stroke-width="1"/>
-<rect x="206" y="196" width="36" height="22" fill="#fff" stroke="#dadce0" stroke-width="1"/>
-<text x="30" y="242" font-size="12" fill="#5f6368"><tspan font-style="italic">q</tspan> = the query’s own bucket in each table</text>
-<text x="30" y="261" font-size="12" fill="#5f6368">1, 2, 3 … = further buckets, in one global order</text>
-<text x="284" y="54" font-size="12.5" fill="#5f6368">global probe order</text>
-<text x="284" y="80" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
-<text x="302" y="80" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">T2</text>
-<text x="332" y="80" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0.61</text>
-<text x="284" y="102" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">2</text>
-<text x="302" y="102" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">T4</text>
-<text x="332" y="102" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0.55</text>
-<text x="284" y="124" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">3</text>
-<text x="302" y="124" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">T1</text>
-<text x="332" y="124" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0.48</text>
-<text x="284" y="146" font-size="12" fill="#1f1f1f" font-weight="600" font-family="ui-monospace,Menlo,monospace">4</text>
-<text x="302" y="146" font-size="12" fill="#1f1f1f" font-weight="600" font-family="ui-monospace,Menlo,monospace">T5</text>
-<text x="332" y="146" font-size="12" fill="#1f1f1f" font-weight="600" font-family="ui-monospace,Menlo,monospace">0.42</text>
-<text x="284" y="168" font-size="12" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">5</text>
-<text x="302" y="168" font-size="12" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">T3</text>
-<text x="332" y="168" font-size="12" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0.39</text>
-<rect x="278" y="131" width="94" height="21" rx="4" fill="none" stroke="#3c4043" stroke-width="1"/>
-<text x="384" y="135" font-size="11.5" fill="#5f6368">just read</text>
-<text x="284" y="196" font-size="12.5" fill="#5f6368">result heap</text>
-<line x1="352" y1="222" x2="322" y2="252" stroke="#3c4043" stroke-width="1.2"/>
-<line x1="368" y1="222" x2="398" y2="252" stroke="#3c4043" stroke-width="1.2"/>
-<rect x="337" y="203" width="46" height="22" rx="11" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="360" y="218.5" font-size="12" text-anchor="middle" fill="#1f1f1f" font-weight="600" font-family="ui-monospace,Menlo,monospace">0.77</text>
-<rect x="293" y="251" width="46" height="22" rx="11" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="316" y="266.5" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0.91</text>
-<rect x="381" y="251" width="46" height="22" rx="11" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="404" y="266.5" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0.83</text>
-<text x="284" y="292" font-size="11.5" fill="#5f6368">k-th best on top</text>
-<line x1="384" y1="141" x2="476" y2="141" stroke="#3c4043" stroke-width="1.2" marker-end="url(#approximate-mips-query-stopping-ar)"/>
-<line x1="386" y1="214" x2="476" y2="214" stroke="#3c4043" stroke-width="1.2" marker-end="url(#approximate-mips-query-stopping-ar)"/>
-<rect x="480" y="36" width="262" height="252" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
-<text x="496" y="60" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: the stopping rule</text>
-<text x="496" y="80" font-size="12.5" fill="#3c4043">after each bucket, stop or probe on?</text>
-<text x="496" y="114" font-size="12" fill="#5f6368">k-th best score</text>
-<text x="608" y="114" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0.77</text>
-<text x="496" y="135" font-size="12" fill="#5f6368">bucket score</text>
-<text x="608" y="135" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0.42</text>
-<text x="496" y="156" font-size="12" fill="#5f6368">buckets probed</text>
-<text x="608" y="156" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">4</text>
-<text x="496" y="177" font-size="12" fill="#5f6368">vectors checked</text>
-<text x="608" y="177" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">231 of 6,000</text>
-<text x="496" y="198" font-size="12" fill="#5f6368">approx. ratio c</text>
-<text x="608" y="198" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0.8</text>
-<line x1="496" y1="220" x2="726" y2="220" stroke="#9aa0a6" stroke-width="1"/>
-<text x="496" y="242" font-size="12.5" fill="#0b57d0"><tspan font-weight="600">stop</tspan>: go to the next partition</text>
-<text x="496" y="264" font-size="12.5" fill="#0b57d0"><tspan font-weight="600">probe on</tspan>: read bucket 5</text>
+<svg xmlns="http://www.w3.org/2000/svg" class="fig2" viewBox="0 0 760 322" role="img" aria-label="Left, what is given: one norm partition held in five hash tables. A query first reads its own bucket in each table, then further buckets in one global probe order across the tables; the fourth bucket, from table T5 with score 0.42, was just read, and a result heap keeps the k-th best score, 0.77, on top. Right, the stopping rule the agent writes. After each bucket it reads the search state: k-th best score 0.77, bucket score 0.42, 4 buckets probed, 231 of 6,000 vectors checked, approximation ratio 0.8. Then it either stops and goes to the next partition, or probes on and reads bucket 5.">
+<defs><marker id="approximate-mips-query-stopping-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arh" d="M0 0L10 5L0 10z"/></marker></defs>
+<rect class="given" x="0" y="0" width="416" height="322" rx="10"/>
+<text class="k" x="18" y="30">GIVEN</text>
+<text class="mid" x="32.0" y="54">T1</text>
+<rect class="floor" x="18" y="64" width="28" height="20"/>
+<rect class="g3" x="18" y="84" width="28" height="20"/>
+<text class="b mid" x="32.0" y="98.5">3</text>
+<rect class="g2" x="18" y="104" width="28" height="20"/>
+<text class="n mid" x="32.0" y="118.5">q</text>
+<rect class="floor" x="18" y="124" width="28" height="20"/>
+<rect class="floor" x="18" y="144" width="28" height="20"/>
+<rect class="floor" x="18" y="164" width="28" height="20"/>
+<rect class="floor" x="18" y="184" width="28" height="20"/>
+<text class="mid" x="68.0" y="54">T2</text>
+<rect class="floor" x="54" y="64" width="28" height="20"/>
+<rect class="g2" x="54" y="84" width="28" height="20"/>
+<text class="n mid" x="68.0" y="98.5">q</text>
+<rect class="g3" x="54" y="104" width="28" height="20"/>
+<text class="b mid" x="68.0" y="118.5">1</text>
+<rect class="floor" x="54" y="124" width="28" height="20"/>
+<rect class="floor" x="54" y="144" width="28" height="20"/>
+<rect class="floor" x="54" y="164" width="28" height="20"/>
+<rect class="floor" x="54" y="184" width="28" height="20"/>
+<text class="mid" x="104.0" y="54">T3</text>
+<rect class="floor" x="90" y="64" width="28" height="20"/>
+<rect class="floor" x="90" y="84" width="28" height="20"/>
+<rect class="floor" x="90" y="104" width="28" height="20"/>
+<rect class="g2" x="90" y="124" width="28" height="20"/>
+<text class="n mid" x="104.0" y="138.5">q</text>
+<rect class="floor" x="90" y="144" width="28" height="20"/>
+<rect class="ln2 dash" x="90.65" y="144.65" width="26.7" height="18.7"/>
+<text class="n mid" x="104.0" y="158.5">5</text>
+<rect class="floor" x="90" y="164" width="28" height="20"/>
+<rect class="floor" x="90" y="184" width="28" height="20"/>
+<text class="mid" x="140.0" y="54">T4</text>
+<rect class="floor" x="126" y="64" width="28" height="20"/>
+<rect class="floor" x="126" y="84" width="28" height="20"/>
+<rect class="g2" x="126" y="104" width="28" height="20"/>
+<text class="n mid" x="140.0" y="118.5">q</text>
+<rect class="g3" x="126" y="124" width="28" height="20"/>
+<text class="b mid" x="140.0" y="138.5">2</text>
+<rect class="floor" x="126" y="144" width="28" height="20"/>
+<rect class="floor" x="126" y="164" width="28" height="20"/>
+<rect class="floor" x="126" y="184" width="28" height="20"/>
+<text class="mid" x="176.0" y="54">T5</text>
+<rect class="floor" x="162" y="64" width="28" height="20"/>
+<rect class="floor" x="162" y="84" width="28" height="20"/>
+<rect class="floor" x="162" y="104" width="28" height="20"/>
+<rect class="g3" x="162" y="124" width="28" height="20"/>
+<text class="b mid" x="176.0" y="138.5">4</text>
+<rect class="g2" x="162" y="144" width="28" height="20"/>
+<text class="n mid" x="176.0" y="158.5">q</text>
+<rect class="floor" x="162" y="164" width="28" height="20"/>
+<rect class="floor" x="162" y="184" width="28" height="20"/>
+<rect class="g2" x="18" y="220" width="28" height="20"/>
+<text class="n mid" x="32.0" y="234.5">q</text>
+<text class="n" x="56" y="234.5">the query’s own bucket</text>
+<rect class="g3" x="18" y="248" width="28" height="20"/>
+<text class="b mid" x="32.0" y="262.5">1</text>
+<text class="n" x="56" y="262.5">further buckets, in order</text>
+<text class="n" x="222" y="54">global probe order</text>
+<text class="code" x="222" y="82">1</text>
+<text class="code" x="242" y="82">T2</text>
+<text class="code" x="272" y="82">0.61</text>
+<text class="code" x="222" y="106">2</text>
+<text class="code" x="242" y="106">T4</text>
+<text class="code" x="272" y="106">0.55</text>
+<text class="code" x="222" y="130">3</text>
+<text class="code" x="242" y="130">T1</text>
+<text class="code" x="272" y="130">0.48</text>
+<rect class="chip" x="214" y="137" width="104" height="24" rx="5"/>
+<text class="code b" x="222" y="154">4</text>
+<text class="code b" x="242" y="154">T5</text>
+<text class="code b" x="272" y="154">0.42</text>
+<text class="code n" x="222" y="178">5</text>
+<text class="code n" x="242" y="178">T3</text>
+<text class="code n" x="272" y="178">0.39</text>
+<text class="sm n" x="328" y="154">just read</text>
+<text class="n" x="222" y="214">result heap</text>
+<line class="ln2" x1="260" y1="248" x2="244" y2="274"/>
+<line class="ln2" x1="276" y1="248" x2="316" y2="274"/>
+<rect class="chip" x="242" y="226" width="52" height="22" rx="11"/>
+<text class="code b mid" x="268.0" y="241.5">0.77</text>
+<rect class="chip" x="218" y="274" width="52" height="22" rx="11"/>
+<text class="code mid" x="244.0" y="289.5">0.91</text>
+<rect class="chip" x="290" y="274" width="52" height="22" rx="11"/>
+<text class="code mid" x="316.0" y="289.5">0.83</text>
+<text class="sm n" x="306" y="241.5">k-th best on top</text>
+<rect class="agent" x="432" y="0" width="328" height="322" rx="10"/>
+<text class="k ak" x="452" y="30">THE AGENT WRITES</text>
+<text class="h" x="452" y="53">The stopping rule after each bucket</text>
+<circle class="chip" cx="461" cy="81.5" r="9"/><text class="sn ak" x="461" y="86" text-anchor="middle">1</text>
+<text x="478" y="86">Read the search state</text>
+<rect class="chip" x="452" y="98" width="288" height="116" rx="6"/>
+<text class="n" x="464" y="120">k-th best score</text>
+<text class="code" x="592" y="120">0.77</text>
+<text class="n" x="464" y="141">bucket score</text>
+<text class="code" x="592" y="141">0.42</text>
+<text class="n" x="464" y="162">buckets probed</text>
+<text class="code" x="592" y="162">4</text>
+<text class="n" x="464" y="183">vectors checked</text>
+<text class="code" x="592" y="183">231 of 6,000</text>
+<text class="n" x="464" y="204">approx. ratio c</text>
+<text class="code" x="592" y="204">0.8</text>
+<circle class="chip" cx="461" cy="237.5" r="9"/><text class="sn ak" x="461" y="242" text-anchor="middle">2</text>
+<text x="478" y="242">Stop, or probe on</text>
+<rect class="chip" x="452" y="254" width="288" height="26" rx="6"/>
+<text class="b" x="464" y="271.5">stop</text>
+<text x="540" y="271.5">go to the next partition</text>
+<rect class="chip" x="452" y="286" width="288" height="26" rx="6"/>
+<text class="b" x="464" y="303.5">probe on</text>
+<text x="540" y="303.5">read bucket 5</text>
 </svg>

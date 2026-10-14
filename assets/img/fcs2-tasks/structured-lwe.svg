@@ -1,63 +1,69 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 26 760 274" role="img" aria-label="A toy structured-LWE instance with q = 97: a public 5 by 4 matrix A times a secret s = (1, 0, −1, 1), plus a small error e, equals the public vector b mod 97. The agent writes a solver that finds s. A secret is accepted if it uses only −1, 0 and 1 with exactly three nonzeros and every entry of b − A·s, centered mod 97, is at most 2.">
-<defs><marker id="structured-lwe-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#0b57d0"/></marker></defs>
-
-<path d="M43 64H36V204H43M197 64H204V204H197" fill="none" stroke="#3c4043" stroke-width="1.3"/>
-<text x="60" y="82.5" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">57</text>
-<text x="100" y="82.5" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">71</text>
-<text x="140" y="82.5" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">59</text>
-<text x="180" y="82.5" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">57</text>
-<text x="60" y="110.5" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">65</text>
-<text x="100" y="110.5" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">75</text>
-<text x="140" y="110.5" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">24</text>
-<text x="180" y="110.5" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">23</text>
-<text x="60" y="138.5" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">65</text>
-<text x="100" y="138.5" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">60</text>
-<text x="140" y="138.5" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">80</text>
-<text x="180" y="138.5" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">78</text>
-<text x="60" y="166.5" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">23</text>
-<text x="100" y="166.5" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">12</text>
-<text x="140" y="166.5" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">57</text>
-<text x="180" y="166.5" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">38</text>
-<text x="60" y="194.5" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">18</text>
-<text x="100" y="194.5" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">11</text>
-<text x="140" y="194.5" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">68</text>
-<text x="180" y="194.5" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">88</text>
-<text x="216" y="139" font-size="15" text-anchor="middle" fill="#1f1f1f">·</text>
-<rect x="228" y="74" width="40" height="122" rx="6" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
-<text x="248" y="96.5" font-size="13" font-weight="600" text-anchor="middle" fill="#0b57d0" font-family="ui-monospace,Menlo,monospace">1</text>
-<text x="248" y="124.5" font-size="13" font-weight="600" text-anchor="middle" fill="#0b57d0" font-family="ui-monospace,Menlo,monospace">0</text>
-<text x="248" y="152.5" font-size="13" font-weight="600" text-anchor="middle" fill="#0b57d0" font-family="ui-monospace,Menlo,monospace">−1</text>
-<text x="248" y="180.5" font-size="13" font-weight="600" text-anchor="middle" fill="#0b57d0" font-family="ui-monospace,Menlo,monospace">1</text>
-<text x="284" y="139.5" font-size="15" text-anchor="middle" fill="#1f1f1f">+</text>
-<path d="M307 64H300V204H307M325 64H332V204H325" fill="none" stroke="#3c4043" stroke-width="1.3"/>
-<text x="316" y="82.5" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
-<text x="316" y="110.5" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">−2</text>
-<text x="316" y="138.5" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0</text>
-<text x="316" y="166.5" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
-<text x="316" y="194.5" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">−1</text>
-<text x="350" y="139.5" font-size="15" text-anchor="middle" fill="#1f1f1f">=</text>
-<path d="M375 64H368V204H375M397 64H404V204H397" fill="none" stroke="#3c4043" stroke-width="1.3"/>
-<text x="386" y="82.5" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">56</text>
-<text x="386" y="110.5" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">62</text>
-<text x="386" y="138.5" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">63</text>
-<text x="386" y="166.5" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">5</text>
-<text x="386" y="194.5" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">37</text>
-<text x="418" y="139" font-size="12.5" fill="#5f6368">mod 97</text>
-<text x="120" y="52" font-size="12.5" text-anchor="middle" fill="#5f6368">public matrix A</text>
-<text x="248" y="52" font-size="12.5" text-anchor="middle" fill="#0b57d0">secret s</text>
-<text x="316" y="52" font-size="12.5" text-anchor="middle" fill="#5f6368">error e</text>
-<text x="386" y="52" font-size="12.5" text-anchor="middle" fill="#5f6368">public b</text>
-<rect x="130" y="222" width="340" height="66" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
-<line x1="248" y1="220" x2="248" y2="200" stroke="#0b57d0" stroke-width="1.4" marker-end="url(#structured-lwe-ar)"/>
-<text x="146" y="246" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: a solver that finds s</text>
-<text x="146" y="270" font-size="12.5" fill="#3c4043">lattice reduction, sparsity, or any other attack</text>
-<text x="500" y="80" font-size="13" font-weight="600" fill="#1f1f1f">Accepted when</text>
-<text x="500" y="104" font-size="12.5" fill="#3c4043">s uses only −1, 0 and 1,</text>
-<text x="500" y="123" font-size="12.5" fill="#3c4043">s has exactly three nonzeros, and</text>
-<text x="500" y="142" font-size="12.5" fill="#3c4043">each entry of b − A·s, centered</text>
-<text x="500" y="161" font-size="12.5" fill="#3c4043">mod 97, is at most 2 in size</text>
-<line x1="500" y1="182" x2="736" y2="182" stroke="#dadce0" stroke-width="1"/>
-<text x="500" y="206" font-size="13" font-weight="600" fill="#1f1f1f">200 instances, ten families</text>
-<text x="500" y="226" font-size="12.5" fill="#3c4043">dense or sparse A;</text>
-<text x="500" y="245" font-size="12.5" fill="#3c4043">binary, ternary, small or any s</text>
+<svg xmlns="http://www.w3.org/2000/svg" class="fig2" viewBox="0 0 760 300" role="img" aria-label="A toy structured-LWE instance with q = 97. Left, what is given: a public 5 by 4 matrix A and a public vector b, where b = A·s + e mod 97 for a small secret s and a small error e. Middle, the solver the agent writes, by lattice reduction, sparsity or any other attack: it finds s = (1, 0, −1, 1), and then b − A·s is (1, −2, 0, 1, −1). Right, a secret is accepted if it uses only −1, 0 and 1 with exactly three nonzeros and every entry of b − A·s, centered mod 97, is at most 2 in size. There are 200 instances in ten families.">
+<defs><marker id="structured-lwe-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arh" d="M0 0L10 5L0 10z"/></marker></defs>
+<rect class="given" x="0" y="0" width="262" height="300" rx="10"/>
+<text class="k" x="18" y="30">GIVEN</text>
+<text class="n" x="28" y="84">Matrix A</text>
+<text class="n mid" x="214" y="84">b</text>
+<path class="ln2" d="M28 96H22V226H28M170 96H176V226H170"/>
+<text class="code mid" x="44" y="116">57</text>
+<text class="code mid" x="80" y="116">71</text>
+<text class="code mid" x="116" y="116">59</text>
+<text class="code mid" x="152" y="116">57</text>
+<text class="code mid" x="44" y="144">65</text>
+<text class="code mid" x="80" y="144">75</text>
+<text class="code mid" x="116" y="144">24</text>
+<text class="code mid" x="152" y="144">23</text>
+<text class="code mid" x="44" y="172">65</text>
+<text class="code mid" x="80" y="172">60</text>
+<text class="code mid" x="116" y="172">80</text>
+<text class="code mid" x="152" y="172">78</text>
+<text class="code mid" x="44" y="200">23</text>
+<text class="code mid" x="80" y="200">12</text>
+<text class="code mid" x="116" y="200">57</text>
+<text class="code mid" x="152" y="200">38</text>
+<text class="code mid" x="44" y="228">18</text>
+<text class="code mid" x="80" y="228">11</text>
+<text class="code mid" x="116" y="228">68</text>
+<text class="code mid" x="152" y="228">88</text>
+<path class="ln2" d="M200 96H194V226H200M228 96H234V226H228"/>
+<text class="code mid" x="214" y="116">56</text>
+<text class="code mid" x="214" y="144">62</text>
+<text class="code mid" x="214" y="172">63</text>
+<text class="code mid" x="214" y="200">5</text>
+<text class="code mid" x="214" y="228">37</text>
+<text class="n" x="18" y="262">b = A·s + e mod 97, with</text>
+<text class="n" x="18" y="280">s and e small and unknown</text>
+<rect class="agent" x="278" y="0" width="240" height="300" rx="10"/>
+<text class="k ak" x="298" y="30">THE AGENT WRITES</text>
+<text class="h" x="298" y="53">The solver, which finds s</text>
+<text class="n mid" x="328" y="84">secret s</text>
+<rect class="chip on" x="308" y="99" width="40" height="24" rx="5"/>
+<text class="code ak b mid" x="328" y="116">1</text>
+<rect class="chip on" x="308" y="127" width="40" height="24" rx="5"/>
+<text class="code ak b mid" x="328" y="144">0</text>
+<rect class="chip on" x="308" y="155" width="40" height="24" rx="5"/>
+<text class="code ak b mid" x="328" y="172">−1</text>
+<rect class="chip on" x="308" y="183" width="40" height="24" rx="5"/>
+<text class="code ak b mid" x="328" y="200">1</text>
+<text class="n mid" x="438" y="84">b − A·s</text>
+<path class="ln2" d="M422 96H416V226H422M454 96H460V226H454"/>
+<text class="code mid" x="438" y="116">1</text>
+<text class="code mid" x="438" y="144">−2</text>
+<text class="code mid" x="438" y="172">0</text>
+<text class="code mid" x="438" y="200">1</text>
+<text class="code mid" x="438" y="228">−1</text>
+<text class="n" x="298" y="262">by lattice reduction, sparsity</text>
+<text class="n" x="298" y="280">or any other attack</text>
+<rect class="result" x="534" y="0" width="226" height="300" rx="10"/>
+<text class="k" x="552" y="30">ACCEPTED WHEN</text>
+<text x="552" y="62">s uses only −1, 0 and 1,</text>
+<text x="552" y="80">s has exactly three</text>
+<text x="552" y="98">nonzeros, and each entry</text>
+<text x="552" y="116">of b − A·s, centered</text>
+<text x="552" y="134">mod 97, is at most 2</text>
+<line class="ln" x1="552" y1="168" x2="742" y2="168"/>
+<text class="b" x="552" y="196">200 instances, ten families</text>
+<text class="n" x="552" y="218">dense or sparse A;</text>
+<text class="n" x="552" y="236">binary, ternary, small</text>
+<text class="n" x="552" y="254">or any s</text>
 </svg>

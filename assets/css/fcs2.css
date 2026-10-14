@@ -377,8 +377,16 @@ a.pbtn:hover{border-color:var(--teal); color:var(--teal-d)}
 .fig2 .ring{fill:none; stroke:var(--ink); stroke-width:1.5}
 .fig2 .box{fill:#fff; stroke:var(--ink); stroke-width:1.4}
 .fig2 .boxx{stroke:var(--ink); stroke-width:1.1}
-.fig2 .ar{stroke:#5f6368; stroke-width:1.3}
+.fig2 .ar{fill:none; stroke:#5f6368; stroke-width:1.3}
 .fig2 .arh{fill:#5f6368}
+/* general marks for the other diagrams: grey fills, thin lines, the domain colour as a mark, and red for a fault */
+.fig2 .g1{fill:#f1f3f4} .fig2 .g2{fill:#e8eaed} .fig2 .g3{fill:#dadce0} .fig2 .g5{fill:#9aa0a6} .fig2 .g7{fill:#5f6368} .fig2 .w{fill:#fff}
+.fig2 .ln{fill:none; stroke:#bdc1c6; stroke-width:1} .fig2 .ln2{fill:none; stroke:#5f6368; stroke-width:1.3} .fig2 .lnk{fill:none; stroke:var(--ink); stroke-width:1.5}
+.fig2 .dash{stroke-dasharray:3 3}
+.fig2 .fa{fill:var(--a, #174ea6)} .fig2 .sa{fill:none; stroke:var(--a, #174ea6); stroke-width:1.5} .fig2 .fal{fill:var(--af, #d2e3fc)}
+.fig2 .bad{fill:#c5221f} .fig2 .sbad{fill:none; stroke:#c5221f; stroke-width:1.5}
+.fig2 .result{fill:#f1f3f4}
+.fig2 .sm{font-size:11.5px} .fig2 .mid{text-anchor:middle} .fig2 .end{text-anchor:end}
 .tsum{margin:0 0 12px; font-size:15px; color:var(--ink-2); font-variant-numeric:tabular-nums}
 .tsum b{color:var(--ink); font-weight:600}
 .rtab th.rv, .rtab td.rv{text-align:left}

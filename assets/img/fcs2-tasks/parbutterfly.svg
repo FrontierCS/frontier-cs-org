@@ -1,53 +1,54 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 26 760 264" role="img" aria-label="A bipartite graph with vertices u1 to u3 on one side and v1 to v4 on the other. The agent writes the exact count: wedges grouped by endpoint pair, 3 for u1 and u2, 1 for u1 and u3, 2 for u2 and u3, give 3, 0 and 1 butterflies, 4 in total. The bold butterfly is u2, u3, v3, v4.">
-<defs><marker id="parbutterfly-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker></defs>
-
-<line x1="70" y1="72" x2="220" y2="58" stroke="#9aa0a6" stroke-width="1.3"/>
-<line x1="70" y1="72" x2="220" y2="114" stroke="#9aa0a6" stroke-width="1.3"/>
-<line x1="70" y1="72" x2="220" y2="170" stroke="#9aa0a6" stroke-width="1.3"/>
-<line x1="70" y1="142" x2="220" y2="58" stroke="#9aa0a6" stroke-width="1.3"/>
-<line x1="70" y1="142" x2="220" y2="114" stroke="#9aa0a6" stroke-width="1.3"/>
-<line x1="70" y1="142" x2="220" y2="170" stroke="#1f1f1f" stroke-width="2.6"/>
-<line x1="70" y1="142" x2="220" y2="226" stroke="#1f1f1f" stroke-width="2.6"/>
-<line x1="70" y1="212" x2="220" y2="170" stroke="#1f1f1f" stroke-width="2.6"/>
-<line x1="70" y1="212" x2="220" y2="226" stroke="#1f1f1f" stroke-width="2.6"/>
-<circle cx="70" cy="72" r="15" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="70" y="76.5" font-size="12.5" text-anchor="middle" fill="#1f1f1f">u1</text>
-<circle cx="70" cy="142" r="15" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="70" y="146.5" font-size="12.5" text-anchor="middle" fill="#1f1f1f">u2</text>
-<circle cx="70" cy="212" r="15" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="70" y="216.5" font-size="12.5" text-anchor="middle" fill="#1f1f1f">u3</text>
-<circle cx="220" cy="58" r="15" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="220" y="62.5" font-size="12.5" text-anchor="middle" fill="#1f1f1f">v1</text>
-<circle cx="220" cy="114" r="15" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="220" y="118.5" font-size="12.5" text-anchor="middle" fill="#1f1f1f">v2</text>
-<circle cx="220" cy="170" r="15" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="220" y="174.5" font-size="12.5" text-anchor="middle" fill="#1f1f1f">v3</text>
-<circle cx="220" cy="226" r="15" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="220" y="230.5" font-size="12.5" text-anchor="middle" fill="#1f1f1f">v4</text>
-<text x="70" y="262" font-size="12" text-anchor="middle" fill="#5f6368">side U</text>
-<text x="220" y="262" font-size="12" text-anchor="middle" fill="#5f6368">side V</text>
-<text x="20" y="282" font-size="12" fill="#5f6368">bold: the butterfly u2, u3, v3, v4</text>
-<line x1="246" y1="142" x2="286" y2="142" stroke="#3c4043" stroke-width="1.3" marker-end="url(#parbutterfly-ar)"/>
-<rect x="290" y="40" width="450" height="226" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
-<text x="306" y="64" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: the exact butterfly count</text>
-<text x="306" y="83" font-size="12.5" fill="#3c4043">on four threads, with any vertex order or way of grouping wedges</text>
-<text x="316" y="114" font-size="12" fill="#5f6368">endpoints</text>
-<text x="420" y="114" font-size="12" fill="#5f6368">wedges, via</text>
-<text x="720" y="114" font-size="12" text-anchor="end" fill="#5f6368">butterflies = w(w − 1)/2</text>
-<line x1="306" y1="122" x2="724" y2="122" stroke="#dadce0" stroke-width="1"/>
-<text x="316" y="146" font-size="13" fill="#1f1f1f">u1, u2</text>
-<text x="420" y="146" font-size="13" fill="#1f1f1f">3: v1, v2, v3</text>
-<text x="720" y="146" font-size="13" text-anchor="end" fill="#1f1f1f">3</text>
-<line x1="306" y1="155" x2="724" y2="155" stroke="#dadce0" stroke-width="1"/>
-<text x="316" y="172" font-size="13" fill="#1f1f1f">u1, u3</text>
-<text x="420" y="172" font-size="13" fill="#1f1f1f">1: v3</text>
-<text x="720" y="172" font-size="13" text-anchor="end" fill="#1f1f1f">0</text>
-<line x1="306" y1="181" x2="724" y2="181" stroke="#dadce0" stroke-width="1"/>
-<text x="316" y="198" font-size="13" fill="#1f1f1f">u2, u3</text>
-<text x="420" y="198" font-size="13" fill="#1f1f1f">2: v3, v4</text>
-<text x="720" y="198" font-size="13" text-anchor="end" fill="#1f1f1f">1</text>
-<line x1="306" y1="210" x2="724" y2="210" stroke="#9aa0a6" stroke-width="1.2"/>
-<text x="316" y="234" font-size="13" font-weight="600" fill="#1f1f1f">total</text>
-<text x="720" y="234" font-size="13" font-weight="600" text-anchor="end" fill="#1f1f1f">4</text>
-<text x="316" y="254" font-size="12" fill="#5f6368">a wedge is a two-edge path between two vertices of side U</text>
+<svg xmlns="http://www.w3.org/2000/svg" class="fig2" viewBox="0 0 760 312" role="img" aria-label="Left, what is given: a bipartite graph with vertices u1 to u3 on side U and v1 to v4 on side V; u2, u3, v3 and v4 form one butterfly. Right, the exact butterfly count the agent writes, on four threads, with any vertex order or way of grouping wedges. Wedges, two-edge paths between two vertices of side U, are grouped by endpoint pair: 3 for u1 and u2, 1 for u1 and u3, 2 for u2 and u3. Each group of w wedges gives w(w − 1)/2 butterflies, here 3, 0 and 1, so 4 in total.">
+<defs><marker id="parbutterfly-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arh" d="M0 0L10 5L0 10z"/></marker></defs>
+<rect class="given" x="0" y="0" width="250" height="312" rx="10"/>
+<text class="k" x="18" y="30">GIVEN</text>
+<line class="ln" x1="52" y1="78" x2="196" y2="66"/>
+<line class="ln" x1="52" y1="78" x2="196" y2="122"/>
+<line class="ln" x1="52" y1="78" x2="196" y2="178"/>
+<line class="ln" x1="52" y1="150" x2="196" y2="66"/>
+<line class="ln" x1="52" y1="150" x2="196" y2="122"/>
+<line class="sa" x1="52" y1="150" x2="196" y2="178"/>
+<line class="sa" x1="52" y1="150" x2="196" y2="234"/>
+<line class="sa" x1="52" y1="222" x2="196" y2="178"/>
+<line class="sa" x1="52" y1="222" x2="196" y2="234"/>
+<circle class="chip" cx="52" cy="78" r="15"/>
+<text class="mid" x="52" y="82.5">u1</text>
+<circle class="chip" cx="52" cy="150" r="15"/>
+<text class="mid" x="52" y="154.5">u2</text>
+<circle class="chip" cx="52" cy="222" r="15"/>
+<text class="mid" x="52" y="226.5">u3</text>
+<circle class="chip" cx="196" cy="66" r="15"/>
+<text class="mid" x="196" y="70.5">v1</text>
+<circle class="chip" cx="196" cy="122" r="15"/>
+<text class="mid" x="196" y="126.5">v2</text>
+<circle class="chip" cx="196" cy="178" r="15"/>
+<text class="mid" x="196" y="182.5">v3</text>
+<circle class="chip" cx="196" cy="234" r="15"/>
+<text class="mid" x="196" y="238.5">v4</text>
+<text class="n mid" x="52" y="268">side U</text>
+<text class="n mid" x="196" y="268">side V</text>
+<text class="ak" x="18" y="294">u2, u3, v3, v4: one butterfly</text>
+<rect class="agent" x="266" y="0" width="494" height="312" rx="10"/>
+<text class="k ak" x="286" y="30">THE AGENT WRITES</text>
+<text class="h" x="286" y="53">The exact butterfly count, on four threads</text>
+<text class="n" x="286" y="78">Any vertex order or way of grouping wedges is allowed.</text>
+<text class="n sm" x="298" y="112">endpoints</text>
+<text class="n sm" x="406" y="112">wedges, via</text>
+<text class="n sm end" x="728" y="112">butterflies = w(w − 1)/2</text>
+<rect class="chip" x="286" y="122" width="454" height="30" rx="6"/>
+<text x="298" y="141.5">u1, u2</text>
+<text x="406" y="141.5">3: v1, v2, v3</text>
+<text class="num end" x="728" y="141.5">3</text>
+<rect class="chip" x="286" y="158" width="454" height="30" rx="6"/>
+<text x="298" y="177.5">u1, u3</text>
+<text x="406" y="177.5">1: v3</text>
+<text class="num end" x="728" y="177.5">0</text>
+<rect class="chip on" x="286" y="194" width="454" height="30" rx="6"/>
+<text x="298" y="213.5">u2, u3</text>
+<text x="406" y="213.5">2: v3, v4</text>
+<text class="num end ak b" x="728" y="213.5">1</text>
+<line class="ln2" x1="286" y1="236" x2="740" y2="236"/>
+<text class="b" x="298" y="258">total</text>
+<text class="num b end" x="728" y="258">4</text>
+<text class="n" x="286" y="294">A wedge is a two-edge path between two vertices of side U.</text>
 </svg>

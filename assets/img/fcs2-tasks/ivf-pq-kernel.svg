@@ -1,133 +1,152 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 18 760 278" role="img" aria-label="A fixed IVF-PQ index stores each database vector in one of 8,192 lists as its id and 16 short codes, for example vector 1043 with codes 17, 201, 3 and so on up to 88. The agent writes the whole search: probe the nearest lists for query q, build the query’s distance table with one row per sub-space, add up one table entry per code to get each vector’s distance, such as 41230, and keep the best k.">
-<defs><marker id="ivf-pq-kernel-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker></defs>
-
-<text x="20" y="52" font-size="12.5" fill="#1f1f1f">list 4071 of the index</text>
-<rect x="20" y="62" width="212" height="100" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="30" y="77" font-size="11.5" fill="#5f6368">id</text><text x="88" y="77" font-size="11.5" fill="#5f6368">16 codes</text>
-<line x1="20" y1="82" x2="232" y2="82" stroke="#dadce0"/>
-<text x="30" y="96.5" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1043</text>
-<rect x="84" y="84" width="26" height="16" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<text x="97" y="96.5" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">17</text>
-<rect x="112" y="84" width="26" height="16" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<text x="125" y="96.5" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">201</text>
-<rect x="140" y="84" width="26" height="16" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<text x="153" y="96.5" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">3</text>
-<rect x="168" y="84" width="26" height="16" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<text x="181" y="96.5" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">⋯</text>
-<rect x="196" y="84" width="26" height="16" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<text x="209" y="96.5" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">88</text>
-<text x="30" y="116.5" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">5520</text>
-<rect x="84" y="104" width="26" height="16" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<text x="97" y="116.5" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">64</text>
-<rect x="112" y="104" width="26" height="16" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<text x="125" y="116.5" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">9</text>
-<rect x="140" y="104" width="26" height="16" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<text x="153" y="116.5" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">130</text>
-<rect x="168" y="104" width="26" height="16" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<text x="181" y="116.5" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">⋯</text>
-<rect x="196" y="104" width="26" height="16" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<text x="209" y="116.5" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">12</text>
-<text x="30" y="136.5" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">77801</text>
-<rect x="84" y="124" width="26" height="16" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<text x="97" y="136.5" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">220</text>
-<rect x="112" y="124" width="26" height="16" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<text x="125" y="136.5" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">41</text>
-<rect x="140" y="124" width="26" height="16" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<text x="153" y="136.5" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">7</text>
-<rect x="168" y="124" width="26" height="16" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<text x="181" y="136.5" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">⋯</text>
-<rect x="196" y="124" width="26" height="16" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<text x="209" y="136.5" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">150</text>
-<text x="30" y="155" font-size="12" fill="#5f6368">⋮</text>
-<rect x="22" y="83" width="208" height="19" fill="none" stroke="#1f1f1f" stroke-width="1.6"/>
-<text x="20" y="186" font-size="12" fill="#5f6368">8,192 lists, each around a centroid;</text>
-<text x="20" y="203" font-size="12" fill="#5f6368">a code names one codebook entry</text>
-<rect x="250" y="32" width="494" height="258" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
-<text x="266" y="56" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: the search, from probing lists to top-k</text>
-<line x1="234" y1="92" x2="262" y2="99" stroke="#3c4043" stroke-width="1.3" marker-end="url(#ivf-pq-kernel-ar)"/>
-<text x="268" y="84" font-size="12" fill="#5f6368">scan: add one table entry per code</text>
-<text x="268" y="104" font-size="12.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">d = T[1][17] + T[2][201]</text>
-<text x="283" y="124" font-size="12.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">+ T[3][3] + ⋯ + T[16][88]</text>
-<text x="283" y="144" font-size="12.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">= 41230</text>
-<text x="268" y="180" font-size="12" fill="#5f6368">keep the best k, sorted</text>
-<rect x="268" y="188" width="150" height="20" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<text x="278" y="202.5" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">77801</text>
-<text x="408" y="202.5" font-size="12" text-anchor="end" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">39870</text>
-<rect x="268" y="208" width="150" height="20" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<text x="278" y="222.5" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1043</text>
-<text x="408" y="222.5" font-size="12" text-anchor="end" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">41230</text>
-<rect x="268" y="228" width="150" height="20" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<text x="278" y="242.5" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">5520</text>
-<text x="408" y="242.5" font-size="12" text-anchor="end" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">44115</text>
-<rect x="269" y="209" width="148" height="18" fill="none" stroke="#1f1f1f" stroke-width="1.6"/>
-<text x="278" y="264" font-size="12" fill="#5f6368">⋮</text>
-<text x="490" y="84" font-size="12" fill="#5f6368">probe the nearest 32 to 128 lists</text>
-<rect x="490" y="92" width="48" height="20" rx="4" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="514.0" y="106.5" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">4071</text>
-<rect x="544" y="92" width="40" height="20" rx="4" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="564.0" y="106.5" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">518</text>
-<rect x="590" y="92" width="48" height="20" rx="4" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="614.0" y="106.5" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">7730</text>
-<rect x="644" y="92" width="30" height="20" rx="4" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="659.0" y="106.5" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">⋯</text>
-<text x="490" y="140" font-size="12" fill="#5f6368">build the distance table T for q</text>
-<text x="506" y="163" font-size="11.5" text-anchor="end" fill="#5f6368" font-family="ui-monospace,Menlo,monospace">1</text>
-<rect x="512" y="150" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="529" y="150" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="546" y="150" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="563" y="150" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="580" y="150" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="597" y="150" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="614" y="150" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="631" y="150" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="648" y="150" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="665" y="150" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="682" y="150" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="699" y="150" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="567.5" y="155" width="8" height="8" fill="#3c4043"/>
-<text x="506" y="181" font-size="11.5" text-anchor="end" fill="#5f6368" font-family="ui-monospace,Menlo,monospace">2</text>
-<rect x="512" y="168" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="529" y="168" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="546" y="168" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="563" y="168" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="580" y="168" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="597" y="168" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="614" y="168" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="631" y="168" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="648" y="168" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="665" y="168" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="682" y="168" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="699" y="168" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="669.5" y="173" width="8" height="8" fill="#3c4043"/>
-<text x="506" y="199" font-size="11.5" text-anchor="end" fill="#5f6368" font-family="ui-monospace,Menlo,monospace">3</text>
-<rect x="512" y="186" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="529" y="186" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="546" y="186" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="563" y="186" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="580" y="186" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="597" y="186" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="614" y="186" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="631" y="186" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="648" y="186" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="665" y="186" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="682" y="186" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="699" y="186" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="516.5" y="191" width="8" height="8" fill="#3c4043"/>
-<text x="506" y="217" font-size="11.5" text-anchor="end" fill="#5f6368" font-family="ui-monospace,Menlo,monospace">⋮</text>
-<text x="506" y="235" font-size="11.5" text-anchor="end" fill="#5f6368" font-family="ui-monospace,Menlo,monospace">16</text>
-<rect x="512" y="222" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="529" y="222" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="546" y="222" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="563" y="222" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="580" y="222" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="597" y="222" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="614" y="222" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="631" y="222" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="648" y="222" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="665" y="222" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="682" y="222" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="699" y="222" width="17" height="18" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="618.5" y="227" width="8" height="8" fill="#3c4043"/>
-<text x="512" y="254" font-size="12" fill="#5f6368">row: one of 16 vector parts</text>
-<text x="512" y="270" font-size="12" fill="#5f6368">column: code value</text>
+<svg xmlns="http://www.w3.org/2000/svg" class="fig2" viewBox="0 0 760 312" role="img" aria-label="Left, what is given: list 4071 of the index, where each vector id carries 16 codes, for example 1043 with codes 17, 201, 3 up to 88; there are 8,192 lists, each around a centroid, and a code names one codebook entry. Right, the search the agent writes, from probing lists to top-k: probe the nearest 32 to 128 lists, build the distance table T for the query (one row per vector part, one column per code value), scan by adding one table entry per code, d = T[1][17] + T[2][201] + ... + T[16][88] = 41230, and keep the best k sorted.">
+<defs><marker id="ivf-pq-kernel-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arh" d="M0 0L10 5L0 10z"/></marker></defs>
+<rect class="given" x="0" y="0" width="278" height="312" rx="10"/>
+<text class="k" x="18" y="30">GIVEN</text>
+<text x="18" y="58">List 4071 of the index</text>
+<text class="sm n" x="18" y="84">id</text>
+<text class="sm n" x="84" y="84">16 codes</text>
+<rect class="chip on" x="14" y="94" width="250" height="30" rx="6"/>
+<text class="code" x="24" y="113.5">1043</text>
+<rect class="g1" x="84" y="99" width="30" height="20" rx="3"/>
+<text class="code mid" x="99" y="113.5">17</text>
+<rect class="g1" x="118" y="99" width="30" height="20" rx="3"/>
+<text class="code mid" x="133" y="113.5">201</text>
+<rect class="g1" x="152" y="99" width="30" height="20" rx="3"/>
+<text class="code mid" x="167" y="113.5">3</text>
+<rect class="g1" x="186" y="99" width="30" height="20" rx="3"/>
+<text class="code mid" x="201" y="113.5">…</text>
+<rect class="g1" x="220" y="99" width="30" height="20" rx="3"/>
+<text class="code mid" x="235" y="113.5">88</text>
+<rect class="chip" x="14" y="128" width="250" height="30" rx="6"/>
+<text class="code" x="24" y="147.5">5520</text>
+<rect class="g1" x="84" y="133" width="30" height="20" rx="3"/>
+<text class="code mid" x="99" y="147.5">64</text>
+<rect class="g1" x="118" y="133" width="30" height="20" rx="3"/>
+<text class="code mid" x="133" y="147.5">9</text>
+<rect class="g1" x="152" y="133" width="30" height="20" rx="3"/>
+<text class="code mid" x="167" y="147.5">130</text>
+<rect class="g1" x="186" y="133" width="30" height="20" rx="3"/>
+<text class="code mid" x="201" y="147.5">…</text>
+<rect class="g1" x="220" y="133" width="30" height="20" rx="3"/>
+<text class="code mid" x="235" y="147.5">12</text>
+<rect class="chip" x="14" y="162" width="250" height="30" rx="6"/>
+<text class="code" x="24" y="181.5">77801</text>
+<rect class="g1" x="84" y="167" width="30" height="20" rx="3"/>
+<text class="code mid" x="99" y="181.5">220</text>
+<rect class="g1" x="118" y="167" width="30" height="20" rx="3"/>
+<text class="code mid" x="133" y="181.5">41</text>
+<rect class="g1" x="152" y="167" width="30" height="20" rx="3"/>
+<text class="code mid" x="167" y="181.5">7</text>
+<rect class="g1" x="186" y="167" width="30" height="20" rx="3"/>
+<text class="code mid" x="201" y="181.5">…</text>
+<rect class="g1" x="220" y="167" width="30" height="20" rx="3"/>
+<text class="code mid" x="235" y="181.5">150</text>
+<text class="n" x="24" y="212">⋮</text>
+<text x="18" y="246">8,192 lists, each around a</text>
+<text x="18" y="264">centroid; a code names one</text>
+<text x="18" y="282">codebook entry</text>
+<rect class="agent" x="294" y="0" width="466" height="312" rx="10"/>
+<text class="k ak" x="314" y="30">THE AGENT WRITES</text>
+<text class="h" x="314" y="53">The search, from probing lists to top-k</text>
+<circle class="chip" cx="323" cy="81.5" r="9"/><text class="sn ak mid" x="323" y="86">1</text>
+<text x="340" y="86">Probe the nearest lists</text>
+<rect class="chip on" x="314" y="98" width="52" height="28" rx="5"/>
+<text class="code mid" x="340.0" y="116.5">4071</text>
+<rect class="chip" x="371" y="98" width="44" height="28" rx="5"/>
+<text class="code mid" x="393.0" y="116.5">518</text>
+<rect class="chip" x="420" y="98" width="52" height="28" rx="5"/>
+<text class="code mid" x="446.0" y="116.5">7730</text>
+<rect class="chip" x="477" y="98" width="30" height="28" rx="5"/>
+<text class="code mid" x="492.0" y="116.5">…</text>
+<text class="sm n" x="314" y="144">32 to 128 of them</text>
+<circle class="chip" cx="323" cy="167.5" r="9"/><text class="sn ak mid" x="323" y="172">2</text>
+<text x="340" y="172">Build the table T for q</text>
+<text class="sm n end" x="330" y="195">1</text>
+<rect class="w" x="336" y="184" width="168" height="14"/>
+<line class="ln" x1="336" y1="184" x2="336" y2="198"/>
+<line class="ln" x1="350" y1="184" x2="350" y2="198"/>
+<line class="ln" x1="364" y1="184" x2="364" y2="198"/>
+<line class="ln" x1="378" y1="184" x2="378" y2="198"/>
+<line class="ln" x1="392" y1="184" x2="392" y2="198"/>
+<line class="ln" x1="406" y1="184" x2="406" y2="198"/>
+<line class="ln" x1="420" y1="184" x2="420" y2="198"/>
+<line class="ln" x1="434" y1="184" x2="434" y2="198"/>
+<line class="ln" x1="448" y1="184" x2="448" y2="198"/>
+<line class="ln" x1="462" y1="184" x2="462" y2="198"/>
+<line class="ln" x1="476" y1="184" x2="476" y2="198"/>
+<line class="ln" x1="490" y1="184" x2="490" y2="198"/>
+<line class="ln" x1="504" y1="184" x2="504" y2="198"/>
+<line class="ln" x1="336" y1="184" x2="504" y2="184"/><line class="ln" x1="336" y1="198" x2="504" y2="198"/>
+<rect class="fa" x="381" y="187" width="8" height="8"/>
+<text class="sm n end" x="330" y="209">2</text>
+<rect class="w" x="336" y="198" width="168" height="14"/>
+<line class="ln" x1="336" y1="198" x2="336" y2="212"/>
+<line class="ln" x1="350" y1="198" x2="350" y2="212"/>
+<line class="ln" x1="364" y1="198" x2="364" y2="212"/>
+<line class="ln" x1="378" y1="198" x2="378" y2="212"/>
+<line class="ln" x1="392" y1="198" x2="392" y2="212"/>
+<line class="ln" x1="406" y1="198" x2="406" y2="212"/>
+<line class="ln" x1="420" y1="198" x2="420" y2="212"/>
+<line class="ln" x1="434" y1="198" x2="434" y2="212"/>
+<line class="ln" x1="448" y1="198" x2="448" y2="212"/>
+<line class="ln" x1="462" y1="198" x2="462" y2="212"/>
+<line class="ln" x1="476" y1="198" x2="476" y2="212"/>
+<line class="ln" x1="490" y1="198" x2="490" y2="212"/>
+<line class="ln" x1="504" y1="198" x2="504" y2="212"/>
+<line class="ln" x1="336" y1="198" x2="504" y2="198"/><line class="ln" x1="336" y1="212" x2="504" y2="212"/>
+<rect class="fa" x="465" y="201" width="8" height="8"/>
+<text class="sm n end" x="330" y="223">3</text>
+<rect class="w" x="336" y="212" width="168" height="14"/>
+<line class="ln" x1="336" y1="212" x2="336" y2="226"/>
+<line class="ln" x1="350" y1="212" x2="350" y2="226"/>
+<line class="ln" x1="364" y1="212" x2="364" y2="226"/>
+<line class="ln" x1="378" y1="212" x2="378" y2="226"/>
+<line class="ln" x1="392" y1="212" x2="392" y2="226"/>
+<line class="ln" x1="406" y1="212" x2="406" y2="226"/>
+<line class="ln" x1="420" y1="212" x2="420" y2="226"/>
+<line class="ln" x1="434" y1="212" x2="434" y2="226"/>
+<line class="ln" x1="448" y1="212" x2="448" y2="226"/>
+<line class="ln" x1="462" y1="212" x2="462" y2="226"/>
+<line class="ln" x1="476" y1="212" x2="476" y2="226"/>
+<line class="ln" x1="490" y1="212" x2="490" y2="226"/>
+<line class="ln" x1="504" y1="212" x2="504" y2="226"/>
+<line class="ln" x1="336" y1="212" x2="504" y2="212"/><line class="ln" x1="336" y1="226" x2="504" y2="226"/>
+<rect class="fa" x="339" y="215" width="8" height="8"/>
+<text class="sm n end" x="330" y="255">16</text>
+<rect class="w" x="336" y="244" width="168" height="14"/>
+<line class="ln" x1="336" y1="244" x2="336" y2="258"/>
+<line class="ln" x1="350" y1="244" x2="350" y2="258"/>
+<line class="ln" x1="364" y1="244" x2="364" y2="258"/>
+<line class="ln" x1="378" y1="244" x2="378" y2="258"/>
+<line class="ln" x1="392" y1="244" x2="392" y2="258"/>
+<line class="ln" x1="406" y1="244" x2="406" y2="258"/>
+<line class="ln" x1="420" y1="244" x2="420" y2="258"/>
+<line class="ln" x1="434" y1="244" x2="434" y2="258"/>
+<line class="ln" x1="448" y1="244" x2="448" y2="258"/>
+<line class="ln" x1="462" y1="244" x2="462" y2="258"/>
+<line class="ln" x1="476" y1="244" x2="476" y2="258"/>
+<line class="ln" x1="490" y1="244" x2="490" y2="258"/>
+<line class="ln" x1="504" y1="244" x2="504" y2="258"/>
+<line class="ln" x1="336" y1="244" x2="504" y2="244"/><line class="ln" x1="336" y1="258" x2="504" y2="258"/>
+<rect class="fa" x="423" y="247" width="8" height="8"/>
+<text class="sm n end" x="327" y="240">⋮</text>
+<text class="sm n" x="314" y="280">row: one of 16 vector parts</text>
+<text class="sm n" x="314" y="296">column: a code value</text>
+<circle class="chip" cx="553" cy="81.5" r="9"/><text class="sn ak mid" x="553" y="86">3</text>
+<text x="570" y="86">Scan: one lookup per code</text>
+<rect class="chip" x="544" y="98" width="196" height="70" rx="6"/>
+<text class="code" x="556" y="118">d = T[1][17]</text>
+<text class="code" x="571" y="137">+ T[2][201] + …</text>
+<text class="code" x="571" y="156">+ T[16][88] = 41230</text>
+<circle class="chip" cx="553" cy="191.5" r="9"/><text class="sn ak mid" x="553" y="196">4</text>
+<text x="570" y="196">Keep the best k, sorted</text>
+<rect class="chip" x="544" y="208" width="196" height="23" rx="5"/>
+<text class="code" x="556" y="224">77801</text>
+<text class="code end" x="728" y="224">39870</text>
+<rect class="chip on" x="544" y="234" width="196" height="23" rx="5"/>
+<text class="code" x="556" y="250">1043</text>
+<text class="code end" x="728" y="250">41230</text>
+<rect class="chip" x="544" y="260" width="196" height="23" rx="5"/>
+<text class="code" x="556" y="276">5520</text>
+<text class="code end" x="728" y="276">44115</text>
 </svg>
