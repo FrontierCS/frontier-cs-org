@@ -36,13 +36,13 @@ svg#map text{{font-family:'Hanken Grotesk',sans-serif}}
 <div class="txt">
   <div class="brand"><svg viewBox="4.5 14.44 81.06 81.06"><path d="M10 40 A50 50 0 0 1 60 90" fill="none" style="stroke:var(--mk-in,#1f1f1f)" stroke-width="11" stroke-linecap="round"/><path d="M50.45 19.94 A80.9 80.9 0 0 1 80.06 49.55" fill="none" style="stroke:var(--mk-out,#0b57d0)" stroke-width="11" stroke-linecap="round"/></svg>FrontierCS</div>
   <h1>FrontierCS 2</h1>
-  <p class="sub">A benchmark for computer&#8209;science R&amp;D</p>
+  <p class="sub">A Benchmark for Computer Science R&amp;D</p>
   <p class="lead" id="lead"></p>
   <div class="url">frontier-cs.org</div>
 </div>
 <svg id="map" xmlns="http://www.w3.org/2000/svg"></svg>
 </div><script>
-document.getElementById('lead').textContent = `${{TASKS.length}} open-ended tasks in ${{DOMAINS.length}} domains, each built from a published paper. The code of the original authors is the bar to beat.`;
+document.getElementById('lead').textContent = `${{TASKS.length}} open-ended problems in ${{DOMAINS.length}} domains, each built from a published paper. The code of the original authors is the bar to beat.`;
 function squarify(vals, x, y, w, h) {{
   const tot = vals.reduce((a, b) => a + b, 0), areas = vals.map(v => v * w * h / tot), out = [];
   const worst = (row, side) => {{ const s = row.reduce((a, b) => a + b, 0); return Math.max(...row.map(r => Math.max(side * side * r / (s * s), s * s / (side * side * r)))); }};

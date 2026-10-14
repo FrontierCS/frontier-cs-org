@@ -1,14 +1,14 @@
 ---
 layout: default
 title: FrontierCS 2
-description: A benchmark of 48 open-ended computer-science R&D tasks built from published papers, where the authors’ own code is the reference to beat.
+description: A benchmark of 48 open-ended computer science R&D problems built from published papers, where the authors’ own code is the reference to beat.
 permalink: /
 page_css: fcs2
 og_image: assets/img/fcs2-card.png   # share card for X and other link previews, drawn by bin/fcs2_card.py
 ---
 <div class="fcs2">
 <nav class="sub" aria-label="Sections"><div class="col" id="subnav">
-  <a href="#overview" class="on">Overview</a><a href="#leaderboard">Leaderboard</a><a href="#tasks">Tasks</a><a href="#cases">Case studies</a><a href="#private">Private set</a><a href="#sponsors">Sponsors</a><a href="#questions">Questions</a>
+  <a href="#overview" class="on">Overview</a><a href="#leaderboard">Leaderboard</a><a href="#tasks">Problems</a><a href="#cases">Case studies</a><a href="#private">Private set</a><a href="#sponsors">Sponsors</a><a href="#questions">Questions</a>
 </div></nav>
 
 <div class="col" id="main" tabindex="-1">
@@ -16,8 +16,8 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
   <div class="hero">
   <div class="hero-text">
   <p class="upd"><i></i><span>Last updated: {{ site.time | date: "%B %-d, %Y" }}</span></p>
-  <h1>FrontierCS 2: A benchmark for computer-science R&amp;D</h1>
-  <p class="lead">FrontierCS 2 evaluates AI agents on computer-science research. Its <span data-fill="ntasks">48</span> tasks come from published papers in <span data-fill="ndomains">12</span> fields, from databases and systems to cryptography and theory. Each task removes the key contribution of a paper from the code released with it. An agent passes only if its own version beats the original implementation on hidden workloads, so every result is measured against published work.</p>
+  <h1>FrontierCS 2: A Benchmark for Computer Science R&amp;D</h1>
+  <p class="lead">FrontierCS 2 evaluates AI agents on computer science research. Its <span data-fill="ntasks">48</span> problems come from published papers in <span data-fill="ndomains">12</span> fields, from machine learning and ML systems to databases, security and theory. Each problem removes the key contribution of a paper from the code released with it. An agent passes only if its own version beats the original implementation on every metric of every hidden workload, so each result is measured against published work.</p>
 
   <div class="links"><a class="pill lg" id="paperlink" aria-disabled="true">Paper (coming soon)</a></div>
   <a id="taskbase" href="{{ '/task/' | relative_url }}" hidden></a>
@@ -27,8 +27,8 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
   </div>
 
   <figure class="chart" id="teaser">
-    <div class="chead"><span>Tasks</span></div>
-    <div class="map" id="map"><svg id="mapsvg" aria-label="The 48 tasks by domain"></svg></div>
+    <div class="chead"><span>Problems</span></div>
+    <div class="map" id="map"><svg id="mapsvg" aria-label="The 48 problems by domain"></svg></div>
   </figure>
 </section>
 
@@ -58,21 +58,21 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
       <div class="how-body">
         <div class="how-row">
           <div class="how-txt">
-            <p class="how-step"><span>1</span>One curve per task</p>
-            <p>FECI puts every model and the authors’ code on one scale. Each task gets an S-shaped curve: a model’s expected score on the task rises from 0 to 100 as its FECI passes the task’s difficulty, the FECI at which the expected score is 50.</p>
+            <p class="how-step"><span>1</span>One curve per problem</p>
+            <p>FECI puts every model and the authors’ code on one scale. Each problem gets an S-shaped curve: a model’s expected score on the problem rises from 0 to 100 as its FECI passes the problem’s difficulty, the FECI at which the expected score is 50.</p>
             <div class="how-eq">\[\text{expected score} = \frac{100}{1 + e^{-k\,(\text{FECI} - \text{difficulty})}}\]</div>
           </div>
           <figure class="chart how-fig">
-            <div class="chead"><span>Expected score on three tasks</span></div>
-            <div class="plot" id="howaplot"><svg id="howasvg" role="img" aria-label="Expected score against FECI on three tasks"></svg><div class="tip" id="howatip" hidden></div></div>
+            <div class="chead"><span>Expected score on three problems</span></div>
+            <div class="plot" id="howaplot"><svg id="howasvg" role="img" aria-label="Expected score against FECI on three problems"></svg><div class="tip" id="howatip" hidden></div></div>
             <div class="legend" id="howalegend"></div>
           </figure>
         </div>
         <p class="how-step"><span>2</span>Why FECI</p>
         <ul class="how-why">
-          <li><b>It weighs each score by difficulty.</b> A mean score counts a point on an easy task the same as a point on a hard one. FECI weighs each score by how hard its task is.</li>
-          <li><b>It has a human anchor.</b> Every task scores on its own scale. FECI turns them into one number, and 25 always means the authors’ code.</li>
-          <li><b>It has room at the top.</b> The hardest task sits at difficulty <span id="how-dmax">206</span>, far above every model, so the scale does not saturate the way a 0 to 100 average does.</li>
+          <li><b>It weighs each score by difficulty.</b> A mean score counts a point on an easy problem the same as a point on a hard one. FECI weighs each score by how hard its problem is.</li>
+          <li><b>It has a human anchor.</b> Every problem scores on its own scale. FECI turns them into one number, and 25 always means the authors’ code.</li>
+          <li><b>It has room at the top.</b> The hardest problem sits at difficulty <span id="how-dmax">206</span>, far above every model, so the scale does not saturate the way a 0 to 100 average does.</li>
           <li><b>The method is tested.</b> FECI is item response theory, the model behind standardized tests that compare students who answered different questions. Epoch AI uses it in the <a href="https://epoch.ai/benchmarks/eci" target="_blank" rel="noopener">Epoch Capabilities Index</a> to combine many benchmarks into one scale, and Anthropic tracks how fast its models’ capabilities rise with a fork of Epoch’s index, the Anthropic ECI, in its <a href="https://www.anthropic.com/system-cards" target="_blank" rel="noopener">system cards</a>.</li>
         </ul>
       </div>
@@ -98,13 +98,13 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
       <button class="pill lg custom" id="custom" type="button" aria-expanded="false" aria-controls="settings">
         <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3M5.5 5.5l2.1 2.1M16.4 16.4l2.1 2.1M5.5 18.5l2.1-2.1M16.4 7.6l2.1-2.1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
         Customize graph</button>
-      <div class="cfoot">{% include chart_logo.html %}<span id="lbnote">scores on each task’s own 0–100 scale</span></div>
+      <div class="cfoot">{% include chart_logo.html %}<span id="lbnote">scores on each problem’s own 0–100 scale</span></div>
     </figure>
     <aside class="settings" id="settings" aria-label="Graph settings">
       <h3>Settings</h3>
       <label class="toggle"><input type="checkbox" id="showruns" checked> Show individual runs</label>
       <h4>Group by</h4>
-      <div class="chips" id="groupby"><button class="chip" type="button" data-g="model" aria-pressed="true">Model</button><button class="chip" type="button" data-g="task" aria-pressed="false">Task</button></div>
+      <div class="chips" id="groupby"><button class="chip" type="button" data-g="model" aria-pressed="true">Model</button><button class="chip" type="button" data-g="task" aria-pressed="false">Problem</button></div>
       <h4>Domain</h4>
       <div class="radios" id="domradios"></div>
     </aside>
@@ -141,7 +141,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
 
 <section class="sec" id="private">
   <h2>Private set</h2>
-  <p class="tbd">Tasks we don’t release.</p>
+  <p class="tbd">Problems we don’t release.</p>
   <div class="locked" id="locked" aria-hidden="true"></div>
   <p class="pcontact">Questions about the private set: write to Qiuyang Mang at <a href="mailto:qmang@berkeley.edu">qmang@berkeley.edu</a> or Wenhao Chai at <a href="mailto:wenhao.chai@princeton.edu">wenhao.chai@princeton.edu</a>.</p>
 </section>
@@ -158,14 +158,14 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
   <div class="faq">
     <h2>Questions</h2>
     <div class="fqlist">
-      <details id="q-built"><summary>How is a task built?</summary><div class="ans"><p>We delete a paper’s contribution from its own repository. The agent writes it back and is scored against the authors’ code.</p></div></details>
+      <details id="q-built"><summary>How is a problem built?</summary><div class="ans"><p>We delete a paper’s contribution from its own repository. The agent writes it back and is scored against the authors’ code.</p></div></details>
       <details id="q-see"><summary>What does the agent see?</summary><div class="ans"><p>It sees its repository and, for each patch it submits, a score on the development workloads and one message. The development and evaluation sets are separate: the evaluator, the hidden evaluation workloads and the reference stay with the judge. At the end the agent picks one of its versions as its final submission, and only that version is scored on the hidden workloads. Each run has a wall-clock budget of 5 hours.</p></div></details>
       <details id="q-pick"><summary>What if the agent picks the wrong version?</summary><div class="ans"><p>We report it as it is. Agents sometimes end on a version that fails although an earlier one would have passed. Choosing which version to submit is part of the work we measure, so we do not correct the choice: every run is scored by the submission the agent chose.</p></div></details>
-      <details id="q-bar"><summary>What counts as a pass?</summary><div class="ans"><p>A run passes only when its final submission beats the human baseline, the authors’ code, on every metric the task checks and on every hidden workload. A higher total score is not enough: a run that is faster on average but worse on one metric or one workload does not pass. The criteria are set from the reference’s own measurements. For SVG-EAR, its latency must be at most 0.96 of the reference’s, with PSNR, SSIM and LPIPS within fixed bands. Each task’s page lists the metrics its judge checks.</p></div></details>
-      <details id="q-score"><summary>How are scores computed?</summary><div class="ans"><p>The leaderboard’s main number is pass rate, the share of runs that pass by the criteria above. Each task’s evaluator also scores the final submission on the hidden suite, from 0 to 100, and a run that times out scores 0. The mean score chart averages these scores. FECI, the FrontierCS Epoch Capabilities Index, is fitted with Epoch AI’s own ECI code. It fits one logistic curve per task to every model’s score and to the human reference, the authors’ own code, then scales the result so Human is 25 and Kimi K2.7 Code is 0. Kimi K2.7 Code takes part in the fit as this 0 point but is not on the leaderboard. Above 25 means above the authors’ code on each task’s own scale. FECI’s bars are 90% intervals from Epoch’s bootstrap, which resamples each model’s task results. Costs are estimates; “How is cost estimated?” below gives the method. The results cover <span data-fill="summary">480 runs on 48 tasks by 10 models</span>.</p></div></details>
-      <details id="q-scaling"><summary>How is test-time scaling computed?</summary><div class="ans"><p>The agent submits many times during a run, and each submission is scored on the task’s development workloads. At a cost budget, a run counts its latest valid submission within that budget, the latest whose development score is above 0, or a score of 0 if it has none yet. One submission in ten scores 0, mostly from a failed build, validation or correctness gate, and agents usually recover from it; counting such a failure as the run’s result would score an experiment instead of the agent’s working code. Taking the best submission so far instead would choose with hindsight. Development scores are not adjusted to the hidden suite, because the platform does not score the final submission on the development workloads. Once the budget covers a whole run, its hidden final score counts, so every curve ends at the model’s leaderboard value. The budget is the estimated cost, as the next answer explains.</p></div></details>
+      <details id="q-bar"><summary>What counts as a pass?</summary><div class="ans"><p>A run passes only when its final submission beats the human baseline, the authors’ code, on every metric the problem checks and on every hidden workload. A higher total score is not enough: a run that is faster on average but worse on one metric or one workload does not pass. The criteria are set from the reference’s own measurements. For SVG-EAR, its latency must be at most 0.96 of the reference’s, with PSNR, SSIM and LPIPS within fixed bands. Each problem’s page lists the metrics its judge checks.</p></div></details>
+      <details id="q-score"><summary>How are scores computed?</summary><div class="ans"><p>The leaderboard’s main number is pass rate, the share of runs that pass by the criteria above. Each problem’s evaluator also scores the final submission on the hidden suite, from 0 to 100, and a run that times out scores 0. The mean score chart averages these scores. FECI, the FrontierCS Epoch Capabilities Index, is fitted with Epoch AI’s own ECI code. It fits one logistic curve per problem to every model’s score and to the human reference, the authors’ own code, then scales the result so Human is 25 and Kimi K2.7 Code is 0. Kimi K2.7 Code takes part in the fit as this 0 point but is not on the leaderboard. Above 25 means above the authors’ code on each problem’s own scale. FECI’s bars are 90% intervals from Epoch’s bootstrap, which resamples each model’s problem results. Costs are estimates; “How is cost estimated?” below gives the method. The results cover <span data-fill="summary">480 runs on 48 problems by 10 models</span>.</p></div></details>
+      <details id="q-scaling"><summary>How is test-time scaling computed?</summary><div class="ans"><p>The agent submits many times during a run, and each submission is scored on the problem’s development workloads. At a cost budget, a run counts its latest valid submission within that budget, the latest whose development score is above 0, or a score of 0 if it has none yet. One submission in ten scores 0, mostly from a failed build, validation or correctness gate, and agents usually recover from it; counting such a failure as the run’s result would score an experiment instead of the agent’s working code. Taking the best submission so far instead would choose with hindsight. Development scores are not adjusted to the hidden suite, because the platform does not score the final submission on the development workloads. Once the budget covers a whole run, its hidden final score counts, so every curve ends at the model’s leaderboard value. The budget is the estimated cost, as the next answer explains.</p></div></details>
       <details id="q-cost"><summary>How is cost estimated?</summary><div class="ans"><p>Cost per run comes from three sources. For GPT-6 Astra, GPT-6.1 Sol, Muse Spark 1.3 and Muse Wonder 1.0 it is the cost their model gateway estimated. For Claude Opus 5.5 it is the cost Claude Code reports for itself; where a run’s saved trace stops before the run ends, its tokens are priced at the rates Claude Code’s complete reports follow and scaled to the whole run. Kimi K3, DeepSeek V4.1 Flash, GLM 5.3, GLM 5.3 Flash and Qwen 3.8 Max report tokens but no cost, so we price every token at the model’s cache-read list price, in US$ per million tokens: Kimi K3 0.30, DeepSeek V4.1 Flash 0.003 (off-peak), GLM 5.3 0.26, GLM 5.3 Flash 0.03 and Qwen 3.8 Max 0.25, found on October 9, 2026, and for GLM 5.3 Flash on October 13. Their output tokens are not counted apart, so their costs are lower bounds. The platform gives no spend per development submission; the test-time scaling chart splits a run’s spend by the share of its wall time elapsed. Costs compare orders of magnitude better than small gaps.</p></div></details>
-      <details id="q-run"><summary>Can I run it?</summary><div class="ans"><p>We will release the tasks, evaluators and judge as one evaluation environment.</p></div></details>
+      <details id="q-run"><summary>Can I run it?</summary><div class="ans"><p>We will release the problems, evaluators and judge as one evaluation environment.</p></div></details>
     </div>
   </div>
 </section>
