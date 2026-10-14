@@ -5,7 +5,7 @@ The block sits between the BEGIN/END converter markers; the rest of the file (ta
 Task descriptions come from bin/fcs2_descriptions.tsv, a copy of the paper repo's notes/descriptions_{a,b,c}.tsv.
 
 usage: python3 bin/fcs2_runs_from_db.py path/to/sqlite.db [--json=out.json]   (needs numpy, scipy, pandas, tqdm)
---json also writes every number the page shows, for the paper's figures.
+--json also writes every number the page shows, for the paper's figures, and the raw-score fit described below.
 
 The database lists one run per (model, task version) in `cells`. A run's score is `display_score`:
 the verifier's final score, with timeouts shown as 0. Runs without a score are left out.
@@ -13,25 +13,39 @@ Tasks are matched to the paper's task list by display name (TASK below): the dom
 task's folder under tasks/frontier-cs-2.0-demo/problems/ in FrontierCS-2.0-Preview, and the
 short name is the paper's name for the task, or the database name when the paper list has none.
 
-FECI, the leaderboard's main number, is fitted with Epoch AI's own ECI code (bin/eci_fitting.py, vendored
-from epoch-research/eci-public): every task is one benchmark with score/100 = sigmoid(slope_t * (capability_m - difficulty_t)),
-fitted by bounded least squares with Epoch's defaults (L2 penalty 0.1 over the parameter count, scores clipped to [0.001, 0.999]).
-Epoch pins one benchmark's slope to 1; here that is the task with the most observations (ties: first by name).
-Respondents are the models (mean score over their runs on a task) and the authors' reference
-(median reference_score over the task's runs; references of 0 mean the task has none and are left out).
-Capabilities are mapped linearly so that Human (the authors' reference) is HUMAN_VALUE and LOW_ANCHOR is LOW_VALUE.
-The 90% interval follows Epoch's bootstrap: each respondent's task results are resampled with replacement and the fit
-is redone from the central solution (BOOT draws, seeds 0..BOOT-1). Epoch's code raises when a draw puts the anchors in the
-wrong order; those draws are left out and counted.
+ECI, the leaderboard's main number, is fitted on pass and fail (Qiuyang, 2026-10-14): Epoch AI's ECI idea, a Rasch model
+P(model m passes task t) = sigmoid(theta_m - beta_t), with every scored run of every model one observation (hidden models
+too: they are respondents, never shown). Strengths theta and difficulties beta, in logits, are fitted together by
+penalised maximum likelihood with penalty LAM/2 (sum theta^2 + sum beta^2), LAM = 0.35 as in the site's in-browser TDIFF.
+A strength is shown as ECI = PASS_ZERO_VALUE + PASS_UNIT * (theta_m - theta of PASS_ZERO), the constants at the top.
+The 90% interval resamples task columns with replacement (BOOT draws, seeds 0..BOOT-1), refits, maps each draw the same
+way, and takes the 5th and 95th percentiles.
 
-Test-time scaling (SCALE): at a budget B of US$ (usd() below), a run's submission is its latest valid submission, the
-latest with a development score above 0 (a development score is what a submission gets on the task's development
-workloads while the agent runs; a failed build or validation scores 0), or nothing (score 0) if it has none yet; once B
-passes the run's end, its hidden final score (owner, 2026-10-09; restored 2026-10-13). No dev-to-hidden calibration is
-applied: the platform pairs no development score with the final patch.
-ECI(model, B) keeps every task's curve from the leaderboard fit and solves one capability per (model, budget) by
-least squares, so it is on the FECI scale and equals the leaderboard value at full budget. Its 90% interval
-resamples the model's tasks (SCALE_BOOT draws, task curves held fixed).
+Task difficulty (DIFF, and the pass curves in TFIT) puts passes first; a run's final score enters only as a win against the
+human reference r_t, the median reference_score over the task's runs (0 or less: the task has none). A win w is 1 when
+the score is above r_t + TIE_EPS, 0 when below r_t - TIE_EPS, otherwise 1/2. With the strengths held at the fit above,
+each task has a pass threshold b_t, P(pass) = sigmoid(theta_m - b_t), and a beat-the-human threshold h_t,
+P(win) = sigmoid(a (theta_m - h_t)). Priors: h_t ~ N(mean theta, PRIOR_SD^2) and b_t = h_t + delta_t with
+delta_t ~ N(DELTA, TAU^2); a task without a reference has b_t ~ N(mean theta, PRIOR_SD^2). a, DELTA and TAU maximise the
+marginal likelihood of passes and wins over the tasks with a reference (a and TAU on a log scale, TAU >= 0.25). A task's
+difficulty D is the posterior median of b_t on a grid (GRID, around the mean strength), its interval the 5th and 95th
+posterior percentiles; all are mapped to ECI points like the strengths.
+
+The raw-score fit that the leaderboard showed before 2026-10-14 runs only with --json (feci_score, task_fit_score). It is
+Epoch AI's own ECI code (bin/eci_fitting.py, vendored from epoch-research/eci-public): every task is one benchmark with
+score/100 = sigmoid(slope_t * (capability_m - difficulty_t)), fitted by bounded least squares with Epoch's defaults
+(L2 penalty 0.1 over the parameter count, scores clipped to [0.001, 0.999]). Epoch pins one benchmark's slope to 1; here
+that is the task with the most observations (ties: first by name). Respondents are the models (mean score over their runs
+on a task) and the authors' reference r_t (tasks without one are left out). Capabilities are mapped linearly so that
+the authors' reference is HUMAN_VALUE and PASS_ZERO is PASS_ZERO_VALUE. Its 90% interval follows Epoch's bootstrap:
+each respondent's task results are resampled with replacement and the fit is redone from the central solution (BOOT
+draws); Epoch's code raises when a draw puts the anchors in the wrong order, and those draws are left out and counted.
+
+Test-time scaling (SCALE): at a budget B of US$ (usd() below), a run counts as passed only when it has ended within B
+(its spend at the end is at most B) and its verdict is PASS; otherwise it counts as failed (Qiuyang, 2026-10-14).
+ECI(model, B) holds every task's difficulty beta_t at the leaderboard fit and solves the model's one strength with the
+same penalty, so it equals the leaderboard ECI at full budget; it is mapped with the leaderboard's theta of PASS_ZERO.
+Its 90% interval resamples the model's tasks (SCALE_BOOT draws, difficulties held fixed).
 
 Pass rate is the share of scored runs whose verdict is PASS: the final submission meets the task's
 beat-the-reference criteria on every workload. It is a plain count, so it has no interval.
@@ -39,13 +53,21 @@ beat-the-reference criteria on every workload. It is a plain count, so it has no
 import json, re, sqlite3, sys
 from collections import Counter, defaultdict
 import numpy as np
-from scipy.optimize import minimize_scalar
+from scipy.optimize import brentq, minimize
+from scipy.special import expit, log_expit
 import pandas as pd
 import os
 os.environ.setdefault('TQDM_DISABLE', '1')   # Epoch's bootstrap bar, once per draw here
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from eci_fitting import fit_eci_model
 from datetime import datetime
+
+# The ECI scale (Qiuyang, 2026-10-14): ECI = PASS_ZERO_VALUE + PASS_UNIT * (theta - theta of PASS_ZERO), theta in logits.
+# ECI, SCALE, TFIT, DIFF and DIFF_FIT all follow from these three.
+PASS_ZERO = 'Kimi K2.7 Code'   # the 0 point; it is hidden (HIDDEN below) but stays in every fit
+PASS_ZERO_VALUE = 0
+PASS_UNIT = 1.0                # ECI points per logit
+TIE_EPS = 0                    # a final score within TIE_EPS of the human reference is half a win; 0: only an exact tie
 
 # database display name -> (domain folder, paper short name or None)
 TASK = {
@@ -117,20 +139,122 @@ MODEL = {
     'GLM 5.3 Flash (ZCode)': ('glmf', 'GLM 5.3 Flash', 'GLM 5.3 Flash', 'ZCode', 'Z.ai'),
 }
 
-HUMAN_VALUE = 25                               # owner's choice, 2026-10-13 (was 60 from 2026-10-09; tried 100; K2.7 was 20)
-HIDDEN = {'Kimi K2.7 Code'}                    # owner's call, 2026-10-09: off the leaderboard, kept in the ECI fit as its 0 point
-LOW_ANCHOR, LOW_VALUE = 'Kimi K2.7 Code', 0   # Kimi K3 = 20 is degenerate on the 2026-10-08 data: K3 scores level with the reference
-for a in sys.argv[2:]:   # optional: --low='Model name=value' to try another anchor
-    if a.startswith('--low='): LOW_ANCHOR, LOW_VALUE = a[6:].rsplit('=', 1)[0], float(a[6:].rsplit('=', 1)[1])
+HIDDEN = {'Kimi K2.7 Code'}                    # owner's call, 2026-10-09: off the leaderboard, kept in the fits (it is the ECI's 0 point)
+for a in sys.argv[2:]:   # optional: --low='Model name=value' to try another 0 point
+    if a.startswith('--low='): PASS_ZERO, PASS_ZERO_VALUE = a[6:].rsplit('=', 1)[0], float(a[6:].rsplit('=', 1)[1])
 
 
+LAM = 0.35                       # L2 penalty on every strength and difficulty of the pass fit, as the site's in-browser TDIFF
 BOOT = 500
+PRIOR_SD = 6                     # logits: prior sd of a task's beat-the-human threshold, or of its pass threshold without a reference
+GRID = np.arange(-30, 36.001, 0.02)   # logits from the mean strength: the grid of the task posteriors, 5 prior sd each side and room for DELTA
+HUMAN_VALUE = 25                 # the raw-score fit only (--json): the authors' reference is HUMAN_VALUE (owner, 2026-10-13)
 
 
-def eci(rows):
-    """Per respondent: (ECI, 90% low, 90% high, tasks); plus the number of bootstrap draws kept and dropped."""
+def on_scale(theta, theta0):
+    """Logits to ECI points, theta0 being PASS_ZERO's strength in the same fit."""
+    return PASS_ZERO_VALUE + PASS_UNIT * (np.asarray(theta) - theta0)
+
+
+def fit_data(rows):
+    """The fits' data: one (model, task, passed, score) per scored run, hidden models included, and each task's
+    reference r_t, the median reference_score over its runs (tasks where it is 0 or less have none)."""
+    obs, ref = [], defaultdict(list)
+    for cand, task, score, verdict, fj in rows:
+        if score is not None: obs.append((cand, task, int(verdict == 'PASS'), score))
+        f = json.loads(fj) if fj else {}
+        if f.get('reference_score') is not None: ref[task].append(f['reference_score'])
+    return obs, {t: float(np.median(v)) for t, v in ref.items() if np.median(v) > 0}
+
+
+def win(score, ref):
+    """A run against the human reference: 1 above it, 0 below it, 1/2 within TIE_EPS of it."""
+    return 1.0 if score > ref + TIE_EPS else 0.0 if score < ref - TIE_EPS else 0.5
+
+
+def rasch(mi, ti, y, nm, nt):
+    """Penalised ML of P(pass) = sigmoid(theta_m - beta_t), one term per run, penalty LAM/2 (sum theta^2 + sum beta^2).
+    Newton's method with step halving; the objective is strictly concave. Returns (theta, beta) in logits."""
+    x = np.zeros(nm + nt)
+    obj = lambda x: np.sum(y * log_expit(x[mi] - x[nm + ti]) + (1 - y) * log_expit(x[nm + ti] - x[mi])) - LAM / 2 * x @ x
+    for _ in range(200):
+        q = expit(x[mi] - x[nm + ti]); w = q * (1 - q)
+        g = np.concatenate([np.bincount(mi, y - q, nm), -np.bincount(ti, y - q, nt)]) - LAM * x
+        if np.abs(g).max() < 1e-11: break
+        H = np.diag(np.concatenate([np.bincount(mi, w, nm), np.bincount(ti, w, nt)]) + LAM)   # minus the Hessian
+        C = np.zeros((nm, nt)); np.add.at(C, (mi, ti), w)
+        H[:nm, nm:], H[nm:, :nm] = -C, -C.T
+        step, f0 = np.linalg.solve(H, g), obj(x)
+        while obj(x + step) < f0 and np.abs(step).max() > 1e-12: step /= 2
+        x = x + step
+    return x[:nm], x[nm:]
+
+
+def pass_eci(obs):
+    """The leaderboard fit. Per model: (ECI, 90% low, 90% high, tasks); plus every model's strength and every task's
+    difficulty in logits, and PASS_ZERO's strength."""
+    M, T = list(dict.fromkeys(o[0] for o in obs)), sorted({o[1] for o in obs})
+    assert PASS_ZERO in M, f'{PASS_ZERO} has no scored runs'
+    mi, ti = np.array([M.index(o[0]) for o in obs]), np.array([T.index(o[1]) for o in obs])
+    y, z = np.array([o[2] for o in obs], float), M.index(PASS_ZERO)
+    th, b = rasch(mi, ti, y, len(M), len(T))
+    cols, draws = [np.flatnonzero(ti == k) for k in range(len(T))], []
+    for seed in range(BOOT):   # a draw is a set of task columns, a task drawn twice being two columns
+        pick = np.random.default_rng(seed).integers(0, len(T), len(T))
+        idx = np.concatenate([cols[k] for k in pick])
+        d, _ = rasch(mi[idx], np.repeat(np.arange(len(T)), [len(cols[k]) for k in pick]), y[idx], len(M), len(T))
+        draws.append(on_scale(d, d[z]))
+    point, (lo, hi) = on_scale(th, th[z]), np.percentile(draws, [5, 95], axis=0)
+    out = {m: (round(float(point[i]), 2), round(float(lo[i]), 2), round(float(hi[i]), 2), len({o[1] for o in obs if o[0] == m}))
+           for i, m in enumerate(M)}
+    return out, dict(zip(M, th)), dict(zip(T, b)), th[z]
+
+
+def task_difficulty(obs, ref, theta):
+    """Per task (database name): (D, 90% low, 90% high) in logits, the posterior of its pass threshold b_t given who
+    passes and who beats the human reference, strengths held at theta (see the docstring); and the fitted (a, DELTA, TAU)."""
+    T = sorted({o[1] for o in obs})
+    th, ti = np.array([theta[o[0]] for o in obs]), np.array([T.index(o[1]) for o in obs])
+    y = np.array([o[2] for o in obs], float)
+    w = np.array([win(o[3], ref[o[1]]) if o[1] in ref else np.nan for o in obs]); has = ~np.isnan(w); w = np.nan_to_num(w)
+    R = np.array([t in ref for t in T])
+    tbar = float(np.mean(list(theta.values()))); G, dx = tbar + GRID, GRID[1] - GRID[0]
+    A = (ti[None, :] == np.arange(len(T))[:, None]).astype(float)   # task x run
+    Z = th[:, None] - G[None, :]                                    # run x grid: strength minus threshold
+    LP = A @ (y[:, None] * log_expit(Z) + (1 - y)[:, None] * log_expit(-Z))   # log L_pass(b)
+    prior = -0.5 * ((G - tbar) / PRIOR_SD) ** 2 - np.log(PRIOR_SD * np.sqrt(2 * np.pi))
+    # log L_win(h) + log N(h; mean theta, PRIOR_SD^2); rows of tasks without a reference are unused
+    LH = lambda a: (A * has) @ (w[:, None] * log_expit(a * Z) + (1 - w)[:, None] * log_expit(-a * Z)) + prior
+    DIF = G[:, None] - G[None, :]                                   # b - h
+
+    def kernel(d, tau):   # N(b - h; d, tau^2) on the grid, b by row
+        K = (DIF - d) / tau; K *= K; K *= -0.5; np.exp(K, out=K); K /= tau * np.sqrt(2 * np.pi)
+        return K
+
+    def loglik(p):   # sum over tasks with a reference of log of the double integral over b and h
+        a, d, tau = np.exp(p[0]), p[1], np.exp(p[2])
+        lh, lp = LH(a)[R], LP[R]; mh, mp = lh.max(1), lp.max(1)
+        v = np.exp(lh - mh[:, None]) @ kernel(d, tau).T
+        return float(np.sum(np.log(np.sum(np.exp(lp - mp[:, None]) * v, 1)) + mh + mp) + R.sum() * 2 * np.log(dx))
+
+    fit = minimize(lambda p: -loglik(p), [np.log(.5), 2.8, np.log(2)], method='L-BFGS-B',
+                   bounds=[(np.log(1e-3), np.log(1e3)), (-30, 30), (np.log(.25), np.log(30))])
+    assert fit.success, fit.message
+    a, d, tau = np.exp(fit.x[0]), fit.x[1], np.exp(fit.x[2])
+    K, lh, out = kernel(d, tau), LH(a), {}
+    for k, t in enumerate(T):
+        if R[k]: post = np.exp(LP[k] - LP[k].max()) * (K @ np.exp(lh[k] - lh[k].max()))
+        else: post = np.exp(LP[k] + prior - (LP[k] + prior).max())
+        cdf = np.cumsum(post); cdf /= cdf[-1]   # the mass up to the right edge of each grid cell
+        out[t] = tuple(float(v) for v in np.interp([.5, .05, .95], cdf, G + dx / 2))
+    return out, (float(a), float(d), float(tau)), -fit.fun
+
+
+def eci_score(rows):
+    """The raw-score fit (--json only). Per respondent: (ECI, 90% low, 90% high, tasks); plus the number of bootstrap
+    draws kept and dropped, the pinned task and the task curves."""
     sc, ref = defaultdict(list), defaultdict(list)
-    for cand, task, score, fj in rows:
+    for cand, task, score, verdict, fj in rows:
         if score is not None: sc[(cand, task)].append(score)
         f = json.loads(fj) if fj else {}
         if f.get('reference_score') is not None: ref[task].append(f['reference_score'])
@@ -140,7 +264,7 @@ def eci(rows):
     df['model_id'], df['benchmark_id'] = df['Model'], df['benchmark']
     counts = df['benchmark'].value_counts()
     pinned = sorted(counts.index, key=lambda t: (-counts[t], t))[0]
-    kw = dict(anchor_benchmark=pinned, anchor_model_low=LOW_ANCHOR, anchor_eci_low=float(LOW_VALUE),
+    kw = dict(anchor_benchmark=pinned, anchor_model_low=PASS_ZERO, anchor_eci_low=float(PASS_ZERO_VALUE),
               anchor_model_high='reference', anchor_eci_high=float(HUMAN_VALUE))
     central, curves, _ = fit_eci_model(df, bootstrap_samples=0, **kw)
     point = dict(zip(central['Model'], central['eci']))
@@ -188,52 +312,36 @@ def cost(db):
     return {m: [round(float(np.mean(v)), 4), len(v)] for m, v in sorted(by.items())}
 
 
-def scaling(db, curves):
-    """{model id: [[US$ budget, ECI, 90% low, 90% high, share of runs still going], ...]}; spend from usd()."""
-    EDI = dict(zip(curves['benchmark'], curves['edi'])); SL = dict(zip(curves['benchmark'], curves['discriminability_scaled']))
-    info = {r: (c, t, s) for r, c, t, s in db.execute('''select r.id, cd.name, t.name, r.display_score from cells ce join runs r on r.id = ce.run_id
-        join candidates cd on cd.id = ce.candidate_id join tasks t on t.id = ce.task_id''') if s is not None and c not in HIDDEN}
-    pts = {(r, sid): (sc, tt, ot) for r, sid, sc, tt, ot in db.execute('select run_id, submission_id, score, total_tokens, output_tokens from score_points')}
-    subs = defaultdict(list)
-    for r, sid, kind, ph in db.execute('select run_id, id, kind, patch_sha256 from submissions order by run_id, ordinal'): subs[r].append((sid, kind, ph))
-    # calibration pairs: dev score of the final patch, hidden final score
-    gaps = defaultdict(list)
-    for r, (c, t, hidden) in info.items():
-        dev = {ph: pts[(r, sid)][0] for sid, kind, ph in subs[r] if kind == 'train' and (r, sid) in pts}
-        fin = [ph for sid, kind, ph in subs[r] if kind == 'final']
-        if fin and fin[0] in dev: gaps[t].append(hidden - dev[fin[0]])
-    g, off = 0.0, {}   # no dev-to-hidden calibration: the platform pairs no development score with the final patch
+def strength(y, b):
+    """The one strength theta (logits) that maximises sum [y log sigmoid(theta - b) + (1 - y) log(1 - sigmoid(theta - b))]
+    - LAM theta^2 / 2 with the difficulties b fixed: the root of its derivative, which falls in theta."""
+    y, b = np.asarray(y, float), np.asarray(b, float)
+    return brentq(lambda x: np.sum(y - expit(x - b)) - LAM * x, -200, 200, xtol=1e-13)
 
-    def cap(ys):
-        t = list(ys); y = np.clip(np.array([ys[k] for k in t]) / 100, 1e-3, 1 - 1e-3)
-        e = np.array([EDI[k] for k in t]); sl = np.array([SL[k] for k in t])
-        return minimize_scalar(lambda x: np.sum((1 / (1 + np.exp(-sl * (x - e))) - y) ** 2), bounds=(-400, 400), method='bounded').x
 
+def scaling(db, beta, theta0):
+    """{model id: [[US$ budget, ECI, 90% low, 90% high, share of runs still going], ...]}; spend from usd().
+    beta: the leaderboard fit's task difficulties (logits, by database task name); theta0: PASS_ZERO's strength there."""
+    info = {r: (c, t, v == 'PASS') for r, c, t, s, v in db.execute('''select r.id, cd.name, t.name, r.display_score, r.display_verdict from cells ce
+        join runs r on r.id = ce.run_id join candidates cd on cd.id = ce.candidate_id join tasks t on t.id = ce.task_id''') if s is not None and c not in HIDDEN}
+    pts = {(r, sid): (tt, ot) for r, sid, tt, ot in db.execute('select run_id, submission_id, total_tokens, output_tokens from score_points')}
+    end = {}   # a run's spend at its end: usd() at its last submission with a score point, 0 if none
+    for r, sid in db.execute('select run_id, id from submissions order by run_id, ordinal'):
+        if r in info and (r, sid) in pts: end[r] = usd(MODEL[info[r][0]][0], *pts[(r, sid)])
     out = {}
-    for axis in ('usd',):
-        traj = {}
-        for r, (c, t, hidden) in info.items():
-            seq, end = [], 0
-            for sid, kind, ph in subs[r]:
-                if (r, sid) not in pts: continue
-                p = pts[(r, sid)]; end = usd(MODEL[c][0], p[1], p[2])
-                if kind == 'train' and p[0] > 0: seq.append((end, float(np.clip(p[0] + off.get(t, g), 0, 100))))
-            traj[r] = (seq, end, hidden)
-        # stopped at B, the run's result is its latest valid submission: the latest with a dev score above 0 (owner, 2026-10-09;
-        # restored 2026-10-13 after a day of best-so-far capped at the hidden score)
-        at = lambda r, B: traj[r][2] if B >= traj[r][1] else next((d for spend, d in reversed(traj[r][0]) if spend <= B), 0.0)
-        out[axis] = {}
-        for c in sorted({v[0] for v in info.values()}, key=lambda c: MODEL[c][0]):
-            runs = [r for r in info if info[r][0] == c]; tasks = sorted({info[r][1] for r in runs}); ends = [traj[r][1] for r in runs]
-            if not max(ends): continue   # no spend reported: no curve
-            rng, curve = np.random.default_rng(3), []
-            # budgets are rounded up to the stored precision before use, so each point is exact at its stored budget
-            for B in np.ceil(np.geomspace(1e-3, max(ends), SCALE_POINTS) * 1e5) / 1e5:
-                ys = {t: float(np.mean([at(r, B) for r in runs if info[r][1] == t])) for t in tasks}
-                lo, hi = np.percentile([cap({t: ys[t] for t in rng.choice(tasks, len(tasks))}) for _ in range(SCALE_BOOT)], [5, 95])
-                curve.append([float(B), round(float(cap(ys)), 1), round(float(lo), 1), round(float(hi), 1), round(float(np.mean([e > B for e in ends])), 2)])
-            out[axis][MODEL[c][0]] = curve
-    return out['usd']
+    for c in sorted({v[0] for v in info.values()}, key=lambda c: MODEL[c][0]):
+        runs = [r for r in info if info[r][0] == c]; tasks = sorted({info[r][1] for r in runs}); ends = [end.get(r, 0) for r in runs]
+        if not max(ends): continue   # no spend reported: no curve
+        rng, curve = np.random.default_rng(3), []
+        # budgets are rounded up to the stored precision before use, so each point is exact at its stored budget
+        for B in np.ceil(np.geomspace(1e-3, max(ends), SCALE_POINTS) * 1e5) / 1e5:
+            # at B a run has passed only if it has ended within B with verdict PASS (Qiuyang, 2026-10-14)
+            y = {t: [float(info[r][2] and end.get(r, 0) <= B) for r in runs if info[r][1] == t] for t in tasks}
+            eci = lambda ts: float(on_scale(strength([v for t in ts for v in y[t]], [beta[t] for t in ts for _ in y[t]]), theta0))
+            lo, hi = np.percentile([eci(rng.choice(tasks, len(tasks))) for _ in range(SCALE_BOOT)], [5, 95])
+            curve.append([float(B), round(eci(tasks), 2), round(float(lo), 2), round(float(hi), 2), round(float(np.mean([e > B for e in ends])), 2)])
+        out[MODEL[c][0]] = curve
+    return out
 
 
 def hidden_json(generated, hidden):   # one run per line, so a refresh diffs by run
@@ -252,7 +360,7 @@ rows = db.execute('''select c.name, t.name, r.display_score, r.state, r.display_
 missing = {r[1] for r in rows} - set(TASK)
 assert not missing, f'unmapped tasks: {missing}'
 assert not {c for c, *_ in rows} - set(MODEL), 'unmapped model'
-MODEL = {c: v for c, v in MODEL.items() if c in {r[0] for r in rows} or c == LOW_ANCHOR}   # only the models this database has
+MODEL = {c: v for c, v in MODEL.items() if c in {r[0] for r in rows} or c == PASS_ZERO}   # only the models this database has
 
 runs = []
 for cand, task, score, state, verdict in rows:
@@ -284,17 +392,31 @@ def trajectories(db):
     return out
 
 
-def task_facts(db, curves):
-    """Per task short name: the authors' reference score (median reference_score over its runs, left out when 0) and the
-    task's FECI curve from the leaderboard fit, [difficulty, slope]: expected score = 100 / (1 + exp(-slope (FECI - difficulty)))."""
+short = lambda t: TASK[t][1] or t.split(' — ')[0]   # database task name -> the name RUNS and the page use
+assert len({short(t) for t in {r[1] for r in rows}}) == len({r[1] for r in rows}), 'two tasks share a short name'
+
+
+def task_reference(db):
+    """Per task short name: the authors' reference score (median reference_score over its runs, left out when 0)."""
     ref = defaultdict(list)
     for t, fj in db.execute('select t.name, r.feedback_json from cells ce join runs r on r.id = ce.run_id join tasks t on t.id = ce.task_id'):
         f = json.loads(fj) if fj else {}
-        if f.get('reference_score') is not None: ref[TASK[t][1] or t.split(' — ')[0]].append(f['reference_score'])
-    REF = {t: round(float(np.median(v)), 1) for t, v in sorted(ref.items()) if np.median(v) > 0}
-    FIT = {TASK[b][1] or b.split(' — ')[0]: [round(float(e), 2), round(float(k), 4)]
-           for b, e, k in zip(curves['benchmark'], curves['edi'], curves['discriminability_scaled'])}
-    return REF, dict(sorted(FIT.items()))
+        if f.get('reference_score') is not None: ref[short(t)].append(f['reference_score'])
+    return {t: round(float(np.median(v)), 1) for t, v in sorted(ref.items()) if np.median(v) > 0}
+
+
+def task_fits(D, fit, ref, theta0):
+    """TFIT, DIFF and DIFF_FIT from task_difficulty()'s output, on the ECI scale. TFIT[task] = [D, slope], the pass curve
+    P(pass) = 1 / (1 + exp(-slope (ECI - D))); DIFF[task] = [D, 90% low, 90% high, passes, wins, runs], counting the runs
+    the page shows (RUNS), wins null without a reference."""
+    a, d, tau = fit
+    TFIT, DIFF = {}, {}
+    for t, v in D.items():
+        rs = [(s, p) for c, tt, s, st, p in rows if tt == t and s is not None and c not in HIDDEN]
+        e = [round(float(x), 2) for x in on_scale(v, theta0)]
+        TFIT[short(t)] = [e[0], round(1 / PASS_UNIT, 4)]
+        DIFF[short(t)] = e + [sum(p == 'PASS' for s, p in rs), round(sum(win(s, ref[t]) for s, p in rs), 1) if t in ref else None, len(rs)]
+    return dict(sorted(TFIT.items())), dict(sorted(DIFF.items())), {'a': round(a, 3), 'delta': round(PASS_UNIT * d, 2), 'tau': round(PASS_UNIT * tau, 2)}
 
 
 def task_checks(db):
@@ -329,27 +451,35 @@ def pass_rate(runs):
 js_path = 'assets/js/fcs2-data.js'
 when = datetime.fromisoformat(generated[:19])
 models = [MODEL[c] for c in MODEL if c not in HIDDEN]
-E, nboot, nbad, pinned, curves = eci(db.execute('''select c.name, t.name, r.display_score, r.feedback_json from cells ce
-  join runs r on r.id = ce.run_id join candidates c on c.id = ce.candidate_id join tasks t on t.id = ce.task_id''').fetchall())
-SC, CO = scaling(db, curves), cost(db)
-REF, TFIT = task_facts(db, curves)
+fit_rows = db.execute('''select c.name, t.name, r.display_score, r.display_verdict, r.feedback_json from cells ce
+  join runs r on r.id = ce.run_id join candidates c on c.id = ce.candidate_id join tasks t on t.id = ce.task_id''').fetchall()
+obs, task_ref = fit_data(fit_rows)
+E, THETA, BETA, theta0 = pass_eci(obs)
+D, dfit, dll = task_difficulty(obs, task_ref, THETA)
+TFIT, DIFF, DIFF_FIT = task_fits(D, dfit, task_ref, theta0)
+SC, CO = scaling(db, BETA, theta0), cost(db)
+REF = task_reference(db)
 CHECKS = task_checks(db)
 eci_js = {MODEL[c][0]: list(E[c]) for c in MODEL if c not in HIDDEN}
+zero = MODEL[PASS_ZERO][1]
 block = (f'// One entry per scored run in the preview results database of {when:%Y-%m-%d} (bin/fcs2_runs_from_db.py):\n'
          f'// model, domain, task, final score (0-100, the task\'s own scale), passed (1 = verdict PASS). Timeouts score 0; {sum(dropped.values())} unscored runs are left out' + ''.join(f'; {MODEL[c][1]} is left out (only the ECI 0 point)' for c in sorted(HIDDEN)) + '.\n'
          f'const RUNS = {json.dumps(runs, ensure_ascii=False)}.map(([m, d, t, s, p]) => ({{m, d, t, s, p}}));\n'
          'const MODELS = [\n' + ''.join(f"  {{id:'{i}', name:'{n}', short:'{s}', h:'{h}', lab:'{l}'}},\n" for i, n, s, h, l in models) + '];\n'
          f"const UPDATED = '{when:%B} {when.day}, {when.year}';\n"
-         f"// FECI per model: [point, 90% low, 90% high, tasks]; Human (the authors' reference) is {HUMAN_VALUE:g} and {LOW_ANCHOR} is {LOW_VALUE:g} ({nboot} bootstrap draws kept, {nbad} dropped with the anchors inverted; pinned slope: {pinned}).\n"
          f"// Pass rate per model: [percent, runs that pass, runs].\nconst PASS = {json.dumps(pass_rate(runs))};\n"
-         f"const ECI = {json.dumps(eci_js)};\nconst ECI_HUMAN = {HUMAN_VALUE:g}, ECI_LOW = '{MODEL[LOW_ANCHOR][0]}', ECI_LOW_NAME = '{MODEL[LOW_ANCHOR][1]}', ECI_LOW_VALUE = {LOW_VALUE:g}, ECI_REF_TASKS = {E['reference'][3]};\n"
-         f"// Test-time scaling per model: [US$ budget per run, ECI, 90% low, 90% high, share of runs still going] (see the converter's docstring).\nconst SCALE = {json.dumps(SC, separators=(',', ':'))};\n"
+         f"// ECI per model: [point, 90% low, 90% high, tasks], fitted on pass and fail: P(model passes task) = 1 / (1 + exp(-(strength - difficulty))), every run of every model one observation ({zero} too), L2 penalty {LAM:g}; ECI = {PASS_ZERO_VALUE:g} + {PASS_UNIT:g} x (strength - {zero}'s strength), strengths in logits (ECI_LOW, ECI_LOW_VALUE, ECI_UNIT); the interval resamples tasks ({BOOT} bootstrap draws).\n"
+         f"const ECI = {json.dumps(eci_js)};\nconst ECI_LOW = '{MODEL[PASS_ZERO][0]}', ECI_LOW_NAME = '{zero}', ECI_LOW_VALUE = {PASS_ZERO_VALUE:g}, ECI_UNIT = {PASS_UNIT:g};\n"
+         f"// Test-time scaling per model: [US$ budget per run, ECI, 90% low, 90% high, share of runs still going]; at a budget a run has passed only if it ended within it with verdict PASS, task difficulties held at the ECI fit (see the converter's docstring).\nconst SCALE = {json.dumps(SC, separators=(',', ':'))};\n"
          f"// Cost per model: [mean US$ per scored run, runs]; output tokens x output price + every token x cache-read price (PRICE above).\nconst COST = {json.dumps(CO)};\nconst PRICE = {json.dumps(PRICE)};\n"
          f"// Every scored run: [model, task, final score, passed, US$ at end, hours, [[US$, dev score] per development submission]].\nconst TRAJ = {json.dumps(trajectories(db), separators=(',', ':'), ensure_ascii=False)};\n"
-         f"// Per task: the authors' reference score, and its FECI curve [difficulty, slope] (score = 100 / (1 + exp(-slope (FECI - difficulty)))).\nconst REF = {json.dumps(REF, ensure_ascii=False)};\nconst TFIT = {json.dumps(TFIT, ensure_ascii=False)};\n"
+         f"// Per task: the authors' reference score, the median over the task's runs (tasks without one are left out).\nconst REF = {json.dumps(REF, ensure_ascii=False)};\n"
+         f"// Per task: its pass curve [D, slope], P(pass) = 1 / (1 + exp(-slope (ECI - D))), with D from DIFF.\nconst TFIT = {json.dumps(TFIT, ensure_ascii=False)};\n"
+         f"// Per task: [D, 90% low, 90% high, passes, wins, runs] in RUNS. D, the difficulty, is the ECI at which a model passes half the time: the posterior median of the task's pass threshold given who passes and, through an easier beat-the-human threshold (DIFF_FIT), whose final score beats the human reference (a win; a tie is half; wins is null without a reference).\nconst DIFF = {json.dumps(DIFF, ensure_ascii=False)};\n"
+         f"// The difficulty fit's shared parameters, by marginal likelihood over the tasks with a reference: a, the slope of P(win) over that of P(pass); delta and tau, the mean and sd of the pass threshold minus the beat-the-human threshold, in ECI points.\nconst DIFF_FIT = {json.dumps(DIFF_FIT)};\n"
          f"// Per task: the metrics its judge checks and the number of hidden final workloads; a run passes only when every check passes on every final workload.\nconst CHECKS = {json.dumps(CHECKS, ensure_ascii=False, separators=(',', ':'))};\n"
          f"// Task descriptions from the paper repo (bin/fcs2_descriptions.tsv).\nconst DESC = {json.dumps(descriptions(), ensure_ascii=False)};\n")
-js = open(js_path, encoding='utf-8').read()   # read late: the fits above take minutes
+js = open(js_path, encoding='utf-8').read()   # read late: the fits above take a while
 BEGIN, END = '// BEGIN converter block (bin/fcs2_runs_from_db.py writes everything up to END)\n', '// END converter block\n'
 assert js.count(BEGIN) == 1 and js.count(END) == 1, 'converter markers not found'
 js = js[:js.index(BEGIN) + len(BEGIN)] + block + js[js.index(END):]
@@ -357,16 +487,26 @@ open(js_path, 'w', encoding='utf-8').write(js)
 hid_path = '_data/fcs2_runs_hidden.json'
 open(hid_path, 'w', encoding='utf-8').write(hidden_json(generated, hidden))
 print('PASS', pass_rate(runs))
-print('ECI', eci_js, 'reference tasks', E['reference'][3])
+print('ECI', eci_js)
+print('DIFF_FIT', DIFF_FIT, f'(logits: a {dfit[0]:.4f}, delta {dfit[1]:.4f}, tau {dfit[2]:.4f}; log marginal likelihood {dll:.3f})')
 print(f'{len(runs)} runs, {len({r[2] for r in runs})} tasks, {len(models)} models; dropped {dict(dropped)}; generated {generated}')
 
 for a in sys.argv[2:]:
     if a.startswith('--json='):
+        S, nboot, nbad, pinned, curves = eci_score(fit_rows)   # the raw-score fit, kept for the paper only
         out = {'source': sys.argv[1], 'generated_at': generated, 'runs_columns': ['model', 'domain', 'task', 'score', 'passed'], 'runs': runs,
                'models': [dict(zip(['id', 'name', 'short', 'harness', 'lab'], m)) for m in models], 'dropped': dict(dropped),
-               'pass': pass_rate(runs), 'cost_usd': CO, 'price_per_mtok': PRICE, 'eci': eci_js, 'eci_human': HUMAN_VALUE,
-               'eci_low': [LOW_ANCHOR, LOW_VALUE], 'eci_boot_kept': nboot, 'eci_boot_dropped': nbad, 'eci_pinned_task': pinned,
-               'eci_reference_tasks': E['reference'][3], 'scaling_columns': ['usd', 'eci', 'lo90', 'hi90', 'share_running'], 'scaling': SC,
-               'task_reference': REF, 'task_fit_columns': ['difficulty', 'slope'], 'task_fit': TFIT, 'task_checks': CHECKS}   # per task, for the paper's task-difficulty section
+               'pass': pass_rate(runs), 'cost_usd': CO, 'price_per_mtok': PRICE, 'eci': eci_js, 'eci_unit': PASS_UNIT,
+               'eci_low': [PASS_ZERO, PASS_ZERO_VALUE], 'eci_penalty': LAM, 'eci_boot': BOOT,
+               'scaling_columns': ['usd', 'eci', 'lo90', 'hi90', 'share_running'], 'scaling': SC,
+               'task_reference': REF, 'task_fit_columns': ['difficulty', 'slope'], 'task_fit': TFIT,
+               'task_difficulty_columns': ['difficulty', 'lo90', 'hi90', 'passes', 'wins', 'runs'], 'task_difficulty': DIFF,
+               'difficulty_fit': DIFF_FIT, 'task_checks': CHECKS,
+               'feci_score_columns': ['eci', 'lo90', 'hi90'], 'feci_score': {MODEL[c][0]: list(S[c][:3]) for c in MODEL if c not in HIDDEN},
+               'feci_score_anchors': {'reference': HUMAN_VALUE, PASS_ZERO: PASS_ZERO_VALUE}, 'feci_score_boot_kept': nboot,
+               'feci_score_boot_dropped': nbad, 'feci_score_pinned_task': pinned, 'feci_score_reference_tasks': S['reference'][3],
+               'task_fit_score_columns': ['difficulty', 'slope'],   # expected score = 100 / (1 + exp(-slope (feci_score - difficulty)))
+               'task_fit_score': dict(sorted({short(b): [round(float(e), 2), round(float(k), 4)]
+                                              for b, e, k in zip(curves['benchmark'], curves['edi'], curves['discriminability_scaled'])}.items()))}
         json.dump(out, open(a[7:], 'w'), indent=1)
         print('wrote', a[7:])
