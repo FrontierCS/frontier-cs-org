@@ -186,14 +186,11 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 /* task index */
 .idx{display:grid; grid-template-columns:240px minmax(0,1fr); gap:24px 56px}
 @media (max-width:900px){ .idx{grid-template-columns:1fr} }
-.filter h3{font-size:26px; font-weight:500; margin:0 0 22px}
-.filter h4{font-size:21px; font-weight:500; margin:0 0 14px}
 .checks{display:flex; flex-direction:column; gap:7px; font-size:17px}
 .checks label{display:flex; align-items:center; gap:8px; cursor:pointer}
 .checks input{width:14px; height:14px; margin:0; accent-color:var(--ink-2)}
 .ftoggle{display:none}
 @media (max-width:900px){
-  .filter h3{display:none}
   .ftoggle{display:inline-flex; align-items:center; gap:8px; border:1px solid #80868b; background:#fff; border-radius:4px; height:42px; padding-inline:14px; font-weight:600}
   .filter .fbody{display:none; margin-top:14px} .filter.open .fbody{display:block}
   .checks{display:grid; grid-template-columns:1fr 1fr; gap:8px 12px; font-size:15px}
@@ -202,23 +199,44 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 .bar .field{flex:1 1 260px}
 .sel{height:42px; border:1px solid var(--line-2); border-radius:4px; padding:0 10px; font:inherit; font-size:15px; background:#fff; color:var(--ink-2)}
 .cnt{font-size:15px; color:var(--ink-2); white-space:nowrap}
-.rows{margin-top:10px}
-/* task index rows: one grid so domain, name, paper title and links line up from row to row (owner, 2026-10-11; the class
-   was .row, which _fcs.scss also styles as a wrapping flex row, so the parts drifted) */
-.trow{position:relative; display:grid; grid-template-columns:184px minmax(0,15em) minmax(0,1fr) auto; gap:6px 28px; align-items:center; padding:20px 0; border-top:1px solid var(--line)}
+.rows{margin-top:0; max-height:min(68vh,760px); overflow-y:auto; scrollbar-width:thin; scrollbar-color:var(--line) transparent; outline:0;
+  -webkit-mask-image:linear-gradient(#000 calc(100% - 56px), transparent); mask-image:linear-gradient(#000 calc(100% - 56px), transparent)}
+.rows.at-end{-webkit-mask-image:none; mask-image:none}
+.rows:focus-visible{box-shadow:0 0 0 2px var(--teal)}
+/* task index: a head line (how many tasks, what the dots are), then one compact row per task on a shared grid, so names,
+   goals, dots and links line up from row to row: name over domain, goal over source, a dot per model, links */
+.lhead, .trow{display:grid; grid-template-columns:minmax(0,12.5em) minmax(0,1fr) 107px 86px; gap:4px 24px; align-items:center}
+.lhead{margin-top:16px; padding-bottom:9px; border-bottom:1px solid var(--line); font-size:13px; color:var(--muted)}
+.lhead span:nth-child(3){text-align:right; cursor:help}
+.trow{position:relative; padding:13px 0; border-top:1px solid var(--line)}
 .trow:first-child{border-top:0}
-.trow .tag{justify-self:start}
-.trow h3{font-size:clamp(19px,1.8vw,22px); font-weight:500; margin:0; overflow-wrap:anywhere}
+.trow h3{font-size:18px; font-weight:500; line-height:1.25; margin:0; overflow-wrap:anywhere}
 .trow h3 a{color:inherit; text-decoration:none}
 .trow h3 a::after{content:""; position:absolute; inset:0}
 .trow:hover h3 a{color:var(--teal-d)}
-.trow p{margin:0; color:var(--ink-2); font-size:16px; line-height:1.4}
-.trow .lk{display:flex; gap:18px; font-size:14px; color:var(--muted-2); white-space:nowrap}
+.trow .td{display:inline-flex; align-items:center; gap:6px; margin-top:4px; font-size:13px; color:var(--muted)}
+.trow .td::before{content:""; width:8px; height:8px; border-radius:2px; background:var(--a)}
+.trow .tx{min-width:0}
+.trow p{margin:0; color:var(--ink-2); font-size:15.5px; line-height:1.35}
+.trow p.src{margin-top:3px; font-size:13px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.trow p.src b{font-weight:600; color:var(--ink-2)}
+.trow .tp{position:relative; z-index:1; display:flex; flex-direction:column; align-items:flex-end; gap:5px; font-size:12.5px; color:var(--muted); white-space:nowrap; text-decoration:none}
+.trow .pr{font-size:13px; font-weight:600; color:var(--ink-2); font-variant-numeric:tabular-nums} .trow .pr.none{font-weight:500; color:var(--muted)}
+.dots{display:flex; gap:3px}
+.dots i{width:8px; height:8px; border-radius:50%; box-sizing:border-box; border:1.5px solid #bdc1c6}
+.dots i.y{background:var(--ink); border-color:var(--ink)}
+.dots i.x{border-style:dotted}
+.trow .lk{display:flex; justify-content:flex-end; gap:14px; font-size:14px; color:var(--muted-2); white-space:nowrap}
 .trow .lk a{position:relative; z-index:1; color:var(--ink-2); text-decoration:underline; text-underline-offset:3px; text-decoration-color:var(--line-2)} .trow .lk a:hover{color:var(--teal); text-decoration-color:currentColor}
 .trow.flash{background:#e8f0fe; box-shadow:-12px 0 0 #e8f0fe, 12px 0 0 #e8f0fe}
-@media (max-width:900px){ .trow{grid-template-columns:minmax(0,1fr) auto; gap:8px 16px} .trow .tag{grid-column:1} .trow .lk{grid-column:2; grid-row:1; justify-self:end} .trow h3, .trow p{grid-column:1 / -1} }
+@media (max-width:900px){
+  .lhead, .trow{grid-template-columns:minmax(0,1fr) auto; gap:6px 16px}
+  .lhead span:nth-child(2), .lhead span:nth-child(4){display:none}
+  .trow .tn{grid-area:1 / 1} .trow .tp{grid-area:1 / 2; align-self:start; margin-top:5px}
+  .trow .tx{grid-area:2 / 1 / 3 / -1} .trow .lk{grid-area:3 / 1 / 4 / -1; justify-content:flex-start}
+  .trow .lk:empty{display:none}
+}
 .empty{color:var(--muted); padding:30px 0}
-.showmore{margin-top:16px}
 
 /* task teaser: the paper's treemap, one block per domain; a click filters the index */
 .tz{margin-bottom:44px}

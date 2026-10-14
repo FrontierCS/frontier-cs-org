@@ -113,13 +113,11 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
 </section>
 
 <section class="sec" id="tasks">
-  <h2>Tasks</h2>
+  <h2>Problems</h2>
   <div class="idx">
-    <div class="filter" id="filter">
-      <h3>Filter</h3>
-      <button class="ftoggle" type="button" id="ftoggle" aria-expanded="false">Filter by domain <span id="fcount"></span></button>
+    <div class="filter" id="filter" aria-label="Filter by domain">
+      <button class="ftoggle" type="button" id="ftoggle" aria-expanded="false">Filter <span id="fcount"></span></button>
       <div class="fbody">
-        <h4>Domain</h4>
         <div class="checks" id="checks"></div>
       </div>
     </div>
@@ -127,9 +125,12 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
       <div class="bar">
         <label class="field" for="q"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
           <input id="q" type="search" placeholder="Search" autocomplete="off"></label>
+        <select class="sel" id="tsort" aria-label="Sort tasks">
+          <option value="hard">Hardest first</option><option value="easy">Easiest first</option><option value="domain">By domain</option><option value="name">By name</option>
+        </select>
       </div>
-      <div class="rows" id="rows"></div>
-      <button class="pill lg showmore" type="button" id="showmore">Show more</button>
+      <div class="lhead" id="lhead"></div>
+      <div class="rows" id="rows" role="region" aria-label="Task list" tabindex="0"></div>
     </div>
   </div>
 </section>
