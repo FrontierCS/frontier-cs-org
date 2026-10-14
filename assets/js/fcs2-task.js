@@ -187,20 +187,42 @@ function drawFit() {
   const L = 44, R = narrow ? 12 : 24, T = 12, B = 46, H = narrow ? 280 : 320;
   // the axis holds 0 (Kimi K2.7), every model and the FDI, nothing more, so a hard task does not stretch it
   const es = RANKED.map(m => ECI[m.id][0]), lo = Math.min(ECI_LOW_VALUE, d, ...es), hi = Math.max(d, ...es), step = eciStep(hi - lo, narrow ? 4 : 7);
-  const xmin = Math.floor(lo / step) * step, xmax = Math.ceil(hi / step) * step;
-  const X = v => L + (v - xmin) / (xmax - xmin) * (W - L - R), Y = v => T + (1 - v / 100) * (H - T - B), f = x => 100 / (1 + Math.exp(-k * (x - d)));
+  const xmin = Math.floor(lo / step) * step, xmax = Math.ceil(hi / step) * step, top = Math.max(ECI_LOW_VALUE, ...es), PW = W - L - R;
+  const Y = v => T + (1 - v / 100) * (H - T - B), f = x => 100 / (1 + Math.exp(-k * (x - d)));
+  /* A broken axis (Qiuyang, 2026-10-14): on a phone, when reaching the FDI would leave the models less than 60% of the
+     plot, the axis runs to a little past the strongest model, breaks, and shows a short stretch around the FDI at the
+     same scale, with a tick of its own at the FDI. The gap is marked by two slanted strokes on the axis line and on the
+     curve, and nothing is drawn inside it. */
+  let X = v => L + (v - xmin) / (xmax - xmin) * PW, segs = [[xmin, xmax]], gap = null, ticks = [];
+  for (let i = 0, v = xmin; v <= xmax + step / 2; v = xmin + ++i * step) ticks.push([v, tick(v)]);
+  if (narrow && d > top && (top - xmin) / (xmax - xmin) < .6) {
+    const s1 = eciStep(top - xmin, 3), xa = Math.ceil(top / s1) * s1 + (Math.ceil(top / s1) * s1 === top ? s1 : 0);
+    const G = 14, lp = Math.round(PW * .7), ppu = lp / (xa - xmin), half = (PW - lp - G) / ppu / 2, r0 = d - half;
+    if (r0 > xa) {
+      X = v => v <= xa + 1e-9 ? L + (v - xmin) * ppu : L + lp + G + (v - r0) * ppu;
+      segs = [[xmin, xa], [r0, d + half]]; gap = [L + lp, L + lp + G]; ticks = [];
+      for (let i = 0, v = xmin; v <= xa + s1 / 2; v = xmin + ++i * s1) ticks.push([v, tick(v)]);
+      ticks.push([d, fe(d)]);
+    }
+  }
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
   for (let v = 0; v <= 100; v += 25) {
-    svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1}));
+    for (const [x1, x2] of gap ? [[L, gap[0]], [gap[1], W - R]] : [[L, W - R]]) svg.append(sv('line', {x1, x2, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1}));
     svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, v + '%'));
   }
-  for (let i = 0, v = xmin; v <= xmax + step / 2; v = xmin + ++i * step) {
+  ticks.forEach(([v, label]) => {
     svg.append(sv('line', {x1:X(v), x2:X(v), y1:H - B, y2:H - B + 5, stroke:'var(--ink-2)', 'stroke-width':1}));
-    svg.append(sv('text', {x:X(v), y:H - B + 20, 'text-anchor':'middle'}, tick(v)));
+    svg.append(sv('text', {x:X(v), y:H - B + 20, 'text-anchor':'middle'}, label));
+  });
+  svg.append(sv('text', {class:'ax', x:L + PW / 2, y:H - 6, 'text-anchor':'middle'}, 'FCI'));
+  const n = 120;
+  segs.forEach(([a, b]) => svg.append(sv('path', {d:Array.from({length:n + 1}, (_, i) => { const x = a + (b - a) * i / n; return `${i ? 'L' : 'M'}${X(x).toFixed(1)},${Y(f(x)).toFixed(1)}`; }).join(''),
+    fill:'none', stroke:'var(--ink-2)', 'stroke-width':2.5})));
+  if (gap) {   // the break: a pair of slanted strokes where the axis line and the curve leave off and start again
+    const ys = [[H - B, H - B], [Y(f(segs[0][1])), Y(f(segs[1][0]))]];
+    ys.forEach(([ya, yb]) => [[gap[0], ya], [gap[1], yb]].forEach(([x, y]) =>
+      svg.append(sv('line', {x1:x - 3, y1:y + 6, x2:x + 3, y2:y - 6, stroke:'var(--ink-2)', 'stroke-width':1.5}))));
   }
-  svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'FCI'));
-  const n = 120, path = Array.from({length:n + 1}, (_, i) => { const x = xmin + (xmax - xmin) * i / n; return `${i ? 'L' : 'M'}${X(x).toFixed(1)},${Y(f(x)).toFixed(1)}`; }).join('');
-  svg.append(sv('path', {d:path, fill:'none', stroke:'var(--ink-2)', 'stroke-width':2.5}));
   // the task's FDI: where the curve crosses 50%, an open circle; a dashed drop
   // to the axis marks it there; the label sits above and left of the point, which is off a rising curve
   svg.append(sv('line', {x1:X(d), x2:X(d), y1:Y(50), y2:H - B, stroke:'var(--ink-2)', 'stroke-width':1, 'stroke-dasharray':'3 3', opacity:.7}));
