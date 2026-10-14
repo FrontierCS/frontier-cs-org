@@ -44,14 +44,15 @@ percentiles. D, a task's difficulty, is the strength at which a run beats every 
 sigmoid(D + u - beta_tj) N(u; 0, SIGMA_U^2) du = 1/2, with beta at the mode. Its 90% interval comes from IS_DRAWS draws
 of the task's parameters from the Laplace Gaussian (strengths held), weighted by the exact posterior over the Gaussian's
 density (the posterior of a metric nobody beats is one-sided): the weighted 5th and 95th percentiles of D. TFIT's slope
-is that of the logistic matched to the pass curve at D, 4 dP(pass)/dtheta there. All are mapped to FCI points like the
-strengths. GROUPS gives each task's metric-group difficulties at the mode, on the FCI scale, so the task chart can draw
-the model's own pass curve, which crosses 1/2 at the task's FDI (the script checks this on the rounded values, to 0.05
-points); TFIT's matched logistic stays for the pages that still read it. PROG gives each task's progress curve for its
-chart (Qiuyang): the expected share of the task's hidden checks a model beats (summed over its final workloads; a run
-without counts beats none), E[share | theta] = f_t + (1 - f_t) integral sigmoid(kappa_t (theta - g_t) + u) N(u; 0,
-SIGMA_U^2) du, with a floor f_t in [0, 0.95], a slope kappa_t (log kappa_t ~ N(0, PROG_K_SD^2)) and g_t (weak prior N(0,
-PRIOR_SD^2)), fitted by fractional-logit quasi-likelihood with strengths and SIGMA_U held at the joint fit.
+(--json only) is that of the logistic matched to the pass curve at D, 4 dP(pass)/dtheta there. All are mapped to FCI
+points like the strengths. GROUPS gives each task's metric-group difficulties at the mode, on the FCI scale, so the task
+chart can draw the model's own pass curve, which crosses 1/2 at the task's FDI (the script checks this on the rounded
+values, to 0.05 points). TFIT (the logistic matched to that curve at FDI) and PROG are written to --json only (task_fit,
+progress_curve). PROG gives each task a progress curve (Qiuyang): the expected share of the task's hidden checks a model
+beats (summed over its final workloads; a run without counts beats none), E[share | theta] = f_t + (1 - f_t) integral
+sigmoid(kappa_t (theta - g_t) + u) N(u; 0, SIGMA_U^2) du, with a floor f_t in [0, 0.95], a slope kappa_t (log kappa_t ~
+N(0, PROG_K_SD^2)) and g_t (weak prior N(0, PRIOR_SD^2)), fitted by fractional-logit quasi-likelihood with strengths and
+SIGMA_U held at the joint fit.
 
 The raw-score fit that the leaderboard showed before 2026-10-14 runs only with --json (feci_score, task_fit_score). It is
 Epoch AI's own ECI code (bin/eci_fitting.py, vendored from epoch-research/eci-public): every task is one benchmark with
@@ -86,7 +87,7 @@ from eci_fitting import fit_eci_model
 from datetime import datetime
 
 # The FCI scale (Qiuyang, 2026-10-14): FCI = PASS_ZERO_VALUE + PASS_UNIT * (theta - theta of PASS_ZERO), theta in logits.
-# FCI, SCALE, TFIT, DIFF and DIFF_FIT all follow from these three.
+# FCI, SCALE, DIFF, GROUPS and DIFF_FIT all follow from these three.
 PASS_ZERO = 'Kimi K2.7 Code'   # the 0 point; it is hidden (HIDDEN below) but stays in every fit
 PASS_ZERO_VALUE = 0
 PASS_UNIT = 10                 # FCI points per logit (Qiuyang, 2026-10-14; was 1)
@@ -669,8 +670,8 @@ CHECKS = task_checks(db)
 eci_js = {MODEL[c][0]: list(E[c]) for c in MODEL if c not in HIDDEN}
 zero = MODEL[PASS_ZERO][1]
 # no task or model may drop out of the fits in an update, Security tasks included (Qiuyang, 2026-10-14)
-lost = {k: sorted({r[2] for r in runs} - set(v)) for k, v in (('DIFF', DIFF), ('TFIT', TFIT), ('PROG', PROG), ('GROUPS', GROUPS))}
-assert not any(lost.values()), f'tasks in RUNS without a fit: {lost}'
+lost = {k: sorted({r[2] for r in runs} - set(v)) for k, v in (('DIFF', DIFF), ('GROUPS', GROUPS))}
+assert not any(lost.values()), f'tasks in RUNS without a difficulty: {lost}'
 half = {t: float(fdi(np.array([b]) / PASS_UNIT, DIFF_FIT['sigma_u'] / PASS_UNIT)[0]) * PASS_UNIT for t, b in GROUPS.items()}
 gap = max(abs(half[t] - DIFF[t][0]) for t in GROUPS)
 assert gap <= 0.05 + 1e-9, f'the pass curve from GROUPS misses FDI by {gap:.3f} points'
@@ -687,11 +688,9 @@ block = (f'// One entry per scored run in the preview results database of {when:
          f"// Cost per model: [mean US$ per scored run, runs]; output tokens x output price + every token x cache-read price (PRICE above).\nconst COST = {json.dumps(CO)};\nconst PRICE = {json.dumps(PRICE)};\n"
          f"// Every scored run: [model, task, final score, passed, US$ at end, hours, [[US$, dev score] per development submission]].\nconst TRAJ = {json.dumps(trajectories(db), separators=(',', ':'), ensure_ascii=False)};\n"
          f"// Per task: the authors' reference score, the median over the task's runs; where the database has none, the converter's REF_DEFAULT (" + ', '.join(f'{k}: {v:g}' for k, v in REF_DEFAULT.items()) + f"), else the task is left out.\nconst REF = {json.dumps(REF, ensure_ascii=False)};\n"
-         f"// Per task: [D, slope], the logistic matched to its pass curve at D, P(pass) ~ 1 / (1 + exp(-slope (FCI - D))), slope = 4 x the curve's gradient at D (DIFF has D).\nconst TFIT = {json.dumps(TFIT, ensure_ascii=False)};\n"
          f"// Per task: its metric groups' difficulties [beta_g, ...], highest first, on the FCI scale. A run passes when it beats every group, so the pass curve is P(pass | FCI) = integral of prod_g 1 / (1 + exp(-((FCI - beta_g) / ECI_UNIT + u))) N(u; 0, (sigma_u / ECI_UNIT)^2) du, sigma_u from DIFF_FIT (24-node Gauss-Hermite); it is 1/2 at the task's FDI.\nconst GROUPS = {json.dumps(GROUPS, ensure_ascii=False)};\n"
          f"// Per task: [D, 90% low, 90% high, passes, wins, runs] in RUNS. D, the difficulty, is the FCI at which a model passes half the time, a pass being every metric beaten at once. It comes from each metric's own difficulty (metrics that pass and fail together share one), fitted on which metrics each run beats and whether its final score beats the human reference (a win; a tie is half; wins is null without a reference), with a run effect shared by both (DIFF_FIT).\nconst DIFF = {json.dumps(DIFF, ensure_ascii=False)};\n"
          f"// The FCI and FDI model's shared parameters, by Laplace marginal likelihood over all tasks: sigma_u, the sd of a run's effect on its metrics and its win; a, the slope of P(win) over that of a metric; delta and tau, the mean and sd of a metric's difficulty above the task's beat-the-human level (these three in FCI points).\nconst DIFF_FIT = {json.dumps(DIFF_FIT)};\n"
-         f"// Per task: [g, k, f], the task chart's progress curve, a model's expected share of the task's hidden checks beaten: E[share | FCI] = f + (1 - f) x integral of 1 / (1 + exp(-(k (FCI - g) + v / ECI_UNIT))) N(v; 0, sigma_u^2) dv, sigma_u from DIFF_FIT, all in FCI points (24-node Gauss-Hermite); f the floor (0 to 0.95), k the slope per point, g where the rising part is half way. Fitted to each run's share by fractional-logit quasi-likelihood, with log k ~ N(log(1 / ECI_UNIT), {PROG_K_SD:g}^2) and a weak prior on g.\nconst PROG = {json.dumps(PROG, ensure_ascii=False)};\n"
          f"// Per task: the metrics its judge checks and the number of hidden final workloads; a run passes only when every check passes on every final workload.\nconst CHECKS = {json.dumps(CHECKS, ensure_ascii=False, separators=(',', ':'))};\n"
          f"// Task descriptions from the paper repo (bin/fcs2_descriptions.tsv).\nconst DESC = {json.dumps(descriptions(), ensure_ascii=False)};\n")
 js = open(js_path, encoding='utf-8').read()   # read late: the fits above take a while
