@@ -24,8 +24,8 @@ way, and takes the 5th and 95th percentiles.
 Task difficulty (DIFF, TFIT) is built from per-metric passes (Qiuyang, 2026-10-14): a run passes only when it beats the
 human reference on every workload of every metric its task checks, and each metric has its own difficulty. The counts
 come from assets/js/fcs2-checks.js (PASSBY), which bin/fcs2_checks_from_platform.py must refresh before this script
-runs. A metric is a check key's stem, the text after its last '/' (Yannakakis's keys are per workload), with its counts
-summed over its keys; a run beats it (z = 1) when it beats every workload, and a run without counts (it failed before
+runs. Keys of development workloads ('dev/...', which Yannakakis lists) are dropped: PASS is judged on the hidden final
+workloads. A metric is a check key's stem, the text after its last '/', with its counts summed over its keys; a run beats it (z = 1) when it beats every workload, and a run without counts (it failed before
 the hidden evaluation) beats none. The script stops unless PASS is exactly "every metric beaten" for every run. A win w
 against the human reference r_t (the median reference_score over the task's runs; 0 or less: the task has none) is 1
 for a final score above r_t + TIE_EPS, 0 below r_t - TIE_EPS, otherwise 1/2. The final score comes from the same
@@ -236,7 +236,7 @@ def passby():
 def metric_tasks(obs, ref, PB):
     """Per task (database name): its metric stems, the models of its runs and their outcomes O (run x item). The items
     are the task's metrics, then, with a reference, the final-score win. A metric is a check key's stem, the text after
-    its last '/' (Yannakakis's keys are per workload), with its counts summed over its keys; a run beats it (z = 1) when
+    its last '/' (Yannakakis's keys are per workload; 'dev/' keys are dropped), with its counts summed over its keys; a run beats it (z = 1) when
     it beats every workload. A run without counts failed before the hidden evaluation and beats none."""
     n = Counter((MODEL[o[0]][0], o[1]) for o in obs)
     assert max(n.values()) == 1, 'PASSBY has one entry per task and model: two runs of one model on a task cannot be told apart'
@@ -246,6 +246,7 @@ def metric_tasks(obs, ref, PB):
         for c, *_ in rs:
             agg = defaultdict(lambda: [0, 0])
             for key, (b, tot) in PB.get(short(t), {}).get(MODEL[c][0], {}).items():
+                if key.startswith('dev/'): continue   # PASS is judged on the hidden final workloads; Yannakakis also lists its dev ones
                 agg[key.rsplit('/', 1)[-1]][0] += b; agg[key.rsplit('/', 1)[-1]][1] += tot
             cnt.append(agg)
         stems = sorted({j for a in cnt for j in a})
