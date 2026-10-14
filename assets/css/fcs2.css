@@ -90,8 +90,13 @@ h2{font-weight:600; font-size:clamp(25px,2.4vw,30px); line-height:1.2; margin:0}
 .chip[aria-pressed="true"]{background:var(--ink-2); border-color:var(--ink-2); color:#fff}
 .chip:focus-visible{outline:2px solid var(--teal); outline-offset:2px}
 .radios{display:flex; flex-direction:column; gap:8px; font-size:15px}
-.radios label{display:flex; align-items:center; gap:9px; cursor:pointer}
-.radios input{accent-color:var(--teal); width:15px; height:15px; margin:0}
+.radios label{display:flex; align-items:center; gap:10px; cursor:pointer}
+/* a Material 3 radio, the filter checkbox's twin: same size, outline and blue, round with a dot (owner, design audit 5A) */
+.radios input{appearance:none; flex:none; display:grid; place-content:center; width:18px; height:18px; margin:0; border:2px solid var(--muted); border-radius:50%; background:#fff; cursor:pointer}
+.radios input::before{content:""; width:8px; height:8px; border-radius:50%; background:var(--teal); transform:scale(0); transition:transform .12s}
+.radios input:checked{border-color:var(--teal)} .radios input:checked::before{transform:scale(1)}
+.radios label:hover input:not(:checked){border-color:var(--ink-2)}
+.radios input:focus-visible{outline:2px solid var(--teal); outline-offset:2px}
 .toggle{display:flex; align-items:center; gap:10px; font-size:15px; cursor:pointer; padding-bottom:16px; border-bottom:1px solid var(--line)}
 .toggle input{appearance:none; width:30px; height:16px; border-radius:20px; border:1px solid var(--ink-2); position:relative; margin:0; cursor:pointer; background:#fff; flex:none}
 .toggle input::after{content:""; position:absolute; top:2px; left:2px; width:10px; height:10px; border-radius:50%; background:var(--ink-2); transition:left .15s}
