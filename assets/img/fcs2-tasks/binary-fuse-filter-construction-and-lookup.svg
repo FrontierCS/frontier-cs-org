@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 35 760 255" role="img" aria-label="A binary fuse filter with 16 one-byte slots in four segments. Key x maps to one slot in each of segments 0, 1 and 2, key y to one slot in each of segments 1, 2 and 3. A lookup XORs the three slots and compares the result with the key’s fingerprint. The agent writes the construction that fills the slots.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 38 760 244" role="img" aria-label="A binary fuse filter with 16 one-byte slots in four segments. Key x maps to one slot in each of segments 0, 1 and 2, key y to one slot in each of segments 1, 2 and 3. A lookup XORs the three slots and compares the result with the key’s fingerprint. The agent writes the construction that fills the slots.">
 
-<rect x="136" y="104" width="572" height="126" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
+<rect x="136" y="104" width="572" height="112" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
 <line x1="210" y1="70" x2="201" y2="123" stroke="#3c4043" stroke-width="1.2"/>
 <line x1="210" y1="70" x2="405" y2="123" stroke="#3c4043" stroke-width="1.2"/>
 <line x1="210" y1="70" x2="439" y2="123" stroke="#3c4043" stroke-width="1.2"/>
@@ -51,11 +51,8 @@
 <text x="490" y="176" font-size="12" text-anchor="middle" fill="#5f6368">segment 2</text>
 <text x="626" y="176" font-size="12" text-anchor="middle" fill="#5f6368">segment 3</text>
 <text x="152" y="202" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: the construction that fills every slot</text>
-<text x="152" y="220" font-size="12.5" fill="#3c4043">so that each key’s three slots XOR to that key’s fingerprint</text>
-<text x="20" y="258" font-size="12.5" fill="#5f6368">lookup x</text>
-<text x="86" y="258" font-size="13" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">3A ⊕ 5C ⊕ C1 = A7 = fingerprint(x)</text>
-<text x="20" y="280" font-size="12.5" fill="#5f6368">lookup y</text>
-<text x="86" y="280" font-size="13" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">9E ⊕ 14 ⊕ 2B = A1 = fingerprint(y)</text>
-<text x="440" y="258" font-size="12" fill="#5f6368">Each key uses one slot in each of three</text>
-<text x="440" y="276" font-size="12" fill="#5f6368">consecutive segments; a match means present.</text>
+<text x="20" y="242" font-size="12.5" fill="#5f6368">lookup x</text>
+<text x="86" y="242" font-size="13" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">3A ⊕ 5C ⊕ C1 = A7 = fingerprint(x)</text>
+<text x="20" y="264" font-size="12.5" fill="#5f6368">lookup y</text>
+<text x="86" y="264" font-size="13" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">9E ⊕ 14 ⊕ 2B = A1 = fingerprint(y)</text>
 </svg>

@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 22 760 242" role="img" aria-label="One launch of 8,192 GPU thread blocks. Matrices A, B and C are stored as consecutive slices, one per block, and block b reads and writes only slice b. The agent writes one block’s kernel: C becomes A times B transposed plus 0.5 times C, in double precision on the tensor cores, here for 64 by 32 and 32 by 64 inputs.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 22 760 226" role="img" aria-label="One launch of 8,192 GPU thread blocks. Matrices A, B and C are stored as consecutive slices, one per block, and block b reads and writes only slice b. The agent writes one block’s kernel: C becomes A times B transposed plus 0.5 times C, in double precision on the tensor cores, here for 64 by 32 and 32 by 64 inputs.">
 
 <text x="30" y="69" font-size="14" font-style="italic" text-anchor="middle" fill="#1f1f1f">A</text>
 <rect x="50" y="52" width="52" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
@@ -44,21 +44,19 @@
 <rect x="246" y="196" width="60" height="26" rx="4" fill="#fff" stroke="#1f1f1f" stroke-width="2"/>
 <text x="276.0" y="213" font-size="12" text-anchor="middle" fill="#1f1f1f">blk b</text>
 <text x="50" y="186" font-size="12" fill="#5f6368">thread blocks</text>
-<text x="50" y="246" font-size="12" fill="#5f6368">block b touches only its own slices</text>
 <line x1="306" y1="52" x2="380" y2="44" stroke="#9aa0a6" stroke-width="1"/>
-<line x1="306" y1="222" x2="380" y2="246" stroke="#9aa0a6" stroke-width="1"/>
-<rect x="380" y="36" width="360" height="214" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
+<line x1="306" y1="222" x2="380" y2="228" stroke="#9aa0a6" stroke-width="1"/>
+<rect x="380" y="36" width="360" height="198" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
 <text x="396" y="60" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: the kernel each block runs</text>
-<text x="396" y="79" font-size="12.5" fill="#3c4043">in double precision, on the tensor cores</text>
-<rect x="470" y="96" width="77" height="38" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="508" y="120" font-size="14" font-style="italic" text-anchor="middle" fill="#1f1f1f">Bᵀ</text>
-<text x="556" y="120" font-size="11.5" fill="#5f6368">32 × 64</text>
-<rect x="422" y="142" width="38" height="77" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="441" y="185" font-size="14" font-style="italic" text-anchor="middle" fill="#1f1f1f">A</text>
-<text x="441" y="237" font-size="11.5" text-anchor="middle" fill="#5f6368">64 × 32</text>
-<rect x="470" y="142" width="77" height="77" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="508" y="185" font-size="14" font-style="italic" text-anchor="middle" fill="#1f1f1f">C</text>
-<text x="508" y="237" font-size="11.5" text-anchor="middle" fill="#5f6368">64 × 64</text>
-<text x="570" y="178" font-size="15" fill="#1f1f1f">C ← A · Bᵀ + 0.5 · C</text>
+<rect x="470" y="78" width="77" height="38" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
+<text x="508" y="102" font-size="14" font-style="italic" text-anchor="middle" fill="#1f1f1f">Bᵀ</text>
+<text x="556" y="102" font-size="11.5" fill="#5f6368">32 × 64</text>
+<rect x="422" y="124" width="38" height="77" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
+<text x="441" y="167" font-size="14" font-style="italic" text-anchor="middle" fill="#1f1f1f">A</text>
+<text x="441" y="219" font-size="11.5" text-anchor="middle" fill="#5f6368">64 × 32</text>
+<rect x="470" y="124" width="77" height="77" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
+<text x="508" y="167" font-size="14" font-style="italic" text-anchor="middle" fill="#1f1f1f">C</text>
+<text x="508" y="219" font-size="11.5" text-anchor="middle" fill="#5f6368">64 × 64</text>
+<text x="570" y="160" font-size="15" fill="#1f1f1f">C ← A · Bᵀ + 0.5 · C</text>
 
 </svg>

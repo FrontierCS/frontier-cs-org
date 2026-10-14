@@ -1,78 +1,68 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 20 760 280" role="img" aria-label="Two hash tables of one query. Each shows four projection values, the bits they give, and the cost of flipping each bit. The agent writes the global probe order: buckets from both tables sorted by distance, the sum of flipped-bit costs, with a stop point after which buckets are skipped.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 20 760 272" role="img" aria-label="Two hash tables of one query. Each shows four projection values, the bits they give, and the cost of flipping each bit. The agent writes the global probe order: buckets from both tables sorted by distance, the sum of flipped-bit costs, with a stop point after which buckets are skipped.">
 
-<text x="20" y="50" font-size="13" font-weight="600" fill="#1f1f1f">Table 1</text>
-<text x="20" y="75" font-size="12" fill="#5f6368">projection</text>
-<rect x="96" y="58" width="54" height="24" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<rect x="150" y="58" width="54" height="24" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<rect x="204" y="58" width="54" height="24" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<rect x="258" y="58" width="54" height="24" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="123" y="75" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0.82</text>
-<text x="177" y="75" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">−0.31</text>
-<text x="231" y="75" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0.47</text>
-<text x="285" y="75" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">−0.12</text>
-<text x="20" y="99" font-size="12" fill="#5f6368">bit</text>
-<text x="123" y="99" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
-<text x="177" y="99" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0</text>
-<text x="231" y="99" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
-<text x="285" y="99" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0</text>
-<text x="324" y="99" font-size="12" fill="#5f6368">key</text>
-<text x="347" y="99" font-size="13" font-weight="600" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1010</text>
-<text x="20" y="118" font-size="12" fill="#5f6368">flip cost</text>
-<text x="123" y="118" font-size="11.5" text-anchor="middle" fill="#5f6368" font-family="ui-monospace,Menlo,monospace">.672</text>
-<text x="177" y="118" font-size="11.5" text-anchor="middle" fill="#5f6368" font-family="ui-monospace,Menlo,monospace">.096</text>
-<text x="231" y="118" font-size="11.5" text-anchor="middle" fill="#5f6368" font-family="ui-monospace,Menlo,monospace">.221</text>
-<text x="285" y="118" font-size="11.5" text-anchor="middle" fill="#5f6368" font-family="ui-monospace,Menlo,monospace">.014</text>
-<text x="20" y="156" font-size="13" font-weight="600" fill="#1f1f1f">Table 2</text>
-<text x="20" y="181" font-size="12" fill="#5f6368">projection</text>
-<rect x="96" y="164" width="54" height="24" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<rect x="150" y="164" width="54" height="24" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<rect x="204" y="164" width="54" height="24" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<rect x="258" y="164" width="54" height="24" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="123" y="181" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">−0.58</text>
-<text x="177" y="181" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0.08</text>
-<text x="231" y="181" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0.70</text>
-<text x="285" y="181" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">−0.41</text>
-<text x="20" y="205" font-size="12" fill="#5f6368">bit</text>
-<text x="123" y="205" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0</text>
-<text x="177" y="205" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
-<text x="231" y="205" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
-<text x="285" y="205" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0</text>
-<text x="324" y="205" font-size="12" fill="#5f6368">key</text>
-<text x="347" y="205" font-size="13" font-weight="600" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0110</text>
-<text x="20" y="224" font-size="12" fill="#5f6368">flip cost</text>
-<text x="123" y="224" font-size="11.5" text-anchor="middle" fill="#5f6368" font-family="ui-monospace,Menlo,monospace">.336</text>
-<text x="177" y="224" font-size="11.5" text-anchor="middle" fill="#5f6368" font-family="ui-monospace,Menlo,monospace">.006</text>
-<text x="231" y="224" font-size="11.5" text-anchor="middle" fill="#5f6368" font-family="ui-monospace,Menlo,monospace">.490</text>
-<text x="285" y="224" font-size="11.5" text-anchor="middle" fill="#5f6368" font-family="ui-monospace,Menlo,monospace">.168</text>
-<text x="20" y="262" font-size="12" fill="#5f6368">Each probed bucket’s vectors get exact inner products;</text>
-<text x="20" y="280" font-size="12" fill="#5f6368">the k best found so far feed the stop test.</text>
-<rect x="392" y="34" width="348" height="258" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
+<text x="20" y="60" font-size="13" font-weight="600" fill="#1f1f1f">Table 1</text>
+<text x="20" y="85" font-size="12" fill="#5f6368">projection</text>
+<rect x="96" y="68" width="54" height="24" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<rect x="150" y="68" width="54" height="24" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<rect x="204" y="68" width="54" height="24" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<rect x="258" y="68" width="54" height="24" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<text x="123" y="85" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0.82</text>
+<text x="177" y="85" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">−0.31</text>
+<text x="231" y="85" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0.47</text>
+<text x="285" y="85" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">−0.12</text>
+<text x="20" y="109" font-size="12" fill="#5f6368">bit</text>
+<text x="123" y="109" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
+<text x="177" y="109" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0</text>
+<text x="231" y="109" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
+<text x="285" y="109" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0</text>
+<text x="324" y="109" font-size="12" fill="#5f6368">key</text>
+<text x="347" y="109" font-size="13" font-weight="600" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1010</text>
+<text x="20" y="128" font-size="12" fill="#5f6368">flip cost</text>
+<text x="123" y="128" font-size="11.5" text-anchor="middle" fill="#5f6368" font-family="ui-monospace,Menlo,monospace">.672</text>
+<text x="177" y="128" font-size="11.5" text-anchor="middle" fill="#5f6368" font-family="ui-monospace,Menlo,monospace">.096</text>
+<text x="231" y="128" font-size="11.5" text-anchor="middle" fill="#5f6368" font-family="ui-monospace,Menlo,monospace">.221</text>
+<text x="285" y="128" font-size="11.5" text-anchor="middle" fill="#5f6368" font-family="ui-monospace,Menlo,monospace">.014</text>
+<text x="20" y="186" font-size="13" font-weight="600" fill="#1f1f1f">Table 2</text>
+<text x="20" y="211" font-size="12" fill="#5f6368">projection</text>
+<rect x="96" y="194" width="54" height="24" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<rect x="150" y="194" width="54" height="24" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<rect x="204" y="194" width="54" height="24" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<rect x="258" y="194" width="54" height="24" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<text x="123" y="211" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">−0.58</text>
+<text x="177" y="211" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0.08</text>
+<text x="231" y="211" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0.70</text>
+<text x="285" y="211" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">−0.41</text>
+<text x="20" y="235" font-size="12" fill="#5f6368">bit</text>
+<text x="123" y="235" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0</text>
+<text x="177" y="235" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
+<text x="231" y="235" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
+<text x="285" y="235" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0</text>
+<text x="324" y="235" font-size="12" fill="#5f6368">key</text>
+<text x="347" y="235" font-size="13" font-weight="600" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0110</text>
+<text x="20" y="254" font-size="12" fill="#5f6368">flip cost</text>
+<text x="123" y="254" font-size="11.5" text-anchor="middle" fill="#5f6368" font-family="ui-monospace,Menlo,monospace">.336</text>
+<text x="177" y="254" font-size="11.5" text-anchor="middle" fill="#5f6368" font-family="ui-monospace,Menlo,monospace">.006</text>
+<text x="231" y="254" font-size="11.5" text-anchor="middle" fill="#5f6368" font-family="ui-monospace,Menlo,monospace">.490</text>
+<text x="285" y="254" font-size="11.5" text-anchor="middle" fill="#5f6368" font-family="ui-monospace,Menlo,monospace">.168</text>
+<rect x="392" y="34" width="348" height="244" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
 <text x="408" y="58" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: the probe order and stop rule</text>
-<text x="408" y="77" font-size="12.5" fill="#3c4043">every table, lowest distance first</text>
-<rect x="408" y="88" width="184" height="19" rx="3" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="418" y="102" font-size="12.5" fill="#1f1f1f">T1</text><text x="446" y="102" font-size="12.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1010</text><text x="582" y="102" font-size="12.5" text-anchor="end" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0</text>
-<text x="604" y="102" font-size="12" fill="#5f6368">own key</text>
-<rect x="408" y="110" width="184" height="19" rx="3" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="418" y="124" font-size="12.5" fill="#1f1f1f">T2</text><text x="446" y="124" font-size="12.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0110</text><text x="582" y="124" font-size="12.5" text-anchor="end" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0</text>
-<text x="604" y="124" font-size="12" fill="#5f6368">own key</text>
-<rect x="408" y="132" width="184" height="19" rx="3" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="418" y="146" font-size="12.5" fill="#1f1f1f">T2</text><text x="446" y="146" font-size="12.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0010</text><text x="582" y="146" font-size="12.5" text-anchor="end" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0.006</text>
-<text x="604" y="146" font-size="12" fill="#5f6368">flip bit 2</text>
-<rect x="408" y="154" width="184" height="19" rx="3" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="418" y="168" font-size="12.5" fill="#1f1f1f">T1</text><text x="446" y="168" font-size="12.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1011</text><text x="582" y="168" font-size="12.5" text-anchor="end" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0.014</text>
-<text x="604" y="168" font-size="12" fill="#5f6368">flip bit 4</text>
-<rect x="408" y="176" width="184" height="19" rx="3" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="418" y="190" font-size="12.5" fill="#1f1f1f">T1</text><text x="446" y="190" font-size="12.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1110</text><text x="582" y="190" font-size="12.5" text-anchor="end" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0.096</text>
-<text x="604" y="190" font-size="12" fill="#5f6368">flip bit 2</text>
-<rect x="408" y="198" width="184" height="19" rx="3" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="418" y="212" font-size="12.5" fill="#1f1f1f">T1</text><text x="446" y="212" font-size="12.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1111</text><text x="582" y="212" font-size="12.5" text-anchor="end" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0.110</text>
-<text x="604" y="212" font-size="12" fill="#5f6368">flip bits 2, 4</text>
-<line x1="408" y1="228" x2="592" y2="228" stroke="#0b57d0" stroke-width="2"/>
-<text x="604" y="236" font-size="12" fill="#0b57d0">stop: more probes</text>
-<text x="604" y="251" font-size="12" fill="#0b57d0">are unlikely to help</text>
-<rect x="408" y="246" width="184" height="19" rx="3" fill="#fff" stroke="#dadce0" stroke-width="1.1"/>
-<text x="418" y="260" font-size="12.5" fill="#9aa0a6">T2</text><text x="446" y="260" font-size="12.5" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0111</text><text x="582" y="260" font-size="12.5" text-anchor="end" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0.168</text>
-<rect x="408" y="268" width="184" height="19" rx="3" fill="#fff" stroke="#dadce0" stroke-width="1.1"/>
-<text x="418" y="282" font-size="12.5" fill="#9aa0a6">T2</text><text x="446" y="282" font-size="12.5" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0011</text><text x="582" y="282" font-size="12.5" text-anchor="end" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0.174</text>
-<text x="604" y="281" font-size="12" fill="#9aa0a6">skipped</text>
+<rect x="408" y="72" width="224" height="19" rx="3" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
+<text x="418" y="86" font-size="12.5" fill="#1f1f1f">T1</text><text x="446" y="86" font-size="12.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1010</text><text x="622" y="86" font-size="12.5" text-anchor="end" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0</text>
+<rect x="408" y="94" width="224" height="19" rx="3" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
+<text x="418" y="108" font-size="12.5" fill="#1f1f1f">T2</text><text x="446" y="108" font-size="12.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0110</text><text x="622" y="108" font-size="12.5" text-anchor="end" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0</text>
+<rect x="408" y="116" width="224" height="19" rx="3" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
+<text x="418" y="130" font-size="12.5" fill="#1f1f1f">T2</text><text x="446" y="130" font-size="12.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0010</text><text x="622" y="130" font-size="12.5" text-anchor="end" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0.006</text>
+<rect x="408" y="138" width="224" height="19" rx="3" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
+<text x="418" y="152" font-size="12.5" fill="#1f1f1f">T1</text><text x="446" y="152" font-size="12.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1011</text><text x="622" y="152" font-size="12.5" text-anchor="end" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0.014</text>
+<rect x="408" y="160" width="224" height="19" rx="3" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
+<text x="418" y="174" font-size="12.5" fill="#1f1f1f">T1</text><text x="446" y="174" font-size="12.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1110</text><text x="622" y="174" font-size="12.5" text-anchor="end" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0.096</text>
+<rect x="408" y="182" width="224" height="19" rx="3" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
+<text x="418" y="196" font-size="12.5" fill="#1f1f1f">T1</text><text x="446" y="196" font-size="12.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1111</text><text x="622" y="196" font-size="12.5" text-anchor="end" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0.110</text>
+<line x1="408" y1="212" x2="632" y2="212" stroke="#0b57d0" stroke-width="2"/>
+<text x="646" y="216" font-size="12" fill="#0b57d0">stop</text>
+<rect x="408" y="223" width="224" height="19" rx="3" fill="#fff" stroke="#dadce0" stroke-width="1.1"/>
+<text x="418" y="237" font-size="12.5" fill="#9aa0a6">T2</text><text x="446" y="237" font-size="12.5" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0111</text><text x="622" y="237" font-size="12.5" text-anchor="end" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0.168</text>
+<rect x="408" y="245" width="224" height="19" rx="3" fill="#fff" stroke="#dadce0" stroke-width="1.1"/>
+<text x="418" y="259" font-size="12.5" fill="#9aa0a6">T2</text><text x="446" y="259" font-size="12.5" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0011</text><text x="622" y="259" font-size="12.5" text-anchor="end" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0.174</text>
+<text x="646" y="248" font-size="12" fill="#9aa0a6">skipped</text>
 </svg>

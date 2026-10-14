@@ -1,14 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 22 760 288" role="img" aria-label="A matrix G with singular values from 0.001 to 1 goes through five polynomial steps. Each step applies an odd fifth-degree polynomial chosen for the range of singular values left by the step before. The singular values spread over zero to two, then close in on one, so the output approximates the polar factor U V transpose. The polynomial schedule and the matrix iteration are the part the agent writes.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 22 760 276" role="img" aria-label="A matrix G with singular values from 0.001 to 1 goes through five polynomial steps. Each step applies an odd fifth-degree polynomial chosen for the range of singular values left by the step before. The singular values spread over zero to two, then close in on one, so the output approximates the polar factor U V transpose. The polynomial schedule and the matrix iteration are the part the agent writes.">
 <defs><marker id="polar-express-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker></defs>
 
+<g transform="translate(0 -18)">
 <rect x="20" y="120" width="92" height="64" rx="8" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
 <text x="66" y="148" font-size="14" text-anchor="middle" fill="#1f1f1f" font-style="italic">G = UΣVᵀ</text>
 <text x="66" y="169" font-size="11.5" text-anchor="middle" fill="#5f6368">σ: 0.001 to 1</text>
 <line x1="112" y1="152" x2="134" y2="152" stroke="#3c4043" stroke-width="1.3" marker-end="url(#polar-express-ar)"/>
-<rect x="138" y="36" width="482" height="266" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
+</g>
+<rect x="138" y="36" width="482" height="248" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
 <text x="154" y="60" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: the polynomial schedule and the iteration</text>
 <text x="154" y="82" font-size="13" fill="#1f1f1f" font-style="italic">X ← aX + bX(XᵀX) + cX(XᵀX)²</text>
-<text x="154" y="101" font-size="12" fill="#3c4043">a, b, c: the best fifth-degree odd polynomial for the range the last step left</text>
+<g transform="translate(0 -18)">
 <line x1="406.0" y1="114" x2="406.0" y2="261" stroke="#9aa0a6" stroke-width="1" stroke-dasharray="3 3"/>
 <text x="154" y="130.5" font-size="12" fill="#5f6368">start</text>
 <line x1="214.2" y1="126" x2="406.0" y2="126" stroke="#9aa0a6" stroke-width="1.2"/>
@@ -104,5 +106,6 @@
 <line x1="620" y1="152" x2="640" y2="152" stroke="#3c4043" stroke-width="1.3" marker-end="url(#polar-express-ar)"/>
 <rect x="644" y="120" width="98" height="64" rx="8" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
 <text x="693" y="148" font-size="14" text-anchor="middle" fill="#1f1f1f" font-style="italic">X ≈ UVᵀ</text>
-<text x="693" y="169" font-size="11.5" text-anchor="middle" fill="#5f6368">all σ near 1</text>
+<text x="693" y="169" font-size="11.5" text-anchor="middle" fill="#5f6368">σ ≈ 1</text>
+</g>
 </svg>

@@ -1,6 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 291" role="img" aria-label="Part of a Glenside e-graph for a small convolution. Classes of equal expressions hold the weights access, the data windows, their Cartesian product, and the dot product, which also holds an equivalent systolic-array form. Each class carries a fact of outer shape and item shape; the agent writes how these facts are built and merged.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 270" role="img" aria-label="Part of a Glenside e-graph for a small convolution. Classes of equal expressions hold the weights access, the data windows, their Cartesian product, and the dot product, which also holds an equivalent systolic-array form. Each class carries a fact of outer shape and item shape; the agent writes how these facts are built and merged.">
 <defs><marker id="glenside-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker></defs>
-<text x="20" y="24" font-size="12.5" fill="#5f6368">Each grey outline is a class of equal expressions</text>
+<text x="20" y="24" font-size="12.5" fill="#5f6368">grey outline: class of equal expressions</text>
+<text x="740" y="24" font-size="12.5" text-anchor="end" fill="#5f6368">fact: outer shape ‖ item shape</text>
 <rect x="20" y="44" width="190" height="44" rx="10" fill="#fff" stroke="#9aa0a6" stroke-width="1.3"/>
 <rect x="34" y="54" width="162" height="24" rx="5" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
 <text x="115.0" y="70" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">access weights 1</text>
@@ -16,19 +17,16 @@
 <text x="378.0" y="123" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">cartesian-product</text>
 <rect x="288" y="149" width="180" height="24" rx="6" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
 <text x="378.0" y="165" font-size="12" text-anchor="middle" fill="#0b57d0" font-family="ui-monospace,Menlo,monospace">[1,1,2,2] ‖ [2,1,2,2]</text>
-<rect x="522" y="44" width="222" height="92" rx="10" fill="#fff" stroke="#9aa0a6" stroke-width="1.3"/>
-<rect x="534" y="54" width="198" height="24" rx="5" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="633.0" y="70" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">dot-product</text>
-<rect x="534" y="98" width="198" height="24" rx="5" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="633.0" y="114" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">reshape (systolic-array …)</text>
-<rect x="558" y="144" width="150" height="24" rx="6" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
-<text x="633.0" y="160" font-size="12" text-anchor="middle" fill="#0b57d0" font-family="ui-monospace,Menlo,monospace">[1,1,2,2] ‖ []</text>
-<text x="633" y="190" font-size="12" text-anchor="middle" fill="#5f6368">lower node: the accelerator form,</text>
-<text x="633" y="206" font-size="12" text-anchor="middle" fill="#5f6368">found by rewrites and a fixed rule</text>
+<rect x="522" y="73" width="222" height="92" rx="10" fill="#fff" stroke="#9aa0a6" stroke-width="1.3"/>
+<rect x="534" y="83" width="198" height="24" rx="5" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<text x="633.0" y="99" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">dot-product</text>
+<rect x="534" y="127" width="198" height="24" rx="5" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
+<text x="633.0" y="143" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">reshape (systolic-array …)</text>
+<rect x="558" y="173" width="150" height="24" rx="6" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
+<text x="633.0" y="189" font-size="12" text-anchor="middle" fill="#0b57d0" font-family="ui-monospace,Menlo,monospace">[1,1,2,2] ‖ []</text>
 <line x1="290" y1="113" x2="214" y2="72" stroke="#3c4043" stroke-width="1.2" marker-end="url(#glenside-ar)"/>
 <line x1="290" y1="125" x2="214" y2="166" stroke="#3c4043" stroke-width="1.2" marker-end="url(#glenside-ar)"/>
-<line x1="534" y1="66" x2="484" y2="106" stroke="#3c4043" stroke-width="1.2" marker-end="url(#glenside-ar)"/>
+<line x1="534" y1="95" x2="484" y2="115" stroke="#3c4043" stroke-width="1.2" marker-end="url(#glenside-ar)"/>
 <text x="20" y="252" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: the facts on each class, built from its children’s facts and merged when classes join</text>
-<text x="20" y="274" font-size="12.5" fill="#5f6368">A fact gives outer shape ‖ item shape, plus known zero regions and whether accelerator calls lie inside.</text>
 
 </svg>

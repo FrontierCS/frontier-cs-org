@@ -1,5 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 20 760 265" role="img" aria-label="A bitmap tree of width 4 over 16 priority buckets. A set bit marks a subtree that still holds packets. Dequeue-min follows the first set bit at each level to priority 6; dequeue-max follows the last set bit to priority 11. The logic of the bitmap levels, generated as hardware, is the part the agent writes; the buckets below are given.">
 
+<g transform="translate(48 0)">
 <rect x="24" y="34" width="480" height="142" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
 <text x="40" y="58" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: each bitmap level’s enqueue and dequeue logic</text>
 <line x1="262" y1="96" x2="136" y2="138" stroke="#9aa0a6" stroke-width="1"/>
@@ -103,15 +104,9 @@
 <text x="458" y="268" font-size="11.5" text-anchor="middle" fill="#5f6368">14</text>
 <rect x="471" y="200" width="14" height="50" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
 <text x="478" y="268" font-size="11.5" text-anchor="middle" fill="#5f6368">15</text>
-<line x1="528" y1="70" x2="552" y2="70" stroke="#3c4043" stroke-width="2"/>
-<text x="560" y="75" font-size="13" font-weight="600" fill="#1f1f1f">dequeue-min</text>
-<text x="528" y="94" font-size="12.5" fill="#5f6368">follows the first set bit down</text>
-<line x1="528" y1="118" x2="552" y2="118" stroke="#3c4043" stroke-width="1.6" stroke-dasharray="4 3"/>
-<text x="560" y="123" font-size="13" font-weight="600" fill="#1f1f1f">dequeue-max</text>
-<text x="528" y="142" font-size="12.5" fill="#5f6368">follows the last set bit down</text>
-<text x="528" y="171" font-size="13" font-weight="600" fill="#1f1f1f">enqueue</text>
-<text x="528" y="190" font-size="12.5" fill="#5f6368">sets the bits along its path</text>
-<text x="528" y="222" font-size="13" font-weight="600" fill="#1f1f1f">throughput</text>
-<text x="528" y="241" font-size="12.5" fill="#5f6368">operations per cycle × clock rate;</text>
-<text x="528" y="259" font-size="12.5" fill="#5f6368">the longest logic path sets the clock</text>
+<line x1="528" y1="138" x2="552" y2="138" stroke="#3c4043" stroke-width="2"/>
+<text x="560" y="143" font-size="13" font-weight="600" fill="#1f1f1f">dequeue-min</text>
+<line x1="528" y1="168" x2="552" y2="168" stroke="#3c4043" stroke-width="1.6" stroke-dasharray="4 3"/>
+<text x="560" y="173" font-size="13" font-weight="600" fill="#1f1f1f">dequeue-max</text>
+</g>
 </svg>

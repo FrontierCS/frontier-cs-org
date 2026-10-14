@@ -1,14 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 25 760 275" role="img" aria-label="One Lloyd k-means step. Points, N by D, are compared with centers, K by D, giving an N by K grid of distances. Each row’s smallest distance gives the point’s label. Points are then summed and counted per center to give the new centers, which feed the second step. The whole step, nearest-center search and center update, is the part the agent writes.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 30 760 274" role="img" aria-label="One Lloyd k-means step. Points, N by D, are compared with centers, K by D, giving an N by K grid of distances. Each row’s smallest distance gives the point’s label. Points are then summed and counted per center to give the new centers, which feed the second step. The whole step, nearest-center search and center update, is the part the agent writes.">
 <defs><marker id="kmeans-kernel-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker></defs>
 
 <rect x="150" y="44" width="204" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
 <text x="20" y="56" font-size="12.5" fill="#1f1f1f">centers, K × D</text>
-<text x="20" y="73" font-size="11.5" fill="#5f6368">e.g. 1,024 × 128</text>
 <rect x="104" y="110" width="28" height="150" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="20" y="170" font-size="12.5" fill="#1f1f1f">points,</text>
-<text x="20" y="187" font-size="12.5" fill="#1f1f1f">N × D</text>
-<text x="20" y="206" font-size="11.5" fill="#5f6368">e.g. 500,000</text>
-<text x="20" y="221" font-size="11.5" fill="#5f6368">× 128</text>
+<text x="20" y="180" font-size="12.5" fill="#1f1f1f">points</text>
+<text x="20" y="197" font-size="12.5" fill="#1f1f1f">N × D</text>
 <rect x="140" y="84" width="602" height="206" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
 <rect x="150" y="110" width="204" height="150" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
 <line x1="150" y1="126.7" x2="354" y2="126.7" stroke="#dadce0" stroke-width="1"/>
@@ -32,7 +29,7 @@
 <line x1="337.0" y1="110" x2="337.0" y2="260" stroke="#dadce0" stroke-width="1"/>
 <rect x="269.0" y="160.0" width="17.0" height="16.7" fill="#3c4043"/>
 <rect x="150" y="160.0" width="204" height="16.7" fill="none" stroke="#3c4043" stroke-width="1.6"/>
-<text x="150" y="280" font-size="12" fill="#5f6368">distances, N × K; dark cell: the row’s minimum</text>
+<text x="150" y="280" font-size="12" fill="#5f6368">distances, N × K; dark: row minimum</text>
 <text x="407" y="103" font-size="12" text-anchor="middle" fill="#5f6368">labels</text>
 <rect x="386" y="110.0" width="42" height="16.7" fill="#fff" stroke="#3c4043" stroke-width="1"/>
 <text x="407" y="122.8" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">402</text>
@@ -54,22 +51,21 @@
 <text x="407" y="256.2" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">3</text>
 <line x1="357" y1="168.3" x2="383" y2="168.3" stroke="#3c4043" stroke-width="1.3" marker-end="url(#kmeans-kernel-ar)"/>
 <text x="466" y="108" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: the k-means step</text>
-<text x="466" y="127" font-size="12.5" fill="#3c4043">nearest-center search, then new means</text>
-<text x="466" y="158" font-size="12" fill="#5f6368">center</text>
-<text x="524" y="158" font-size="12" fill="#5f6368">points</text>
-<text x="584" y="158" font-size="12" fill="#5f6368">new center</text>
-<line x1="466" y1="165" x2="724" y2="165" stroke="#9aa0a6" stroke-width="1"/>
-<text x="466" y="186" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">3</text>
-<text x="524" y="186" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1,212</text>
-<text x="584" y="186" font-size="12" fill="#1f1f1f">mean of its points</text>
-<text x="466" y="210" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">17</text>
-<text x="524" y="210" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">958</text>
-<text x="584" y="210" font-size="12" fill="#1f1f1f">mean of its points</text>
-<text x="466" y="234" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">402</text>
-<text x="524" y="234" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0</text>
-<text x="584" y="234" font-size="12" fill="#1f1f1f">keeps the old one</text>
-<line x1="432" y1="185.0" x2="458" y2="185.0" stroke="#3c4043" stroke-width="1.3" marker-end="url(#kmeans-kernel-ar)"/>
+<text x="466" y="140" font-size="12" fill="#5f6368">center</text>
+<text x="524" y="140" font-size="12" fill="#5f6368">points</text>
+<text x="584" y="140" font-size="12" fill="#5f6368">new center</text>
+<line x1="466" y1="147" x2="724" y2="147" stroke="#9aa0a6" stroke-width="1"/>
+<text x="466" y="172" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">3</text>
+<text x="524" y="172" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1,212</text>
+<text x="584" y="172" font-size="12" fill="#1f1f1f">mean</text>
+<text x="466" y="196" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">17</text>
+<text x="524" y="196" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">958</text>
+<text x="584" y="196" font-size="12" fill="#1f1f1f">mean</text>
+<text x="466" y="220" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">402</text>
+<text x="524" y="220" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0</text>
+<text x="584" y="220" font-size="12" fill="#1f1f1f">unchanged</text>
+<line x1="432" y1="168.3" x2="458" y2="168.3" stroke="#3c4043" stroke-width="1.3" marker-end="url(#kmeans-kernel-ar)"/>
 
 <path d="M730 84 V57 H360" fill="none" stroke="#3c4043" stroke-width="1.3" marker-end="url(#kmeans-kernel-ar)"/>
-<text x="470" y="50" font-size="12" fill="#5f6368">new centers feed the second step</text>
+<text x="600" y="50" font-size="12" fill="#5f6368">new centers</text>
 </svg>
