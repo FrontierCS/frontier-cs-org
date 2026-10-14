@@ -1,7 +1,7 @@
 // FrontierCS 2 task page (_pages/fcs2-task.md). /task/#<slug> renders one task from fcs2-data.js, loaded first;
 // /task/ with no slug lists every task by domain. For a task with runs: what the agent must do and what it is scored on,
 // a results table (pass or fail, final score against the Human reference, cost), the solution each shown model handed in,
-// the pass criteria, every run's development score against its spend, and the task's FECI curve. assets/css/fcs2.css holds the styles.
+// the pass criteria, every run's final score against its cost, and the task's FECI curve. assets/css/fcs2.css holds the styles.
 
 const RANK = Object.fromEntries(RANKED.map((m, i) => [m.id, i]));
 const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;   // the patch counts files
@@ -50,7 +50,7 @@ function drawPage() {
     + `<section class="tres"><h2 class="th2">Results</h2><p class="tsum">${sum.join(' · ')}</p><div class="res-scroll"><table class="res rtab" id="rtbl"></table></div></section>`
     + (CHECKS[t.s] ? `<section class="tcrit"><h2 class="th2">Pass criteria</h2><p>A run passes only if its final submission beats the human reference on every metric, on every hidden workload. Each cell counts the hidden workloads on which it did.</p>`
       + `<div class="res-scroll"><table class="res ctab" id="ctbl"></table></div></section>` : '')   // no general submission note (owner audit, 2026-10-14)
-    + figure('dc', 'Development score against spend')
+    + figure('sc', 'Final score against cost')
     + (TFIT[t.s] ? figure('fc', 'Expected score by FECI') : '')
     + solutionHTML(t, runs);   // the solution last (owner, 2026-10-14)
   drawResults(); if (CHECKS[t.s]) drawCriteria(); drawCharts(); loadPatches(t); loadFig(t); drawPager(t);
@@ -124,40 +124,57 @@ function drawResults() {
 
 function drawCharts() {
   if (!cur || !cur.runs.length) return;
-  drawDev(); if (TFIT[cur.t.s]) drawFit();
+  drawScore(); if (TFIT[cur.t.s]) drawFit();
 }
 
-/* Every run's development score at each submission against its estimated spend so far, US$ on a log scale. */
-function drawDev() {
-  const {runs} = cur, rs = runs.filter(r => r[6].length);
-  const svg = $('#dcsvg'), W = Math.max(300, $('#dcplot').clientWidth), narrow = W < 560;
-  const L = 34, R = narrow ? 12 : 24, T = 12, B = 46, H = narrow ? 280 : 340;
-  const all = rs.flatMap(r => r[6]).filter(p => p[0] > 0);
-  if (!all.length) { svg.replaceChildren(); $('#dcnote').textContent = 'No development submission was scored on this task.'; return; }
-  const x0 = Math.floor(Math.log10(Math.min(...all.map(p => p[0]))) * 2) / 2, x1 = Math.max(x0 + 1, Math.ceil(Math.log10(Math.max(...all.map(p => p[0]))) * 2) / 2);
-  const ymax = Math.max(100, Math.ceil(Math.max(...all.map(p => p[1])) / 20) * 20);
-  const X = v => L + (Math.log10(Math.max(v, 10 ** x0)) - x0) / (x1 - x0) * (W - L - R), Y = v => T + (1 - v / ymax) * (H - T - B);
+/* Final score against cost (Qiuyang, 2026-10-14: in place of the development score against spend, drawn as the overview's
+   pass rate chart): one dot per run, a model's one run on the task, its final score against its cost in US$ on a log
+   scale. The runs no cheaper run matches or beats on final score have a larger dot and a bold name; labels sit beside the
+   dots (labelDot, fcs2-data.js), and the Human reference is a dashed line with its name at one end. */
+function drawScore() {
+  const {t, runs} = cur, ref = REF[t.s], rs = runs.filter(r => r[4] > 0);
+  const svg = $('#scsvg'), W = Math.max(300, $('#scplot').clientWidth), narrow = W < 560;
+  const L = 34, R = narrow ? 12 : 24, T = 14, B = 46, H = narrow ? 320 : 400;
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
+  if (!rs.length) { $('#scnote').textContent = 'No run on this task has a cost.'; return; }
+  const tx = rs.map(r => r[4]);
+  // as the overview: 0.15 decade past the outermost dots, more on the right on phones so the labels there fit
+  const x0 = Math.log10(Math.min(...tx)) - .15, x1 = Math.log10(Math.max(...tx)) + (narrow ? .74 : .15);
+  const ymax = Math.min(100, Math.ceil((Math.max(...rs.map(r => r[2]), ref != null ? ref : 0) + 5) / 20) * 20);
+  const X = v => L + (Math.log10(v) - x0) / (x1 - x0) * (W - L - R), Y = v => T + (1 - v / ymax) * (H - T - B);
   for (let v = 0; v <= ymax; v += 20) {
     svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1}));
     svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, v));
   }
-  for (let k = Math.ceil(x0); k <= Math.floor(x1); k++) {
-    svg.append(sv('line', {x1:X(10 ** k), x2:X(10 ** k), y1:H - B, y2:H - B + 5, stroke:'var(--ink-2)', 'stroke-width':1}));
-    svg.append(sv('text', {x:X(10 ** k), y:H - B + 20, 'text-anchor':'middle'}, usdfmt(10 ** k)));
+  for (let k = Math.floor(x0); k <= Math.ceil(x1); k++) [1, 2, 5].forEach(f => { const v = f * 10 ** k, lv = Math.log10(v);
+    // phones drop the 2s past a decade and a half, as the overview does, and the 5s past two and a half: one run's cost spans more
+    if (lv < x0 - 1e-9 || lv > x1 + 1e-9 || (narrow && ((f === 2 && x1 - x0 > 1.5) || (f === 5 && x1 - x0 > 2.5)))) return;
+    svg.append(sv('line', {x1:X(v), x2:X(v), y1:T, y2:H - B, stroke:'var(--grid)', 'stroke-width':1}));
+    svg.append(sv('text', {x:X(v), y:H - B + 20, 'text-anchor':'middle'}, usdfmt(v))); });
+  svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'Cost of the run in US$, log scale'));
+  const at = r => [X(r[4]), Y(r[2])], order = [...rs].sort((a, b) => b[2] - a[2]);
+  const boxes = order.map(r => { const [cx, cy] = at(r); return {x:cx - 9, y:cy - 9, w:18, h:18}; });
+  // the Human reference: a dashed line, its name above it at the right end, or wherever a dot leaves room
+  if (ref != null) {
+    svg.append(sv('line', {x1:L, x2:W - R, y1:Y(ref), y2:Y(ref), stroke:'var(--ink-2)', 'stroke-width':1.2, 'stroke-dasharray':'4 4'}));
+    const lab = sv('text', {class:'lab halo', x:0, y:0, fill:'var(--ink-2)'}, 'Human reference'); svg.append(lab);
+    const w = lab.getComputedTextLength() + 2, y = Y(ref);
+    const spots = [[W - R, y - 6, 'end'], [W - R, y + 15, 'end'], [L + 4, y - 6, 'start'], [L + 4, y + 15, 'start']];
+    const box = ([x, yy, an]) => ({x:an === 'end' ? x - w : x, y:yy - 11, w, h:14});
+    const sp = spots.find(q => { const b = box(q); return b.y > 0 && b.y + b.h < H - B && !boxes.some(o => b.x < o.x + o.w && o.x < b.x + b.w && b.y < o.y + o.h && o.y < b.y + b.h); }) || spots[0];
+    lab.setAttribute('x', sp[0]); lab.setAttribute('y', sp[1]); lab.setAttribute('text-anchor', sp[2]); boxes.push(box(sp));
+    boxes.push({x:L, y:y - 2, w:W - R - L, h:4});   // and the line itself, so no run's name is written across it
   }
-  svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'Cost so far in US$, log scale'));
+  // the frontier: the runs no cheaper run matches or beats on final score
+  const front = [...rs].sort((p, q) => p[4] - q[4] || q[2] - p[2]).filter((r, i, a) => a.slice(0, i).every(o => o[2] < r[2]));
   const pts = [];
-  [...rs].reverse().forEach(r => {
-    const seq = r[6].filter(p => p[0] > 0);
-    svg.append(sv('path', {d:seq.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join(''), fill:'none', stroke:MCOL[r[0]], 'stroke-width':1.6, 'stroke-linejoin':'round', opacity:.85}));
-    const e = seq[seq.length - 1];
-    if (e) svg.append(sv('circle', {cx:X(e[0]), cy:Y(e[1]), r:3.5, fill:MCOL[r[0]]}));
-    seq.forEach((p, i) => pts.push({x:X(p[0]), y:Y(p[1]), html:`<b>${esc(MNAME[r[0]])}</b><br>Submission ${i + 1}: development score <b>${f1(p[1])}</b><br>${money(p[0])} spent`}));
+  order.forEach(r => {
+    const [cx, cy] = at(r), m = MODELS.find(x => x.id === r[0]), lead = front.includes(r);
+    svg.append(sv('circle', {cx, cy, r:lead ? 7.5 : 5, fill:MCOL[r[0]], stroke:'#fff', 'stroke-width':2}));
+    labelDot(svg, boxes, cx, cy, narrow ? m.short : m.name, L, W, MTXT(r[0]), lead);
+    pts.push({x:cx, y:cy, mean:true, html:`<b>${esc(m.name)}</b><br>Final score <b>${f1(r[2])}</b>, ${r[3] ? 'passes' : 'does not pass'}<br>${money(r[4])}`});
   });
-  attachTip(svg, W, H, pts, $('#dctip'));
-  $('#dclegend').innerHTML = RANKED.filter(m => rs.some(r => r[0] === m.id)).map(m => `<span><i style="background:${MCOL[m.id]}"></i>${esc(m.name)}</span>`).join('');
-  $('#dcnote').textContent = 'Each line is one run: its score on the development workloads after each submission, against its estimated spend so far. A failed build or check scores 0.';
+  attachTip(svg, W, H, pts, $('#sctip'));
 }
 
 /* The task's curve from the FECI fit: the score a model of a given FECI is expected to reach. Dots: each model's mean final
