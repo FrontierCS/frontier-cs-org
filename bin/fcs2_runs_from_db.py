@@ -32,23 +32,23 @@ metric beaten" for every run. Metrics that pass and fail together cannot be told
 separately makes a task look harder than it is (Qiuyang): metrics whose outcomes over the task's runs differ in at most
 GROUP_TOL runs are linked, a group is a connected set of them (recomputed from the data on every run), and the fit
 treats each group as one item that a run beats when it beats every member. A win w against the human reference r_t (the
-median reference_score over the task's runs; 0 or less: the task has none) is 1 for a final score above r_t + TIE_EPS, 0
-below r_t - TIE_EPS, otherwise 1/2. The final score comes from the same measurements as the metrics, so a run's metrics
-and its win share one run effect u ~ N(0, SIGMA_U^2) (Qiuyang). The strengths theta are held at the fit above, which has
-no run effect, so its slope-1 logits absorb the run noise; the model stretches them by a fitted factor c (Qiuyang). A
-run's likelihood is the integral over u, by Gauss-Hermite quadrature (24 nodes), of prod_j sigmoid(c theta_m + u -
-beta_tj)^z (1 - sigmoid(.))^(1 - z), j over the task's metric groups, times sigmoid(a (c theta_m + u - h_t))^w (1 -
-sigmoid(.))^(1 - w), with h_t the task's beat-the-human level. Priors: h_t ~ N(c mean theta, PRIOR_SD^2) and beta_tj ~
-N(h_t + DELTA, TAU^2); a task without a reference has no win and no h_t, and beta_tj ~ N(c mean theta, PRIOR_SD^2). Each
-task's parameters are fitted at their posterior mode (Newton's method); SIGMA_U, a, DELTA, TAU and c maximise the sum
-over tasks of the Laplace approximation to the log marginal likelihood (Nelder-Mead from four starts; all but DELTA on a
-log scale; SIGMA_U at most 4, where 24 nodes stay accurate). D, the task's difficulty, is the strength at which a run
-beats every metric half the time, integral prod_j sigmoid(c D + u - beta_tj) N(u; 0, SIGMA_U^2) du = 1/2, with beta at
-the mode. Its 90% interval comes from IS_DRAWS draws of the task's parameters from the Laplace Gaussian, weighted by the
-exact posterior over the Gaussian's density (the posterior of a metric nobody beats is one-sided): the weighted 5th and
-95th percentiles of D. TFIT's slope is that of the logistic matched to the pass curve at D, 4 dP(pass)/dtheta there. All
-are divided by c back to the strengths' logits (a metric's difficulty is its group's beta_tj / c) and mapped to FCI points like
-them.
+median reference_score over the task's runs; 0 or less: REF_DEFAULT's value, else the task has none) is 1 for a final
+score above r_t + TIE_EPS, 0 below r_t - TIE_EPS, otherwise 1/2. The final score comes from the same measurements as the
+metrics, so a run's metrics and its win share one run effect u ~ N(0, SIGMA_U^2) (Qiuyang). The strengths theta are held
+at the fit above, which has no run effect, so its slope-1 logits absorb the run noise; the model stretches them by a
+fitted factor c (Qiuyang). A run's likelihood is the integral over u, by Gauss-Hermite quadrature (24 nodes), of prod_j
+sigmoid(c theta_m + u - beta_tj)^z (1 - sigmoid(.))^(1 - z), j over the task's metric groups, times sigmoid(a (c theta_m
++ u - h_t))^w (1 - sigmoid(.))^(1 - w), with h_t the task's beat-the-human level. Priors: h_t ~ N(c mean theta,
+PRIOR_SD^2) and beta_tj ~ N(h_t + DELTA, TAU^2); a task without a reference has no win and no h_t, and beta_tj ~ N(c
+mean theta, PRIOR_SD^2). Each task's parameters are fitted at their posterior mode (Newton's method); SIGMA_U, a, DELTA,
+TAU and c maximise the sum over tasks of the Laplace approximation to the log marginal likelihood (Nelder-Mead from four
+starts; all but DELTA on a log scale; SIGMA_U at most 4, where 24 nodes stay accurate). D, the task's difficulty, is the
+strength at which a run beats every metric half the time, integral prod_j sigmoid(c D + u - beta_tj) N(u; 0, SIGMA_U^2)
+du = 1/2, with beta at the mode. Its 90% interval comes from IS_DRAWS draws of the task's parameters from the Laplace
+Gaussian, weighted by the exact posterior over the Gaussian's density (the posterior of a metric nobody beats is
+one-sided): the weighted 5th and 95th percentiles of D. TFIT's slope is that of the logistic matched to the pass curve
+at D, 4 dP(pass)/dtheta there. All are divided by c back to the strengths' logits (a metric's difficulty is its group's
+beta_tj / c) and mapped to FCI points like them.
 
 The raw-score fit that the leaderboard showed before 2026-10-14 runs only with --json (feci_score, task_fit_score). It is
 Epoch AI's own ECI code (bin/eci_fitting.py, vendored from epoch-research/eci-public): every task is one benchmark with
@@ -88,6 +88,7 @@ PASS_ZERO_VALUE = 0
 PASS_UNIT = 10                 # FCI points per logit (Qiuyang, 2026-10-14; was 1)
 DEC = max(0, int(np.ceil(2 - np.log10(PASS_UNIT) - 1e-9)))   # decimals of FCI points: a hundredth of a logit or finer, 1 at 10 per logit
 TIE_EPS = 0                    # a final score within TIE_EPS of the human reference is half a win; 0: only an exact tie
+REF_DEFAULT = {'Structured LWE': 100}   # Qiuyang, 2026-10-14: the human reference (by short name) where the database has none
 
 # database display name -> (domain folder, paper short name or None)
 TASK = {
@@ -182,13 +183,14 @@ def on_scale(theta, theta0):
 
 def fit_data(rows):
     """The fits' data: one (model, task, passed, score) per scored run, hidden models included, and each task's
-    reference r_t, the median reference_score over its runs (tasks where it is 0 or less have none)."""
+    reference r_t, the median reference_score over its runs; where that is 0 or less, REF_DEFAULT's value, else none."""
     obs, ref = [], defaultdict(list)
     for cand, task, score, verdict, fj in rows:
         if score is not None: obs.append((cand, task, int(verdict == 'PASS'), score))
         f = json.loads(fj) if fj else {}
         if f.get('reference_score') is not None: ref[task].append(f['reference_score'])
-    return obs, {t: float(np.median(v)) for t, v in ref.items() if np.median(v) > 0}
+    out = {t: float(np.median(v)) for t, v in ref.items() if np.median(v) > 0}
+    return obs, {**{t: float(REF_DEFAULT[short(t)]) for t in {r[1] for r in rows} if short(t) in REF_DEFAULT}, **out}
 
 
 def win(score, ref):
@@ -542,12 +544,15 @@ assert len({short(t) for t in {r[1] for r in rows}}) == len({r[1] for r in rows}
 
 
 def task_reference(db):
-    """Per task short name: the authors' reference score (median reference_score over its runs, left out when 0)."""
+    """Per task short name: the authors' reference score (median reference_score over its runs; where that is 0 or
+    less, REF_DEFAULT's value, else left out)."""
     ref = defaultdict(list)
     for t, fj in db.execute('select t.name, r.feedback_json from cells ce join runs r on r.id = ce.run_id join tasks t on t.id = ce.task_id'):
         f = json.loads(fj) if fj else {}
         if f.get('reference_score') is not None: ref[short(t)].append(f['reference_score'])
-    return {t: round(float(np.median(v)), 1) for t, v in sorted(ref.items()) if np.median(v) > 0}
+    out = {t: round(float(np.median(v)), 1) for t, v in ref.items() if np.median(v) > 0}
+    tasks = {short(t) for t, in db.execute('select name from tasks')}
+    return dict(sorted({**{t: float(v) for t, v in REF_DEFAULT.items() if t in tasks}, **out}.items()))
 
 
 def task_fits(tasks, fit, theta0):
@@ -625,7 +630,7 @@ block = (f'// One entry per scored run in the preview results database of {when:
          f"// Test-time scaling per model: [US$ budget per run, FCI, 90% low, 90% high, share of runs still going]; at a budget a run has passed only if it ended within it with verdict PASS, task difficulties held at the FCI fit (see the converter's docstring).\nconst SCALE = {json.dumps(SC, separators=(',', ':'))};\n"
          f"// Cost per model: [mean US$ per scored run, runs]; output tokens x output price + every token x cache-read price (PRICE above).\nconst COST = {json.dumps(CO)};\nconst PRICE = {json.dumps(PRICE)};\n"
          f"// Every scored run: [model, task, final score, passed, US$ at end, hours, [[US$, dev score] per development submission]].\nconst TRAJ = {json.dumps(trajectories(db), separators=(',', ':'), ensure_ascii=False)};\n"
-         f"// Per task: the authors' reference score, the median over the task's runs (tasks without one are left out).\nconst REF = {json.dumps(REF, ensure_ascii=False)};\n"
+         f"// Per task: the authors' reference score, the median over the task's runs; where the database has none, the converter's REF_DEFAULT (" + ', '.join(f'{k}: {v:g}' for k, v in REF_DEFAULT.items()) + f"), else the task is left out.\nconst REF = {json.dumps(REF, ensure_ascii=False)};\n"
          f"// Per task: [D, slope], the logistic matched to its pass curve at D, P(pass) ~ 1 / (1 + exp(-slope (FCI - D))), slope = 4 x the curve's gradient at D (DIFF has D).\nconst TFIT = {json.dumps(TFIT, ensure_ascii=False)};\n"
          f"// Per task: [D, 90% low, 90% high, passes, wins, runs] in RUNS. D, the difficulty, is the FCI at which a model passes half the time, a pass being every metric beaten at once. It comes from each metric's own difficulty (metrics that pass and fail together share one), fitted on which metrics each run beats and whether its final score beats the human reference (a win; a tie is half; wins is null without a reference), with a run effect shared by both (DIFF_FIT).\nconst DIFF = {json.dumps(DIFF, ensure_ascii=False)};\n"
          f"// The difficulty fit's shared parameters, by Laplace marginal likelihood over all tasks: sigma_u, the sd of a run's effect on its metrics and its win; a, the slope of P(win) over that of a metric; delta and tau, the mean and sd of a metric's difficulty above the task's beat-the-human level (these three in FCI points); c, how much the fit stretches the FCI fit's logits, which have no run effect.\nconst DIFF_FIT = {json.dumps(DIFF_FIT)};\n"
