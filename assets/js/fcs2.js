@@ -5,6 +5,8 @@ document.querySelectorAll('[data-fill]').forEach(el => { el.textContent = {updat
   runtasks:`on ${NTASK(RUNS)} tasks`, models:`${MODELS.length} models from ${new Set(MODELS.map(m => m.lab)).size} labs have run so far.`,
   summary:`${RUNS.length} runs on ${NTASK(RUNS)} tasks by ${MODELS.length} models`,
   ntasks:String(TASKS.length), ndomains:String(new Set(TASKS.map(t => t.d)).size), dmax:fe(Math.max(...Object.values(FDI))), zero:tick(ECI_LOW_VALUE)}[el.dataset.fill]; });
+// text in a model's colour, 22% darker: GPT-6.1 Sol, Qwen 3.8 Max and GLM 5.3 Flash are under 3:1 on white at full colour
+const MTXT = id => `color-mix(in srgb, ${MCOL[id]} 78%, #000)`;
 // Bring a tab into view inside its own horizontal strip only. scrollIntoView would also scroll the page,
 // which fought the reader's scrolling whenever the section spy fired.
 const reveal = el => { const p = el.parentElement, pr = p.getBoundingClientRect(), er = el.getBoundingClientRect();
@@ -86,7 +88,25 @@ function drawPassCost() {
     // under it a smaller dot and a regular name, both at full colour (owner, 2026-10-13: keep the chart clean)
     const lead = front.includes(m);
     svg.append(sv('circle', {cx, cy, r:lead ? 7.5 : 5, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':2, 'data-m':m.id}));
-    labelDot(svg, boxes, cx, cy, name, L, W, MTXT(m.id), lead);   // fcs2-data.js
+    const lab = sv('text', {class:'lab halo', x:cx, y:cy}, name); svg.append(lab);
+    let w = lab.getComputedTextLength() + 2;
+    // right, left, above, below, the four diagonals, then the same one and two lines further out; the first spot clear of every dot and placed label wins
+    const spots = [[cx + 12, cy + 4.5, 'start'], [cx - 12, cy + 4.5, 'end'], [cx, cy - 13, 'middle'], [cx, cy + 22, 'middle'],
+      [cx + 8, cy - 11, 'start'], [cx - 8, cy - 11, 'end'], [cx + 8, cy + 20, 'start'], [cx - 8, cy + 20, 'end'],
+      [cx, cy - 31, 'middle'], [cx, cy + 40, 'middle'], [cx + 6, cy - 29, 'start'], [cx - 6, cy - 29, 'end'], [cx + 6, cy + 38, 'start'], [cx - 6, cy + 38, 'end'],
+      [cx, cy - 49, 'middle'], [cx, cy + 58, 'middle'], [cx - 6, cy - 47, 'end'], [cx - 6, cy + 56, 'end']];
+    const box = ([x, y, an]) => ({x:an === 'start' ? x : an === 'end' ? x - w : x - w / 2, y:y - 11, w, h:14});   // the glyphs' own height, so a label can sit beside its dot in a tight cluster
+    const hit = q => boxes.some(o => q.x < o.x + o.w && o.x < q.x + q.w && q.y < o.y + o.h && o.y < q.y + q.h) || q.x < L || q.x + q.w > W || q.y < 0;
+    // a name with no spot next to its dot sheds its brand word ("Muse Wonder 1.0" becomes "Wonder 1.0", as Claude Opus 5.5 is "Opus 5.5")
+    // before it moves a line or two away; a label is dropped only when neither form fits anywhere
+    const tight = /^\S+ (\S+ \d[\d.]*)$/.exec(name), forms = tight ? [name, tight[1]] : [name];
+    let spot;
+    for (const [str, from] of [...forms.map(f => [f, spots.slice(0, 8)]), ...forms.map(f => [f, spots])]) {
+      lab.textContent = str; w = lab.getComputedTextLength() + 2; spot = from.find(sp => !hit(box(sp))); if (spot) break; }
+    if (spot) { boxes.push(box(spot)); lab.setAttribute('x', spot[0]); lab.setAttribute('y', spot[1]); lab.setAttribute('text-anchor', spot[2]);
+      // a label wears its dot's colour, darkened to read on white, so a crowded patch still pairs each name with its dot
+      lab.style.fill = MTXT(m.id); if (lead) lab.style.fontWeight = 600; }
+    else lab.remove();
     const pct = PASS[m.id][0];
     pts.push({x:cx, y:cy, mean:true, html:`<b>${esc(m.name)}</b><br>Pass rate <b>${f1(pct)}%</b><br>${usdfmt(COST[m.id][0])} per run, mean`});
   });
