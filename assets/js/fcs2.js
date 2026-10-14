@@ -24,7 +24,7 @@ const spy = () => { spyRaf = 0;
 addEventListener('scroll', () => { spyRaf ||= requestAnimationFrame(spy); }, {passive:true}); spy();
 
 /* ---------- scroll-in animation ----------
-   The mean-score, FECI and test-time scaling charts play once when they first come into view (owner, 2026-10-11): bars
+   The mean-score, FCI and test-time scaling charts play once when they first come into view (owner, 2026-10-11): bars
    grow from 0, run dots appear one after another and then the mean (owner, 2026-10-11), curves are uncovered left to right.
    A chart starts once 65% of it is on screen, or, if it is taller than that, once it fills 65% of the window (owner: 30% was too early). A chart drawn again later (resize,
    fonts) is drawn still. Off with reduced motion, without IntersectionObserver, and for the thread cards (CHART_H). */
@@ -96,7 +96,7 @@ function drawPassCost() {
 /* On phones the model column is as wide as the longest model name, so every name shows in full (owner: "DeepSeek V4.1 Flash", not cut). */
 const nameCol = svg => { svg.replaceChildren(); const w = Math.max(...MODELS.map(m => { const t = sv('text', {class:'lab', x:-999, y:-999}, m.short); svg.append(t); return t.getComputedTextLength(); })); svg.replaceChildren(); return Math.max(112, Math.ceil(w) + 12); };
 
-/* FECI: one row per model ranked by ECI, a bar from 0 to its FECI and its 90% interval as a whisker. */
+/* FCI: one row per model ranked by ECI, a bar from 0 to its FCI and its 90% interval as a whisker. */
 function drawECI() {
   const order = [...MODELS].sort((a, b) => ECI[b.id][0] - ECI[a.id][0]);
   const svg = $('#ecisvg'), W = Math.max(300, $('#eciplot').clientWidth), narrow = W < 560;
@@ -110,7 +110,7 @@ function drawECI() {
     svg.append(sv('line', {x1:X(v), x2:X(v), y1:T, y2:H - B + 6, stroke:'var(--grid)', 'stroke-width':1}));
     svg.append(sv('text', {x:X(v), y:H - B + 22, 'text-anchor':'middle'}, v));
   }
-  svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'FECI'));
+  svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'FCI'));
   const pts = [];
   order.forEach((m, i) => {
     const [e, lo, hi] = ECI[m.id], y0 = T + i * lane, yc = y0 + lane / 2;
@@ -122,17 +122,17 @@ function drawECI() {
     const val = sv('text', {class:'val halo', x:X(e), y:yc - bh / 2 - 6, fill:MTXT(m.id), 'text-anchor':'middle'}, f1(e));   // one decimal: on this scale whole numbers tie
     svg.append(bar, wk, val);
     if (an) { mark(bar, 'a-bar', i * .07); mark(wk, 'a-fade', .55 + i * .07); mark(val, 'a-fade', .55 + i * .07); }
-    pts.push({x:X(e), y:yc, mean:true, html:`<b>${esc(m.name)}</b><br>FECI <b>${f1(e)}</b><br>90% interval ${Math.round(lo)}–${Math.round(hi)}`});
+    pts.push({x:X(e), y:yc, mean:true, html:`<b>${esc(m.name)}</b><br>FCI <b>${f1(e)}</b><br>90% interval ${Math.round(lo)}–${Math.round(hi)}`});
   });
   attachTip(svg, W, H, pts, $('#ecitip'));
 }
 
-/* Test-time scaling: FECI when every run stops at a US$ budget (SCALE, from bin/fcs2_runs_from_db.py). Straight segments
+/* Test-time scaling: FCI when every run stops at a US$ budget (SCALE, from bin/fcs2_runs_from_db.py). Straight segments
    and one legend (owner, 2026-10-13). A run stopped at a budget counts its latest valid submission, so a curve can dip.
-   Every model with reported spend is in the legend; at first only each lab's model with the highest FECI is drawn and the
+   Every model with reported spend is in the legend; at first only each lab's model with the highest FCI is drawn and the
    others are greyed in the legend; a click on an entry shows or hides its curve (owner, 2026-10-14). A model's 90% band
    shows only while the pointer is on its curve or its legend entry (owner, 2026-10-13: no bands otherwise).
-   Each curve starts at its first budget on the scale, FECI 0 or more, marked by an open dot (Qiuyang, 2026-10-14: the
+   Each curve starts at its first budget on the scale, FCI 0 or more, marked by an open dot (Qiuyang, 2026-10-14: the
    values under 0 drew every curve in from the bottom edge as a comb of near-vertical strokes). When the chart first comes
    into view a moving focus plays (Melissa's and Qiuyang's idea, 2026-10-14): a budget cursor sweeps right, slow where
    curves start or rise and quick across empty stretches; the view follows it, zoomed in on cheap budgets first and
@@ -142,7 +142,7 @@ let ttsHover = null, ttsRun = 0;
 const TTSM = RANKED.filter(m => SCALE[m.id]);   // a model with no reported spend has no curve
 const ttsOn = new Set(TTSM.filter((m, i, a) => a.findIndex(o => o.lab === m.lab) === i).map(m => m.id));
 const ttsBands = () => document.querySelectorAll('#ttssvg .tband').forEach(b => b.setAttribute('opacity', b.dataset.m === ttsHover ? .12 : 0));
-const ttsCurve = id => SCALE[id].filter(p => p[1] >= 0);   // [US$, FECI, 90% low, 90% high, share still going], from FECI 0 up
+const ttsCurve = id => SCALE[id].filter(p => p[1] >= 0);   // [US$, FCI, 90% low, 90% high, share still going], from FCI 0 up
 // a curve up to log budget lx, ending on the point interpolated there
 function ttsUpTo(c, lx) {
   const out = [];
@@ -155,7 +155,7 @@ function ttsUpTo(c, lx) {
   return out;
 }
 const ttsEase = t => t < .5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
-// the cursor's log budget at time t: a stretch takes time in proportion to how much happens in it (curves starting, FECI
+// the cursor's log budget at time t: a stretch takes time in proportion to how much happens in it (curves starting, FCI
 // gained), with a floor, so the sweep slows through the busy stretches and hurries across the empty ones
 function ttsSweep(cs, x0, x1, t) {
   const n = 240, w = [0], at = (c, lx) => { const v = ttsUpTo(c, lx); return v.length ? v[v.length - 1][1] : null; };
@@ -198,7 +198,7 @@ function drawTTS(t) {
   }
   svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'Cost budget per run in US$, log scale'));
   const g = sv('g', {'clip-path':'url(#ttsclip)'}), gb = sv('g'), gl = sv('g'); g.append(gb, gl); svg.append(g);   // bands under every line
-  // rising at the cursor: started within the last 0.35 decade, or 2 FECI gained over it; nothing steps back while nothing rises
+  // rising at the cursor: started within the last 0.35 decade, or 2 FCI gained over it; nothing steps back while nothing rises
   const rising = c => { const s0 = Math.log10(c[0][0]); if (s0 > sweep) return false; const e = ttsUpTo(c, sweep), b = ttsUpTo(c, sweep - .35);
     return s0 > sweep - .35 || e[e.length - 1][1] - b[b.length - 1][1] >= 2; };
   const anyRising = play && cs.some(rising), pts = [], tips = [];
@@ -214,7 +214,7 @@ function drawTTS(t) {
       sv('circle', {cx:X(c[0][0]), cy:Y(c[0][1]), r:2.6, fill:'#fff', stroke:MCOL[m.id], 'stroke-width':1.5, opacity:op}),   // where it starts
       sv('circle', {cx:X(e[0]), cy:Y(e[1]), r:4.5, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':1.5, opacity:op}));
     if (play && anyRising && lit) tips.push({m, e});
-    if (!play) c.forEach(p => pts.push({x:X(p[0]), y:Y(p[1]), m:m.id, html:`<b>${esc(m.name)}</b><br>FECI <b>${f1(p[1])}</b> at ${usdfmt(p[0])} per run`
+    if (!play) c.forEach(p => pts.push({x:X(p[0]), y:Y(p[1]), m:m.id, html:`<b>${esc(m.name)}</b><br>FCI <b>${f1(p[1])}</b> at ${usdfmt(p[0])} per run`
       + `<br>90% interval ${Math.round(Math.max(p[2], 0))}–${Math.round(p[3])}<br>${Math.round(p[4] * 100)}% of runs still going`}));
   });
   // while the focus moves, the rising curves are named at their tips, off every line where there is room
@@ -344,13 +344,13 @@ function drawTable() {
 /* ---------- case studies: a placeholder until the preview runs have their own (owner, 2026-10-09) ---------- */
 const redraws = [];
 
-/* ---------- How FECI works: a fold under the FECI chart (owner, 2026-10-11) ----------
-   Three tasks' fitted curves, expected score = 100 / (1 + exp(-k (FECI - FEDI))) from TFIT: an easy one, one at the
+/* ---------- How FCI works: a fold under the FCI chart (owner, 2026-10-11) ----------
+   Three tasks' fitted curves, expected score = 100 / (1 + exp(-k (FCI - FEDI))) from TFIT: an easy one, one at the
    human reference and a hard one, picked in code as the tasks with a clear S (slope .07 to .3) whose FEDI is nearest
    -15, 25 and 50, so the picture follows the data (owner, 2026-10-14). Dashed lines mark the two fixed points of the
    scale, Kimi K2.7 = 0 and Human = 25. */
 function drawHow() {
-  const box = $('#feci-how'); if (!box || !box.open) return;
+  const box = $('#fci-how'); if (!box || !box.open) return;
   const fits = Object.entries(TFIT), clear = fits.filter(([, [, k]]) => k >= .07 && k <= .3);
   $('#how-dmax').textContent = Math.round(Math.max(...fits.map(([, [d]]) => d)));
   const INKS = ['#8ab4f8', '#1a73e8', '#174ea6'];   // easy to hard: Google blue 300, 600, 900
@@ -360,7 +360,7 @@ function drawHow() {
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
   for (let v = 0; v <= 100; v += 25) { svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1})); svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, v)); }
   for (let v = X0; v <= X1; v += 20) svg.append(sv('text', {x:X(v), y:H - B + 20, 'text-anchor':'middle'}, v));
-  svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'FECI'));
+  svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'FCI'));
   [[0, narrow ? 'K2.7' : 'Kimi K2.7'], [ECI_HUMAN, 'Human']].forEach(([v, name]) => {
     svg.append(sv('line', {x1:X(v), x2:X(v), y1:T - 4, y2:H - B, stroke:'var(--ink-2)', 'stroke-width':1, 'stroke-dasharray':'3 3', opacity:.6}),
       sv('text', {x:X(v), y:T - 10, 'text-anchor':'middle'}, `${name} ${v}`)); });
@@ -370,12 +370,12 @@ function drawHow() {
     const f = x => 100 / (1 + Math.exp(-k * (x - d)));
     svg.append(sv('path', {d:Array.from({length:241}, (_, j) => { const x = X0 + j / 2; return `${j ? 'L' : 'M'}${X(x).toFixed(1)},${Y(f(x)).toFixed(1)}`; }).join(''), fill:'none', stroke:INKS[i], 'stroke-width':2.5}));
     svg.append(sv('circle', {cx:X(d), cy:Y(50), r:5, fill:INKS[i], stroke:'#fff', 'stroke-width':2}));   // the FEDI: expected score 50
-    for (let x = X0; x <= X1; x += 2) pts.push({x:X(x), y:Y(f(x)), html:`<b>${esc(NAME(s))}</b><br>FEDI ${f1(d)}, slope ${k.toFixed(3)}<br>At FECI ${x}: expected score <b>${f1(f(x))}</b>`});
+    for (let x = X0; x <= X1; x += 2) pts.push({x:X(x), y:Y(f(x)), html:`<b>${esc(NAME(s))}</b><br>FEDI ${f1(d)}, slope ${k.toFixed(3)}<br>At FCI ${x}: expected score <b>${f1(f(x))}</b>`});
   });
   attachTip(svg, W, H, pts, $('#howatip'));
   $('#howalegend').innerHTML = picks.map(([s, [d]], i) => `<span><i style="background:${INKS[i]}"></i>${esc(NAME(s))}, FEDI ${f1(d)}</span>`).join('');
 }
-$('#feci-how').addEventListener('toggle', drawHow);
+$('#fci-how').addEventListener('toggle', drawHow);
 redraws.push(drawHow);
 
 /* ---------- questions ---------- */
@@ -638,7 +638,7 @@ document.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse' &&
 function drawRows() {
   const h = hits(); $('#fcount').textContent = picked.size ? `(${picked.size})` : '';
   $('#lhead').innerHTML = `<span>${h.length === TASKS.length ? `${TASKS.length} tasks` : `${h.length} of ${TASKS.length} tasks`}</span><span></span>`
-    + `<span title="FEDI, the FrontierCS Epoch Difficulty Index: the FECI at which a model is expected to score 50 on the task">FEDI</span><span></span>`;
+    + `<span title="FEDI, the FrontierCS Epoch Difficulty Index: the FCI at which a model is expected to score 50 on the task">FEDI</span><span></span>`;
   $('#rows').innerHTML = h.map(t => { const s = t.s, v = VENUE[s], goal = GOAL[s], ttl = t.t || (v ? t.name : '');
     // with a goal, the source is the small line under it (venue in bold, then the title); without one (Security), the title is the main line
     const main = goal || ttl, small = goal ? (v && ttl ? `<b>${esc(v)}</b> · ${esc(ttl)}` : esc(v || ttl)) : v ? `<b>${esc(v)}</b>` : '';

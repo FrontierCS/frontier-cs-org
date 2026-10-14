@@ -14,9 +14,9 @@ IMG = ROOT / 'assets' / 'img'
 OUT = IMG / 'cards'
 W, H, PW, PH = 1200, 630, 620, 550   # card, and the picture on the right (40 px from the top, right and bottom edges)
 
-BRAND = ('<div class="brand"><svg viewBox="0 -7 87 87"><g fill="#1f1f1f"><rect width="24" height="24" rx="5.5"/>'
-         '<rect x="28" width="24" height="24" rx="5.5"/><rect y="28" width="24" height="24" rx="5.5"/><rect x="28" y="28" width="24" height="24" rx="5.5"/>'
-         '<rect y="56" width="24" height="24" rx="5.5"/></g><rect x="63" y="-7" width="24" height="24" rx="5.5" fill="#0b57d0"/></svg>FrontierCS</div>')   # the pixel F (#64)
+BRAND = ('<div class="brand"><svg viewBox="-5.5 -69.2 74.7 74.7">'
+         '<path d="M0 -50 A50 50 0 0 1 50 0" fill="none" stroke="#1f1f1f" stroke-width="11" stroke-linecap="round"/><rect x="45.2" y="-69.2" width="24" height="24" rx="5.5" fill="#0b57d0"/>'
+         '</svg>FrontierCS</div>')   # the arc and the tile beyond it (owner: proposal 7)
 
 def uri(p):
     p = IMG / p; kind = {'.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg'}[p.suffix]
