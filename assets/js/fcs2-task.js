@@ -226,19 +226,89 @@ function loadPatches(t) {
   if (PATCHES[s]) return show(PATCHES[s]);
   fetch(`${window.PATCH_DIR || '/assets/patches/'}${s}.json`).then(r => r.ok ? r.json() : null).then(d => { if (d) { PATCHES[s] = d; show(d); } }).catch(() => {});
 }
-const DIFF_META = /^(index |--- |\+\+\+ |new file mode|deleted file mode|similarity index|rename (from|to) |old mode|new mode|Binary files|GIT binary patch)/;
 // a patch without git's own header (a plain unified diff) gets one per file, so it shows its file names too
 const withHeads = t => t.includes('diff --git ') ? t : t.replace(/^--- (?:a\/)?(.+)\n\+\+\+ (?:b\/)?(.+)$/gm, (m, a, b) => `diff --git a/${b} b/${b}\n${m}`);
-const filesOf = p => p.files.length ? p.files : [...p.patch.matchAll(/^\+\+\+ (?:b\/)?(.+)$/gm)].map(m => m[1]);
 // a line longer than LONG characters (one-line JSON answers) shows its start and how much follows
-const LONG = 600, cut = l => l.length > LONG ? `${esc(l.slice(0, LONG))}<i class="dmore"> … ${(l.length - LONG).toLocaleString('en-US')} more characters</i>` : esc(l) || ' ';
-function diffHTML(text) {
-  let n = 0;
-  return withHeads(text).split('\n').map(l => l.startsWith('diff --git ') ? `<span class="df" id="pf${n++}">${esc(l.replace(/^diff --git a\/(.*?) b\/.*$/, '$1'))}</span>`
-    : DIFF_META.test(l) ? `<span class="dm">${esc(l)}</span>` : l.startsWith('@@') ? `<span class="dh">${esc(l)}</span>`
-    : l.startsWith('+') ? `<span class="da">${cut(l)}</span>` : l.startsWith('-') ? `<span class="dd">${cut(l)}</span>` : `<span>${cut(l)}</span>`).join('');
+const LONG = 600, cut = l => l.length > LONG ? `${esc(l.slice(0, LONG))}<i class="dmore"> … ${(l.length - LONG).toLocaleString('en-US')} more characters</i>` : esc(l);
+const lines = n => `<b>${n}</b> ${n === 1 ? 'line' : 'lines'}`;
+
+/* The patch as Claude Code shows an edit (Qiuyang, 2026-10-14: concise and strong, in Claude Code's design): for each file
+   "Update(path)", or "Write(path)" for a new one, an elbow line with its counts, then numbered rows, the old line's number
+   on a removal and the new one's otherwise, "…" between hunks, and Claude Code's light-theme colours. Within a removed
+   line and the added line that replaces it, the changed words are marked, unless most of the line changed. A file longer
+   each file folds on its own, its two head lines as the fold's summary, open when it is the patch's only file (Qiuyang,
+   2026-10-14); an open file's rows scroll in a box as the task list on the overview does: its drawn rail, the foot
+   fading until the end, no frame. */
+function parsePatch(text) {
+  const files = []; let f = null, o = 0, n = 0, inHunk = false;
+  for (const l of withHeads(text).split('\n')) {
+    if (l.startsWith('diff --git ')) { f = {path: l.replace(/^diff --git a\/.*? b\//, ''), kind: 'Update', rows: [], add: 0, del: 0}; files.push(f); inHunk = false; continue; }
+    if (!f) continue;
+    const h = l.match(/^@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@/);
+    if (h) { if (f.rows.length) f.rows.push({t: 'g'}); o = +h[1]; n = +h[2]; inHunk = true; continue; }
+    if (!inHunk) {   // the file's header lines
+      if (l.startsWith('new file mode') || l === '--- /dev/null') f.kind = 'Write';
+      else if (l.startsWith('deleted file mode') || l === '+++ /dev/null') f.kind = 'Delete';
+      else if (l.startsWith('Binary files') || l.startsWith('GIT binary patch')) f.binary = true;
+      continue;
+    }
+    if (l[0] === '+') { f.rows.push({t: 'a', n: n++, s: l.slice(1)}); f.add++; }
+    else if (l[0] === '-') { f.rows.push({t: 'd', n: o++, s: l.slice(1)}); f.del++; }
+    else if (l[0] === ' ') { f.rows.push({t: 'c', n: n++, s: l.slice(1)}); o++; }
+  }
+  files.forEach(f => f.rows.forEach((r, i) => {   // a run of removals, then the additions that replace them, line for line
+    if (r.t !== 'd' || (f.rows[i - 1] || {}).t === 'd') return;
+    let j = i; while (f.rows[j] && f.rows[j].t === 'd') j++;
+    for (let k = 0; k < j - i && f.rows[j + k] && f.rows[j + k].t === 'a'; k++) marks(f.rows[i + k], f.rows[j + k]);
+  }));
+  return files;
 }
-const counts = (p, files) => `${plural(files.length, 'file')} changed, <b class="a">+${p.add}</b> <b class="d">−${p.del}</b>`;
+const toks = s => s.match(/\s+|\w+|[^\s\w]/g) || [];
+function marks(d, a) {
+  if (d.s.length > LONG || a.s.length > LONG) return;
+  const x = toks(d.s), y = toks(a.s); let i = 0, j = 0;
+  while (i < x.length && i < y.length && x[i] === y[i]) i++;
+  while (j < x.length - i && j < y.length - i && x[x.length - 1 - j] === y[y.length - 1 - j]) j++;
+  const mx = x.slice(i, x.length - j).join(''), my = y.slice(i, y.length - j).join('');
+  if (mx.length + my.length > .4 * (d.s.length + a.s.length)) return;   // mostly rewritten: no marks, as Claude Code does
+  const wrap = (t, m) => esc(t.slice(0, i).join('')) + (m ? `<mark>${esc(m)}</mark>` : '') + esc(t.slice(t.length - j).join(''));
+  d.h = wrap(x, mx); a.h = wrap(y, my);
+}
+function fileHTML(f, i, all) {
+  const w = f.kind === 'Write';
+  const sum = f.binary ? 'Binary file' : w ? `Wrote ${lines(f.add)}` : f.kind === 'Delete' ? `Removed ${lines(f.del)}`
+    : [f.add ? `Added ${lines(f.add)}` : '', f.del ? `${f.add ? 'removed' : 'Removed'} ${lines(f.del)}` : ''].filter(Boolean).join(', ');
+  const nw = String(Math.max(1, ...f.rows.map(r => r.n || 0))).length;
+  const rows = f.rows.map(r => r.t === 'g' ? '<div class="r g"><span class="n"></span><span class="s"></span><span class="c">…</span></div>'
+    : `<div class="r ${r.t}"><span class="n">${r.n}</span><span class="s">${r.t === 'a' ? '+' : r.t === 'd' ? '-' : ''}</span>`
+      + `<span class="c">${r.h != null ? r.h : cut(r.s)}</span></div>`).join('');
+  const head = `<span class="cct"><b>${f.kind}</b>(${esc(f.path)})</span><span class="ccs">${sum}</span>`;
+  if (!f.rows.length) return `<div class="ccf"><span class="cch">${head}</span></div>`;   // nothing to unfold: a binary file
+  return `<details class="fold ccf"${all.length === 1 ? ' open' : ''}><summary><span class="cch">${head}</span></summary>`
+    + `<div class="ccwrap"><div class="ccbox" tabindex="0"><div class="ccd" style="--nw:${nw + 2}ch">${rows}</div></div>`
+    + '<div class="rail" hidden><i></i></div></div></details>';
+}
+// a box that scrolls with the overview's drawn rail (fcs2.js, the task list): the thumb's height is the visible share, its
+// top the share scrolled; dragging it scrolls in step, a press on the rail centres the thumb there first; the foot fades
+// until the end. Returns the function that redraws it, for a scroll, an opened fold or a resize.
+let patchEnd = () => {};
+function railed(box, rail) {
+  const th = rail.firstElementChild;
+  const at = () => { box.classList.toggle('at-end', box.scrollTop + box.clientHeight >= box.scrollHeight - 2);
+    const over = box.scrollHeight > box.clientHeight + 1; rail.hidden = !over;
+    if (over) { const h = Math.max(36, box.clientHeight * box.clientHeight / box.scrollHeight); th.style.height = `${h}px`;
+      th.style.top = `${(box.clientHeight - h) * box.scrollTop / (box.scrollHeight - box.clientHeight)}px`; } };
+  box.addEventListener('scroll', at, {passive:true});
+  rail.addEventListener('pointerdown', e => { const r = rail.getBoundingClientRect(), span = box.clientHeight - th.offsetHeight;
+    const per = (box.scrollHeight - box.clientHeight) / (span || 1);
+    if (e.target !== th) box.scrollTop = (e.clientY - r.top - th.offsetHeight / 2) * per;
+    const y0 = e.clientY, s0 = box.scrollTop; rail.classList.add('drag'); rail.setPointerCapture(e.pointerId); e.preventDefault();
+    const move = ev => { box.scrollTop = s0 + (ev.clientY - y0) * per; };
+    const up = () => { rail.classList.remove('drag'); rail.removeEventListener('pointermove', move); rail.removeEventListener('pointerup', up); rail.removeEventListener('pointercancel', up); };
+    rail.addEventListener('pointermove', move); rail.addEventListener('pointerup', up); rail.addEventListener('pointercancel', up); });
+  return at;
+}
+const counts = p => `${plural(p.files.length || parsePatch(p.patch).length, 'file')} changed, <b class="a">+${p.add}</b> <b class="d">−${p.del}</b>`;
 function drawPatches(d) {
   const ms = RANKED.filter(m => d.runs[m.id]);
   if (!ms.length) return;
@@ -256,30 +326,29 @@ function drawPatches(d) {
   const words = typeof SOLUTION !== 'undefined' && SOLUTION[cur.t.s], m0 = ms[0], p0 = d.runs[m0.id];
   const who = one && words && words.m !== m0.id ? `${esc(m0.name)}’s patch` : one ? 'The patch' : 'The patches';
   sec.insertAdjacentHTML('beforeend', `<details class="fold pfold"><summary><h3>${who}</h3>`
-    + (one && has(m0) ? `<span class="pd">${counts(p0, filesOf(p0))}</span>` : '') + '</summary>'
-    + `<p class="pnote">${one ? 'A' : 'Each model’s final submission as a'} diff against the code the task starts from.</p>`
-    + `<div class="pchips" id="pchips"${one ? ' hidden' : ''}></div><div class="pmeta" id="pmeta"></div><div id="pview"></div></details>`);
+    + (one && has(m0) ? `<span class="pd">${counts(p0)}</span>` : '') + '</summary>'
+    + `<div class="pchips" id="pchips"${one ? ' hidden' : ''}></div><div class="pmeta" id="pmeta"></div><div class="cc" id="pview"></div></details>`);
+  sec.querySelector('.pfold').addEventListener('toggle', () => patchEnd());
   if (!one) $('#pchips').innerHTML = ms.map(m => { const p = d.runs[m.id];
-    return `<button type="button" class="pchip" data-m="${m.id}" aria-pressed="false"><i style="background:${MCOL[m.id]}"></i><span>${esc(m.short)}</span>`
+    return `<button type="button" class="pchip" data-m="${m.id}" aria-pressed="false"><i style="background:${MCOL[m.id]}"></i><span>${esc(m.name)}</span>`
       + `<span class="pv ${passed(m) ? 'y' : 'n'}">${passed(m) ? 'Pass' : 'Fail'}</span>`
       + (has(m) ? `<span class="pd"><b class="a">+${p.add}</b> <b class="d">−${p.del}</b></span>` : '<span class="pd">no solution</span>') + '</button>'; }).join('');
   const pick = id => {
     const m = ms.find(x => x.id === id), p = d.runs[id];
     $('#pchips').querySelectorAll('.pchip').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.m === id)));
     if (!has(m)) { $('#pmeta').innerHTML = ''; $('#pview').innerHTML = `<p class="pempty">${esc(m.name)} handed in no solution on this task (${esc(p.missing || 'none')}).</p>`; return; }
-    const files = filesOf(p);
-    $('#pmeta').innerHTML = (one ? '' : `<b>${esc(m.name)}</b> · ${esc(p.submission)} · ${counts(p, files)}`)
-      + (p.truncated ? `${one ? '' : ' · '}the first ${Math.round(p.patch.length / 1000)} kB of ${Math.round(p.bytes / 1000)} kB shown` : '')
-      + (files.length > 1 ? `<div class="pfiles">${files.map((f, i) => `<a href="#pf${i}" data-i="${i}">${esc(f)}</a>`).join('')}</div>` : '');
-    $('#pview').innerHTML = `<pre class="pdiff" tabindex="0"><code>${diffHTML(p.patch)}</code></pre>`;
+    $('#pmeta').innerHTML = one ? '' : `<b>${esc(m.name)}</b> · ${esc(p.submission)} · ${counts(p)}`;
+    $('#pview').innerHTML = parsePatch(p.patch).map(fileHTML).join('')
+      + (p.truncated ? `<p class="ccn">The first ${Math.round(p.patch.length / 1000)} kB of ${Math.round(p.bytes / 1000)} kB</p>` : '');
+    // each file's box gets its rail, redrawn when the file or the whole patch opens, and on a resize
+    const ends = [...$('#pview').querySelectorAll('details.ccf')].map(d => { const at = railed(d.querySelector('.ccbox'), d.querySelector('.rail'));
+      d.addEventListener('toggle', at); return at; });
+    patchEnd = () => ends.forEach(at => at()); patchEnd();
   };
   $('#pchips').onclick = e => { const b = e.target.closest('.pchip'); if (b) pick(b.dataset.m); };
-  // a file name scrolls the diff, not the page, to that file
-  $('#pmeta').onclick = e => { const a = e.target.closest('.pfiles a'); if (!a) return; e.preventDefault();
-    const pre = $('#pview .pdiff'), h = pre && pre.querySelector(`#pf${a.dataset.i}`); if (h) pre.scrollTop = h.offsetTop - pre.offsetTop; };
   pick((ms.find(m => passed(m) && has(m)) || ms.find(has) || ms[0]).id);
 }
 
 addEventListener('hashchange', drawPage);
 drawPage();
-let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(drawCharts, 120); });
+let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { drawCharts(); patchEnd(); }, 120); });
