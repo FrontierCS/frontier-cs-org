@@ -220,13 +220,13 @@ OVERVIEW = {
       console.assert(fe(ECI[top.id][0]) !== fe(ECI[RANKED[1].id][0]), 'FCI wording: a tie at the top', top.id, RANKED[1].id);
       const v = card('stack', 'FCI (FrontierCS Capabilities Index)',   // owner, 2026-10-13: the index's name as the headline
         `${top.name} is highest, at ${fe(ECI[top.id][0])}.`,
-        `FCI, fitted on pass verdicts. ${ECI_LOW_NAME} = ${ECI_LOW_VALUE}.`);
+        `FCI, fitted on the beat or miss of each metric. ${ECI_LOW_NAME} = ${ECI_LOW_VALUE}.`);
       CHART_H.eciLane = Math.floor((v.clientHeight - 60) / MODELS.length); v.append(document.getElementById('eciplot')); drawECI(); oneLine(document.getElementById('ecisvg')); sideVals(document.getElementById('ecisvg'));
     }""",
     # test-time scaling: the overview's chart
     '06-scaling': """() => {
       const v = card('stack', 'FCI vs. budget per run',
-        'A run counts as passed once it has ended with a pass within the budget.',
+        'A run that ended within the budget counts what it beat; one still going counts as beating nothing.',
         'One curve per lab, its model with the highest FCI, as on the site.');
       fit(v, 'tts', 62); v.append(document.getElementById('ttsplot'), document.getElementById('ttslegend')); drawTTS();
       document.querySelectorAll('#ttslegend button[aria-pressed="false"]').forEach(b => b.remove());   // a still card: the hidden models leave the legend

@@ -131,8 +131,8 @@ function drawECI() {
 }
 
 /* Test-time scaling: the FCI a model would have if every run stopped at a US$ budget (SCALE, from
-   bin/fcs2_runs_from_db.py); a run counts as passed only once it has ended within the budget with a pass (Qiuyang,
-   2026-10-14). Straight segments and one legend (owner, 2026-10-13).
+   bin/fcs2_runs_from_db.py); a run that has ended within the budget counts what it beat, and a run still going counts
+   as beating nothing (Qiuyang, 2026-10-14). Straight segments and one legend (owner, 2026-10-13).
    Every model with reported spend is in the legend; at first only each lab's model with the highest FCI is drawn and the
    others are greyed in the legend; a click on an entry shows or hides its curve (owner, 2026-10-14). A model's 90% band
    shows only while the pointer is on its curve or its legend entry (owner, 2026-10-13: no bands otherwise).
