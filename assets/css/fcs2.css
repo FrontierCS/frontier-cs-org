@@ -76,8 +76,7 @@ h2{font-weight:600; font-size:clamp(25px,2.4vw,30px); line-height:1.2; margin:0}
 .legend i{width:12px; height:12px; display:inline-block}
 #ttslegend button{display:inline-flex; align-items:center; gap:7px; padding:3px 9px 3px 7px; margin:-3px -9px -3px -7px; border:0; border-radius:14px; background:none; font:inherit; color:var(--ink); cursor:pointer}
 #ttslegend button:hover{background:var(--grid)}
-#ttslegend button.off{color:var(--ink-2)}
-#ttslegend button.off i{background:#c9ccd1!important}
+#ttslegend button[aria-pressed="true"]{background:var(--grid); font-weight:600}   /* the picked model, whose band stays */
 #ttslegend{gap:10px 26px}
 .cfoot{display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:16px; padding-top:14px; border-top:1px solid var(--line); font-size:13px; color:var(--muted-2)}
 /* the FrontierCS logo (mark and wordmark) signs each chart at the bottom left (owner, 2026-10-11) */

@@ -72,6 +72,7 @@ CSS = """
 # Card shell: brand and address on top; 'stack' puts the visual under the headline, 'side' beside it.
 SHELL = """
 window.card = (layout, h, sub, note) => {
+  console.assert(![h, sub, note].some(t => /[’']/.test(t || '')), 'no apostrophes on a card (owner, 2026-10-13)', h, sub, note);
   document.querySelectorAll('.tcard').forEach(e => e.remove());
   const c = document.createElement('div'); c.className = `tcard fcs2 ${layout}`;
   c.innerHTML = `<div class="tc-top"><div class="tc-brand"><svg viewBox="4.5 14.44 81.06 81.06"><path d="M10 40 A50 50 0 0 1 60 90" fill="none" style="stroke:var(--mk-in,#1f1f1f)" stroke-width="11" stroke-linecap="round"/><path d="M50.45 19.94 A80.9 80.9 0 0 1 80.06 49.55" fill="none" style="stroke:var(--mk-out,#0b57d0)" stroke-width="11" stroke-linecap="round"/></svg>FrontierCS</div><div class="tc-url">frontier-cs.org</div></div>
@@ -84,8 +85,14 @@ window.PRE = 'Preliminary results';
 // row charts (mean score, FECI): drop the harness line under each model name and centre the name on its row
 window.oneLine = svg => svg.querySelectorAll('text.lab').forEach(l => { const n = l.nextElementSibling;
   if (n && n.tagName === 'text' && /12px/.test(n.getAttribute('style') || '')) { l.setAttribute('y', +l.getAttribute('y') + 7); n.remove(); } });
+// row charts on a card: the lanes are too tight for a value above its mark (it would sit in the row above), so each value
+// moves beside its row's mark, to the right of the mean dot (mean score) or of the whisker's end (FECI)
+window.sideVals = svg => svg.querySelectorAll('text.val').forEach(v => { const m = v.previousElementSibling; if (!m) return;
+  const yc = m.tagName === 'circle' ? +m.getAttribute('cy') : m.getBBox().y + m.getBBox().height / 2;
+  const x = m.tagName === 'circle' ? +m.getAttribute('cx') + +m.getAttribute('r') + 5 : m.getBBox().x + m.getBBox().width + 7;
+  v.setAttribute('x', x.toFixed(1)); v.setAttribute('y', (yc + 5).toFixed(1)); v.setAttribute('text-anchor', 'start'); });
 // layout audit, run on every card: visible text boxes must not overlap each other, must stay inside the card, and in a
-// row chart each model name must sit level with its row's mean dot
+// row chart each model name must sit level with its row's mean dot or bar
 window.audit = () => {
   const c = document.querySelector('.tcard'), cb = c.getBoundingClientRect(), bad = [];
   const texts = [...c.querySelectorAll('text, .tc-h, .tc-sub, .tc-note, .tc-cap, .tc-brand, .tc-url, .legend span, td, th, span')]
@@ -99,7 +106,8 @@ window.audit = () => {
     const ox = Math.min(a.r, b.r) - Math.max(a.l, b.l), oy = Math.min(a.b, b.b) - Math.max(a.t, b.t);
     if (ox > 1 && oy > 2) bad.push(`overlap: "${a.e.textContent.slice(0, 24)}" / "${b.e.textContent.slice(0, 24)}"`); }
   c.querySelectorAll('#lbsvg, #ecisvg').forEach(svg => {
-    const dots = [...svg.querySelectorAll('circle')].map(d => d.getBoundingClientRect()).filter(r => r.width >= 11);
+    // the row's mark: the mean dot (mean score chart) or the bar (FECI chart)
+    const dots = [...svg.querySelectorAll('circle, rect.ebar')].map(d => d.getBoundingClientRect()).filter(r => r.width >= 11);
     svg.querySelectorAll('text.lab').forEach(l => { const r = l.getBoundingClientRect(), cy = (r.top + r.bottom) / 2;
       const near = Math.min(...dots.map(d => Math.abs((d.top + d.bottom) / 2 - cy)));
       if (near > 4) bad.push(`label off its row by ${near.toFixed(1)}px: ${l.textContent}`); }); });
@@ -155,7 +163,7 @@ OVERVIEW = {
       const subs = t => longest(t).reduce((a, r) => a + r[6].length, 0);
       const t = TASKS.filter(t => longest(t).length >= 4).sort((a, b) => better(b) - better(a) || subs(b) - subs(a))[0], runs = longest(t), n = runs.reduce((a, r) => a + r[6].length, 0), k = AREA_OF[t.d].k;
       console.assert(runs.length >= 4, 'run card: too few models', t.s, runs.length);
-      const v = card('side', 'Agents don’t one-shot research.',
+      const v = card('side', 'Agents do not solve research in one shot.',
         `${runs.length} models, ${n} submissions on ${esc(t.s)}. Every dot is a try.`, '');
       const W = 470, H = 360, svgNS = 'http://www.w3.org/2000/svg', col = id => getComputedStyle(document.documentElement).getPropertyValue(`--m-${id}`).trim();
       v.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="display:block; font-family:'Hanken Grotesk'"></svg>`;
@@ -191,11 +199,9 @@ OVERVIEW = {
     }""",
     # pass rate against cost: the overview's chart
     '03-pass-cost': """() => {
-      const top = RANKED.reduce((a, b) => PASS[a.id][0] >= PASS[b.id][0] ? a : b), ratio = COST.ds[0] / COST.sol[0];
-      console.assert(top.id === 'astra' && Math.abs(PASS.ds[0] - PASS.sol[0]) < 1 && ratio > .15 && ratio < .25, 'pass/cost wording');
       const v = card('stack', 'Pass rate vs. price',
         'One dot per model.',
-        `${PRE} · a pass beats the authors’ code on every hidden workload`);
+        `${PRE} · a pass beats the original code on every hidden workload`);
       fit(v, 'pc'); v.append(document.getElementById('pcplot')); drawPassCost();
     }""",
     # mean final score: the overview's chart, grouped by model
@@ -205,18 +211,19 @@ OVERVIEW = {
       console.assert(hi >= 95 && lo <= 10, 'mean-score wording', hi, lo);
       const v = card('stack', 'Mean score by model',
         'One dot per run.',
-        `${PRE} · the large dot is the model’s mean`);
-      CHART_H.lbLane = Math.floor((v.clientHeight - 54) / MODELS.length); v.append(document.getElementById('lbplot')); drawLB(); oneLine(document.getElementById('lbsvg'));
+        `${PRE} · the large dot is the mean of each model`);
+      CHART_H.lbLane = Math.floor((v.clientHeight - 54) / MODELS.length); v.append(document.getElementById('lbplot')); drawLB(); oneLine(document.getElementById('lbsvg')); sideVals(document.getElementById('lbsvg'));
     }""",
-    # FECI: the overview's chart; the headline names the models whose whole 90% interval is above Human
+    # FECI: the overview's chart; the headline counts the models whose whole 90% interval is above Human, the line under
+    # it names them and any whose whole interval is below
     '05-feci': """() => {
-      const above = RANKED.filter(m => ECI[m.id][1] > ECI_HUMAN).map(m => m.name);
-      const near = RANKED.filter(m => ECI[m.id][1] <= ECI_HUMAN && ECI[m.id][2] >= ECI_HUMAN).length;
-      console.assert(above.length === 2 && near === MODELS.length - 2, 'FECI wording', above, near);
-      const v = card('stack', 'Two models beat the authors',
-        `${above.join(' and ')} clear the authors’ code. The rest are within noise.`,
-        `${PRE} · FECI, fitted with Epoch AI’s ECI code`);
-      CHART_H.eciLane = Math.floor((v.clientHeight - 60) / MODELS.length); v.append(document.getElementById('eciplot')); drawECI(); oneLine(document.getElementById('ecisvg'));
+      const above = RANKED.filter(m => ECI[m.id][1] > ECI_HUMAN).map(m => m.name), below = RANKED.filter(m => ECI[m.id][2] < ECI_HUMAN).map(m => m.name);
+      const NUM = ['No', 'One', 'Two', 'Three', 'Four', 'Five', 'Six'], and = a => a.length < 3 ? a.join(' and ') : a.slice(0, -1).join(', ') + ' and ' + a.at(-1);
+      console.assert(above.length >= 1 && above.length < NUM.length, 'FECI wording', above, below);
+      const v = card('stack', 'FECI (FrontierCS Epoch Capabilities Index)',   // owner, 2026-10-13: the index's name as the headline
+        `${and(above)} clear${above.length > 1 ? '' : 's'} the original code.${below.length ? ` ${and(below)} fall${below.length > 1 ? '' : 's'} short.` : ''} The rest are within noise.`,
+        `${PRE} · FECI, fitted with the ECI code of Epoch AI`);
+      CHART_H.eciLane = Math.floor((v.clientHeight - 60) / MODELS.length); v.append(document.getElementById('eciplot')); drawECI(); oneLine(document.getElementById('ecisvg')); sideVals(document.getElementById('ecisvg'));
     }""",
     # test-time scaling: the overview's chart; budgets where two models come within 1 point of their final FECI
     '06-scaling': """() => {
@@ -225,12 +232,12 @@ OVERVIEW = {
       const v = card('stack', 'FECI vs. budget per run',
         'Each run counts its latest valid submission at the budget.',
         PRE);
-      fit(v, 'tts', 30); v.append(document.getElementById('ttsplot'), document.getElementById('ttslegend')); drawTTS();
+      fit(v, 'tts', 62); /* room for two legend rows (ten models) */ v.append(document.getElementById('ttsplot'), document.getElementById('ttslegend')); drawTTS();
     }""",
     # the private set (owner, 2026-10-10: a separate set of unreleased tasks; no count on the card): task illustrations
     # blurred past recognition, each under a white lock, in the closing card's grid
     '07-private': """() => {
-      const v = card('side', 'Plus a private set.', 'Tasks we don’t release.', '');
+      const v = card('side', 'Plus a private set.', 'Tasks we do not release.', '');
       const all = AREAS.flatMap(a => TASKS.filter(t => a.d.includes(t.d)).map(t => [t, a.k])), pick = Array.from({length:12}, (_, i) => all[Math.floor((i + .5) * all.length / 12)]);
       const cols = 3, gw = 470, gap = 6, tw = (gw - gap * (cols - 1)) / cols, th = tw / 1.5;
       const lock = `<svg viewBox="0 0 24 24" width="18" height="18"><rect x="5" y="10.5" width="14" height="10" rx="2.2" fill="#3c4043"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="#3c4043" stroke-width="2.2" stroke-linecap="round"/></svg>`;
@@ -242,7 +249,7 @@ OVERVIEW = {
     # where to look: a sample of task illustrations
     '08-explore': """() => {
       const v = card('side', `Explore all ${TASKS.length} tasks`,
-        'Each with its paper and every model’s runs.', '');
+        'Each with its paper and the runs of every model.', '');
       const pick = AREAS.flatMap(a => TASKS.filter(t => a.d.includes(t.d)).slice(0, 2).map(t => [t, a.k])).slice(0, 12);
       const cols = 3, gw = 470, gap = 6, tw = (gw - gap * (cols - 1)) / cols, th = tw / 1.5;
       v.style.display = 'grid'; v.style.gridTemplateColumns = `repeat(${cols}, ${tw}px)`; v.style.gap = `${gap}px`; v.style.alignContent = 'center';

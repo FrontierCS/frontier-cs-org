@@ -145,8 +145,12 @@ function drawECI() {
 }
 
 /* Test-time scaling: FECI when every run stops at a US$ budget (SCALE, from bin/fcs2_runs_from_db.py).
-   Values below 0 leave the plot through its bottom edge. The drawing is that of 2026-10-12: straight segments, every band at
-   12%, one legend (owner, 2026-10-13: back to it). A run stopped at a budget counts its latest valid submission, so a curve can dip. */
+   Values below 0 leave the plot through its bottom edge. The drawing is that of 2026-10-12: straight segments, one legend
+   (owner, 2026-10-13: back to it). A run stopped at a budget counts its latest valid submission, so a curve can dip.
+   A model's 90% band shows only while the pointer is on its curve or its legend entry, or while its legend entry is
+   picked; a click picks it, a second click drops it (owner, 2026-10-13: no bands otherwise). */
+let ttsPick = null, ttsHover = null;
+const ttsBands = () => document.querySelectorAll('#ttssvg .tband').forEach(b => b.setAttribute('opacity', b.dataset.m === (ttsHover || ttsPick) ? .12 : 0));
 function drawTTS() {
   const svg = $('#ttssvg'), W = Math.max(300, $('#ttsplot').clientWidth), narrow = W < 560;
   const L = 34, R = narrow ? 12 : 24, T = 12, B = 46, H = CHART_H.tts || (narrow ? 300 : 380);
@@ -168,23 +172,34 @@ function drawTTS() {
     svg.append(sv('text', {x:X(10 ** k), y:H - B + 20, 'text-anchor':'middle'}, usdfmt(10 ** k)));
   }
   svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'Cost budget per run in US$, log scale'));
-  const g = sv('g', {'clip-path':'url(#ttsclip)'}); svg.append(g);
+  const g = sv('g', {'clip-path':'url(#ttsclip)'}), gb = sv('g'), gl = sv('g'); g.append(gb, gl); svg.append(g);   // bands under every line
   const pts = [];
   [...RANKED].reverse().filter(m => SCALE[m.id]).forEach(m => {   // a model with no reported spend has no curve
     const c = SCALE[m.id], path = c.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join('');
     const band = c.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[3]).toFixed(1)}`).join('')
       + [...c].reverse().map(p => `L${X(p[0]).toFixed(1)},${Y(p[2]).toFixed(1)}`).join('') + 'Z';
-    const bp = sv('path', {d:band, fill:MCOL[m.id], opacity:.12});
+    const bp = sv('path', {class:'tband', 'data-m':m.id, d:band, fill:MCOL[m.id], opacity:0});
     const lp = sv('path', {d:path, fill:'none', stroke:MCOL[m.id], 'stroke-width':2.2, 'stroke-linejoin':'round'});
     const e = c[c.length - 1], end = sv('circle', {cx:X(e[0]), cy:Y(e[1]), r:4.5, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':1.5});
-    g.append(bp, lp, end);
+    gb.append(bp); gl.append(lp, end);
     if (an) mark(end, 'a-fade', 1.3);
-    c.forEach(p => { if (p[1] >= 0) pts.push({x:X(p[0]), y:Y(p[1]), html:`<b>${esc(m.name)}</b><br>FECI <b>${f1(p[1])}</b> at ${usdfmt(p[0])} per run`
+    c.forEach(p => { if (p[1] >= 0) pts.push({x:X(p[0]), y:Y(p[1]), m:m.id, html:`<b>${esc(m.name)}</b><br>FECI <b>${f1(p[1])}</b> at ${usdfmt(p[0])} per run`
       + `<br>90% interval ${Math.round(Math.max(p[2], 0))}–${Math.round(p[3])}<br>${Math.round(p[4] * 100)}% of runs still going`}); });
   });
   attachTip(svg, W, H, pts, $('#ttstip'));
+  // the curve under the pointer: the nearest point within 28 px, as the tooltip picks it
+  svg.addEventListener('pointermove', ev => { const rc = svg.getBoundingClientRect(), px = (ev.clientX - rc.left) * W / rc.width, py = (ev.clientY - rc.top) * H / rc.height;
+    let best = null, bd = 28; pts.forEach(p => { const d = Math.hypot(p.x - px, p.y - py); if (d < bd) { bd = d; best = p; } });
+    const m = best ? best.m : null; if (m !== ttsHover) { ttsHover = m; ttsBands(); } });
+  svg.addEventListener('pointerleave', () => { ttsHover = null; ttsBands(); });
+  ttsBands();
 }
-$('#ttslegend').innerHTML = RANKED.map(m => `<span><i style="background:${MCOL[m.id]}"></i>${esc(m.name)}</span>`).join('');
+$('#ttslegend').innerHTML = RANKED.filter(m => SCALE[m.id]).map(m => `<button type="button" data-m="${m.id}" aria-pressed="false"><i style="background:${MCOL[m.id]}"></i>${esc(m.name)}</button>`).join('');
+$('#ttslegend').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return;
+  ttsPick = ttsPick === b.dataset.m ? null : b.dataset.m;
+  $('#ttslegend').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x.dataset.m === ttsPick)); ttsBands(); });
+$('#ttslegend').addEventListener('pointerover', e => { const b = e.target.closest('button'); if (b && e.pointerType === 'mouse') { ttsHover = b.dataset.m; ttsBands(); } });
+$('#ttslegend').addEventListener('pointerleave', () => { ttsHover = null; ttsBands(); });
 
 const TASK_OF = Object.fromEntries(TASKS.map(t => [t.s, t]));
 const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
