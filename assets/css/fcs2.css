@@ -500,6 +500,7 @@ a.pbtn:hover{border-color:var(--teal); color:var(--teal-d)}
 .cnote:empty{display:none}
 .legend i.dot{border-radius:50%; border:2px solid var(--ink-2); background:#fff; box-sizing:border-box}
 .legend i.dot.on{background:var(--ink-2)}
+.legend i.dash{width:22px; height:0; border-top:1.5px dashed var(--ink-2)}   /* a reference line, as a task's Human reference */
 .th2{margin:72px 0 14px}
 #rtbl td:first-child{white-space:nowrap}
 

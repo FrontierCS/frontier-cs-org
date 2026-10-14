@@ -130,7 +130,8 @@ function drawCharts() {
 /* Final score against cost (Qiuyang, 2026-10-14: in place of the development score against spend, drawn as the overview's
    pass rate chart): one dot per run, a model's one run on the task, its final score against its cost in US$ on a log
    scale. The runs no cheaper run matches or beats on final score have a larger dot and a bold name; labels sit beside the
-   dots (labelDot, fcs2-data.js), and the Human reference is a dashed line with its name at one end. */
+   dots (labelDot, fcs2-data.js), and the Human reference is a dashed line named in the legend, not among the runs' names
+   (Qiuyang, 2026-10-14). */
 function drawScore() {
   const {t, runs} = cur, ref = REF[t.s], rs = runs.filter(r => r[4] > 0);
   const svg = $('#scsvg'), W = Math.max(300, $('#scplot').clientWidth), narrow = W < 560;
@@ -154,24 +155,19 @@ function drawScore() {
   svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'Cost of the run in US$, log scale'));
   const at = r => [X(r[4]), Y(r[2])], order = [...rs].sort((a, b) => b[2] - a[2]);
   const boxes = order.map(r => { const [cx, cy] = at(r); return {x:cx - 9, y:cy - 9, w:18, h:18}; });
-  // the Human reference: a dashed line, its name above it at the right end, or wherever a dot leaves room
+  // the Human reference: a dashed line, named in the legend; no run's name is written across it
   if (ref != null) {
     svg.append(sv('line', {x1:L, x2:W - R, y1:Y(ref), y2:Y(ref), stroke:'var(--ink-2)', 'stroke-width':1.2, 'stroke-dasharray':'4 4'}));
-    const lab = sv('text', {class:'lab halo', x:0, y:0, fill:'var(--ink-2)'}, 'Human reference'); svg.append(lab);
-    const w = lab.getComputedTextLength() + 2, y = Y(ref);
-    const spots = [[W - R, y - 6, 'end'], [W - R, y + 15, 'end'], [L + 4, y - 6, 'start'], [L + 4, y + 15, 'start']];
-    const box = ([x, yy, an]) => ({x:an === 'end' ? x - w : x, y:yy - 11, w, h:14});
-    const sp = spots.find(q => { const b = box(q); return b.y > 0 && b.y + b.h < H - B && !boxes.some(o => b.x < o.x + o.w && o.x < b.x + b.w && b.y < o.y + o.h && o.y < b.y + b.h); }) || spots[0];
-    lab.setAttribute('x', sp[0]); lab.setAttribute('y', sp[1]); lab.setAttribute('text-anchor', sp[2]); boxes.push(box(sp));
-    boxes.push({x:L, y:y - 2, w:W - R - L, h:4});   // and the line itself, so no run's name is written across it
+    boxes.push({x:L, y:Y(ref) - 2, w:W - R - L, h:4});
   }
+  $('#sclegend').innerHTML = ref != null ? `<span><i class="dash"></i>Human reference, final score ${f1(ref)}</span>` : '';
   // the frontier: the runs no cheaper run matches or beats on final score
   const front = [...rs].sort((p, q) => p[4] - q[4] || q[2] - p[2]).filter((r, i, a) => a.slice(0, i).every(o => o[2] < r[2]));
   const pts = [];
   order.forEach(r => {
     const [cx, cy] = at(r), m = MODELS.find(x => x.id === r[0]), lead = front.includes(r);
     svg.append(sv('circle', {cx, cy, r:lead ? 7.5 : 5, fill:MCOL[r[0]], stroke:'#fff', 'stroke-width':2}));
-    labelDot(svg, boxes, cx, cy, narrow ? m.short : m.name, L, W, MTXT(r[0]), lead);
+    labelDot(svg, boxes, cx, cy, narrow ? m.short : m.name, {l:L, r:W, t:T, b:H - B}, MTXT(r[0]), lead);
     pts.push({x:cx, y:cy, mean:true, html:`<b>${esc(m.name)}</b><br>Final score <b>${f1(r[2])}</b>, ${r[3] ? 'passes' : 'does not pass'}<br>${money(r[4])}`});
   });
   attachTip(svg, W, H, pts, $('#sctip'));
