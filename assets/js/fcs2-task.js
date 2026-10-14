@@ -11,7 +11,8 @@ let cur = null;   // the task on show and its runs
 
 function drawPage() {
   const t = TASK_BY_SLUG[decodeURIComponent(location.hash.slice(1))];
-  if (!t) return drawIndex();
+  // no problem named (or an unknown one): the list on the overview is the index (owner, design audit 11A)
+  if (!t) { location.replace($('#tolist').href); return; }
   const runs = TRAJ.filter(r => r[1] === t.s).sort((a, b) => RANK[a[0]] - RANK[b[0]] || b[2] - a[2]);
   cur = {t, runs};
   document.title = `${t.name} · FrontierCS 2`;
@@ -118,18 +119,6 @@ function drawResults() {
     + [...runs].sort((p, q) => q[2] - p[2]).map(r => `<tr><td><span class="sq" style="background:${MCOL[r[0]]}"></span><span class="full">${esc(MNAME[r[0]])}</span><span class="short">${esc(short[r[0]])}</span></td>`
       + `<td class="rv">${r[3] ? TICK : CROSS}</td><td class="rs">${bar(r[2], `background:${MCOL[r[0]]}`)}</td><td>$${r[4].toFixed(2)}</td></tr>`).join('')
     + '</tbody>';
-}
-
-function drawIndex() {
-  cur = null;
-  document.title = 'Problems · FrontierCS 2';
-  $('#tmeta').innerHTML = ''; $('#tlinks').innerHTML = ''; $('#tkeys').innerHTML = ''; $('#tfedi').innerHTML = ''; $('#tgoal').hidden = true; $('#tpager').innerHTML = '';
-  $('#tfig').hidden = true; $('#tfig').innerHTML = ''; $('#thero').classList.add('nofig');
-  $('#tname').textContent = 'Problems'; $('#tcrumb').textContent = ''; $('#tcsep').hidden = true;
-  $('#tpaper').textContent = `${TASKS.length} problems in ${DOMAINS.filter(d => N_IN(d)).length} domains. Select a problem for its description and results.`;
-  $('#tbody').innerHTML = DOMAINS.filter(d => N_IN(d)).map(d => `<section class="tgroup"><h2>${esc(d)}</h2><ul>`
-    + TASKS.filter(t => t.d === d).map(t => `<li><a href="#${slug(t.s)}">${esc(t.name)}</a></li>`).join('')
-    + '</ul></section>').join('');
 }
 
 function drawCharts() {

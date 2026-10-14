@@ -442,14 +442,6 @@ a.pbtn:hover{border-color:var(--teal); color:var(--teal-d)}
 .legend i.dot.on{background:var(--ink-2)}
 .th2{margin:72px 0 14px}
 #rtbl td:first-child{white-space:nowrap}
-.tgroup{margin-top:44px}
-.tgroup h2{font-size:22px}
-.tgroup ul{list-style:none; padding:0; margin:12px 0 0; columns:2 20em; column-gap:48px}
-.tgroup li{display:flex; align-items:center; gap:12px; padding:7px 0; border-bottom:1px solid var(--line); break-inside:avoid; font-size:16px}
-.tgroup li a{color:var(--ink); text-decoration:none}
-.tgroup li a:hover{color:var(--teal-d); text-decoration:underline; text-underline-offset:3px}
-.tgroup .ran{display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:600; color:var(--ink-2)}
-.tgroup .ran i{width:8px; height:8px; border-radius:50%; background:var(--teal)}
 
 /* scroll-in animation of the mean-score, FECI and test-time scaling charts (fcs2.js: animates, mark); .pre is the state before the chart comes into view */
 .anim .a-bar{transform-box:fill-box; transform-origin:left center; transition:transform .8s cubic-bezier(.2,.7,.2,1) var(--d,0s)}
