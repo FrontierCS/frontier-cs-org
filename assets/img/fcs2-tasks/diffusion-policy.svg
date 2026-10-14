@@ -1,76 +1,79 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 22 760 272" role="img" aria-label="The Push-T controller turns random noise into a sequence of ten pusher positions in several denoising steps. A fixed trained network, given the last two observations, guides every step. The robot runs the first eight positions and then plans again. The sampling loop is the part the agent writes.">
-<defs><marker id="diffusion-policy-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker></defs>
-
-<rect x="24" y="58" width="120" height="120" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<path d="M-16 -16 H16 V-8 H4.0 V16 H-4.0 V-8 H-16 Z" transform="translate(108 142) rotate(0)" fill="none" stroke="#9aa0a6" stroke-width="1.3" stroke-dasharray="3 3"/>
-<path d="M-16 -16 H16 V-8 H4.0 V16 H-4.0 V-8 H-16 Z" transform="translate(72 106) rotate(-30)" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<circle cx="36" cy="136" r="5" fill="#fff" stroke="#9aa0a6" stroke-width="1.2"/>
-<circle cx="43" cy="124" r="5" fill="#3c4043"/>
-<text x="24" y="198" font-size="12" fill="#5f6368">last 2 observations:</text>
-<text x="24" y="215" font-size="12" fill="#5f6368">block and pusher</text>
-<text x="24" y="232" font-size="12" fill="#5f6368">dashed: target area</text>
-<rect x="170" y="36" width="420" height="186" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
-<text x="186" y="60" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: the sampling loop</text>
-<text x="186" y="79" font-size="12.5" fill="#3c4043">how many denoising steps, and how each step updates the sample</text>
-<rect x="192" y="98" width="84" height="84" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<circle cx="221.6" cy="164.6" r="3.6" fill="#3c4043"/>
-<circle cx="244.6" cy="170.2" r="3.6" fill="#3c4043"/>
-<circle cx="236.5" cy="149.5" r="3.6" fill="#3c4043"/>
-<circle cx="202.8" cy="139.5" r="3.6" fill="#3c4043"/>
-<circle cx="201.4" cy="144.7" r="3.6" fill="#3c4043"/>
-<circle cx="203.6" cy="168.9" r="3.6" fill="#3c4043"/>
-<circle cx="228.7" cy="116.9" r="3.6" fill="#3c4043"/>
-<circle cx="207.5" cy="159.5" r="3.6" fill="#3c4043"/>
-<circle cx="243.0" cy="108.4" r="3.6" fill="#3c4043"/>
-<circle cx="239.4" cy="147.3" r="3.6" fill="#3c4043"/>
-<text x="234.0" y="200" font-size="12" text-anchor="middle" fill="#5f6368">random noise</text>
-<rect x="338" y="98" width="84" height="84" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<circle cx="358.2" cy="162.3" r="3.6" fill="#3c4043"/>
-<circle cx="370.3" cy="155.9" r="3.6" fill="#3c4043"/>
-<circle cx="371.4" cy="141.1" r="3.6" fill="#3c4043"/>
-<circle cx="363.6" cy="131.1" r="3.6" fill="#3c4043"/>
-<circle cx="367.1" cy="128.3" r="3.6" fill="#3c4043"/>
-<circle cx="371.9" cy="134.2" r="3.6" fill="#3c4043"/>
-<circle cx="384.7" cy="115.7" r="3.6" fill="#3c4043"/>
-<circle cx="381.3" cy="132.6" r="3.6" fill="#3c4043"/>
-<circle cx="397.7" cy="118.9" r="3.6" fill="#3c4043"/>
-<circle cx="400.5" cy="138.6" r="3.6" fill="#3c4043"/>
-<text x="380.0" y="200" font-size="12" text-anchor="middle" fill="#5f6368">partly denoised</text>
-<rect x="484" y="98" width="84" height="84" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<polyline points="499.1,161.0 505.3,148.3 511.4,136.5 517.6,126.7 523.8,119.5 529.9,115.5 536.1,115.1 542.2,118.2 548.4,124.6 554.6,133.8" fill="none" stroke="#9aa0a6" stroke-width="1"/>
-<circle cx="499.1" cy="161.0" r="3.6" fill="#3c4043"/>
-<circle cx="505.3" cy="148.3" r="3.6" fill="#3c4043"/>
-<circle cx="511.4" cy="136.5" r="3.6" fill="#3c4043"/>
-<circle cx="517.6" cy="126.7" r="3.6" fill="#3c4043"/>
-<circle cx="523.8" cy="119.5" r="3.6" fill="#3c4043"/>
-<circle cx="529.9" cy="115.5" r="3.6" fill="#3c4043"/>
-<circle cx="536.1" cy="115.1" r="3.6" fill="#3c4043"/>
-<circle cx="542.2" cy="118.2" r="3.6" fill="#3c4043"/>
-<circle cx="548.4" cy="124.6" r="3.6" fill="#3c4043"/>
-<circle cx="554.6" cy="133.8" r="3.6" fill="#3c4043"/>
-<text x="526.0" y="200" font-size="12" text-anchor="middle" fill="#5f6368">10 pusher positions</text>
-<line x1="284" y1="140.0" x2="330" y2="140.0" stroke="#3c4043" stroke-width="1.3" marker-end="url(#diffusion-policy-ar)"/>
-<line x1="430" y1="140.0" x2="476" y2="140.0" stroke="#3c4043" stroke-width="1.3" marker-end="url(#diffusion-policy-ar)"/>
-<text x="307.0" y="132.0" font-size="11.5" text-anchor="middle" fill="#5f6368">steps</text>
-<text x="453.0" y="132.0" font-size="11.5" text-anchor="middle" fill="#5f6368">steps</text>
-<rect x="270" y="246" width="220" height="34" rx="8" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="380.0" y="268" font-size="13" text-anchor="middle" fill="#1f1f1f">trained network, fixed</text>
-<line x1="307.0" y1="246" x2="307.0" y2="148.0" stroke="#3c4043" stroke-width="1.2" marker-end="url(#diffusion-policy-ar)"/>
-<line x1="453.0" y1="246" x2="453.0" y2="148.0" stroke="#3c4043" stroke-width="1.2" marker-end="url(#diffusion-policy-ar)"/>
-<path d="M84.0 246 V263.0 H268" fill="none" stroke="#3c4043" stroke-width="1.2" marker-end="url(#diffusion-policy-ar)"/>
-<rect x="618" y="98" width="104" height="104" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<polyline points="636.7,176.0 644.3,160.2 652.0,145.7 659.6,133.5 667.2,124.6 674.9,119.7 682.5,119.1 690.1,123.0 697.7,130.9 705.4,142.4" fill="none" stroke="#9aa0a6" stroke-width="1"/>
-<circle cx="636.7" cy="176.0" r="3.6" fill="#3c4043"/>
-<circle cx="644.3" cy="160.2" r="3.6" fill="#3c4043"/>
-<circle cx="652.0" cy="145.7" r="3.6" fill="#3c4043"/>
-<circle cx="659.6" cy="133.5" r="3.6" fill="#3c4043"/>
-<circle cx="667.2" cy="124.6" r="3.6" fill="#3c4043"/>
-<circle cx="674.9" cy="119.7" r="3.6" fill="#3c4043"/>
-<circle cx="682.5" cy="119.1" r="3.6" fill="#3c4043"/>
-<circle cx="690.1" cy="123.0" r="3.6" fill="#3c4043"/>
-<circle cx="697.7" cy="130.9" r="3.6" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<circle cx="705.4" cy="142.4" r="3.6" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<line x1="576" y1="140.0" x2="612" y2="140.0" stroke="#3c4043" stroke-width="1.3" marker-end="url(#diffusion-policy-ar)"/>
-<text x="618" y="220" font-size="12" fill="#5f6368">robot runs the first 8,</text>
-<text x="618" y="237" font-size="12" fill="#5f6368">then plans again</text>
+<svg xmlns="http://www.w3.org/2000/svg" class="fig2" viewBox="0 0 760 300" role="img" aria-label="Left, what is given: the Push-T scene, with the last two observations of block and pusher and the dashed target area, and the trained network, which stays fixed. Middle, the sampling loop the agent writes: it turns random noise into a sequence of ten pusher positions in several denoising steps, choosing how many steps to take and how each step updates the sample; the fixed network guides every step. Right, the robot runs the first eight positions and then plans again.">
+<defs><marker id="diffusion-policy-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arh" d="M0 0L10 5L0 10z"/></marker></defs>
+<rect class="given" x="0" y="0" width="176" height="300" rx="10"/>
+<text class="k" x="18" y="30">GIVEN</text>
+<rect class="w" x="18" y="46" width="140" height="128" rx="6"/>
+<path class="ln2 dash" d="M-16 -16 H16 V-8 H4 V16 H-4 V-8 H-16 Z" transform="translate(122 132)"/>
+<path class="box" d="M-16 -16 H16 V-8 H4 V16 H-4 V-8 H-16 Z" transform="translate(80 96) rotate(-30)"/>
+<circle class="ln2" cx="36" cy="128" r="5"/>
+<circle class="ink" cx="44" cy="116" r="5"/>
+<text class="n" x="18" y="196">Last 2 observations of</text>
+<text class="n" x="18" y="214">block and pusher;</text>
+<text class="n" x="18" y="232">dashed: target area</text>
+<rect class="chip" x="18" y="250" width="140" height="30" rx="6"/>
+<text class="mid" x="88.0" y="269.5">Trained network</text>
+<rect class="agent" x="192" y="0" width="384" height="300" rx="10"/>
+<text class="k ak" x="212" y="30">THE AGENT WRITES</text>
+<text class="h" x="212" y="53">The sampling loop, from noise to moves</text>
+<rect class="w" x="212" y="72" width="84" height="84" rx="6"/>
+<circle class="ink" cx="245.6" cy="142.6" r="3.4"/>
+<circle class="ink" cx="268.6" cy="148.2" r="3.4"/>
+<circle class="ink" cx="260.5" cy="127.5" r="3.4"/>
+<circle class="ink" cx="226.8" cy="117.5" r="3.4"/>
+<circle class="ink" cx="225.4" cy="122.7" r="3.4"/>
+<circle class="ink" cx="227.6" cy="146.9" r="3.4"/>
+<circle class="ink" cx="252.7" cy="94.9" r="3.4"/>
+<circle class="ink" cx="231.5" cy="137.5" r="3.4"/>
+<circle class="ink" cx="267.0" cy="86.4" r="3.4"/>
+<circle class="ink" cx="263.4" cy="125.3" r="3.4"/>
+<rect class="w" x="342" y="72" width="84" height="84" rx="6"/>
+<circle class="ink" cx="364.2" cy="142.3" r="3.4"/>
+<circle class="ink" cx="376.3" cy="135.9" r="3.4"/>
+<circle class="ink" cx="377.4" cy="121.1" r="3.4"/>
+<circle class="ink" cx="369.6" cy="111.1" r="3.4"/>
+<circle class="ink" cx="373.1" cy="108.3" r="3.4"/>
+<circle class="ink" cx="377.9" cy="114.2" r="3.4"/>
+<circle class="ink" cx="390.7" cy="95.7" r="3.4"/>
+<circle class="ink" cx="387.3" cy="112.6" r="3.4"/>
+<circle class="ink" cx="403.7" cy="98.9" r="3.4"/>
+<circle class="ink" cx="406.5" cy="118.6" r="3.4"/>
+<rect class="w" x="472" y="72" width="84" height="84" rx="6"/>
+<polyline class="ln" points="487.1,135.0 493.3,122.3 499.4,110.5 505.6,100.7 511.8,93.5 517.9,89.5 524.1,89.1 530.2,92.2 536.4,98.6 542.6,107.8"/>
+<circle class="ink" cx="487.1" cy="135.0" r="3.4"/>
+<circle class="ink" cx="493.3" cy="122.3" r="3.4"/>
+<circle class="ink" cx="499.4" cy="110.5" r="3.4"/>
+<circle class="ink" cx="505.6" cy="100.7" r="3.4"/>
+<circle class="ink" cx="511.8" cy="93.5" r="3.4"/>
+<circle class="ink" cx="517.9" cy="89.5" r="3.4"/>
+<circle class="ink" cx="524.1" cy="89.1" r="3.4"/>
+<circle class="ink" cx="530.2" cy="92.2" r="3.4"/>
+<circle class="ink" cx="536.4" cy="98.6" r="3.4"/>
+<circle class="ink" cx="542.6" cy="107.8" r="3.4"/>
+<text class="n mid" x="254.0" y="176">random noise</text>
+<text class="n mid" x="384.0" y="176">partly denoised</text>
+<text class="n mid" x="514.0" y="176">10 pusher positions</text>
+<line class="ar" x1="302" y1="114.0" x2="336" y2="114.0" marker-end="url(#diffusion-policy-ar)"/>
+<text class="sm n mid" x="319" y="105.0">steps</text>
+<line class="ar" x1="432" y1="114.0" x2="466" y2="114.0" marker-end="url(#diffusion-policy-ar)"/>
+<text class="sm n mid" x="449" y="105.0">steps</text>
+<text x="212" y="208">It chooses how many denoising steps to take,</text>
+<text x="212" y="226">and how each step updates the sample.</text>
+<text class="n" x="212" y="256">The fixed network guides every step.</text>
+<rect class="result" x="592" y="0" width="168" height="300" rx="10"/>
+<text class="k" x="610" y="30">THE ROBOT</text>
+<rect class="w" x="610" y="72" width="132" height="84" rx="6"/>
+<polyline class="ln" points="638.4,141.0 646.8,128.3 655.0,116.5 663.4,106.7 671.7,99.5 680.0,95.5 688.3,95.1 696.6,98.2 704.9,104.6 713.3,113.8"/>
+<circle class="ink" cx="638.4" cy="141.0" r="3.4"/>
+<circle class="ink" cx="646.8" cy="128.3" r="3.4"/>
+<circle class="ink" cx="655.0" cy="116.5" r="3.4"/>
+<circle class="ink" cx="663.4" cy="106.7" r="3.4"/>
+<circle class="ink" cx="671.7" cy="99.5" r="3.4"/>
+<circle class="ink" cx="680.0" cy="95.5" r="3.4"/>
+<circle class="ink" cx="688.3" cy="95.1" r="3.4"/>
+<circle class="ink" cx="696.6" cy="98.2" r="3.4"/>
+<circle class="ring" cx="704.9" cy="104.6" r="3.4"/>
+<circle class="ring" cx="713.3" cy="113.8" r="3.4"/>
+<text class="n" x="610" y="176">It runs the first 8,</text>
+<text class="n" x="610" y="194">then plans again.</text>
+<line class="ar" x1="562" y1="114.0" x2="604" y2="114.0" marker-end="url(#diffusion-policy-ar)"/>
 </svg>

@@ -1,44 +1,48 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 22 760 288" role="img" aria-label="The estimator tracks each slot as a value, a level, a scale and a noise term. Multiplying 1+0i by 0.5+0.25i at level 1 and scale 2 to the 45 passes through multiply, relinearize and rescale, each adding noise, and ends at level 0 with scale 2 to the 90 over Q1. The noise kernels are the part the agent writes. The predicted per-slot precision is compared, by mean and spread, with a real encrypted run.">
-<defs><marker id="ckks-noise-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker></defs>
-
-<rect x="20" y="44" width="150" height="64" rx="8" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="32" y="64" font-size="12.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1 + 0i</text>
-<text x="32" y="82" font-size="11.5" fill="#5f6368">level 1 · scale 2⁴⁵</text>
-<text x="32" y="99" font-size="11.5" fill="#5f6368">noise e₁</text>
-<rect x="20" y="124" width="150" height="64" rx="8" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="32" y="144" font-size="12.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0.5 + 0.25i</text>
-<text x="32" y="162" font-size="11.5" fill="#5f6368">level 1 · scale 2⁴⁵</text>
-<text x="32" y="179" font-size="11.5" fill="#5f6368">noise e₂</text>
-<rect x="196" y="36" width="352" height="176" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
-<text x="212" y="60" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: the noise kernels</text>
-<text x="212" y="79" font-size="12.5" fill="#3c4043">how each step changes a value’s noise and metadata</text>
-<line x1="172" y1="84" x2="208" y2="110" stroke="#3c4043" stroke-width="1.3" marker-end="url(#ckks-noise-ar)"/>
-<line x1="172" y1="152" x2="208" y2="130" stroke="#3c4043" stroke-width="1.3" marker-end="url(#ckks-noise-ar)"/>
-<rect x="212" y="100" width="96" height="40" rx="8" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="260" y="125" font-size="13" text-anchor="middle" fill="#1f1f1f">multiply</text>
-<line x1="308" y1="120" x2="328" y2="120" stroke="#3c4043" stroke-width="1.3" marker-end="url(#ckks-noise-ar)"/>
-<rect x="330" y="100" width="100" height="40" rx="8" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="380" y="125" font-size="13" text-anchor="middle" fill="#1f1f1f">relinearize</text>
-<line x1="430" y1="120" x2="450" y2="120" stroke="#3c4043" stroke-width="1.3" marker-end="url(#ckks-noise-ar)"/>
-<rect x="452" y="100" width="84" height="40" rx="8" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="494" y="125" font-size="13" text-anchor="middle" fill="#1f1f1f">rescale</text>
-<g font-size="11.5" text-anchor="middle" fill="#3c4043">
-<text x="260" y="160">+ m₁e₂ + m₂e₁</text><text x="260" y="176">+ e₁e₂</text>
-<text x="380" y="160">+ key-switching</text><text x="380" y="176">noise</text>
-<text x="494" y="160">÷ Q₁, then</text><text x="494" y="176">+ rounding</text>
-</g>
-<text x="212" y="200" font-size="11.5" fill="#5f6368">also: summed products, division, key switching</text>
-<line x1="536" y1="120" x2="570" y2="120" stroke="#3c4043" stroke-width="1.3" marker-end="url(#ckks-noise-ar)"/>
-<rect x="574" y="88" width="170" height="64" rx="8" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="586" y="108" font-size="12.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0.5 + 0.25i + e′</text>
-<text x="586" y="126" font-size="11.5" fill="#5f6368">level 0 · scale 2⁹⁰/Q₁</text>
-<text x="586" y="143" font-size="11.5" fill="#5f6368">noise e′</text>
-<text x="20" y="244" font-size="12.5" fill="#1f1f1f">Each of 2,048 slots gets a precision of −log₂|error| bits.</text>
-
-<line x1="500" y1="284" x2="700" y2="284" stroke="#3c4043" stroke-width="1.3"/>
-<polyline points="516,283.9 524,283.8 532,283.3 540,282.0 548,279.4 556,274.4 564,266.6 572,256.4 580,245.6 588,237.2 596,234.0 604,237.2 612,245.6 620,256.4 628,266.6 636,274.4 644,279.4 652,282.0 660,283.3 668,283.8 676,283.9" fill="none" stroke="#9aa0a6" stroke-width="2"/>
-<polyline points="526,283.6 534,283.0 542,281.9 550,279.7 558,276.0 566,270.5 574,263.4 582,255.3 590,247.6 598,242.0 606,240.0 614,242.0 622,247.6 630,255.3 638,263.4 646,270.5 654,276.0 662,279.7 670,281.9 678,283.0 686,283.6" fill="none" stroke="#0b57d0" stroke-width="2"/>
-<text x="526" y="236" font-size="12" text-anchor="end" fill="#5f6368">real run</text>
-<text x="640" y="236" font-size="12" fill="#0b57d0">estimate</text>
-<text x="600" y="302" font-size="11.5" text-anchor="middle" fill="#5f6368">precision per slot, bits</text>
+<svg xmlns="http://www.w3.org/2000/svg" class="fig2" viewBox="0 0 760 296" role="img" aria-label="Left, what is given: two encrypted values, 1 + 0i and 0.5 + 0.25i, each at level 1 and scale 2 to the 45, with noise e1 and e2. Middle, what the agent writes: the noise kernels, which say how each operation changes a value’s noise: multiply adds m1 e2 + m2 e1 + e1 e2, relinearize adds key-switching noise, and rescale divides by Q1 and adds rounding noise; also summed products, division with rounding and key switching. Right, the result: 0.5 + 0.25i + e prime at level 0 and scale 2 to the 90 over Q1. Each of 2,048 slots gets a precision of minus log2 of its error, in bits; the estimated spread of precision per slot is compared with a real encrypted run.">
+<defs><marker id="ckks-noise-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arh" d="M0 0L10 5L0 10z"/></marker></defs>
+<rect class="given" x="0" y="0" width="176" height="296" rx="10"/>
+<text class="k" x="18" y="30">GIVEN</text>
+<rect class="chip" x="18" y="48" width="140" height="70" rx="6"/>
+<text class="code b" x="30" y="70">1 + 0i</text>
+<text class="sm n" x="30" y="90">level 1 · scale 2⁴⁵</text>
+<text class="sm n" x="30" y="107">noise e₁</text>
+<rect class="chip" x="18" y="130" width="140" height="70" rx="6"/>
+<text class="code b" x="30" y="152">0.5 + 0.25i</text>
+<text class="sm n" x="30" y="172">level 1 · scale 2⁴⁵</text>
+<text class="sm n" x="30" y="189">noise e₂</text>
+<text class="n" x="18" y="230">Two encrypted</text>
+<text class="n" x="18" y="248">values to multiply</text>
+<rect class="agent" x="192" y="0" width="360" height="296" rx="10"/>
+<text class="k ak" x="212" y="30">THE AGENT WRITES</text>
+<text class="h" x="212" y="53">The noise kernels of each operation</text>
+<circle class="chip" cx="221" cy="88" r="9"/><text class="sn ak" x="221" y="92.5" text-anchor="middle">1</text>
+<rect class="chip on" x="238" y="74" width="104" height="28" rx="6"/>
+<text class="mid" x="290.0" y="92.5">multiply</text>
+<text x="356" y="92.5">+ m₁e₂ + m₂e₁ + e₁e₂</text>
+<line class="ar" x1="290" y1="103" x2="290" y2="119" marker-end="url(#ckks-noise-ar)"/>
+<circle class="chip" cx="221" cy="134" r="9"/><text class="sn ak" x="221" y="138.5" text-anchor="middle">2</text>
+<rect class="chip on" x="238" y="120" width="104" height="28" rx="6"/>
+<text class="mid" x="290.0" y="138.5">relinearize</text>
+<text x="356" y="138.5">+ key-switching noise</text>
+<line class="ar" x1="290" y1="149" x2="290" y2="165" marker-end="url(#ckks-noise-ar)"/>
+<circle class="chip" cx="221" cy="180" r="9"/><text class="sn ak" x="221" y="184.5" text-anchor="middle">3</text>
+<rect class="chip on" x="238" y="166" width="104" height="28" rx="6"/>
+<text class="mid" x="290.0" y="184.5">rescale</text>
+<text x="356" y="184.5">÷ Q₁, then + rounding</text>
+<text class="n" x="212" y="236">Also summed products, division with</text>
+<text class="n" x="212" y="254">rounding and key switching</text>
+<rect class="result" x="568" y="0" width="192" height="296" rx="10"/>
+<text class="k" x="586" y="30">RESULT</text>
+<rect class="chip" x="586" y="48" width="156" height="70" rx="6"/>
+<text class="code b" x="598" y="70">0.5 + 0.25i + e′</text>
+<text class="sm n" x="598" y="90">level 0 · scale 2⁹⁰/Q₁</text>
+<text class="sm n" x="598" y="107">noise e′</text>
+<path class="ln2" d="M586.0 213.8 L588.6 213.8 L591.2 213.6 L593.8 213.5 L596.4 213.2 L599.0 212.9 L601.6 212.4 L604.2 211.8 L606.8 211.0 L609.4 210.0 L612.0 208.7 L614.6 207.2 L617.2 205.3 L619.8 203.0 L622.4 200.4 L625.0 197.5 L627.6 194.3 L630.2 190.8 L632.8 187.1 L635.4 183.4 L638.0 179.7 L640.6 176.2 L643.2 173.1 L645.8 170.4 L648.4 168.2 L651.0 166.8 L653.6 166.1 L656.2 166.1 L658.8 167.0 L661.4 168.6 L664.0 170.8 L666.6 173.7 L669.2 176.9 L671.8 180.4 L674.4 184.1 L677.0 187.9 L679.6 191.5 L682.2 194.9 L684.8 198.1 L687.4 201.0 L690.0 203.5 L692.6 205.7 L695.2 207.5 L697.8 209.0 L700.4 210.2 L703.0 211.2 L705.6 212.0 L708.2 212.5 L710.8 213.0 L713.4 213.3 L716.0 213.5 L718.6 213.7 L721.2 213.8 L723.8 213.9 L726.4 213.9 L729.0 213.9 L731.6 214.0 L734.2 214.0 L736.8 214.0 L739.4 214.0 L742.0 214.0"/>
+<path class="sa" d="M586.0 213.9 L588.6 213.8 L591.2 213.8 L593.8 213.7 L596.4 213.5 L599.0 213.4 L601.6 213.1 L604.2 212.8 L606.8 212.4 L609.4 211.9 L612.0 211.3 L614.6 210.5 L617.2 209.5 L619.8 208.3 L622.4 206.9 L625.0 205.3 L627.6 203.4 L630.2 201.3 L632.8 199.0 L635.4 196.4 L638.0 193.7 L640.6 190.9 L643.2 187.9 L645.8 184.9 L648.4 182.0 L651.0 179.3 L653.6 176.8 L656.2 174.5 L658.8 172.7 L661.4 171.3 L664.0 170.4 L666.6 170.0 L669.2 170.2 L671.8 170.9 L674.4 172.1 L677.0 173.8 L679.6 175.8 L682.2 178.3 L684.8 180.9 L687.4 183.8 L690.0 186.7 L692.6 189.7 L695.2 192.6 L697.8 195.4 L700.4 198.0 L703.0 200.4 L705.6 202.6 L708.2 204.6 L710.8 206.3 L713.4 207.8 L716.0 209.0 L718.6 210.1 L721.2 211.0 L723.8 211.7 L726.4 212.2 L729.0 212.7 L731.6 213.0 L734.2 213.3 L736.8 213.5 L739.4 213.6 L742.0 213.7"/>
+<line class="ln" x1="586" y1="214" x2="742" y2="214"/>
+<text class="sm n" x="586" y="148">real run</text>
+<text class="sm ak end" x="742" y="148">estimate</text>
+<text class="sm n" x="586" y="236">precision per slot, bits</text>
+<text class="n" x="586" y="262">Each of 2,048 slots keeps</text>
+<text class="n" x="586" y="280">−log₂|error| bits</text>
 </svg>

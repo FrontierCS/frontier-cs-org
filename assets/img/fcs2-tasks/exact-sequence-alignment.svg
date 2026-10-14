@@ -1,54 +1,95 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 20 760 314" role="img" aria-label="Path recovery for query ACGT and target ACCT with known distance 1. The edit table is split at its middle row. Scores from the top half going forward are 2 1 0 1 2, from the bottom half going backward 3 2 1 1 2; their sums 5 3 1 2 4 reach the distance 1 at column 2, where an optimal path crosses. Only the top-left and bottom-right quarters remain to be solved the same way. This recovery is the part the agent writes. The output path is match, match, mismatch, match.">
-<defs><marker id="exact-sequence-alignment-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker></defs>
-
-<text x="20" y="98" font-size="12" fill="#5f6368">query</text>
-<text x="20" y="118" font-size="13" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">ACGT</text>
-<text x="20" y="148" font-size="12" fill="#5f6368">target</text>
-<text x="20" y="168" font-size="13" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">ACCT</text>
-<text x="20" y="198" font-size="12" fill="#5f6368">exact distance</text>
-<text x="20" y="218" font-size="13" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
-<rect x="160" y="34" width="364" height="290" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
-<line x1="124" y1="186" x2="206" y2="186" stroke="#3c4043" stroke-width="1.3" marker-end="url(#exact-sequence-alignment-ar)"/>
-<text x="176" y="58" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: the path recovery</text>
-<text x="176" y="77" font-size="12.5" fill="#3c4043">split at the middle row, then solve each half alike</text>
-<g stroke="#9aa0a6" stroke-width="1" stroke-dasharray="2 3">
-<line x1="412" y1="114" x2="476" y2="114"/><line x1="476" y1="114" x2="476" y2="178"/><line x1="444" y1="114" x2="444" y2="178"/><line x1="412" y1="146" x2="476" y2="146"/>
-<line x1="348" y1="242" x2="412" y2="242"/><line x1="348" y1="178" x2="348" y2="242"/><line x1="380" y1="178" x2="380" y2="242"/><line x1="348" y1="210" x2="412" y2="210"/>
-</g>
-<rect x="348" y="114" width="64" height="64" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<rect x="412" y="178" width="64" height="64" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<g stroke="#dadce0" stroke-width="1">
-<line x1="380" y1="114" x2="380" y2="178"/><line x1="348" y1="146" x2="412" y2="146"/>
-<line x1="444" y1="178" x2="444" y2="242"/><line x1="412" y1="210" x2="476" y2="210"/>
-</g>
-<line x1="340" y1="178" x2="484" y2="178" stroke="#3c4043" stroke-width="2"/>
-<g font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">
-<text x="364" y="106">A</text><text x="396" y="106">C</text><text x="428" y="106">C</text><text x="460" y="106">T</text>
-<text x="332" y="134">A</text><text x="332" y="166">C</text><text x="332" y="198">G</text><text x="332" y="230">T</text>
-</g>
-<text x="302" y="160" font-size="12" text-anchor="end" fill="#3c4043">score forward ↓</text>
-<text x="302" y="218" font-size="12" text-anchor="end" fill="#3c4043">score backward ↑</text>
-<polyline points="348,114 380,146 412,178 444,210 476,242" fill="none" stroke="#0b57d0" stroke-width="2.4"/>
-<circle cx="412" cy="178" r="5.5" fill="#0b57d0"/>
-<g font-size="12" text-anchor="end" fill="#3c4043">
-<text x="326" y="270">top half, forward</text><text x="326" y="290">bottom half, backward</text><text x="326" y="310">sum</text>
-</g>
-<g font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">
-<text x="348" y="270">2</text><text x="380" y="270">1</text><text x="412" y="270">0</text><text x="444" y="270">1</text><text x="476" y="270">2</text>
-<text x="348" y="290">3</text><text x="380" y="290">2</text><text x="412" y="290">1</text><text x="444" y="290">1</text><text x="476" y="290">2</text>
-<text x="348" y="310">5</text><text x="380" y="310">3</text><text x="444" y="310">2</text><text x="476" y="310">4</text>
-</g>
-<circle cx="412" cy="306" r="9" fill="#fff" stroke="#0b57d0" stroke-width="1.5"/>
-<text x="412" y="310" font-size="12.5" font-weight="600" text-anchor="middle" fill="#0b57d0" font-family="ui-monospace,Menlo,monospace">1</text>
-<line x1="490" y1="146" x2="598" y2="146" stroke="#3c4043" stroke-width="1.3" marker-end="url(#exact-sequence-alignment-ar)"/>
-<text x="540" y="96" font-size="12" fill="#5f6368">one optimal path</text>
-<text x="540" y="124" font-size="12" fill="#5f6368">query</text>
-<text x="540" y="168" font-size="12" fill="#5f6368">target</text>
-<g font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">
-<text x="616" y="124">A</text><text x="636" y="124">C</text><text x="656" y="124">G</text><text x="676" y="124">T</text>
-<text x="616" y="168">A</text><text x="636" y="168">C</text><text x="656" y="168">C</text><text x="676" y="168">T</text>
-<text x="616" y="146" fill="#0b57d0">=</text><text x="636" y="146" fill="#0b57d0">=</text><text x="656" y="146" fill="#0b57d0">X</text><text x="676" y="146" fill="#0b57d0">=</text>
-</g>
-<text x="540" y="204" font-size="12" fill="#1f1f1f">match, match, mismatch, match</text>
-<text x="540" y="226" font-size="12" fill="#5f6368">cost 1, equal to the distance</text>
+<svg xmlns="http://www.w3.org/2000/svg" class="fig2" viewBox="0 0 760 318" role="img" aria-label="Left, what is given: the query ACGT, the target ACCT and their exact distance, 1. Middle, the path recovery the agent writes. It splits the edit table at its middle row, scores the top half forward and the bottom half backward: 2 1 0 1 2 and 3 2 1 1 2. Their sums, 5 3 1 2 4, reach the distance 1 at column 2, where an optimal path crosses; only the top-left and bottom-right quarters remain, and each is solved the same way. Right, the output: one optimal path, match, match, mismatch, match, of cost 1.">
+<defs><marker id="exact-sequence-alignment-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arh" d="M0 0L10 5L0 10z"/></marker></defs>
+<rect class="given" x="0" y="0" width="150" height="318" rx="10"/>
+<text class="k" x="18" y="30">GIVEN</text>
+<text class="n" x="18" y="60">query</text>
+<rect class="chip" x="18" y="69" width="72" height="28" rx="5"/>
+<text class="code mid" x="54.0" y="87.5">ACGT</text>
+<text class="n" x="18" y="124">target</text>
+<rect class="chip" x="18" y="133" width="72" height="28" rx="5"/>
+<text class="code mid" x="54.0" y="151.5">ACCT</text>
+<text class="n" x="18" y="188">exact distance</text>
+<rect class="chip" x="18" y="197" width="40" height="28" rx="5"/>
+<text class="code mid" x="38.0" y="215.5">1</text>
+<rect class="agent" x="166" y="0" width="404" height="318" rx="10"/>
+<text class="k ak" x="186" y="30">THE AGENT WRITES</text>
+<text class="h" x="186" y="53">The path recovery, by halving the table</text>
+<text class="code mid" x="226.0" y="91">A</text>
+<text class="code mid" x="254.0" y="91">C</text>
+<text class="code mid" x="282.0" y="91">C</text>
+<text class="code mid" x="310.0" y="91">T</text>
+<text class="code mid" x="198" y="118.5">A</text>
+<text class="code mid" x="198" y="146.5">C</text>
+<text class="code mid" x="198" y="174.5">G</text>
+<text class="code mid" x="198" y="202.5">T</text>
+<rect class="w" x="213" y="101" width="26" height="26" rx="2"/>
+<rect class="w" x="241" y="101" width="26" height="26" rx="2"/>
+<rect class="chip pad" x="269" y="101" width="26" height="26" rx="2"/>
+<rect class="chip pad" x="297" y="101" width="26" height="26" rx="2"/>
+<rect class="w" x="213" y="129" width="26" height="26" rx="2"/>
+<rect class="w" x="241" y="129" width="26" height="26" rx="2"/>
+<rect class="chip pad" x="269" y="129" width="26" height="26" rx="2"/>
+<rect class="chip pad" x="297" y="129" width="26" height="26" rx="2"/>
+<rect class="chip pad" x="213" y="157" width="26" height="26" rx="2"/>
+<rect class="chip pad" x="241" y="157" width="26" height="26" rx="2"/>
+<rect class="w" x="269" y="157" width="26" height="26" rx="2"/>
+<rect class="w" x="297" y="157" width="26" height="26" rx="2"/>
+<rect class="chip pad" x="213" y="185" width="26" height="26" rx="2"/>
+<rect class="chip pad" x="241" y="185" width="26" height="26" rx="2"/>
+<rect class="w" x="269" y="185" width="26" height="26" rx="2"/>
+<rect class="w" x="297" y="185" width="26" height="26" rx="2"/>
+<rect class="ln2" x="212" y="100" width="56" height="56"/>
+<rect class="ln2" x="268" y="156" width="56" height="56"/>
+<line class="lnk" x1="206" y1="156" x2="330" y2="156"/>
+<polyline class="sa" points="212,100 324,212"/>
+<circle class="fa" cx="268" cy="156" r="5"/>
+<text class="code num mid" x="212" y="256">2</text>
+<text class="code num mid" x="240" y="256">1</text>
+<text class="code num mid" x="268" y="256">0</text>
+<text class="code num mid" x="296" y="256">1</text>
+<text class="code num mid" x="324" y="256">2</text>
+<text class="n" x="346" y="256">top half, forward</text>
+<text class="code num mid" x="212" y="277">3</text>
+<text class="code num mid" x="240" y="277">2</text>
+<text class="code num mid" x="268" y="277">1</text>
+<text class="code num mid" x="296" y="277">1</text>
+<text class="code num mid" x="324" y="277">2</text>
+<text class="n" x="346" y="277">bottom half, backward</text>
+<text class="code num mid" x="212" y="298">5</text>
+<text class="code num mid" x="240" y="298">3</text>
+<circle class="chip on" cx="268" cy="293.5" r="9.5"/>
+<text class="code num mid b ak" x="268" y="298">1</text>
+<text class="code num mid" x="296" y="298">2</text>
+<text class="code num mid" x="324" y="298">4</text>
+<text class="n" x="346" y="298">sum</text>
+<circle class="chip" cx="363" cy="99.5" r="9"/><text class="sn ak" x="363" y="104" text-anchor="middle">1</text>
+<text x="380" y="104">Score the top half forward,</text>
+<text x="380" y="122">the bottom half backward</text>
+<circle class="chip" cx="363" cy="151.5" r="9"/><text class="sn ak" x="363" y="156" text-anchor="middle">2</text>
+<text x="380" y="156">The smallest sum, 1, marks</text>
+<text x="380" y="174">where the path crosses</text>
+<circle class="chip" cx="363" cy="203.5" r="9"/><text class="sn ak" x="363" y="208" text-anchor="middle">3</text>
+<text x="380" y="208">Solve the two quarters</text>
+<text x="380" y="226">left the same way</text>
+<rect class="result" x="586" y="0" width="174" height="318" rx="10"/>
+<text class="k" x="604" y="30">OUTPUT</text>
+<text x="604" y="60">One optimal path</text>
+<text class="n" x="604" y="98">query</text>
+<text class="code mid" x="662" y="98">A</text>
+<text class="code mid" x="682" y="98">C</text>
+<text class="code mid" x="702" y="98">G</text>
+<text class="code mid" x="722" y="98">T</text>
+<text class="code mid b ak" x="662" y="120">=</text>
+<text class="code mid b ak" x="682" y="120">=</text>
+<text class="code mid b ak" x="702" y="120">X</text>
+<text class="code mid b ak" x="722" y="120">=</text>
+<text class="n" x="604" y="142">target</text>
+<text class="code mid" x="662" y="142">A</text>
+<text class="code mid" x="682" y="142">C</text>
+<text class="code mid" x="702" y="142">C</text>
+<text class="code mid" x="722" y="142">T</text>
+<text x="604" y="176">match, match,</text>
+<text x="604" y="194">mismatch, match</text>
+<text class="n" x="604" y="222">cost 1, equal to</text>
+<text class="n" x="604" y="240">the distance</text>
 </svg>

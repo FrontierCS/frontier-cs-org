@@ -1,81 +1,93 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 300" role="img" aria-label="The agent writes the search that picks a demand of 0, 6 or 18 for each of 27 source–destination pairs, nine of them nonzero. Exact linear programs then replay the demands: in this example the optimum carries 96, POP 66 and demand pinning 74, so the gap to the better heuristic is 22.">
-<text x="20" y="24" font-size="12.5" fill="#5f6368">Example throughputs</text>
-<rect x="20" y="36" width="720" height="98" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
-<text x="36" y="60" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: the search that picks these demands</text>
-<rect x="36" y="72" width="22" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="47" y="90" font-size="12" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
-<rect x="58" y="72" width="22" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="69" y="90" font-size="12" font-weight="600" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">18</text>
-<rect x="80" y="72" width="22" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="91" y="90" font-size="12" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
-<rect x="102" y="72" width="22" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="113" y="90" font-size="12" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
-<rect x="124" y="72" width="22" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="135" y="90" font-size="12" font-weight="600" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">6</text>
-<rect x="146" y="72" width="22" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="157" y="90" font-size="12" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
-<rect x="168" y="72" width="22" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="179" y="90" font-size="12" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
-<rect x="190" y="72" width="22" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="201" y="90" font-size="12" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
-<rect x="212" y="72" width="22" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="223" y="90" font-size="12" font-weight="600" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">18</text>
-<rect x="234" y="72" width="22" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="245" y="90" font-size="12" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
-<rect x="256" y="72" width="22" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="267" y="90" font-size="12" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
-<rect x="278" y="72" width="22" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="289" y="90" font-size="12" font-weight="600" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">6</text>
-<rect x="300" y="72" width="22" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="311" y="90" font-size="12" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
-<rect x="322" y="72" width="22" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="333" y="90" font-size="12" font-weight="600" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">18</text>
-<rect x="344" y="72" width="22" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="355" y="90" font-size="12" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
-<rect x="366" y="72" width="22" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="377" y="90" font-size="12" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
-<rect x="388" y="72" width="22" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="399" y="90" font-size="12" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
-<rect x="410" y="72" width="22" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="421" y="90" font-size="12" font-weight="600" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">6</text>
-<rect x="432" y="72" width="22" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="443" y="90" font-size="12" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
-<rect x="454" y="72" width="22" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="465" y="90" font-size="12" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
-<rect x="476" y="72" width="22" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="487" y="90" font-size="12" font-weight="600" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">18</text>
-<rect x="498" y="72" width="22" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="509" y="90" font-size="12" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
-<rect x="520" y="72" width="22" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="531" y="90" font-size="12" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
-<rect x="542" y="72" width="22" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="553" y="90" font-size="12" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
-<rect x="564" y="72" width="22" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="575" y="90" font-size="12" font-weight="600" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">6</text>
-<rect x="586" y="72" width="22" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="597" y="90" font-size="12" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
-<rect x="608" y="72" width="22" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="619" y="90" font-size="12" font-weight="600" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">18</text>
-<text x="642" y="83" font-size="12" fill="#3c4043">levels 0, 6, 18</text>
-<text x="642" y="99" font-size="12" fill="#3c4043">≤ 9 nonzero</text>
-<text x="36" y="122" font-size="12" fill="#5f6368">one cell per source–destination pair</text>
-<rect x="50" y="166" width="56" height="106" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="78" y="159" font-size="13" text-anchor="middle" fill="#1f1f1f">96</text>
-<text x="78" y="291" font-size="12.5" text-anchor="middle" fill="#1f1f1f">optimal</text>
-<rect x="130" y="199" width="56" height="73" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="158" y="192" font-size="13" text-anchor="middle" fill="#1f1f1f">66</text>
-<text x="158" y="291" font-size="12.5" text-anchor="middle" fill="#1f1f1f">POP</text>
-<rect x="210" y="191" width="56" height="81" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="238" y="184" font-size="13" text-anchor="middle" fill="#1f1f1f">74</text>
-<text x="238" y="291" font-size="12.5" text-anchor="middle" fill="#1f1f1f">pinning</text>
-<line x1="40" y1="272" x2="290" y2="272" stroke="#3c4043" stroke-width="1.3"/>
-<line x1="106" y1="166" x2="296" y2="166" stroke="#9aa0a6" stroke-width="1" stroke-dasharray="3 3"/>
-<line x1="266" y1="191" x2="296" y2="191" stroke="#9aa0a6" stroke-width="1" stroke-dasharray="3 3"/>
-<path d="M296 166 H302 V191 H296" fill="none" stroke="#1f1f1f" stroke-width="1.5"/>
-<text x="310" y="183" font-size="13" font-weight="600" fill="#1f1f1f">gap 22</text>
-<text x="380" y="180" font-size="12.5" fill="#3c4043">optimal: best routing at full link capacity</text>
-<text x="380" y="204" font-size="12.5" fill="#3c4043">POP: three groups, each with a third of every link</text>
-<text x="380" y="228" font-size="12.5" fill="#3c4043">pinning: demands of 6 or less take their shortest path</text>
-<text x="380" y="252" font-size="12.5" fill="#3c4043">heuristic: the better of POP and pinning</text>
-<text x="380" y="276" font-size="12.5" fill="#5f6368">all replayed exactly with linear programs</text>
+<svg xmlns="http://www.w3.org/2000/svg" class="fig2" viewBox="0 0 760 296" role="img" aria-label="Left, what is given: the heuristic, the better of two shortcuts. POP splits demands into three groups, each with a third of every link; demand pinning sends demands of 6 or less along their shortest path; exact linear programs replay every choice. Middle, the search the agent writes: it picks a demand of 0, 6 or 18 for each of 27 source-destination pairs, at most nine nonzero. Right, what it is judged on, in example throughputs: optimal 96, POP 66, pinning 74, a gap of 22.">
+<defs><marker id="metaopt-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arh" d="M0 0L10 5L0 10z"/></marker></defs>
+<rect class="given" x="0" y="0" width="214" height="296" rx="10"/>
+<text class="k" x="18" y="30">GIVEN</text>
+<text x="18" y="60">A heuristic that keeps the</text>
+<text x="18" y="78">better of two shortcuts:</text>
+<text class="b" x="18" y="108">POP</text>
+<text class="n" x="18" y="126">three groups, each with</text>
+<text class="n" x="18" y="144">a third of every link</text>
+<text class="b" x="18" y="174">Demand pinning</text>
+<text class="n" x="18" y="192">demands of 6 or less take</text>
+<text class="n" x="18" y="210">their shortest path</text>
+<text x="18" y="252">Exact linear programs</text>
+<text x="18" y="270">replay every choice.</text>
+<rect class="agent" x="230" y="0" width="318" height="296" rx="10"/>
+<text class="k ak" x="250" y="30">THE AGENT WRITES</text>
+<text class="h" x="250" y="53">The search for the demands</text>
+<rect class="chip pad" x="250" y="78" width="28" height="28" rx="5"/>
+<text class="num n mid" x="264.0" y="96.5">0</text>
+<rect class="chip on" x="281" y="78" width="28" height="28" rx="5"/>
+<text class="num b ak mid" x="295.0" y="96.5">18</text>
+<rect class="chip pad" x="312" y="78" width="28" height="28" rx="5"/>
+<text class="num n mid" x="326.0" y="96.5">0</text>
+<rect class="chip pad" x="343" y="78" width="28" height="28" rx="5"/>
+<text class="num n mid" x="357.0" y="96.5">0</text>
+<rect class="chip on" x="374" y="78" width="28" height="28" rx="5"/>
+<text class="num b ak mid" x="388.0" y="96.5">6</text>
+<rect class="chip pad" x="405" y="78" width="28" height="28" rx="5"/>
+<text class="num n mid" x="419.0" y="96.5">0</text>
+<rect class="chip pad" x="436" y="78" width="28" height="28" rx="5"/>
+<text class="num n mid" x="450.0" y="96.5">0</text>
+<rect class="chip pad" x="467" y="78" width="28" height="28" rx="5"/>
+<text class="num n mid" x="481.0" y="96.5">0</text>
+<rect class="chip on" x="498" y="78" width="28" height="28" rx="5"/>
+<text class="num b ak mid" x="512.0" y="96.5">18</text>
+<rect class="chip pad" x="250" y="110" width="28" height="28" rx="5"/>
+<text class="num n mid" x="264.0" y="128.5">0</text>
+<rect class="chip pad" x="281" y="110" width="28" height="28" rx="5"/>
+<text class="num n mid" x="295.0" y="128.5">0</text>
+<rect class="chip on" x="312" y="110" width="28" height="28" rx="5"/>
+<text class="num b ak mid" x="326.0" y="128.5">6</text>
+<rect class="chip pad" x="343" y="110" width="28" height="28" rx="5"/>
+<text class="num n mid" x="357.0" y="128.5">0</text>
+<rect class="chip on" x="374" y="110" width="28" height="28" rx="5"/>
+<text class="num b ak mid" x="388.0" y="128.5">18</text>
+<rect class="chip pad" x="405" y="110" width="28" height="28" rx="5"/>
+<text class="num n mid" x="419.0" y="128.5">0</text>
+<rect class="chip pad" x="436" y="110" width="28" height="28" rx="5"/>
+<text class="num n mid" x="450.0" y="128.5">0</text>
+<rect class="chip pad" x="467" y="110" width="28" height="28" rx="5"/>
+<text class="num n mid" x="481.0" y="128.5">0</text>
+<rect class="chip on" x="498" y="110" width="28" height="28" rx="5"/>
+<text class="num b ak mid" x="512.0" y="128.5">6</text>
+<rect class="chip pad" x="250" y="142" width="28" height="28" rx="5"/>
+<text class="num n mid" x="264.0" y="160.5">0</text>
+<rect class="chip pad" x="281" y="142" width="28" height="28" rx="5"/>
+<text class="num n mid" x="295.0" y="160.5">0</text>
+<rect class="chip on" x="312" y="142" width="28" height="28" rx="5"/>
+<text class="num b ak mid" x="326.0" y="160.5">18</text>
+<rect class="chip pad" x="343" y="142" width="28" height="28" rx="5"/>
+<text class="num n mid" x="357.0" y="160.5">0</text>
+<rect class="chip pad" x="374" y="142" width="28" height="28" rx="5"/>
+<text class="num n mid" x="388.0" y="160.5">0</text>
+<rect class="chip pad" x="405" y="142" width="28" height="28" rx="5"/>
+<text class="num n mid" x="419.0" y="160.5">0</text>
+<rect class="chip on" x="436" y="142" width="28" height="28" rx="5"/>
+<text class="num b ak mid" x="450.0" y="160.5">6</text>
+<rect class="chip pad" x="467" y="142" width="28" height="28" rx="5"/>
+<text class="num n mid" x="481.0" y="160.5">0</text>
+<rect class="chip on" x="498" y="142" width="28" height="28" rx="5"/>
+<text class="num b ak mid" x="512.0" y="160.5">18</text>
+<text class="n" x="250" y="202">One cell per source–destination</text>
+<text class="n" x="250" y="220">pair: a demand of 0, 6 or 18,</text>
+<text class="n" x="250" y="238">at most nine nonzero</text>
+<rect class="result" x="564" y="0" width="196" height="296" rx="10"/>
+<text class="k" x="582" y="30">JUDGED ON</text>
+<text class="n" x="582" y="53">Example throughputs</text>
+<rect class="g5" x="582" y="121.60000000000002" width="32" height="134.39999999999998" rx="2"/>
+<text class="num sm mid" x="598.0" y="115.60000000000002">96</text>
+<text class="sm n mid" x="598.0" y="272">optimal</text>
+<rect class="g3" x="623" y="163.60000000000002" width="32" height="92.39999999999999" rx="2"/>
+<text class="num sm mid" x="639.0" y="157.60000000000002">66</text>
+<text class="sm n mid" x="639.0" y="272">POP</text>
+<rect class="g3" x="664" y="152.4" width="32" height="103.6" rx="2"/>
+<text class="num sm mid" x="680.0" y="146.4">74</text>
+<text class="sm n mid" x="680.0" y="272">pinning</text>
+<line class="ln2" x1="578" y1="256" x2="700" y2="256"/>
+<line class="ln dash" x1="614" y1="121.60000000000002" x2="704" y2="121.60000000000002"/>
+<line class="ln dash" x1="696" y1="152.4" x2="704" y2="152.4"/>
+<path class="lnk" d="M704 121.60000000000002 h4 V152.4 h-4"/>
+<text class="b ak" x="714" y="135.0">gap</text>
+<text class="b ak num" x="714" y="151.0">22</text>
 </svg>

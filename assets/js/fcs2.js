@@ -211,8 +211,12 @@ $('#ttslegend').addEventListener('pointerleave', () => { ttsHover = null; ttsBan
 const TASK_OF = Object.fromEntries(TASKS.map(t => [t.s, t]));
 const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+/* Mean score, as the difference from the human reference (owner, 2026-10-14): each run's final score minus the human
+   reference's score on the same problem, in points of that problem's 0-100 scale; 0 is the human reference. Problems
+   without a human reference score are left out. s holds the difference, raw the score itself. */
+const sgn = v => (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(1);
 function drawLB() {
-  const runs = RUNS.filter(r => dom === 'All' || r.d === dom);
+  const runs = RUNS.filter(r => (dom === 'All' || r.d === dom) && REF[r.t] != null).map(r => ({...r, raw:r.s, s:r.s - REF[r.t]}));
   // grouped by model, the row labels name the models; grouped by task, the dots need the legend
   $('#lblegend').hidden = group === 'model';
   let rows;
@@ -232,12 +236,16 @@ function drawLB() {
   const rowH = () => lane;
   const H = T + rows.reduce((a, r) => a + rowH(r), 0) + B, an = animates(svg) && group === 'model';
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
-  const X = v => L + v / 100 * (W - L - R);
-  for (let v = 0; v <= 100; v += 20) {
-    svg.append(sv('line', {x1:X(v), x2:X(v), y1:T, y2:H - B + 6, stroke:'var(--grid)', 'stroke-width':1}));
-    svg.append(sv('text', {x:X(v), y:H - B + 22, 'text-anchor':'middle'}, v));
+  // the axis covers every run, shown or not, on a grid of 20 points with 0 in view: each model's range line spans its runs
+  // either way, and the axis stays put when the runs are switched off (owner, 2026-10-14: the lines ran off the chart)
+  const vs = runs.map(r => r.s), step = 20;
+  const xlo = Math.min(0, Math.floor(Math.min(...vs) / step) * step), xhi = Math.max(0, Math.ceil(Math.max(...vs) / step) * step);
+  const X = v => L + (v - xlo) / (xhi - xlo) * (W - L - R);
+  for (let v = xlo; v <= xhi; v += step) {
+    svg.append(sv('line', {x1:X(v), x2:X(v), y1:T, y2:H - B + 6, stroke:v === 0 ? 'var(--ink-2)' : 'var(--grid)', 'stroke-width':v === 0 ? 1.2 : 1}));
+    if (!narrow || v % 40 === 0) svg.append(sv('text', {x:X(v), y:H - B + 22, 'text-anchor':'middle'}, v > 0 ? `+${v}` : v < 0 ? `−${-v}` : '0'));   // phones label every 40
   }
-  svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'Final score'));
+  svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'Final score minus the human reference'));
   const pts = [];
   let y0 = T;
   rows.forEach((r, ri) => {
@@ -255,10 +263,10 @@ function drawLB() {
       if (ms.length > 1) svg.append(sv('line', {x1:X(Math.min(...ms)), x2:X(Math.max(...ms)), y1:yc, y2:yc, stroke:'var(--line)', 'stroke-width':2}));
       r.items.forEach((it, k) => {
         svg.append(sv('circle', {cx:X(ms[k]), cy:yc, r:5.5, fill:MCOL[it.m], stroke:'#fff', 'stroke-width':1.5}));
-        pts.push({x:X(ms[k]), y:yc, html:`<b>${esc(MNAME[it.m])}</b><br>${esc(r.label)} · ${esc(r.sub)}<br>${it.runs.length > 1 ? `Mean <b>${f1(ms[k])}</b>` : `Final score <b>${f1(ms[k])}</b>`}`, mean:true});
+        pts.push({x:X(ms[k]), y:yc, html:`<b>${esc(MNAME[it.m])}</b><br>${esc(r.label)} · ${esc(r.sub)}<br><b>${sgn(ms[k])}</b> against the human reference`, mean:true});
       });
       const edge = X(Math.max(...ms)) + 10, right = edge + 34 > W;
-      svg.append(sv('text', {class:'val', x: right ? X(Math.min(...ms)) - 10 : edge, y:yc + 4.5, fill:'var(--ink-2)', 'text-anchor': right ? 'end' : 'start'}, f1(Math.max(...ms))));
+      svg.append(sv('text', {class:'val', x: right ? X(Math.min(...ms)) - 10 : edge, y:yc + 4.5, fill:'var(--ink-2)', 'text-anchor': right ? 'end' : 'start'}, sgn(Math.max(...ms))));
       y0 += h; return;
     }
     r.items.forEach((it, k) => {
@@ -271,12 +279,12 @@ function drawLB() {
       if (showRuns) it.runs.forEach((x, j) => {
         const jy = ((j * 37) % 17 - 8) * (narrow ? .9 : 1.2);
         const c = sv('circle', {cx:X(x.s), cy:yc + jy, r:4.5, fill:MCOL[it.m], opacity:.4});
-        svg.append(c); if (an) mark(c, 'a-pop', d + rank.get(x) * dn); pts.push({x:X(x.s), y:yc + jy, html:`<b>${esc(MNAME[it.m])}</b><br>${esc(x.t)} · ${esc(x.d)}<br>Final score <b>${f1(x.s)}</b>`});
+        svg.append(c); if (an) mark(c, 'a-pop', d + rank.get(x) * dn); pts.push({x:X(x.s), y:yc + jy, html:`<b>${esc(MNAME[it.m])}</b><br>${esc(x.t)} · ${esc(x.d)}<br><b>${sgn(x.s)}</b>: final score ${f1(x.raw)}, human reference ${f1(REF[x.t])}`});
       });
       const dot = sv('circle', {cx:X(mu), cy:yc, r:8, fill:MCOL[it.m], stroke:'#fff', 'stroke-width':2});
-      pts.push({x:X(mu), y:yc, html:`<b>${esc(MNAME[it.m])}</b><br>Mean <b>${f1(mu)}</b>`, mean:true});
+      pts.push({x:X(mu), y:yc, html:`<b>${esc(MNAME[it.m])}</b><br>Mean <b>${sgn(mu)}</b> against the human reference`, mean:true});
       // the mean sits above its own dot, with a white halo over the run dots
-      const val = sv('text', {class:'val halo', x:X(mu), y:yc - 15, fill:MTXT(it.m), 'text-anchor':'middle'}, f1(mu));
+      const val = sv('text', {class:'val halo', x:X(mu), y:yc - 15, fill:MTXT(it.m), 'text-anchor':'middle'}, sgn(mu));
       svg.append(dot, val);
       if (an) { mark(dot, 'a-pop', dm); mark(val, 'a-fade', dm + .15); }
     });
@@ -343,7 +351,8 @@ addEventListener('hashchange', fqHash); fqHash();
    FEDI, and the links. The filter is by domain; the search also
    reads goals and venues; the order is the reader's choice, hardest first to begin with. */
 let picked = new Set(), q = '', order = 'hard';
-$('#checks').innerHTML = DOMAINS.map(d => `<label><input type="checkbox" value="${esc(d)}"> ${esc(d)} (${N_IN(d)})</label>`).join('');
+// the domain filter: checkboxes drawn as Material 3 ones, any number checked (owner, design audit: chips did not look good, 4B)
+$('#checks').innerHTML = DOMAINS.map(d => `<label><input type="checkbox" value="${esc(d)}"><span>${esc(d)} <span class="cn">${N_IN(d)}</span></span></label>`).join('');
 $('#q').placeholder = `Search ${TASKS.length} problems`;
 const again = () => { drawRows(); $('#rows').scrollTop = 0; atEnd(); };
 $('#checks').addEventListener('change', e => { e.target.checked ? picked.add(e.target.value) : picked.delete(e.target.value); again(); });

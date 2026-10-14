@@ -88,9 +88,15 @@ h2{font-weight:600; font-size:clamp(25px,2.4vw,30px); line-height:1.2; margin:0}
 .chips{display:flex; flex-wrap:wrap; gap:8px}
 .chip{border:1px solid #bdc1c6; background:#fff; border-radius:100px; padding:5px 11px; font-size:14px; color:var(--ink-2)}
 .chip[aria-pressed="true"]{background:var(--ink-2); border-color:var(--ink-2); color:#fff}
+.chip:focus-visible{outline:2px solid var(--teal); outline-offset:2px}
 .radios{display:flex; flex-direction:column; gap:8px; font-size:15px}
-.radios label{display:flex; align-items:center; gap:9px; cursor:pointer}
-.radios input{accent-color:var(--teal); width:15px; height:15px; margin:0}
+.radios label{display:flex; align-items:center; gap:10px; cursor:pointer}
+/* a Material 3 radio, the filter checkbox's twin: same size, outline and blue, round with a dot (owner, design audit 5A) */
+.radios input{appearance:none; flex:none; display:grid; place-content:center; width:18px; height:18px; margin:0; border:2px solid var(--muted); border-radius:50%; background:#fff; cursor:pointer}
+.radios input::before{content:""; width:8px; height:8px; border-radius:50%; background:var(--teal); transform:scale(0); transition:transform .12s}
+.radios input:checked{border-color:var(--teal)} .radios input:checked::before{transform:scale(1)}
+.radios label:hover input:not(:checked){border-color:var(--ink-2)}
+.radios input:focus-visible{outline:2px solid var(--teal); outline-offset:2px}
 .toggle{display:flex; align-items:center; gap:10px; font-size:15px; cursor:pointer; padding-bottom:16px; border-bottom:1px solid var(--line)}
 .toggle input{appearance:none; width:30px; height:16px; border-radius:20px; border:1px solid var(--ink-2); position:relative; margin:0; cursor:pointer; background:#fff; flex:none}
 .toggle input::after{content:""; position:absolute; top:2px; left:2px; width:10px; height:10px; border-radius:50%; background:var(--ink-2); transition:left .15s}
@@ -186,9 +192,16 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 /* task index */
 .idx{display:grid; grid-template-columns:240px minmax(0,1fr); gap:24px 56px}
 @media (max-width:900px){ .idx{grid-template-columns:1fr} }
-.checks{display:flex; flex-direction:column; gap:7px; font-size:17px}
-.checks label{display:flex; align-items:center; gap:8px; cursor:pointer}
-.checks input{width:14px; height:14px; margin:0; accent-color:var(--ink-2)}
+.checks{display:flex; flex-direction:column; gap:8px; font-size:15px}   /* the same type and spacing as the mean-score settings list */
+.checks label{display:flex; align-items:center; gap:10px; cursor:pointer}
+.checks .cn{color:var(--muted); font-variant-numeric:tabular-nums}
+/* a Material 3 checkbox: a 2 px outline with a small radius, filled in the switch's blue with a white tick when checked
+   (owner, design audit 4B; the native box looked like the browser's) */
+.checks input{appearance:none; flex:none; display:grid; place-content:center; width:18px; height:18px; margin:0; border:2px solid var(--muted); border-radius:3px; background:#fff; cursor:pointer}
+.checks input::before{content:""; width:10px; height:5px; margin-top:-3px; border:solid #fff; border-width:0 0 2px 2px; transform:rotate(-45deg) scale(0); transition:transform .12s}
+.checks input:checked{background:var(--teal); border-color:var(--teal)} .checks input:checked::before{transform:rotate(-45deg) scale(1)}
+.checks label:hover input:not(:checked){border-color:var(--ink-2)}
+.checks input:focus-visible{outline:2px solid var(--teal); outline-offset:2px}
 .ftoggle{display:none}
 @media (max-width:900px){
   .ftoggle{display:inline-flex; align-items:center; gap:8px; border:1px solid #80868b; background:#fff; border-radius:4px; height:42px; padding-inline:14px; font-weight:600}
@@ -305,8 +318,11 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 /* task pages (_pages/fcs2-task.md, assets/js/fcs2-task.js) */
 .taskpage .col{padding-bottom:100px}
 .crumbs{display:flex; justify-content:space-between; align-items:center; gap:16px; padding-top:48px; font-size:14px}
-.crumbs a{display:inline-flex; align-items:center; gap:6px; color:var(--muted); text-decoration:none}
-.crumbs a.back::before{content:"←"}
+/* a breadcrumb, FrontierCS 2 / Problems / the problem, with "/" as on the blog's (owner, 2026-10-14: no arrow link) */
+.crumbs .trail{display:flex; align-items:baseline; gap:10px; min-width:0; color:var(--faint)}
+.crumbs .trail a{color:var(--muted); text-decoration:none; white-space:nowrap}
+.crumbs .here{color:var(--ink-2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+@media (max-width:640px){ .crumbs .home{display:none} }   /* phones: Problems / the problem, beside the pager */
 /* previous and next problem: beside the back link, and at the foot of the page */
 .pager{display:flex; align-items:center; gap:10px; color:var(--muted)}
 .pbtn{display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; border:1px solid var(--line); border-radius:50%; color:var(--ink-2); background:var(--bg)}
@@ -314,9 +330,7 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 a.pbtn:hover{border-color:var(--teal); color:var(--teal-d)}
 .pbtn.off{opacity:.35}
 .pager .pos{min-width:3.6em; text-align:center; font-variant-numeric:tabular-nums; color:var(--muted)}
-.tfoot{display:flex; justify-content:space-between; gap:16px; margin:64px 0 0; padding-top:20px; border-top:1px solid var(--line); font-size:15px}
-.tfoot a{color:var(--ink-2); text-decoration:none} .tfoot a:hover{color:var(--teal-d)}
-.crumbs a:hover{color:var(--teal-d)}
+.crumbs .trail a:hover{color:var(--teal-d)}
 .tdom{display:inline-flex; align-items:center; gap:7px; font-size:14px; font-weight:500; color:var(--ink-2)}
 .tdom::before{content:""; width:9px; height:9px; border-radius:2px; background:var(--a)}
 .thead .meta{margin:36px 0 10px}
@@ -351,7 +365,8 @@ a.pbtn:hover{border-color:var(--teal); color:var(--teal-d)}
 .tabout p{margin:0; font-size:15px; line-height:1.6; color:var(--ink-2)}
 @media (max-width:900px){ .tabout{grid-template-columns:minmax(0,1fr)} }
 .tdet{margin:14px 0 0; max-width:46em}
-.tdet summary{cursor:pointer; width:fit-content; font-size:14.5px; font-weight:500; color:var(--teal-d)}
+.tdet summary{width:fit-content}   /* the overview's fold: ink heading, a plus that turns to a minus (owner, design audit 3A) */
+.tdet summary h3{font-size:16px; font-weight:600; color:var(--ink)}
 .tdet p{margin:10px 0 0; font-size:15.5px; line-height:1.6; color:var(--ink-2)}
 .tres{margin:48px 0 0}
 .tfig svg{display:block; width:100%; height:auto}
@@ -380,8 +395,16 @@ a.pbtn:hover{border-color:var(--teal); color:var(--teal-d)}
 .fig2 .ring{fill:none; stroke:var(--ink); stroke-width:1.5}
 .fig2 .box{fill:#fff; stroke:var(--ink); stroke-width:1.4}
 .fig2 .boxx{stroke:var(--ink); stroke-width:1.1}
-.fig2 .ar{stroke:#5f6368; stroke-width:1.3}
+.fig2 .ar{fill:none; stroke:#5f6368; stroke-width:1.3}
 .fig2 .arh{fill:#5f6368}
+/* general marks for the other diagrams: grey fills, thin lines, the domain colour as a mark, and red for a fault */
+.fig2 .g1{fill:#f1f3f4} .fig2 .g2{fill:#e8eaed} .fig2 .g3{fill:#dadce0} .fig2 .g5{fill:#9aa0a6} .fig2 .g7{fill:#5f6368} .fig2 .w{fill:#fff}
+.fig2 .ln{fill:none; stroke:#bdc1c6; stroke-width:1} .fig2 .ln2{fill:none; stroke:#5f6368; stroke-width:1.3} .fig2 .lnk{fill:none; stroke:var(--ink); stroke-width:1.5}
+.fig2 .dash{stroke-dasharray:3 3}
+.fig2 .fa{fill:var(--a, #174ea6)} .fig2 .sa{fill:none; stroke:var(--a, #174ea6); stroke-width:1.5} .fig2 .fal{fill:var(--af, #d2e3fc)}
+.fig2 .bad{fill:#c5221f} .fig2 .sbad{fill:none; stroke:#c5221f; stroke-width:1.5}
+.fig2 .result{fill:#f1f3f4}
+.fig2 .sm{font-size:11.5px} .fig2 .mid{text-anchor:middle} .fig2 .end{text-anchor:end}
 .tsum{margin:0 0 12px; font-size:15px; color:var(--ink-2); font-variant-numeric:tabular-nums}
 .tsum b{color:var(--ink); font-weight:600}
 .rtab th.rv, .rtab td.rv{text-align:left}
@@ -422,14 +445,6 @@ a.pbtn:hover{border-color:var(--teal); color:var(--teal-d)}
 .legend i.dot.on{background:var(--ink-2)}
 .th2{margin:72px 0 14px}
 #rtbl td:first-child{white-space:nowrap}
-.tgroup{margin-top:44px}
-.tgroup h2{font-size:22px}
-.tgroup ul{list-style:none; padding:0; margin:12px 0 0; columns:2 20em; column-gap:48px}
-.tgroup li{display:flex; align-items:center; gap:12px; padding:7px 0; border-bottom:1px solid var(--line); break-inside:avoid; font-size:16px}
-.tgroup li a{color:var(--ink); text-decoration:none}
-.tgroup li a:hover{color:var(--teal-d); text-decoration:underline; text-underline-offset:3px}
-.tgroup .ran{display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:600; color:var(--ink-2)}
-.tgroup .ran i{width:8px; height:8px; border-radius:50%; background:var(--teal)}
 
 /* scroll-in animation of the mean-score, FECI and test-time scaling charts (fcs2.js: animates, mark); .pre is the state before the chart comes into view */
 .anim .a-bar{transform-box:fill-box; transform-origin:left center; transition:transform .8s cubic-bezier(.2,.7,.2,1) var(--d,0s)}

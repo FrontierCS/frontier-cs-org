@@ -1,108 +1,104 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 22 760 288" role="img" aria-label="A matrix G with singular values from 0.001 to 1 goes through five polynomial steps. Each step applies an odd fifth-degree polynomial chosen for the range of singular values left by the step before. The singular values spread over zero to two, then close in on one, so the output approximates the polar factor U V transpose. The polynomial schedule and the matrix iteration are the part the agent writes.">
-<defs><marker id="polar-express-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker></defs>
-
-<rect x="20" y="120" width="92" height="64" rx="8" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="66" y="148" font-size="14" text-anchor="middle" fill="#1f1f1f" font-style="italic">G = UΣVᵀ</text>
-<text x="66" y="169" font-size="11.5" text-anchor="middle" fill="#5f6368">σ: 0.001 to 1</text>
-<line x1="112" y1="152" x2="134" y2="152" stroke="#3c4043" stroke-width="1.3" marker-end="url(#polar-express-ar)"/>
-<rect x="138" y="36" width="482" height="266" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
-<text x="154" y="60" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: the polynomial schedule and the iteration</text>
-<text x="154" y="82" font-size="13" fill="#1f1f1f" font-style="italic">X ← aX + bX(XᵀX) + cX(XᵀX)²</text>
-<text x="154" y="101" font-size="12" fill="#3c4043">a, b, c: the best fifth-degree odd polynomial for the range the last step left</text>
-<line x1="406.0" y1="114" x2="406.0" y2="261" stroke="#9aa0a6" stroke-width="1" stroke-dasharray="3 3"/>
-<text x="154" y="130.5" font-size="12" fill="#5f6368">start</text>
-<line x1="214.2" y1="126" x2="406.0" y2="126" stroke="#9aa0a6" stroke-width="1.2"/>
-<line x1="214.2" y1="121" x2="214.2" y2="131" stroke="#9aa0a6" stroke-width="1.2"/>
-<line x1="406.0" y1="121" x2="406.0" y2="131" stroke="#9aa0a6" stroke-width="1.2"/>
-<circle cx="214.2" cy="126" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="214.4" cy="126" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="214.9" cy="126" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="215.9" cy="126" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="218.1" cy="126" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="222.9" cy="126" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="233.2" cy="126" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="255.4" cy="126" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="303.1" cy="126" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="406.0" cy="126" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<text x="154" y="155.5" font-size="12" fill="#5f6368">step 1</text>
-<line x1="215.6" y1="151" x2="596.4" y2="151" stroke="#9aa0a6" stroke-width="1.2"/>
-<line x1="215.6" y1="146" x2="215.6" y2="156" stroke="#9aa0a6" stroke-width="1.2"/>
-<line x1="596.4" y1="146" x2="596.4" y2="156" stroke="#9aa0a6" stroke-width="1.2"/>
-<circle cx="215.6" cy="151" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="217.4" cy="151" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="221.4" cy="151" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="229.9" cy="151" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="248.2" cy="151" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="287.4" cy="151" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="368.6" cy="151" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="513.0" cy="151" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="571.1" cy="151" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="596.4" cy="151" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<text x="154" y="180.5" font-size="12" fill="#5f6368">step 2</text>
-<line x1="220.5" y1="176" x2="591.5" y2="176" stroke="#9aa0a6" stroke-width="1.2"/>
-<line x1="220.5" y1="171" x2="220.5" y2="181" stroke="#9aa0a6" stroke-width="1.2"/>
-<line x1="591.5" y1="171" x2="591.5" y2="181" stroke="#9aa0a6" stroke-width="1.2"/>
-<circle cx="220.5" cy="176" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="228.1" cy="176" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="244.3" cy="176" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="279.0" cy="176" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="351.4" cy="176" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="484.7" cy="176" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="588.9" cy="176" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="262.5" cy="176" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="367.2" cy="176" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="591.5" cy="176" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<text x="154" y="205.5" font-size="12" fill="#5f6368">step 3</text>
-<line x1="239.8" y1="201" x2="572.2" y2="201" stroke="#9aa0a6" stroke-width="1.2"/>
-<line x1="239.8" y1="196" x2="239.8" y2="206" stroke="#9aa0a6" stroke-width="1.2"/>
-<line x1="572.2" y1="196" x2="572.2" y2="206" stroke="#9aa0a6" stroke-width="1.2"/>
-<circle cx="239.8" cy="201" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="269.4" cy="201" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="331.4" cy="201" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="449.5" cy="201" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="571.8" cy="201" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="307.9" cy="201" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="543.4" cy="201" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="396.7" cy="201" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="569.5" cy="201" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="572.2" cy="201" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<text x="154" y="230.5" font-size="12" fill="#5f6368">step 4</text>
-<line x1="298.4" y1="226" x2="513.6" y2="226" stroke="#9aa0a6" stroke-width="1.2"/>
-<line x1="298.4" y1="221" x2="298.4" y2="231" stroke="#9aa0a6" stroke-width="1.2"/>
-<line x1="513.6" y1="221" x2="513.6" y2="231" stroke="#9aa0a6" stroke-width="1.2"/>
-<circle cx="298.4" cy="226" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="386.5" cy="226" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="502.8" cy="226" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="385.7" cy="226" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="509.8" cy="226" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="472.4" cy="226" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="349.9" cy="226" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="485.0" cy="226" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="491.9" cy="226" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="513.6" cy="226" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<text x="154" y="255.5" font-size="12" fill="#5f6368">step 5</text>
-<line x1="382.3" y1="251" x2="429.7" y2="251" stroke="#9aa0a6" stroke-width="1.2"/>
-<line x1="382.3" y1="246" x2="382.3" y2="256" stroke="#9aa0a6" stroke-width="1.2"/>
-<line x1="429.7" y1="246" x2="429.7" y2="256" stroke="#9aa0a6" stroke-width="1.2"/>
-<circle cx="382.3" cy="251" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="425.6" cy="251" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="407.0" cy="251" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="425.9" cy="251" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="420.7" cy="251" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="382.4" cy="251" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="427.3" cy="251" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="386.9" cy="251" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="392.5" cy="251" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<circle cx="429.7" cy="251" r="3.2" fill="#3c4043" stroke="#e8f0fe" stroke-width="0.8"/>
-<line x1="214" y1="273" x2="598" y2="273" stroke="#3c4043" stroke-width="1"/>
-<line x1="214.0" y1="269" x2="214.0" y2="277" stroke="#3c4043" stroke-width="1"/>
-<text x="214.0" y="291" font-size="12" text-anchor="middle" fill="#5f6368">0</text>
-<line x1="406.0" y1="269" x2="406.0" y2="277" stroke="#3c4043" stroke-width="1"/>
-<text x="406.0" y="291" font-size="12" text-anchor="middle" fill="#5f6368">1</text>
-<line x1="598.0" y1="269" x2="598.0" y2="277" stroke="#3c4043" stroke-width="1"/>
-<text x="598.0" y="291" font-size="12" text-anchor="middle" fill="#5f6368">2</text>
-<line x1="620" y1="152" x2="640" y2="152" stroke="#3c4043" stroke-width="1.3" marker-end="url(#polar-express-ar)"/>
-<rect x="644" y="120" width="98" height="64" rx="8" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="693" y="148" font-size="14" text-anchor="middle" fill="#1f1f1f" font-style="italic">X ≈ UVᵀ</text>
-<text x="693" y="169" font-size="11.5" text-anchor="middle" fill="#5f6368">all σ near 1</text>
+<svg xmlns="http://www.w3.org/2000/svg" class="fig2" viewBox="0 0 760 326" role="img" aria-label="Left, what is given: a matrix G equal to U Sigma V transpose, with singular values from 0.001 to 1. Middle, the polynomial schedule and the matrix iteration the agent writes: each step sets X to aX + bX(XᵀX) + cX(XᵀX)², where a, b and c give the best fifth-degree odd polynomial for the range of singular values the step before leaves. Over five steps the singular values spread over zero to two, then close in on one. Right, the result: X approximates the polar factor U V transpose, with all singular values near 1.">
+<defs><marker id="polar-express-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arh" d="M0 0L10 5L0 10z"/></marker></defs>
+<rect class="given" x="0" y="0" width="150" height="326" rx="10"/>
+<text class="k" x="18" y="30">GIVEN</text>
+<rect class="chip" x="18" y="46" width="114" height="34" rx="6"/>
+<text class="code mid" x="75" y="67">G = UΣVᵀ</text>
+<text x="18" y="108">A matrix whose</text>
+<text x="18" y="126">singular values σ</text>
+<text x="18" y="144">run from 0.001 to 1</text>
+<rect class="agent" x="166" y="0" width="446" height="326" rx="10"/>
+<text class="k ak" x="186" y="30">THE AGENT WRITES</text>
+<text class="h" x="186" y="53">The polynomial schedule and the iteration</text>
+<rect class="chip" x="186" y="68" width="222" height="30" rx="6"/>
+<text class="code" x="198" y="87.5">X ← aX + bX(XᵀX) + cX(XᵀX)²</text>
+<text class="n" x="186" y="122">a, b, c: the best fifth-degree odd polynomial for the</text>
+<text class="n" x="186" y="140">range of σ that the step before leaves</text>
+<line class="ln dash" x1="410" y1="156" x2="410" y2="288"/>
+<text class="n" x="186" y="172.5">start</text>
+<line class="ln2" x1="248.169" y1="168" x2="410" y2="168"/>
+<circle class="fa" cx="248.169" cy="168" r="3.2"/>
+<circle class="fa" cx="248.338" cy="168" r="3.2"/>
+<circle class="fa" cx="248.759" cy="168" r="3.2"/>
+<circle class="fa" cx="249.603" cy="168" r="3.2"/>
+<circle class="fa" cx="251.459" cy="168" r="3.2"/>
+<circle class="fa" cx="255.509" cy="168" r="3.2"/>
+<circle class="fa" cx="264.2" cy="168" r="3.2"/>
+<circle class="fa" cx="282.931" cy="168" r="3.2"/>
+<circle class="fa" cx="323.178" cy="168" r="3.2"/>
+<circle class="fa" cx="410" cy="168" r="3.2"/>
+<text class="n" x="186" y="194.5">step 1</text>
+<line class="ln2" x1="249.35" y1="190" x2="570.65" y2="190"/>
+<circle class="fa" cx="249.35" cy="190" r="3.2"/>
+<circle class="fa" cx="250.869" cy="190" r="3.2"/>
+<circle class="fa" cx="254.244" cy="190" r="3.2"/>
+<circle class="fa" cx="261.416" cy="190" r="3.2"/>
+<circle class="fa" cx="276.856" cy="190" r="3.2"/>
+<circle class="fa" cx="309.931" cy="190" r="3.2"/>
+<circle class="fa" cx="378.444" cy="190" r="3.2"/>
+<circle class="fa" cx="500.281" cy="190" r="3.2"/>
+<circle class="fa" cx="549.303" cy="190" r="3.2"/>
+<circle class="fa" cx="570.65" cy="190" r="3.2"/>
+<text class="n" x="186" y="216.5">step 2</text>
+<line class="ln2" x1="253.484" y1="212" x2="566.516" y2="212"/>
+<circle class="fa" cx="253.484" cy="212" r="3.2"/>
+<circle class="fa" cx="259.897" cy="212" r="3.2"/>
+<circle class="fa" cx="273.566" cy="212" r="3.2"/>
+<circle class="fa" cx="288.922" cy="212" r="3.2"/>
+<circle class="fa" cx="302.844" cy="212" r="3.2"/>
+<circle class="fa" cx="363.931" cy="212" r="3.2"/>
+<circle class="fa" cx="377.262" cy="212" r="3.2"/>
+<circle class="fa" cx="476.403" cy="212" r="3.2"/>
+<circle class="fa" cx="564.322" cy="212" r="3.2"/>
+<circle class="fa" cx="566.516" cy="212" r="3.2"/>
+<text class="n" x="186" y="238.5">step 3</text>
+<line class="ln2" x1="269.769" y1="234" x2="550.231" y2="234"/>
+<circle class="fa" cx="269.769" cy="234" r="3.2"/>
+<circle class="fa" cx="294.744" cy="234" r="3.2"/>
+<circle class="fa" cx="327.228" cy="234" r="3.2"/>
+<circle class="fa" cx="347.056" cy="234" r="3.2"/>
+<circle class="fa" cx="402.153" cy="234" r="3.2"/>
+<circle class="fa" cx="446.703" cy="234" r="3.2"/>
+<circle class="fa" cx="525.931" cy="234" r="3.2"/>
+<circle class="fa" cx="547.953" cy="234" r="3.2"/>
+<circle class="fa" cx="549.894" cy="234" r="3.2"/>
+<circle class="fa" cx="550.231" cy="234" r="3.2"/>
+<text class="n" x="186" y="260.5">step 4</text>
+<line class="ln2" x1="319.212" y1="256" x2="500.788" y2="256"/>
+<circle class="fa" cx="319.212" cy="256" r="3.2"/>
+<circle class="fa" cx="362.666" cy="256" r="3.2"/>
+<circle class="fa" cx="392.872" cy="256" r="3.2"/>
+<circle class="fa" cx="393.547" cy="256" r="3.2"/>
+<circle class="fa" cx="466.025" cy="256" r="3.2"/>
+<circle class="fa" cx="476.656" cy="256" r="3.2"/>
+<circle class="fa" cx="482.478" cy="256" r="3.2"/>
+<circle class="fa" cx="491.675" cy="256" r="3.2"/>
+<circle class="fa" cx="497.581" cy="256" r="3.2"/>
+<circle class="fa" cx="500.788" cy="256" r="3.2"/>
+<text class="n" x="186" y="282.5">step 5</text>
+<line class="ln2" x1="390.003" y1="278" x2="429.997" y2="278"/>
+<circle class="fa" cx="390.003" cy="278" r="3.2"/>
+<circle class="fa" cx="390.087" cy="278" r="3.2"/>
+<circle class="fa" cx="393.884" cy="278" r="3.2"/>
+<circle class="fa" cx="398.609" cy="278" r="3.2"/>
+<circle class="fa" cx="410.844" cy="278" r="3.2"/>
+<circle class="fa" cx="422.403" cy="278" r="3.2"/>
+<circle class="fa" cx="426.538" cy="278" r="3.2"/>
+<circle class="fa" cx="426.791" cy="278" r="3.2"/>
+<circle class="fa" cx="427.972" cy="278" r="3.2"/>
+<circle class="fa" cx="429.997" cy="278" r="3.2"/>
+<line class="ln2" x1="248" y1="300" x2="572" y2="300"/>
+<line class="ln2" x1="248" y1="296" x2="248" y2="304"/>
+<text class="n mid" x="248" y="320">0</text>
+<line class="ln2" x1="410" y1="296" x2="410" y2="304"/>
+<text class="n mid" x="410" y="320">1</text>
+<line class="ln2" x1="572" y1="296" x2="572" y2="304"/>
+<text class="n mid" x="572" y="320">2</text>
+<text class="n" x="584" y="304.5">σ</text>
+<rect class="result" x="628" y="0" width="132" height="326" rx="10"/>
+<text class="k" x="646" y="30">RESULT</text>
+<rect class="chip on" x="646" y="46" width="96" height="34" rx="6"/>
+<text class="code mid" x="694" y="67">X ≈ UVᵀ</text>
+<text x="646" y="108">The polar factor:</text>
+<text x="646" y="126">all σ near 1</text>
 </svg>

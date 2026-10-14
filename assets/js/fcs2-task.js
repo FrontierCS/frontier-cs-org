@@ -11,13 +11,14 @@ let cur = null;   // the task on show and its runs
 
 function drawPage() {
   const t = TASK_BY_SLUG[decodeURIComponent(location.hash.slice(1))];
-  if (!t) return drawIndex();
+  // no problem named (or an unknown one): the list on the overview is the index (owner, design audit 11A)
+  if (!t) { location.replace($('#tolist').href); return; }
   const runs = TRAJ.filter(r => r[1] === t.s).sort((a, b) => RANK[a[0]] - RANK[b[0]] || b[2] - a[2]);
   cur = {t, runs};
   document.title = `${t.name} · FrontierCS 2`;
   // the domain above the name, with its square in the map's colour, as in the task list; a back link replaces the breadcrumb
   $('#tmeta').innerHTML = `<span class="tdom" style="--a:${AINK[AREA_OF[t.d].k]}">${esc(t.d)}</span>`;
-  $('#tname').textContent = t.name;
+  $('#tname').textContent = t.name; $('#tcrumb').textContent = t.name; $('#tcsep').hidden = false;
   // the source as the task list gives it: venue in bold, then the title
   const v = VENUE[t.s], ttl = t.t || (v ? t.name : '');
   $('#tpaper').innerHTML = v && ttl ? `<b>${esc(v)}</b> · ${esc(ttl)}` : esc(v || ttl);
@@ -28,16 +29,17 @@ function drawPage() {
   // assets/img/fcs2-tasks/<slug>.svg and set inline so it takes the page's type (Qiuyang, 2026-10-14)
   const goal = GOAL[t.s], key = KEYM[t.s];
   $('#tgoal').textContent = goal || ''; $('#tgoal').hidden = !goal;
-  // the problem's FEDI and its rank, with a link to what FEDI is (owner, 2026-10-14)
+  // the problem's FEDI and its rank, with a link to what FEDI is (owner, 2026-10-14); the address comes from a real link in the
+  // markup, so it follows the site's base URL and the preview's relative links alike
   const fr = FRANK[t.s], fe = $('#tfedi');
-  fe.innerHTML = fr ? `<span>FEDI</span><b>${f1(FEDI[t.s])}</b><span>the ${fr === Object.keys(FRANK).length ? 'easiest' : (fr === 1 ? '' : ordinal(fr) + ' ') + 'hardest'} of ${Object.keys(FRANK).length} problems</span><a href="${fe.dataset.how}">What is FEDI?</a>` : '';
+  fe.innerHTML = fr ? `<span>FEDI</span><b>${f1(FEDI[t.s])}</b><span>the ${fr === Object.keys(FRANK).length ? 'easiest' : (fr === 1 ? '' : ordinal(fr) + ' ') + 'hardest'} of ${Object.keys(FRANK).length} problems</span><a href="${esc($('#howlink').getAttribute('href'))}">What is FEDI?</a>` : '';
   $('#tkeys').innerHTML = key ? `<span class="lab">Scored on</span>${key.map(k => `<span class="k">${esc(k)}</span>`).join('')}` : '';
   $('#tfig').hidden = true; $('#tfig').innerHTML = ''; $('#thero').classList.add('nofig');
   // a rewritten description (three paragraphs split by ¶) sits under the top block, one column each: the idea, what the
   // agent writes, how it is judged; an older one stays folded (open when there is no goal line, as on Security problems)
   const parts = NEWDESC(t.s) ? DESC[t.s].split(/\s*¶\s*/) : [];
   const lead = parts.length ? `<section class="tabout">${parts.map((p, i) => `<div><h3>${['The idea', 'What the agent writes', 'How it is judged'][i] || ''}</h3><p>${esc(p)}</p></div>`).join('')}</section>`
-    : DESC[t.s] ? `<details class="tdet"${goal ? '' : ' open'}><summary>Problem details</summary><p>${esc(DESC[t.s])}</p></details>` : '';
+    : DESC[t.s] ? `<details class="fold tdet"${goal ? '' : ' open'}><summary><h3>Problem details</h3></summary><p>${esc(DESC[t.s])}</p></details>` : '';
   if (!runs.length) { $('#tbody').innerHTML = lead + '<p class="tbd">No runs on this problem yet.</p>'; loadFig(t); drawPager(t); scrollTo(0, 0); return; }
   const ref = REF[t.s], ms = new Set(runs.map(r => r[0])), np = new Set(runs.filter(r => r[3]).map(r => r[0])).size;
   const best = runs.reduce((a, r) => r[2] > a[2] ? r : a);
@@ -62,7 +64,7 @@ function loadFig(t) {
       const k = AREA_OF[t.d].k; box.style.setProperty('--a', AINK[k]); box.style.setProperty('--af', AFILL[k]); } }).catch(() => {});
 }
 /* Previous and next problem, in the problem list's first order: hardest first (FEDI), then by domain and name
-   (Qiuyang, 2026-10-14). A pager beside the back link, a larger pair at the foot of the page, and the arrow keys. */
+   (Qiuyang, 2026-10-14). A pager beside the breadcrumb, and the arrow keys. */
 const ORDER = [...TASKS].sort((a, b) => (FRANK[a.s] ?? 1e9) - (FRANK[b.s] ?? 1e9)
   || DOMAINS.indexOf(a.d) - DOMAINS.indexOf(b.d) || a.name.localeCompare(b.name));
 function drawPager(t) {
@@ -72,9 +74,7 @@ function drawPager(t) {
   const btn = (x, cls, icon, word) => x ? `<a class="pbtn ${cls}" href="${href(x)}" title="${word}: ${esc(x.name)}" aria-label="${word} problem: ${esc(x.name)}">${icon}</a>`
     : `<span class="pbtn ${cls} off" aria-hidden="true">${icon}</span>`;
   $('#tpager').innerHTML = btn(prev, 'prev', L, 'Previous') + `<span class="pos">${i + 1} / ${ORDER.length}</span>` + btn(next, 'next', R, 'Next');
-  $('#tbody').insertAdjacentHTML('beforeend', `<nav class="tfoot" aria-label="Previous and next problem">`
-    + (prev ? `<a class="prev" href="${href(prev)}" title="${esc(prev.name)}">‹ Previous problem</a>` : '<span></span>')
-    + (next ? `<a class="next" href="${href(next)}" title="${esc(next.name)}">Next problem ›</a>` : '<span></span>') + '</nav>');
+  // no second pair at the foot (owner, design audit 2A: it repeated the pager with arrow characters); the arrow keys still page
 }
 addEventListener('keydown', e => {
   if (!cur || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey || /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return;
@@ -119,18 +119,6 @@ function drawResults() {
     + [...runs].sort((p, q) => q[2] - p[2]).map(r => `<tr><td><span class="sq" style="background:${MCOL[r[0]]}"></span><span class="full">${esc(MNAME[r[0]])}</span><span class="short">${esc(short[r[0]])}</span></td>`
       + `<td class="rv">${r[3] ? TICK : CROSS}</td><td class="rs">${bar(r[2], `background:${MCOL[r[0]]}`)}</td><td>$${r[4].toFixed(2)}</td></tr>`).join('')
     + '</tbody>';
-}
-
-function drawIndex() {
-  cur = null;
-  document.title = 'Problems · FrontierCS 2';
-  $('#tmeta').innerHTML = ''; $('#tlinks').innerHTML = ''; $('#tkeys').innerHTML = ''; $('#tfedi').innerHTML = ''; $('#tgoal').hidden = true; $('#tpager').innerHTML = '';
-  $('#tfig').hidden = true; $('#tfig').innerHTML = ''; $('#thero').classList.add('nofig');
-  $('#tname').textContent = 'Problems';
-  $('#tpaper').textContent = `${TASKS.length} problems in ${DOMAINS.filter(d => N_IN(d)).length} domains. Select a problem for its description and results.`;
-  $('#tbody').innerHTML = DOMAINS.filter(d => N_IN(d)).map(d => `<section class="tgroup"><h2>${esc(d)}</h2><ul>`
-    + TASKS.filter(t => t.d === d).map(t => `<li><a href="#${slug(t.s)}">${esc(t.name)}</a></li>`).join('')
-    + '</ul></section>').join('');
 }
 
 function drawCharts() {

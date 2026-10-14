@@ -1,78 +1,78 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 20 760 250" role="img" aria-label="Live training jobs, each needing 1, 2 or 4 GPUs, change their batch sizes as they train. The agent writes the per-round decision: which live jobs run next, here jobs 3, 6 and 7, needing 1, 1 and 2 GPUs, while jobs 1 and 4 wait. The given simulator places the chosen jobs on the four GPUs and advances training round by round.">
-<defs><marker id="shockwave-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker></defs>
-
-<text x="20" y="52" font-size="12.5" fill="#1f1f1f">live jobs</text>
-<rect x="20" y="60" width="208" height="130" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="30" y="75" font-size="11.5" fill="#5f6368">job</text><text x="78" y="75" font-size="11.5" text-anchor="middle" fill="#5f6368">GPUs</text><text x="110" y="75" font-size="11.5" fill="#5f6368">batch size so far</text>
-<line x1="20" y1="81" x2="228" y2="81" stroke="#dadce0"/>
-<text x="32" y="96.5" font-size="12.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
-<text x="78" y="96.5" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">4</text>
-<polyline points="110,93.0 130,93.0 130,93.0 150,93.0 150,93.0 170,93.0 170,93.0 190,93.0 190,93.0 210,93.0" fill="none" stroke="#3c4043" stroke-width="1.4"/>
-<text x="32" y="118.3" font-size="12.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">3</text>
-<text x="78" y="118.3" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
-<polyline points="110,118.8 130,118.8 130,118.8 150,118.8 150,113.8 170,113.8 170,113.8 190,113.8 190,108.8 210,108.8" fill="none" stroke="#3c4043" stroke-width="1.4"/>
-<text x="32" y="140.1" font-size="12.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">4</text>
-<text x="78" y="140.1" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">2</text>
-<polyline points="110,140.6 130,140.6 130,140.6 150,140.6 150,140.6 170,140.6 170,131.6 190,131.6 190,131.6 210,131.6" fill="none" stroke="#3c4043" stroke-width="1.4"/>
-<text x="32" y="161.9" font-size="12.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">6</text>
-<text x="78" y="161.9" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
-<polyline points="110,161.4 130,161.4 130,161.4 150,161.4 150,161.4 170,161.4 170,161.4 190,161.4 190,161.4 210,161.4" fill="none" stroke="#3c4043" stroke-width="1.4"/>
-<text x="32" y="183.7" font-size="12.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">7</text>
-<text x="78" y="183.7" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">2</text>
-<polyline points="110,185.2 130,185.2 130,181.2 150,181.2 150,181.2 170,181.2 170,177.2 190,177.2 190,173.2 210,173.2" fill="none" stroke="#3c4043" stroke-width="1.4"/>
-
-
-<line x1="230" y1="125" x2="250" y2="125" stroke="#3c4043" stroke-width="1.3" marker-end="url(#shockwave-ar)"/>
-<rect x="254" y="34" width="230" height="222" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
-<text x="270" y="58" font-size="14" font-weight="600" fill="#0b57d0">The agent writes:</text>
-<text x="270" y="76" font-size="14" font-weight="600" fill="#0b57d0">the choice of jobs each round</text>
-<text x="270" y="110" font-size="12" fill="#5f6368">run next round</text>
-<rect x="270" y="118" width="28" height="24" rx="5" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="284" y="135" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">3</text>
-<rect x="304" y="118" width="28" height="24" rx="5" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="318" y="135" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">6</text>
-<rect x="338" y="118" width="28" height="24" rx="5" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="352" y="135" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">7</text>
-<text x="270" y="164" font-size="12.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">GPUs 1 + 1 + 2 = 4</text>
-<text x="270" y="196" font-size="12" fill="#5f6368">wait</text>
-<rect x="270" y="204" width="28" height="24" rx="5" fill="#fff" stroke="#9aa0a6" stroke-width="1.2"/>
-<text x="284" y="221" font-size="13" text-anchor="middle" fill="#5f6368" font-family="ui-monospace,Menlo,monospace">1</text>
-<rect x="304" y="204" width="28" height="24" rx="5" fill="#fff" stroke="#9aa0a6" stroke-width="1.2"/>
-<text x="318" y="221" font-size="13" text-anchor="middle" fill="#5f6368" font-family="ui-monospace,Menlo,monospace">4</text>
-<line x1="486" y1="125" x2="512" y2="125" stroke="#3c4043" stroke-width="1.3" marker-end="url(#shockwave-ar)"/>
-<text x="548" y="52" font-size="12.5" fill="#1f1f1f">simulated cluster</text>
-<text x="628" y="70" font-size="11.5" text-anchor="middle" fill="#5f6368">past rounds</text>
-<text x="724" y="70" font-size="11.5" text-anchor="middle" fill="#5f6368">next</text>
-<text x="540" y="70" font-size="11.5" text-anchor="end" fill="#5f6368">GPU</text>
-<text x="540" y="95" font-size="11.5" text-anchor="end" fill="#5f6368" font-family="ui-monospace,Menlo,monospace">0</text>
-<text x="540" y="121" font-size="11.5" text-anchor="end" fill="#5f6368" font-family="ui-monospace,Menlo,monospace">1</text>
-<text x="540" y="147" font-size="11.5" text-anchor="end" fill="#5f6368" font-family="ui-monospace,Menlo,monospace">2</text>
-<text x="540" y="173" font-size="11.5" text-anchor="end" fill="#5f6368" font-family="ui-monospace,Menlo,monospace">3</text>
-<rect x="548" y="78" width="32" height="104" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<text x="564" y="134.5" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
-<rect x="580" y="78" width="32" height="104" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<text x="596" y="134.5" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
-<rect x="612" y="78" width="32" height="26" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<text x="628" y="95.5" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">3</text>
-<rect x="612" y="104" width="32" height="26" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<text x="628" y="121.5" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">6</text>
-<rect x="612" y="130" width="32" height="52" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<text x="628" y="160.5" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">4</text>
-<rect x="644" y="78" width="32" height="26" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<text x="660" y="95.5" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">3</text>
-<rect x="644" y="104" width="32" height="26" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<text x="660" y="121.5" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">6</text>
-<rect x="644" y="130" width="32" height="52" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<text x="660" y="160.5" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">4</text>
-<rect x="676" y="78" width="32" height="104" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<text x="692" y="134.5" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
-<rect x="708" y="78" width="32" height="26" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<text x="724" y="95.5" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">3</text>
-<rect x="708" y="104" width="32" height="26" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<text x="724" y="121.5" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">6</text>
-<rect x="708" y="130" width="32" height="52" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
-<text x="724" y="160.5" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">7</text>
-<rect x="708" y="78" width="32" height="104" fill="none" stroke="#1f1f1f" stroke-width="1.8"/>
-
-
+<svg xmlns="http://www.w3.org/2000/svg" class="fig2" viewBox="0 0 760 268" role="img" aria-label="Left, what is given: live training jobs, each needing 1, 2 or 4 GPUs, whose batch sizes change as they train. Middle, the decision the agent writes each round: which live jobs run next, here jobs 3, 6 and 7, needing 1, 1 and 2 GPUs, while jobs 1 and 4 wait. Right, the given simulator places the chosen jobs on the four GPUs and advances training round by round.">
+<defs><marker id="shockwave-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arh" d="M0 0L10 5L0 10z"/></marker></defs>
+<rect class="given" x="0" y="0" width="228" height="268" rx="10"/>
+<text class="k" x="18" y="30">GIVEN</text>
+<rect class="chip" x="16" y="44" width="196" height="152" rx="6"/>
+<text class="n sm" x="28" y="64">job</text>
+<text class="n sm mid" x="74" y="64">GPUs</text>
+<text class="n sm" x="104" y="64">batch size so far</text>
+<line class="ln" x1="24" y1="74" x2="204" y2="74"/>
+<text class="code" x="30" y="94">1</text>
+<text class="code mid" x="74" y="94">4</text>
+<polyline class="ln2" points="104,90 123,90 123,90 142,90 142,90 161,90 161,90 180,90 180,90 199,90"/>
+<text class="code" x="30" y="116">3</text>
+<text class="code mid" x="74" y="116">1</text>
+<polyline class="ln2" points="104,117 123,117 123,117 142,117 142,112 161,112 161,112 180,112 180,107 199,107"/>
+<text class="code" x="30" y="138">4</text>
+<text class="code mid" x="74" y="138">2</text>
+<polyline class="ln2" points="104,139 123,139 123,139 142,139 142,139 161,139 161,130 180,130 180,130 199,130"/>
+<text class="code" x="30" y="160">6</text>
+<text class="code mid" x="74" y="160">1</text>
+<polyline class="ln2" points="104,156 123,156 123,156 142,156 142,156 161,156 161,156 180,156 180,156 199,156"/>
+<text class="code" x="30" y="182">7</text>
+<text class="code mid" x="74" y="182">2</text>
+<polyline class="ln2" points="104,183 123,183 123,179 142,179 142,179 161,179 161,175 180,175 180,171 199,171"/>
+<text x="18" y="222">Live jobs, whose batch</text>
+<text x="18" y="240">sizes change as they train</text>
+<rect class="agent" x="244" y="0" width="252" height="268" rx="10"/>
+<text class="k ak" x="264" y="30">THE AGENT WRITES</text>
+<text class="h" x="264" y="53">The jobs to run each round</text>
+<text class="n" x="264" y="90">Run next round</text>
+<rect class="chip on" x="264" y="100" width="30" height="28" rx="6"/>
+<text class="code mid" x="279" y="119">3</text>
+<rect class="chip on" x="300" y="100" width="30" height="28" rx="6"/>
+<text class="code mid" x="315" y="119">6</text>
+<rect class="chip on" x="336" y="100" width="30" height="28" rx="6"/>
+<text class="code mid" x="351" y="119">7</text>
+<text class="code" x="264" y="154">GPUs 1 + 1 + 2 = 4</text>
+<text class="n" x="264" y="192">Wait</text>
+<rect class="chip pad" x="264" y="202" width="30" height="28" rx="6"/>
+<text class="code n mid" x="279" y="221">1</text>
+<rect class="chip pad" x="300" y="202" width="30" height="28" rx="6"/>
+<text class="code n mid" x="315" y="221">4</text>
+<rect class="result" x="512" y="0" width="248" height="268" rx="10"/>
+<text class="k" x="530" y="30">THE SIMULATOR</text>
+<text class="n sm end" x="548" y="64">GPU</text>
+<text class="code n end" x="548" y="91.5">0</text>
+<text class="code n end" x="548" y="119.5">1</text>
+<text class="code n end" x="548" y="147.5">2</text>
+<text class="code n end" x="548" y="175.5">3</text>
+<text class="n sm mid" x="635.0" y="64">past rounds</text>
+<text class="n sm ak b mid" x="731.0" y="64">next</text>
+<rect class="chip" x="556" y="74" width="30" height="110" rx="4"/>
+<text class="code mid" x="571.0" y="133.5">1</text>
+<rect class="chip" x="588" y="74" width="30" height="110" rx="4"/>
+<text class="code mid" x="603.0" y="133.5">1</text>
+<rect class="chip" x="620" y="74" width="30" height="26" rx="4"/>
+<text class="code mid" x="635.0" y="91.5">3</text>
+<rect class="chip" x="620" y="102" width="30" height="26" rx="4"/>
+<text class="code mid" x="635.0" y="119.5">6</text>
+<rect class="chip" x="620" y="130" width="30" height="54" rx="4"/>
+<text class="code mid" x="635.0" y="161.5">4</text>
+<rect class="chip" x="652" y="74" width="30" height="26" rx="4"/>
+<text class="code mid" x="667.0" y="91.5">3</text>
+<rect class="chip" x="652" y="102" width="30" height="26" rx="4"/>
+<text class="code mid" x="667.0" y="119.5">6</text>
+<rect class="chip" x="652" y="130" width="30" height="54" rx="4"/>
+<text class="code mid" x="667.0" y="161.5">4</text>
+<rect class="chip" x="684" y="74" width="30" height="110" rx="4"/>
+<text class="code mid" x="699.0" y="133.5">1</text>
+<rect class="chip on" x="716" y="74" width="30" height="26" rx="4"/>
+<text class="code mid" x="731.0" y="91.5">3</text>
+<rect class="chip on" x="716" y="102" width="30" height="26" rx="4"/>
+<text class="code mid" x="731.0" y="119.5">6</text>
+<rect class="chip on" x="716" y="130" width="30" height="54" rx="4"/>
+<text class="code mid" x="731.0" y="161.5">7</text>
+<text class="n" x="530" y="222">It places the chosen jobs</text>
+<text class="n" x="530" y="240">and advances training</text>
 </svg>

@@ -7,7 +7,7 @@ page_css: fcs2
 ---
 <div class="fcs2 taskpage">
 <div class="col" id="main" tabindex="-1">
-  <nav class="crumbs" aria-label="Problems"><a class="back" href="{{ '/' | relative_url }}#tasks">All problems</a><span class="pager" id="tpager"></span></nav>
+  <nav class="crumbs" aria-label="Breadcrumb"><span class="trail"><a class="home" href="{{ '/' | relative_url }}">FrontierCS 2</a><span class="sep home">/</span><a id="tolist" href="{{ '/' | relative_url }}#tasks">Problems</a><span class="sep" id="tcsep">/</span><span class="here" id="tcrumb"></span></span><span class="pager" id="tpager"></span></nav>
   <div class="thero nofig" id="thero">
     <header class="thead">
       <div class="meta" id="tmeta"></div>
@@ -15,7 +15,8 @@ page_css: fcs2
       <p class="tgoal" id="tgoal" hidden></p>
       <p class="ptitle" id="tpaper"></p>
       <div class="tkeys" id="tkeys"></div>
-      <p class="tfedi" id="tfedi" data-how="{{ '/#feci-how' | relative_url }}"></p>
+      <p class="tfedi" id="tfedi"></p>
+      <a id="howlink" href="{{ '/#feci-how' | relative_url }}" hidden></a>
       <div class="links" id="tlinks"></div>
     </header>
     <figure class="tfig" id="tfig" hidden></figure>
