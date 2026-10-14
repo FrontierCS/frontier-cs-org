@@ -38,9 +38,9 @@ function drawPage() {
     : DESC[t.s] ? `<details class="tdet"${goal ? '' : ' open'}><summary>Problem details</summary><p>${esc(DESC[t.s])}</p></details>` : '';
   if (!runs.length) { $('#tbody').innerHTML = lead + '<p class="tbd">No runs on this problem yet.</p>'; loadFig(t); drawPager(t); scrollTo(0, 0); return; }
   const ref = REF[t.s], ms = new Set(runs.map(r => r[0])), np = new Set(runs.filter(r => r[3]).map(r => r[0])).size;
-  const best = runs.reduce((a, r) => r[2] > a[2] ? r : a), dif = TDIFF[t.s];
+  const best = runs.reduce((a, r) => r[2] > a[2] ? r : a), rk = FRANK[t.s];
   const sum = [`<b>${np} of ${ms.size}</b> models pass`, `best final score <b>${f1(best[2])}</b>, by ${esc(MNAME[best[0]])}`]
-    .concat(ref != null ? [`human reference <b>${f1(ref)}</b>`] : [], dif ? [`${dif.rank === 1 ? 'the' : ordinal(dif.rank)} hardest of ${Object.keys(TDIFF).length} problems`] : []);
+    .concat(ref != null ? [`human reference <b>${f1(ref)}</b>`] : [], rk ? [`FEDI <b>${f1(FEDI[t.s])}</b>, the ${rk === 1 ? '' : ordinal(rk) + ' '}hardest of ${Object.keys(FRANK).length} problems`] : []);
   $('#tbody').innerHTML = lead
     + `<section class="tres"><h2 class="th2">Results</h2><p class="tsum">${sum.join(' · ')}</p><div class="res-scroll"><table class="res rtab" id="rtbl"></table></div></section>`
     + `<section class="tpatch" id="tpatch" hidden><h2 class="th2">Solutions</h2><p class="tnote" id="pnote"></p>`
@@ -56,11 +56,13 @@ const NEWDESC = s => (DESC[s] || '').includes('¶');
 function loadFig(t) {
   const box = $('#tfig'); if (!box) return;
   fetch(`${window.FIG_DIR || '/assets/img/fcs2-tasks/'}${slug(t.s)}.svg`).then(r => r.ok ? r.text() : '').then(svg => {
-    if (svg && cur && cur.t === t && svg.trim().startsWith('<svg')) { box.innerHTML = svg; box.hidden = false; $('#thero').classList.remove('nofig'); } }).catch(() => {});
+    if (svg && cur && cur.t === t && svg.trim().startsWith('<svg')) { box.innerHTML = svg; box.hidden = false; $('#thero').classList.remove('nofig');
+      // the agent's part takes the problem's domain colours, as the domain square beside its name does
+      const k = AREA_OF[t.d].k; box.style.setProperty('--a', AINK[k]); box.style.setProperty('--af', AFILL[k]); } }).catch(() => {});
 }
-/* Previous and next problem, in the problem list's first order: hardest first (TDIFF), then by domain and name
+/* Previous and next problem, in the problem list's first order: hardest first (FEDI), then by domain and name
    (Qiuyang, 2026-10-14). A pager beside the back link, a larger pair at the foot of the page, and the arrow keys. */
-const ORDER = [...TASKS].sort((a, b) => (TDIFF[a.s] ? TDIFF[a.s].rank : 1e9) - (TDIFF[b.s] ? TDIFF[b.s].rank : 1e9)
+const ORDER = [...TASKS].sort((a, b) => (FRANK[a.s] ?? 1e9) - (FRANK[b.s] ?? 1e9)
   || DOMAINS.indexOf(a.d) - DOMAINS.indexOf(b.d) || a.name.localeCompare(b.name));
 function drawPager(t) {
   const i = ORDER.indexOf(t), prev = ORDER[i - 1], next = ORDER[i + 1], href = x => `#${slug(x.s)}`;
@@ -189,11 +191,11 @@ function drawFit() {
   svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'FECI'));
   const n = 120, path = Array.from({length:n + 1}, (_, i) => { const x = xmax * i / n; return `${i ? 'L' : 'M'}${X(x).toFixed(1)},${Y(f(x)).toFixed(1)}`; }).join('');
   svg.append(sv('path', {d:path, fill:'none', stroke:'var(--ink-2)', 'stroke-width':2.5}));
-  // the task's difficulty: where the curve crosses an expected score of 50
+  // the problem's FEDI: where the curve crosses an expected score of 50
   if (d >= 0 && d <= xmax) {
     svg.append(sv('circle', {cx:X(d), cy:Y(50), r:4.5, fill:'#fff', stroke:'var(--ink-2)', 'stroke-width':2}));
     // above and left of its point, which is off a rising curve
-    svg.append(sv('text', {class:'val halo', x:X(d) - 10, y:Y(50) - 12, 'text-anchor':'end', fill:'var(--ink-2)'}, `Difficulty ${f1(d)}`));
+    svg.append(sv('text', {class:'val halo', x:X(d) - 10, y:Y(50) - 12, 'text-anchor':'end', fill:'var(--ink-2)'}, `FEDI ${f1(d)}`));
   }
   const pts = [];
   RANKED.filter(m => runs.some(r => r[0] === m.id)).forEach(m => {

@@ -301,32 +301,35 @@ function drawTable() {
 const redraws = [];
 
 /* ---------- How FECI works: a fold under the FECI chart (owner, 2026-10-11) ----------
-   A: three tasks' fitted curves, expected score = 100 / (1 + exp(-k (FECI - d))) from TFIT, picked in code as the tasks
-   with a clear S (k >= 0.03) whose difficulty is nearest 20, 60 and 110, so the picture follows the data.
-   (owner, 2026-10-11: the second step, task difficulties beside the models' FECI, is gone) */
+   Three problems' fitted curves, expected score = 100 / (1 + exp(-k (FECI - FEDI))) from TFIT: an easy one, one at the
+   human reference and a hard one, picked in code as the problems with a clear S (slope .07 to .3) whose FEDI is nearest
+   -15, 25 and 50, so the picture follows the data (owner, 2026-10-14). Dashed lines mark the two fixed points of the
+   scale, Kimi K2.7 = 0 and Human = 25. */
 function drawHow() {
   const box = $('#feci-how'); if (!box || !box.open) return;
-  const fits = Object.entries(TFIT), clear = fits.filter(([, [, k]]) => k >= .072);   // slope .03 per point on the Human = 60 scale
+  const fits = Object.entries(TFIT), clear = fits.filter(([, [, k]]) => k >= .07 && k <= .3);
   $('#how-dmax').textContent = Math.round(Math.max(...fits.map(([, [d]]) => d)));
   const INKS = ['#8ab4f8', '#1a73e8', '#174ea6'];   // easy to hard: Google blue 300, 600, 900
-  // A
   let svg = $('#howasvg'), W = Math.max(300, $('#howaplot').clientWidth), narrow = W < 560;
-  let L = 34, R = narrow ? 12 : 24, T = 12, B = 46, H = narrow ? 240 : 270;
-  const XM = 70, X = v => L + v / XM * (W - L - R), Y = v => T + (1 - v / 100) * (H - T - B);   // FECI 0 to 70 on the Human = 25 scale
+  let L = 34, R = narrow ? 12 : 24, T = 26, B = 46, H = narrow ? 254 : 284;
+  const X0 = -40, X1 = 80, X = v => L + (v - X0) / (X1 - X0) * (W - L - R), Y = v => T + (1 - v / 100) * (H - T - B);
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
   for (let v = 0; v <= 100; v += 25) { svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1})); svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, v)); }
-  for (let v = 0; v <= XM; v += 10) svg.append(sv('text', {x:X(v), y:H - B + 20, 'text-anchor':'middle'}, v));
+  for (let v = X0; v <= X1; v += 20) svg.append(sv('text', {x:X(v), y:H - B + 20, 'text-anchor':'middle'}, v));
   svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'FECI'));
-  const picks = [8, 25, 46].map(t => clear.slice().sort((a, b) => Math.abs(a[1][0] - t) - Math.abs(b[1][0] - t))[0]);
+  [[0, narrow ? 'K2.7' : 'Kimi K2.7'], [ECI_HUMAN, 'Human']].forEach(([v, name]) => {
+    svg.append(sv('line', {x1:X(v), x2:X(v), y1:T - 4, y2:H - B, stroke:'var(--ink-2)', 'stroke-width':1, 'stroke-dasharray':'3 3', opacity:.6}),
+      sv('text', {x:X(v), y:T - 10, 'text-anchor':'middle'}, `${name} ${v}`)); });
+  const picks = [-15, 25, 50].map(t => clear.slice().sort((a, b) => Math.abs(a[1][0] - t) - Math.abs(b[1][0] - t))[0]);
   const pts = [];
   picks.forEach(([s, [d, k]], i) => {
     const f = x => 100 / (1 + Math.exp(-k * (x - d)));
-    svg.append(sv('path', {d:Array.from({length:141}, (_, i) => { const x = i / 2; return `${i ? 'L' : 'M'}${X(x).toFixed(1)},${Y(f(x)).toFixed(1)}`; }).join(''), fill:'none', stroke:INKS[i], 'stroke-width':2.5}));
-    svg.append(sv('circle', {cx:X(d), cy:Y(50), r:5, fill:INKS[i], stroke:'#fff', 'stroke-width':2}));   // the difficulty: expected score 50
-    for (let x = 0; x <= XM; x += 2) pts.push({x:X(x), y:Y(f(x)), html:`<b>${esc(NAME(s))}</b><br>Difficulty ${f1(d)}, slope ${k.toFixed(3)}<br>At FECI ${x}: expected score <b>${f1(f(x))}</b>`});
+    svg.append(sv('path', {d:Array.from({length:241}, (_, j) => { const x = X0 + j / 2; return `${j ? 'L' : 'M'}${X(x).toFixed(1)},${Y(f(x)).toFixed(1)}`; }).join(''), fill:'none', stroke:INKS[i], 'stroke-width':2.5}));
+    svg.append(sv('circle', {cx:X(d), cy:Y(50), r:5, fill:INKS[i], stroke:'#fff', 'stroke-width':2}));   // the FEDI: expected score 50
+    for (let x = X0; x <= X1; x += 2) pts.push({x:X(x), y:Y(f(x)), html:`<b>${esc(NAME(s))}</b><br>FEDI ${f1(d)}, slope ${k.toFixed(3)}<br>At FECI ${x}: expected score <b>${f1(f(x))}</b>`});
   });
   attachTip(svg, W, H, pts, $('#howatip'));
-  $('#howalegend').innerHTML = picks.map(([s, [d]], i) => `<span><i style="background:${INKS[i]}"></i>${esc(NAME(s))}, difficulty ${Math.round(d)}</span>`).join('');
+  $('#howalegend').innerHTML = picks.map(([s, [d]], i) => `<span><i style="background:${INKS[i]}"></i>${esc(NAME(s))}, FEDI ${f1(d)}</span>`).join('');
 }
 $('#feci-how').addEventListener('toggle', drawHow);
 redraws.push(drawHow);
@@ -336,12 +339,10 @@ const fqHash = () => { const d = document.getElementById(location.hash.slice(1))
 addEventListener('hashchange', fqHash); fqHash();
 
 /* ---------- task index ----------
-   One compact row per task: its name over its domain, what the agent must do (GOAL) over the paper it comes from, a dot
-   per model in leaderboard order (filled: the model passes) over the pass rate, and the links. The filter is by domain; the search also
+   One compact row per task: its name over its domain, what the agent must do (GOAL) over the paper it comes from, its
+   FEDI, and the links. The filter is by domain; the search also
    reads goals and venues; the order is the reader's choice, hardest first to begin with. */
 let picked = new Set(), q = '', order = 'hard';
-// what each model did on a task, in leaderboard order: 1 pass, 0 fail, null no run
-const DID = Object.fromEntries(TASKS.map(t => [t.s, RANKED.map(m => { const r = RUNS.find(r => r.t === t.s && r.m === m.id); return r ? r.p : null; })]));
 $('#checks').innerHTML = DOMAINS.map(d => `<label><input type="checkbox" value="${esc(d)}"> ${esc(d)} (${N_IN(d)})</label>`).join('');
 $('#q').placeholder = `Search ${TASKS.length} problems`;
 const again = () => { drawRows(); $('#rows').scrollTop = 0; atEnd(); };
@@ -375,8 +376,8 @@ function hits() {
   const w = q.toLowerCase().split(/\s+/).filter(Boolean);
   const hay = t => [t.s, t.name, t.t, t.n, t.d, GOAL[t.s] || '', VENUE[t.s] || ''].join(' ').toLowerCase();
   const h = TASKS.filter(t => (!picked.size || picked.has(t.d)) && w.every(x => hay(t).includes(x)));
-  // difficulty is the pass/fail fit's rank (TDIFF, 1 = hardest); a task without runs has none and comes last either way
-  const rank = t => TDIFF[t.s] ? TDIFF[t.s].rank : null, dom = (a, b) => DOMAINS.indexOf(a.d) - DOMAINS.indexOf(b.d), nm = (a, b) => a.name.localeCompare(b.name);
+  // difficulty is the FEDI rank (FRANK, 1 = hardest); a problem without a FEDI has none and comes last either way
+  const rank = t => FRANK[t.s] ?? null, dom = (a, b) => DOMAINS.indexOf(a.d) - DOMAINS.indexOf(b.d), nm = (a, b) => a.name.localeCompare(b.name);
   const hard = (a, b) => (rank(a) ?? 1e9) - (rank(b) ?? 1e9) || dom(a, b) || nm(a, b), easy = (a, b) => (rank(b) ?? -1) - (rank(a) ?? -1) || dom(a, b) || nm(a, b);
   return [...h].sort({hard, easy, domain:(a, b) => dom(a, b) || hard(a, b), name:nm}[order]);
 }
@@ -530,8 +531,8 @@ function showRun() {
         sv('path', {d:r.p ? `M${cx - R * .46},${cy + R * .04}l${R * .32},${R * .34}l${R * .6},${-R * .7}` : `M${cx - R * .36},${cy - R * .36}l${R * .72},${R * .72}M${cx + R * .36},${cy - R * .36}l${-R * .72},${R * .72}`,
           fill:'none', stroke:r.p ? field : '#fff', 'stroke-width':2, 'stroke-linecap':'round', 'stroke-linejoin':'round', 'stroke-opacity':r.p ? 1 : .85}),
         sv('text', {x:cx + 17, y:cy + 4.5, 'font-size':13.5, 'font-weight':r.p ? 600 : 400, fill:'#fff', 'fill-opacity':r.p ? 1 : .85}, narrow ? m.short : m.name)); });
-  } else {   // difficulty by who passes (TDIFF): the rank, and a strip with every task in rank order and this one as a disc
-    const D = TDIFF[s], N = Object.keys(TDIFF).length;
+  } else {   // difficulty: the FEDI rank (FRANK), and a strip with every problem in rank order and this one as a disc; TDIFF gives who passes
+    const D = TDIFF[s] && FRANK[s] ? {...TDIFF[s], rank:FRANK[s]} : null, N = Object.keys(FRANK).length;
     panel.append(sv('text', {x:p.x + PX, y:top + 4, 'font-size':13, 'font-weight':500, fill:'#fff', 'fill-opacity':.85}, 'Difficulty'));
     if (!D) panel.append(sv('text', {x:p.x + PX, y:top + 52, 'font-size':16, fill:'#fff'}, 'No runs yet'));
     else { const rank = D.rank, X = r => p.x + PX + (N - r) / (N - 1 || 1) * inner, sy = p.y + p.h - 74;
@@ -580,13 +581,12 @@ document.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse' &&
 function drawRows() {
   const h = hits(); $('#fcount').textContent = picked.size ? `(${picked.size})` : '';
   $('#lhead').innerHTML = `<span>${h.length === TASKS.length ? `${TASKS.length} problems` : `${h.length} of ${TASKS.length} problems`}</span><span></span>`
-    + `<span title="The share of the ten models that pass">Pass rate</span><span></span>`;
+    + `<span title="FEDI, the FrontierCS Epoch Difficulty Index: the FECI at which a model is expected to score 50 on the problem">FEDI</span><span></span>`;
   $('#rows').innerHTML = h.map(t => { const s = t.s, v = VENUE[s], goal = GOAL[s], ttl = t.t || (v ? t.name : '');
     // with a goal, the source is the small line under it (venue in bold, then the title); without one (Security), the title is the main line
     const main = goal || ttl, small = goal ? (v && ttl ? `<b>${esc(v)}</b> · ${esc(ttl)}` : esc(v || ttl)) : v ? `<b>${esc(v)}</b>` : '';
-    const did = DID[s], nr = did.filter(x => x !== null).length, who = RANKED.filter((m, i) => did[i] === 1).map(m => m.name);
-    // one number: the share of the models that ran it that pass (owner, 2026-10-14: no dots); the tooltip names them
-    const pass = nr ? `<a class="tp" href="${esc(taskHref(s))}" tabindex="-1" title="${esc(who.length ? 'Passed by ' + who.join(', ') : 'No model passes')}"><span class="pr${who.length ? '' : ' none'}">${Math.round(100 * who.length / nr)}%</span><span class="vh"> of models pass</span></a>` : '<span></span>';
+    // the problem's FEDI in place of the pass rate (owner, 2026-10-14)
+    const pass = FEDI[s] != null ? `<a class="tp" href="${esc(taskHref(s))}" tabindex="-1"><span class="pr">${f1(FEDI[s])}</span></a>` : '<span></span>';
     return `<article class="trow" data-s="${esc(s)}"><div class="tn"><h3><a class="stretch" href="${esc(taskHref(s))}">${esc(t.name)}</a></h3><span class="td" style="--a:${AINK[AREA_OF[t.d].k]}">${esc(t.d)}</span></div>
     <div class="tx">${main ? `<p>${esc(main)}</p>` : ''}${small ? `<p class="src">${small}</p>` : ''}</div>${pass}
     <div class="lk">${t.p ? `<a href="${esc(t.p)}" target="_blank" rel="noopener">${t.t ? t.src : 'Project'}</a>` : ''}${t.r ? `<a href="${esc(t.r)}" target="_blank" rel="noopener">Code</a>` : ''}</div></article>`; }).join('')

@@ -345,6 +345,33 @@ a.pbtn:hover{border-color:var(--teal); color:var(--teal-d)}
 .tdet p{margin:10px 0 0; font-size:15.5px; line-height:1.6; color:var(--ink-2)}
 .tres{margin:48px 0 0}
 .tfig svg{display:block; width:100%; height:auto}
+/* problem diagrams in the site's figure style (svg class fig2, owner 2026-10-14): the page's type, no frame; what is given
+   on a grey 100 ground, the part the agent writes on its domain's tonal ground (--af, with its ink --a, set by
+   fcs2-task.js); white chips without outlines, an outline in the domain ink where the agent's output is; grey 700 lines
+   with solid heads; code in the site's code face; one note colour */
+.thero .tfig:has(svg.fig2){padding:0; border:0; background:none}
+.fig2 text{font-size:13px; fill:var(--ink)}
+.fig2 .n{fill:var(--muted)}
+.fig2 .k{font-size:11.5px; font-weight:600; letter-spacing:.07em; fill:var(--muted)}
+.fig2 .h{font-size:15px; font-weight:600}
+.fig2 .b{font-weight:600}
+.fig2 .ak{fill:var(--a, #174ea6)}
+.fig2 .sn{font-size:11.5px; font-weight:600}
+.fig2 .code{font-family:var(--font-code); font-size:12px}
+.fig2 .num{font-variant-numeric:tabular-nums}
+.fig2 .given{fill:#f1f3f4}
+.fig2 .agent{fill:var(--af, #d2e3fc)}
+.fig2 .chip{fill:#fff}
+.fig2 .chip.on{stroke:var(--a, #174ea6); stroke-width:1.5}
+.fig2 .chip.pad{fill:#fff; fill-opacity:.55}
+.fig2 .wall{fill:#dadce0; stroke:#fff; stroke-width:1}
+.fig2 .floor{fill:#fff; stroke:#e8eaed; stroke-width:1}
+.fig2 .ink{fill:var(--ink)}
+.fig2 .ring{fill:none; stroke:var(--ink); stroke-width:1.5}
+.fig2 .box{fill:#fff; stroke:var(--ink); stroke-width:1.4}
+.fig2 .boxx{stroke:var(--ink); stroke-width:1.1}
+.fig2 .ar{stroke:#5f6368; stroke-width:1.3}
+.fig2 .arh{fill:#5f6368}
 .tsum{margin:0 0 12px; font-size:15px; color:var(--ink-2); font-variant-numeric:tabular-nums}
 .tsum b{color:var(--ink); font-weight:600}
 .rtab th.rv, .rtab td.rv{text-align:left}
