@@ -5,6 +5,8 @@ document.querySelectorAll('[data-fill]').forEach(el => { el.textContent = {updat
   runtasks:`on ${NTASK(RUNS)} tasks`, models:`${MODELS.length} models from ${new Set(MODELS.map(m => m.lab)).size} labs have run so far.`,
   summary:`${RUNS.length} runs on ${NTASK(RUNS)} tasks by ${MODELS.length} models`,
   ntasks:String(TASKS.length), ndomains:String(new Set(TASKS.map(t => t.d)).size)}[el.dataset.fill]; });
+// text in a model's colour, 22% darker: GPT-6.1 Sol, Qwen 3.8 Max and GLM 5.3 Flash are under 3:1 on white at full colour
+const MTXT = id => `color-mix(in srgb, ${MCOL[id]} 78%, #000)`;
 // Bring a tab into view inside its own horizontal strip only. scrollIntoView would also scroll the page,
 // which fought the reader's scrolling whenever the section spy fired.
 const reveal = el => { const p = el.parentElement, pr = p.getBoundingClientRect(), er = el.getBoundingClientRect();
@@ -103,7 +105,7 @@ function drawPassCost() {
       lab.textContent = str; w = lab.getComputedTextLength() + 2; spot = from.find(sp => !hit(box(sp))); if (spot) break; }
     if (spot) { boxes.push(box(spot)); lab.setAttribute('x', spot[0]); lab.setAttribute('y', spot[1]); lab.setAttribute('text-anchor', spot[2]);
       // a label wears its dot's colour, darkened to read on white, so a crowded patch still pairs each name with its dot
-      lab.style.fill = `color-mix(in srgb, ${MCOL[m.id]} 78%, #000)`; if (lead) lab.style.fontWeight = 600; }
+      lab.style.fill = MTXT(m.id); if (lead) lab.style.fontWeight = 600; }
     else lab.remove();
     const pct = PASS[m.id][0];
     pts.push({x:cx, y:cy, mean:true, html:`<b>${esc(m.name)}</b><br>Pass rate <b>${f1(pct)}%</b><br>${usdfmt(COST[m.id][0])} per run, mean`});
@@ -137,7 +139,7 @@ function drawECI() {
     if (m.h) svg.append(sv('text', {x:0, y:yc + 14, 'font-size':12}, m.h));
     const bar = sv('rect', {class:'ebar', x:X(0), y:yc - bh / 2, width:Math.max(0, X(e) - X(0)), height:bh, fill:MCOL[m.id], 'data-m':m.id});
     const wk = sv('path', {class:'ewhisk', d:`M${X(lo)},${yc}H${X(hi)}M${X(lo)},${yc - 5}v10M${X(hi)},${yc - 5}v10`, fill:'none', stroke:'var(--ink)', 'stroke-width':1.5});
-    const val = sv('text', {class:'val halo', x:X(e), y:yc - bh / 2 - 6, fill:MCOL[m.id], 'text-anchor':'middle'}, f1(e));   // one decimal: on this scale whole numbers tie
+    const val = sv('text', {class:'val halo', x:X(e), y:yc - bh / 2 - 6, fill:MTXT(m.id), 'text-anchor':'middle'}, f1(e));   // one decimal: on this scale whole numbers tie
     svg.append(bar, wk, val);
     if (an) { mark(bar, 'a-bar', i * .07); mark(wk, 'a-fade', .55 + i * .07); mark(val, 'a-fade', .55 + i * .07); }
     pts.push({x:X(e), y:yc, mean:true, html:`<b>${esc(m.name)}</b><br>FECI <b>${f1(e)}</b><br>90% interval ${Math.round(lo)}–${Math.round(hi)}`});
@@ -270,7 +272,7 @@ function drawLB() {
       const dot = sv('circle', {cx:X(mu), cy:yc, r:8, fill:MCOL[it.m], stroke:'#fff', 'stroke-width':2});
       pts.push({x:X(mu), y:yc, html:`<b>${esc(MNAME[it.m])}</b><br>Mean <b>${f1(mu)}</b>`, mean:true});
       // the mean sits above its own dot, with a white halo over the run dots
-      const val = sv('text', {class:'val halo', x:X(mu), y:yc - 15, fill:MCOL[it.m], 'text-anchor':'middle'}, f1(mu));
+      const val = sv('text', {class:'val halo', x:X(mu), y:yc - 15, fill:MTXT(it.m), 'text-anchor':'middle'}, f1(mu));
       svg.append(dot, val);
       if (an) { mark(dot, 'a-pop', dm); mark(val, 'a-fade', dm + .15); }
     });
@@ -281,7 +283,7 @@ function drawLB() {
 
 /* ---------- results by domain ---------- */
 function drawTable() {
-  const head = `<tr><th>Domain</th><th class="tk">Tasks run</th>${RANKED.map(m => `<th><span class="mn" style="background:${MCOL[m.id]}"></span><span class="full">${m.name}</span><span class="short">${m.short}</span></th>`).join('')}</tr>`;
+  const head = `<tr><th>Domain</th><th class="tk">Tasks</th>${RANKED.map(m => `<th><span class="mn" style="background:${MCOL[m.id]}"></span><span class="full">${m.name}</span><span class="short">${m.short}</span></th>`).join('')}</tr>`;
   const line = (d, cls) => {
     const vals = RANKED.map(m => { const s = RUNS.filter(r => r.m === m.id && (d === 'All' || r.d === d)).map(r => r.p * 100); return s.length ? mean(s) : null; });
     const best = Math.max(...vals.filter(v => v != null));
@@ -301,9 +303,6 @@ const redraws = [];
 function drawHow() {
   const box = $('#feci-how'); if (!box || !box.open) return;
   const fits = Object.entries(TFIT), clear = fits.filter(([, [, k]]) => k >= .072);   // slope .03 per point on the Human = 60 scale
-  const counts = RANKED.map(m => ECI[m.id][3]);
-  $('#how-ntasks').textContent = `${Math.min(...counts)} to ${Math.max(...counts)}`;
-  $('#how-nall').textContent = fits.length;
   $('#how-dmax').textContent = Math.round(Math.max(...fits.map(([, [d]]) => d)));
   const INKS = ['#8ab4f8', '#1a73e8', '#174ea6'];   // easy to hard: Google blue 300, 600, 900
   // A
@@ -546,7 +545,7 @@ document.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse' &&
 function drawRows() {
   const h = hits(); $('#fcount').textContent = picked.size ? `(${picked.size})` : '';
   $('#rows').innerHTML = h.slice(0, limit).map(t => `<article class="trow" data-s="${esc(t.s)}"><span class="tag">${esc(t.d)}</span>
-    <h3><a class="stretch" href="${esc(taskHref(t.s))}">${esc(t.name)}</a></h3><p>${esc(t.t)}</p><div class="lk">${t.p ? `<a href="${esc(t.p)}" target="_blank" rel="noopener">${t.t ? t.src : 'Project'}</a>` : '<span>No paper link</span>'}${t.r ? `<a href="${esc(t.r)}" target="_blank" rel="noopener">Code</a>` : ''}</div></article>`).join('')
+    <h3><a class="stretch" href="${esc(taskHref(t.s))}">${esc(t.name)}</a></h3><p>${esc(t.t)}</p><div class="lk">${t.p ? `<a href="${esc(t.p)}" target="_blank" rel="noopener">${t.t ? t.src : 'Project'}</a>` : ''}${t.r ? `<a href="${esc(t.r)}" target="_blank" rel="noopener">Code</a>` : ''}</div></article>`).join('')
     || `<p class="empty">No task matches. Clear the filter or try another word.</p>`;
   $('#showmore').hidden = h.length <= limit;
   $('#showmore').textContent = `Show more (${h.length - limit} left)`;

@@ -284,12 +284,9 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 .crit{display:flex; flex-wrap:wrap; gap:8px; margin:0 0 16px; padding:0; list-style:none}
 .crit li{border:1px solid #a8c7fa; border-radius:100px; padding:4px 12px; font-size:14px; color:var(--ink-2); background:#fff}
 .tcrit .tthr{font-size:15px; margin:0 0 16px}
-.tcrit .tthr{font-size:15px; margin:0 0 16px}
-.tcrit .tnote{font-size:14.5px; color:var(--muted, var(--ink-2))}
 .tstats div{display:flex; flex-direction:column; gap:4px}
 .tstats dt{font-size:13.5px; font-weight:600; color:var(--ink-2)}
 .tstats dd{margin:0; font-size:32px; font-weight:500; line-height:1.1}
-.tstats span{font-size:13.5px; color:var(--muted)}
 .tchart{margin:64px 0 0}
 .cnote{font-size:13.5px; line-height:1.45; color:var(--muted-2); margin:10px 0 0; max-width:60em}
 .cnote:empty{display:none}

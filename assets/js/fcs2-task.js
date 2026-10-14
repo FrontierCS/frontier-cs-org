@@ -4,7 +4,6 @@
 // FECI curve with each model's mean score at its FECI, and a table of the runs. assets/css/fcs2.css holds the styles.
 
 const RANK = Object.fromEntries(RANKED.map((m, i) => [m.id, i]));
-const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
 const figure = (id, head, right = '') => `<figure class="chart tchart"><div class="chead"><span>${head}</span><span class="r">${right}</span></div>
   <div class="plot" id="${id}plot"><svg id="${id}svg" role="img" aria-label="${esc(head)}"></svg><div class="tip" id="${id}tip" hidden></div></div>
   <div class="legend" id="${id}legend"></div><p class="cnote" id="${id}note"></p></figure>`;
@@ -24,18 +23,17 @@ function drawPage() {
     + (t.r ? `<a class="pill" href="${esc(t.r)}" target="_blank" rel="noopener">Code</a>` : '');
   const desc = DESC[t.s] ? `<p class="tdesc">${esc(DESC[t.s])}</p>` : '<p class="tdesc tbd">A description of this task will appear here.</p>';
   if (!runs.length) { $('#tbody').innerHTML = desc + '<p class="tbd">No runs on this task yet.</p>'; scrollTo(0, 0); return; }
-  const ref = REF[t.s], pass = runs.filter(r => r[3]).length, models = new Set(runs.map(r => r[0]));
+  const ref = REF[t.s], pass = runs.filter(r => r[3]).length;
   $('#tbody').innerHTML = desc
-    + `<dl class="tstats"><div><dt>Runs</dt><dd>${runs.length}</dd><span>by ${plural(models.size, 'model')}</span></div>`
-    + `<div><dt>Passed</dt><dd>${pass} of ${runs.length}</dd><span>${Math.round(pass / runs.length * 100)}% of runs</span></div>`
-    + `<div><dt>Best final score</dt><dd>${f1(Math.max(...runs.map(r => r[2])))}</dd><span>on the task’s own scale</span></div>`
-    + (ref != null ? `<div><dt>Human baseline</dt><dd>${f1(ref)}</dd><span>the authors’ code, the bar to beat</span></div>` : '') + '</dl>'
+    + `<dl class="tstats"><div><dt>Runs</dt><dd>${runs.length}</dd></div>`
+    + `<div><dt>Passed</dt><dd>${pass} of ${runs.length}</dd></div>`
+    + `<div><dt>Best final score</dt><dd>${f1(Math.max(...runs.map(r => r[2])))}</dd></div>`
+    + (ref != null ? `<div><dt>Human baseline</dt><dd>${f1(ref)}</dd></div>` : '') + '</dl>'
     + (CHECKS[t.s] ? `<section class="tcrit"><h2 class="th2">Pass criteria</h2><p>A run passes only when its final submission beats the human baseline on <b>every</b> metric below, on every hidden workload. A higher total score alone is not a pass.</p>`
       + `<ul class="crit">${CHECKS[t.s].metrics.map(m => `<li>${esc(m.replace(/_/g, ' '))}</li>`).join('')}</ul>`
       + `<p class="tbd tthr">The threshold each metric must meet, relative to the human baseline, will appear here.</p>`   // placeholder until the task configs are in (owner, 2026-10-11)
-      + `<p class="tbd tthr">The threshold each metric must meet, relative to the human baseline, will appear here.</p>`   // placeholder until the task configs are in (owner, 2026-10-11)
-      + `<p class="tnote">The agent submits as often as it likes on the development workloads and picks one version for the hidden evaluation workloads. A wrong pick is not corrected: choosing what to submit is part of the task, so only the final submission counts.</p></section>` : '')
-    + figure('fs', 'Final score by model', plural(runs.length, 'run'))
+      + '</section>' : '')
+    + figure('fs', 'Final score by model')
     + figure('dc', 'Development score against cost')
     + (TFIT[t.s] ? figure('fc', 'Expected score on this task, by FECI') : '')
     + `<h2 class="th2">Runs</h2><div class="res-scroll"><table class="res num" id="rtbl"></table></div>`;
@@ -97,7 +95,7 @@ function drawFinal() {
   });
   attachTip(svg, W, H, pts, $('#fstip'));
   $('#fslegend').innerHTML = '';
-  $('#fsnote').textContent = 'Each bar is a model’s best final score on this task. A run passes only when its final submission beats the human baseline on every metric of every hidden workload, so a bar longer than the human baseline’s is not always a pass.';
+  $('#fsnote').textContent = 'Each bar is a model’s best final score on this task. A bar longer than the human baseline’s is not always a pass.';
 }
 
 /* Every run's development score at each submission against its estimated spend so far, US$ on a log scale. */
@@ -130,7 +128,7 @@ function drawDev() {
   });
   attachTip(svg, W, H, pts, $('#dctip'));
   $('#dclegend').innerHTML = RANKED.filter(m => rs.some(r => r[0] === m.id)).map(m => `<span><i style="background:${MCOL[m.id]}"></i>${esc(m.name)}</span>`).join('');
-  $('#dcnote').textContent = 'Development scores come from the task’s development workloads, which the agent sees while it works; a failed build or check scores 0. Costs are estimates from list prices.';
+  $('#dcnote').textContent = 'Development scores come from the task’s development workloads, which the agent sees while it works; a failed build or check scores 0.';
 }
 
 /* The task's curve from the FECI fit: the score a model of a given FECI is expected to reach. Dots: each model's mean final
@@ -173,7 +171,7 @@ function drawFit() {
   attachTip(svg, W, H, pts, $('#fctip'));
   $('#fclegend').innerHTML = RANKED.filter(m => runs.some(r => r[0] === m.id)).map(m => `<span><i style="background:${MCOL[m.id]}; border-radius:50%"></i>${esc(m.name)}</span>`).join('')
     + (ref != null ? '<span><i style="background:var(--ink)"></i>Human baseline</span>' : '');
-  $('#fcnote').textContent = `The line is the score a model is expected to reach on this task at each FECI, from the FECI fit; it crosses 50 at the task’s difficulty, ${f1(d)}. Each dot is a model’s mean final score here, placed at its FECI; the square is the human baseline, the authors’ code, at FECI ${ECI_HUMAN}.`;
+  $('#fcnote').textContent = `The line is the score a model is expected to reach on this task at each FECI, from the FECI fit. Each dot is a model’s mean final score here, placed at its FECI.`;
 }
 
 addEventListener('hashchange', drawPage);
