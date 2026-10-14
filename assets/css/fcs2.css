@@ -466,7 +466,8 @@ a.pbtn:hover{border-color:var(--teal); color:var(--teal-d)}
    rows in its light theme's diff colours (rows on the dimmed tone, changed words on the full one, signs and numbers in
    the word tone), no frame; each file folds on its own, and an open one scrolls in a box with the task list's rail and fade */
 .cc{--add:rgb(199,225,203); --add-w:rgb(105,219,124); --add-t:rgb(47,157,68); --del:rgb(253,210,216); --del-w:rgb(255,168,180); --del-t:rgb(209,69,75);
-  font:13px/1.6 "Google Sans Code",ui-monospace,Menlo,Consolas,monospace; color:var(--ink)}
+  font:13px/1.6 "Google Sans Code",ui-monospace,Menlo,Consolas,monospace; color:var(--ink);
+  -webkit-text-size-adjust:100%; text-size-adjust:100%}   /* a phone turned sideways enlarges text by how much of it a block holds, so Write's prose grew past Update's code; the patch keeps 13 px */
 .ccf + .ccf{margin-top:14px}
 .ccf summary{width:fit-content}   /* the site's fold: the file's two head lines, then the plus */
 .ccf[open] summary{margin-bottom:8px}
