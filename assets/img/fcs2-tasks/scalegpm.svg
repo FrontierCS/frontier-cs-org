@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 300" role="img" aria-label="A measured query profile, with graph size, triangle count, maximum degree, pattern, error target, both engines’ settings and core count, goes to a chooser that picks neighborhood sampling or color sparsification. Sampling estimates the count from local samples; sparsification keeps edges whose ends share a color and counts exactly. The chooser is the part the agent writes.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 20 760 274" role="img" aria-label="A measured query profile, with graph size, triangle count, maximum degree, pattern, error target, both engines’ settings and core count, goes to a chooser that picks neighborhood sampling or color sparsification. Sampling estimates the count from local samples; sparsification keeps edges whose ends share a color and counts exactly. The chooser is the part the agent writes.">
 <defs><marker id="scalegpm-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker></defs>
-<text x="20" y="24" font-size="12.5" fill="#5f6368">One query: estimate a graph’s triangle count within 20% error</text>
+
 <rect x="20" y="52" width="172" height="212" rx="8" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
 <text x="32" y="76" font-size="12" fill="#5f6368">vertices</text>
 <text x="180" y="76" font-size="12" text-anchor="end" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">60,000</text>
@@ -28,8 +28,8 @@
 <text x="228" y="196" font-size="12.5" fill="#0b57d0">returns sampling or sparsification</text>
 <path d="M484 140 C 494 140, 486 96, 496 96" fill="none" stroke="#3c4043" stroke-width="1.3" marker-end="url(#scalegpm-ar)"/>
 <path d="M484 180 C 494 180, 486 226, 496 226" fill="none" stroke="#3c4043" stroke-width="1.3" marker-end="url(#scalegpm-ar)"/>
-<text x="214" y="248" font-size="12" fill="#5f6368">Both engines meet the error target.</text>
-<text x="214" y="266" font-size="12" fill="#5f6368">A better pick only saves time.</text>
+
+
 <text x="502" y="46" font-size="13" font-weight="600" fill="#1f1f1f">Neighborhood sampling</text>
 <line x1="510" y1="102" x2="540" y2="68" stroke="#9aa0a6" stroke-width="1.1"/>
 <line x1="510" y1="102" x2="546" y2="126" stroke="#9aa0a6" stroke-width="1.1"/>

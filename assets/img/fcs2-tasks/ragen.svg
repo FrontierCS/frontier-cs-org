@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 284" role="img" aria-label="Left, a 6 by 6 Sokoban view given to the model. Right, the context manager the agent writes: it parses a reply such as Right, Up, Left into at most two moves, and packs one game into a left-padded token row with instructions, views and replies; the mask is 1 only on the model’s replies and the reward of 10.8 sits on the last reply token. Four games from the same start stay one group.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 20 760 264" role="img" aria-label="Left, a 6 by 6 Sokoban view given to the model. Right, the context manager the agent writes: it parses a reply such as Right, Up, Left into at most two moves, and packs one game into a left-padded token row with instructions, views and replies; the mask is 1 only on the model’s replies and the reward of 10.8 sits on the last reply token. Four games from the same start stay one group.">
 <defs><marker id="ragen-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker></defs>
-<text x="24" y="22" font-size="12.5" fill="#5f6368">One game of Sokoban, played over several turns</text>
+
 <rect x="36" y="48" width="16" height="16" fill="#dadce0" stroke="#9aa0a6" stroke-width="0.8"/>
 <rect x="52" y="48" width="16" height="16" fill="#dadce0" stroke="#9aa0a6" stroke-width="0.8"/>
 <rect x="68" y="48" width="16" height="16" fill="#dadce0" stroke="#9aa0a6" stroke-width="0.8"/>

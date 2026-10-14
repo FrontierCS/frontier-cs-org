@@ -7,7 +7,7 @@ page_css: fcs2
 ---
 <div class="fcs2 taskpage">
 <div class="col" id="main" tabindex="-1">
-  <nav class="crumbs" aria-label="Back"><a href="{{ '/' | relative_url }}#tasks">All problems</a></nav>
+  <nav class="crumbs" aria-label="Problems"><a class="back" href="{{ '/' | relative_url }}#tasks">All problems</a><span class="pager" id="tpager"></span></nav>
   <div class="thero nofig" id="thero">
     <header class="thead">
       <div class="meta" id="tmeta"></div>

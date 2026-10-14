@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 300" role="img" aria-label="Eight neighboring rows of the reordered matrix A form one cluster. The agent writes the clustered format, which stores each column id of the cluster once with eight lane values, and the multiply: row 4 of B is read once, its entry B[4,7] scales all eight lanes of column 4, and the result is added into column 7 of the output cluster C.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 20 760 280" role="img" aria-label="Eight neighboring rows of the reordered matrix A form one cluster. The agent writes the clustered format, which stores each column id of the cluster once with eight lane values, and the multiply: row 4 of B is read once, its entry B[4,7] scales all eight lanes of column 4, and the result is added into column 7 of the output cluster C.">
 <defs><marker id="clusterwise-spgemm-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker></defs>
-<text x="20" y="22" font-size="12.5" fill="#5f6368">One cluster: eight neighboring rows of A, multiplied by B</text>
+
 <rect x="34" y="40" width="120" height="120" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
 <rect x="36" y="42" width="6" height="6" fill="#9aa0a6"/>
 <rect x="66" y="42" width="6" height="6" fill="#9aa0a6"/>

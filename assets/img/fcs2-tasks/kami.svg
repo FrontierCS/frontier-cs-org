@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 270" role="img" aria-label="One launch of 8,192 GPU thread blocks. Matrices A, B and C are stored as consecutive slices, one per block, and block b reads and writes only slice b. The agent writes one block’s kernel: C becomes A times B transposed plus 0.5 times C, in double precision on the tensor cores, here for 64 by 32 and 32 by 64 inputs.">
-<text x="20" y="24" font-size="12.5" fill="#5f6368">One launch of 8,192 thread blocks for the 64 × 64 × 32 shape</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 22 760 242" role="img" aria-label="One launch of 8,192 GPU thread blocks. Matrices A, B and C are stored as consecutive slices, one per block, and block b reads and writes only slice b. The agent writes one block’s kernel: C becomes A times B transposed plus 0.5 times C, in double precision on the tensor cores, here for 64 by 32 and 32 by 64 inputs.">
+
 <text x="30" y="69" font-size="14" font-style="italic" text-anchor="middle" fill="#1f1f1f">A</text>
 <rect x="50" y="52" width="52" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
 <text x="76.0" y="69" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">A[0]</text>
@@ -60,5 +60,5 @@
 <text x="508" y="185" font-size="14" font-style="italic" text-anchor="middle" fill="#1f1f1f">C</text>
 <text x="508" y="237" font-size="11.5" text-anchor="middle" fill="#5f6368">64 × 64</text>
 <text x="570" y="178" font-size="15" fill="#1f1f1f">C ← A · Bᵀ + 0.5 · C</text>
-<text x="570" y="200" font-size="12" fill="#5f6368">every element is checked</text>
+
 </svg>

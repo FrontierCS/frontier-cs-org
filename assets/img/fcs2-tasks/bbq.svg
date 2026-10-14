@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 290" role="img" aria-label="A bitmap tree of width 4 over 16 priority buckets. A set bit marks a subtree that still holds packets. Dequeue-min follows the first set bit at each level to priority 6; dequeue-max follows the last set bit to priority 11. The logic of the bitmap levels, generated as hardware, is the part the agent writes; the buckets below are given.">
-<text x="24" y="22" font-size="12.5" fill="#5f6368">Bitmap tree of width 4 over 16 priority buckets</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 20 760 265" role="img" aria-label="A bitmap tree of width 4 over 16 priority buckets. A set bit marks a subtree that still holds packets. Dequeue-min follows the first set bit at each level to priority 6; dequeue-max follows the last set bit to priority 11. The logic of the bitmap levels, generated as hardware, is the part the agent writes; the buckets below are given.">
+
 <rect x="24" y="34" width="480" height="142" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
 <text x="40" y="58" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: each bitmap level’s enqueue and dequeue logic</text>
 <line x1="262" y1="96" x2="136" y2="138" stroke="#9aa0a6" stroke-width="1"/>

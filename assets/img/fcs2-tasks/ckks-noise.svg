@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 310" role="img" aria-label="The estimator tracks each slot as a value, a level, a scale and a noise term. Multiplying 1+0i by 0.5+0.25i at level 1 and scale 2 to the 45 passes through multiply, relinearize and rescale, each adding noise, and ends at level 0 with scale 2 to the 90 over Q1. The noise kernels are the part the agent writes. The predicted per-slot precision is compared, by mean and spread, with a real encrypted run.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 22 760 288" role="img" aria-label="The estimator tracks each slot as a value, a level, a scale and a noise term. Multiplying 1+0i by 0.5+0.25i at level 1 and scale 2 to the 45 passes through multiply, relinearize and rescale, each adding noise, and ends at level 0 with scale 2 to the 90 over Q1. The noise kernels are the part the agent writes. The predicted per-slot precision is compared, by mean and spread, with a real encrypted run.">
 <defs><marker id="ckks-noise-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker></defs>
-<text x="20" y="24" font-size="12.5" fill="#5f6368">One slot through a product, as the estimator tracks it</text>
+
 <rect x="20" y="44" width="150" height="64" rx="8" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
 <text x="32" y="64" font-size="12.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1 + 0i</text>
 <text x="32" y="82" font-size="11.5" fill="#5f6368">level 1 · scale 2⁴⁵</text>
@@ -34,7 +34,7 @@
 <text x="586" y="126" font-size="11.5" fill="#5f6368">level 0 · scale 2⁹⁰/Q₁</text>
 <text x="586" y="143" font-size="11.5" fill="#5f6368">noise e′</text>
 <text x="20" y="244" font-size="12.5" fill="#1f1f1f">Each of 2,048 slots gets a precision of −log₂|error| bits.</text>
-<text x="20" y="264" font-size="12.5" fill="#5f6368">The mean and spread are compared with a real encrypted run.</text>
+
 <line x1="500" y1="284" x2="700" y2="284" stroke="#3c4043" stroke-width="1.3"/>
 <polyline points="516,283.9 524,283.8 532,283.3 540,282.0 548,279.4 556,274.4 564,266.6 572,256.4 580,245.6 588,237.2 596,234.0 604,237.2 612,245.6 620,256.4 628,266.6 636,274.4 644,279.4 652,282.0 660,283.3 668,283.8 676,283.9" fill="none" stroke="#9aa0a6" stroke-width="2"/>
 <polyline points="526,283.6 534,283.0 542,281.9 550,279.7 558,276.0 566,270.5 574,263.4 582,255.3 590,247.6 598,242.0 606,240.0 614,242.0 622,247.6 630,255.3 638,263.4 646,270.5 654,276.0 662,279.7 670,281.9 678,283.0 686,283.6" fill="none" stroke="#0b57d0" stroke-width="2"/>

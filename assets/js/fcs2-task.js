@@ -4,6 +4,7 @@
 // the pass criteria, every run's development score against its spend, and the task's FECI curve. assets/css/fcs2.css holds the styles.
 
 const RANK = Object.fromEntries(RANKED.map((m, i) => [m.id, i]));
+const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;   // the Solutions line counts files
 const figure = (id, head, right = '') => `<figure class="chart tchart"><div class="chead"><span>${head}</span><span class="r">${right}</span></div>
   <div class="plot" id="${id}plot"><svg id="${id}svg" role="img" aria-label="${esc(head)}"></svg><div class="tip" id="${id}tip" hidden></div></div>
   <div class="legend" id="${id}legend"></div><p class="cnote" id="${id}note"></p></figure>`;
@@ -35,11 +36,11 @@ function drawPage() {
   const parts = NEWDESC(t.s) ? DESC[t.s].split(/\s*¶\s*/) : [];
   const lead = parts.length ? `<section class="tabout">${parts.map((p, i) => `<div><h3>${['The idea', 'What the agent writes', 'How it is judged'][i] || ''}</h3><p>${esc(p)}</p></div>`).join('')}</section>`
     : DESC[t.s] ? `<details class="tdet"${goal ? '' : ' open'}><summary>Problem details</summary><p>${esc(DESC[t.s])}</p></details>` : '';
-  if (!runs.length) { $('#tbody').innerHTML = lead + '<p class="tbd">No runs on this problem yet.</p>'; loadFig(t); scrollTo(0, 0); return; }
+  if (!runs.length) { $('#tbody').innerHTML = lead + '<p class="tbd">No runs on this problem yet.</p>'; loadFig(t); drawPager(t); scrollTo(0, 0); return; }
   const ref = REF[t.s], ms = new Set(runs.map(r => r[0])), np = new Set(runs.filter(r => r[3]).map(r => r[0])).size;
   const best = runs.reduce((a, r) => r[2] > a[2] ? r : a), dif = TDIFF[t.s];
   const sum = [`<b>${np} of ${ms.size}</b> models pass`, `best final score <b>${f1(best[2])}</b>, by ${esc(MNAME[best[0]])}`]
-    .concat(ref != null ? [`authors’ code <b>${f1(ref)}</b>`] : [], dif ? [`${ordinal(dif.rank)} hardest of ${Object.keys(TDIFF).length} problems`] : []);
+    .concat(ref != null ? [`authors’ code <b>${f1(ref)}</b>`] : [], dif ? [`${dif.rank === 1 ? 'the' : ordinal(dif.rank)} hardest of ${Object.keys(TDIFF).length} problems`] : []);
   $('#tbody').innerHTML = lead
     + `<section class="tres"><h2 class="th2">Results</h2><p class="tsum">${sum.join(' · ')}</p><div class="res-scroll"><table class="res rtab" id="rtbl"></table></div></section>`
     + `<section class="tpatch" id="tpatch" hidden><h2 class="th2">Solutions</h2><p class="tnote" id="pnote"></p>`
@@ -48,7 +49,7 @@ function drawPage() {
       + `<div class="res-scroll"><table class="res ctab" id="ctbl"></table></div></section>` : '')   // no general submission note (owner audit, 2026-10-14)
     + figure('dc', 'Development score against spend')
     + (TFIT[t.s] ? figure('fc', 'Expected score by FECI') : '');
-  drawResults(); if (CHECKS[t.s]) drawCriteria(); drawCharts(); loadPatches(t); loadFig(t);
+  drawResults(); if (CHECKS[t.s]) drawCriteria(); drawCharts(); loadPatches(t); loadFig(t); drawPager(t);
   scrollTo(0, 0);
 }
 const NEWDESC = s => (DESC[s] || '').includes('¶');
@@ -57,6 +58,24 @@ function loadFig(t) {
   fetch(`${window.FIG_DIR || '/assets/img/fcs2-tasks/'}${slug(t.s)}.svg`).then(r => r.ok ? r.text() : '').then(svg => {
     if (svg && cur && cur.t === t && svg.trim().startsWith('<svg')) { box.innerHTML = svg; box.hidden = false; $('#thero').classList.remove('nofig'); } }).catch(() => {});
 }
+/* Previous and next problem, in the problem list's first order: hardest first (TDIFF), then by domain and name
+   (Qiuyang, 2026-10-14). A pager beside the back link, a larger pair at the foot of the page, and the arrow keys. */
+const ORDER = [...TASKS].sort((a, b) => (TDIFF[a.s] ? TDIFF[a.s].rank : 1e9) - (TDIFF[b.s] ? TDIFF[b.s].rank : 1e9)
+  || DOMAINS.indexOf(a.d) - DOMAINS.indexOf(b.d) || a.name.localeCompare(b.name));
+function drawPager(t) {
+  const i = ORDER.indexOf(t), prev = ORDER[i - 1], next = ORDER[i + 1], href = x => `#${slug(x.s)}`;
+  $('#tpager').innerHTML = (prev ? `<a class="prev" href="${href(prev)}" title="Previous: ${esc(prev.name)}">‹ <span>${esc(prev.name)}</span></a>` : '<span class="prev"></span>')
+    + `<span class="pos">${i + 1} / ${ORDER.length}</span>`
+    + (next ? `<a class="next" href="${href(next)}" title="Next: ${esc(next.name)}"><span>${esc(next.name)}</span> ›</a>` : '<span class="next"></span>');
+  $('#tbody').insertAdjacentHTML('beforeend', `<nav class="tfoot" aria-label="Previous and next problem">`
+    + (prev ? `<a class="prev" href="${href(prev)}"><small>Previous problem</small><b>‹ ${esc(prev.name)}</b></a>` : '<span></span>')
+    + (next ? `<a class="next" href="${href(next)}"><small>Next problem</small><b>${esc(next.name)} ›</b></a>` : '<span></span>') + '</nav>');
+}
+addEventListener('keydown', e => {
+  if (!cur || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey || /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return;
+  const i = ORDER.indexOf(cur.t), to = e.key === 'ArrowLeft' ? ORDER[i - 1] : e.key === 'ArrowRight' ? ORDER[i + 1] : null;
+  if (to) location.hash = slug(to.s);
+});
 const ordinal = n => n + ((n % 100 >= 11 && n % 100 <= 13) ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th');
 
 /* One row per run, in leaderboard order: pass or fail, the final score as a bar on the task's own scale, and the run's
@@ -98,7 +117,7 @@ function drawResults() {
 function drawIndex() {
   cur = null;
   document.title = 'Problems · FrontierCS 2';
-  $('#tmeta').innerHTML = ''; $('#tlinks').innerHTML = ''; $('#tkeys').innerHTML = ''; $('#tgoal').hidden = true;
+  $('#tmeta').innerHTML = ''; $('#tlinks').innerHTML = ''; $('#tkeys').innerHTML = ''; $('#tgoal').hidden = true; $('#tpager').innerHTML = '';
   $('#tfig').hidden = true; $('#tfig').innerHTML = ''; $('#thero').classList.add('nofig');
   $('#tname').textContent = 'Problems';
   $('#tpaper').textContent = `${TASKS.length} problems in ${DOMAINS.filter(d => N_IN(d)).length} domains. Select a problem for its description and results.`;

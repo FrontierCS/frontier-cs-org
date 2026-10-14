@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 300" role="img" aria-label="The training procedure runs many simulated Go1 robots in parallel and updates the policy from their experience; its rewards, commands, pushes, terrain, network and algorithm are the agent’s choice. This training procedure is the part the agent writes. The trained policy maps 48 sensor and command values to 12 joint targets and is then tested on flat ground, under pushes and on rough terrain.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 18 760 282" role="img" aria-label="The training procedure runs many simulated Go1 robots in parallel and updates the policy from their experience; its rewards, commands, pushes, terrain, network and algorithm are the agent’s choice. This training procedure is the part the agent writes. The trained policy maps 48 sensor and command values to 12 joint targets and is then tested on flat ground, under pushes and on rough terrain.">
 <defs><marker id="mujoco-playground-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker></defs>
-<text x="20" y="24" font-size="12.5" fill="#5f6368">Train a Go1 walking policy from scratch, then test it</text>
+
 <rect x="20" y="36" width="318" height="250" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
 <text x="36" y="60" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: the training procedure</text>
 <text x="36" y="79" font-size="12.5" fill="#3c4043">from scratch, in the authors’ training time</text>
@@ -84,7 +84,7 @@
 <rect x="642.0" y="169.0" width="32.0" height="10.0" rx="3.0" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
 <rect x="674.0" y="166.0" width="6.0" height="7.0" rx="1.5" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
 <text x="528" y="196" font-size="12.5" fill="#1f1f1f">rough</text>
-<text x="528" y="238" font-size="12" fill="#5f6368">each test: 2,048 robots, 20 s each</text>
-<text x="528" y="258" font-size="12" fill="#5f6368">scored on reward, speed and turn</text>
-<text x="528" y="274" font-size="12" fill="#5f6368">tracking, energy and smoothness</text>
+
+
+
 </svg>

@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 300" role="img" aria-label="One query probes one norm partition held in five hash tables. It first reads its own bucket in each table, then further buckets in one global order across the tables. After each bucket, a stopping rule reads the result heap and the search state and decides whether to stop the partition or probe the next bucket. The stopping rule is the part the agent writes.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 22 760 278" role="img" aria-label="One query probes one norm partition held in five hash tables. It first reads its own bucket in each table, then further buckets in one global order across the tables. After each bucket, a stopping rule reads the result heap and the search state and decides whether to stop the partition or probe the next bucket. The stopping rule is the part the agent writes.">
 <defs><marker id="approximate-mips-query-stopping-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker><marker id="approximate-mips-query-stopping-arb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#0b57d0"/></marker></defs>
-<text x="20" y="24" font-size="12.5" fill="#5f6368">One query, searching one norm partition of the collection</text>
+
 <text x="48.0" y="54" font-size="12.5" text-anchor="middle" fill="#1f1f1f">T1</text>
 <rect x="30" y="64" width="36" height="22" fill="#fff" stroke="#dadce0" stroke-width="1"/>
 <rect x="30" y="86" width="36" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.4"/>

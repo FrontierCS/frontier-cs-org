@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 300" role="img" aria-label="The Push-T controller turns random noise into a sequence of ten pusher positions in several denoising steps. A fixed trained network, given the last two observations, guides every step. The robot runs the first eight positions and then plans again. The sampling loop is the part the agent writes.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 22 760 272" role="img" aria-label="The Push-T controller turns random noise into a sequence of ten pusher positions in several denoising steps. A fixed trained network, given the last two observations, guides every step. The robot runs the first eight positions and then plans again. The sampling loop is the part the agent writes.">
 <defs><marker id="diffusion-policy-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker></defs>
-<text x="20" y="24" font-size="12.5" fill="#5f6368">One planning step of a robot pushing a T-shaped block</text>
+
 <rect x="24" y="58" width="120" height="120" fill="#fff" stroke="#9aa0a6" stroke-width="1"/>
 <path d="M-16 -16 H16 V-8 H4.0 V16 H-4.0 V-8 H-16 Z" transform="translate(108 142) rotate(0)" fill="none" stroke="#9aa0a6" stroke-width="1.3" stroke-dasharray="3 3"/>
 <path d="M-16 -16 H16 V-8 H4.0 V16 H-4.0 V-8 H-16 Z" transform="translate(72 106) rotate(-30)" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>

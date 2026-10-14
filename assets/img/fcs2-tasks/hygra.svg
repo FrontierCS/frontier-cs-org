@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 280" role="img" aria-label="A hypergraph with vertices 0 to 5 and hyperedges e0 = {0,1,2}, e1 = {1,2,3}, e2 = {0,1,2,3} and e3 = {3,4}, stored both ways round. The core-number computation, the part the agent writes, is shown as peeling: vertices sit in buckets by degree; round k = 0 peels 5, k = 1 peels 4 and drops e3, k = 2 peels the rest. The core numbers are 2, 2, 2, 2, 1, 0.">
-<text x="20" y="24" font-size="12.5" fill="#5f6368">Six vertices and four hyperedges, stored both ways round</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 22 760 258" role="img" aria-label="A hypergraph with vertices 0 to 5 and hyperedges e0 = {0,1,2}, e1 = {1,2,3}, e2 = {0,1,2,3} and e3 = {3,4}, stored both ways round. The core-number computation, the part the agent writes, is shown as peeling: vertices sit in buckets by degree; round k = 0 peels 5, k = 1 peels 4 and drops e3, k = 2 peels the rest. The core numbers are 2, 2, 2, 2, 1, 0.">
+
 <g stroke="#9aa0a6" stroke-width="1.2">
 <line x1="40" y1="83" x2="70" y2="167"/><line x1="90" y1="83" x2="70" y2="167"/><line x1="140" y1="83" x2="70" y2="167"/>
 <line x1="90" y1="83" x2="135" y2="167"/><line x1="140" y1="83" x2="135" y2="167"/><line x1="190" y1="83" x2="135" y2="167"/>

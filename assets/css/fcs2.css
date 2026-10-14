@@ -266,9 +266,20 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 
 /* task pages (_pages/fcs2-task.md, assets/js/fcs2-task.js) */
 .taskpage .col{padding-bottom:100px}
-.crumbs{padding-top:48px; font-size:14px}
+.crumbs{display:flex; justify-content:space-between; align-items:center; gap:16px; padding-top:48px; font-size:14px}
 .crumbs a{display:inline-flex; align-items:center; gap:6px; color:var(--muted); text-decoration:none}
-.crumbs a::before{content:"←"}
+.crumbs a.back::before{content:"←"}
+/* previous and next problem: beside the back link, and at the foot of the page */
+.pager{display:flex; align-items:center; gap:14px; min-width:0; color:var(--muted)}
+.pager a{color:var(--ink-2); text-decoration:none; white-space:nowrap; max-width:16em; overflow:hidden; text-overflow:ellipsis}
+.pager a:hover{color:var(--teal-d)}
+.pager .pos{font-variant-numeric:tabular-nums; color:var(--faint)}
+@media (max-width:640px){ .pager a span{display:none} }
+.tfoot{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:64px 0 0; padding-top:24px; border-top:1px solid var(--line)}
+.tfoot a{display:flex; flex-direction:column; gap:4px; padding:14px 18px; border:1px solid var(--line); border-radius:10px; text-decoration:none; color:var(--ink)}
+.tfoot a:hover{border-color:var(--teal); color:var(--teal-d)}
+.tfoot a.next{text-align:right; align-items:flex-end; grid-column:2}
+.tfoot small{font-size:13px; color:var(--muted)} .tfoot b{font-size:17px; font-weight:500}
 .crumbs a:hover{color:var(--teal-d)}
 .tdom{display:inline-flex; align-items:center; gap:7px; font-size:14px; font-weight:500; color:var(--ink-2)}
 .tdom::before{content:""; width:9px; height:9px; border-radius:2px; background:var(--a)}

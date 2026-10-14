@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 296" role="img" aria-label="A fixed IVF-PQ index stores each database vector in one of 8,192 lists as its id and 16 short codes, for example vector 1043 with codes 17, 201, 3 and so on up to 88. The agent writes the whole search: probe the nearest lists for query q, build the query&#8217;s distance table with one row per sub-space, add up one table entry per code to get each vector&#8217;s distance, such as 41230, and keep the best k.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 18 760 278" role="img" aria-label="A fixed IVF-PQ index stores each database vector in one of 8,192 lists as its id and 16 short codes, for example vector 1043 with codes 17, 201, 3 and so on up to 88. The agent writes the whole search: probe the nearest lists for query q, build the query’s distance table with one row per sub-space, add up one table entry per code to get each vector’s distance, such as 41230, and keep the best k.">
 <defs><marker id="ivf-pq-kernel-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker></defs>
-<text x="20" y="22" font-size="12.5" fill="#5f6368">One query q against a fixed IVF-PQ index of SIFT vectors</text>
+
 <text x="20" y="52" font-size="12.5" fill="#1f1f1f">list 4071 of the index</text>
 <rect x="20" y="62" width="212" height="100" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
 <text x="30" y="77" font-size="11.5" fill="#5f6368">id</text><text x="88" y="77" font-size="11.5" fill="#5f6368">16 codes</text>

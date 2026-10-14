@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 280" role="img" aria-label="Two program fragments, (+ (car l) 1) and (+ (car m) 5), are crossed node by node into pairs of e-classes. Where the pair agrees the operator is kept, where it differs a hole is placed, giving the pattern (+ (car ?a) ?b). That pattern becomes the library function f a b, and the programs become (f l 1) and (f m 5). The crossing and candidate search are the part the agent writes.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 26 760 249" role="img" aria-label="Two program fragments, (+ (car l) 1) and (+ (car m) 5), are crossed node by node into pairs of e-classes. Where the pair agrees the operator is kept, where it differs a hole is placed, giving the pattern (+ (car ?a) ?b). That pattern becomes the library function f a b, and the programs become (f l 1) and (f m 5). The crossing and candidate search are the part the agent writes.">
 <defs><marker id="babble-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker></defs>
-<text x="20" y="24" font-size="12.5" fill="#5f6368">Two fragments of the corpus, generalized into one library function</text>
+
 <g stroke="#3c4043" stroke-width="1.2">
 <line x1="70" y1="90" x2="42" y2="116"/><line x1="70" y1="90" x2="100" y2="116"/><line x1="42" y1="140" x2="42" y2="166"/>
 <line x1="190" y1="90" x2="162" y2="116"/><line x1="190" y1="90" x2="220" y2="116"/><line x1="162" y1="140" x2="162" y2="166"/>

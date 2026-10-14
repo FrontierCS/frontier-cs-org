@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 300" role="img" aria-label="Two hash tables of one query. Each shows four projection values, the bits they give, and the cost of flipping each bit. The agent writes the global probe order: buckets from both tables sorted by distance, the sum of flipped-bit costs, with a stop point after which buckets are skipped.">
-<text x="20" y="24" font-size="12.5" fill="#5f6368">One query and two of its hash tables, four bits each</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 20 760 280" role="img" aria-label="Two hash tables of one query. Each shows four projection values, the bits they give, and the cost of flipping each bit. The agent writes the global probe order: buckets from both tables sorted by distance, the sum of flipped-bit costs, with a stop point after which buckets are skipped.">
+
 <text x="20" y="50" font-size="13" font-weight="600" fill="#1f1f1f">Table 1</text>
 <text x="20" y="75" font-size="12" fill="#5f6368">projection</text>
 <rect x="96" y="58" width="54" height="24" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>

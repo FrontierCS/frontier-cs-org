@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 304" role="img" aria-label="The student turns noise x0 into a latent x10 in ten noisy steps; a fixed decoder makes the image, and optical character recognition reads its words. The agent writes the sampler, which runs and records the chain, and the step, which draws the next state from a Gaussian around the mean and returns its log-probability; replay must give the same mean and log-probability again.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 20 760 284" role="img" aria-label="The student turns noise x0 into a latent x10 in ten noisy steps; a fixed decoder makes the image, and optical character recognition reads its words. The agent writes the sampler, which runs and records the chain, and the step, which draws the next state from a Gaussian around the mean and returns its log-probability; replay must give the same mean and log-probability again.">
 <defs><marker id="ocr-distillation-trajectory-sampling-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker></defs>
-<text x="24" y="22" font-size="12.5" fill="#5f6368">One student trajectory: ten noisy steps from noise to an image</text>
+
 <rect x="24" y="34" width="496" height="120" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
 <text x="40" y="58" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: the sampler that runs and records the chain</text>
 <rect x="44" y="76" width="24" height="24" rx="3" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>

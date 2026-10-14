@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 290" role="img" aria-label="An e-graph just after a rewrite merged class c1, holding foo, with class c2, holding (* 1 c1). Classes c3 and c4 now hold congruent nodes, pow of c1 and pow of c2, but are still apart. The agent writes the deferred rebuild: it takes the pending parent nodes, rewrites their children to canonical ids, finds that (pow c1 2) is already in the memo table under c3, unions c3 and c4, and updates analysis data. Afterwards one class holds foo and (* 1 c1) and one class holds (pow c1 2).">
 <defs><marker id="egg-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker></defs>
-<text x="20" y="22" font-size="12.5" fill="#5f6368">One rebuild of an e-graph; each box is an e-class of equal expressions</text>
+<text x="20" y="22" font-size="12.5" fill="#5f6368">Each box is an e-class of equal expressions</text>
 <text x="22" y="52" font-size="12.5" fill="#1f1f1f">before: c1 and c2 just merged</text>
 <rect x="22" y="64" width="188" height="30" rx="8" fill="#fff" stroke="#9aa0a6" stroke-width="1.2"/>
 <text x="32" y="83" font-size="11.5" fill="#5f6368">c3</text>

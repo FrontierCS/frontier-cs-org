@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 334" role="img" aria-label="Path recovery for query ACGT and target ACCT with known distance 1. The edit table is split at its middle row. Scores from the top half going forward are 2 1 0 1 2, from the bottom half going backward 3 2 1 1 2; their sums 5 3 1 2 4 reach the distance 1 at column 2, where an optimal path crosses. Only the top-left and bottom-right quarters remain to be solved the same way. This recovery is the part the agent writes. The output path is match, match, mismatch, match.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 20 760 314" role="img" aria-label="Path recovery for query ACGT and target ACCT with known distance 1. The edit table is split at its middle row. Scores from the top half going forward are 2 1 0 1 2, from the bottom half going backward 3 2 1 1 2; their sums 5 3 1 2 4 reach the distance 1 at column 2, where an optimal path crosses. Only the top-left and bottom-right quarters remain to be solved the same way. This recovery is the part the agent writes. The output path is match, match, mismatch, match.">
 <defs><marker id="exact-sequence-alignment-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker></defs>
-<text x="20" y="22" font-size="12.5" fill="#5f6368">Recovering one optimal alignment, with the distance already known</text>
+
 <text x="20" y="98" font-size="12" fill="#5f6368">query</text>
 <text x="20" y="118" font-size="13" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">ACGT</text>
 <text x="20" y="148" font-size="12" fill="#5f6368">target</text>

@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 290" role="img" aria-label="A binary fuse filter with 16 one-byte slots in four segments. Key x maps to one slot in each of segments 0, 1 and 2, key y to one slot in each of segments 1, 2 and 3. A lookup XORs the three slots and compares the result with the key’s fingerprint. The agent writes the construction that fills the slots.">
-<text x="20" y="24" font-size="12.5" fill="#5f6368">A toy filter: 16 slots of 8-bit fingerprints in four segments</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 35 760 255" role="img" aria-label="A binary fuse filter with 16 one-byte slots in four segments. Key x maps to one slot in each of segments 0, 1 and 2, key y to one slot in each of segments 1, 2 and 3. A lookup XORs the three slots and compares the result with the key’s fingerprint. The agent writes the construction that fills the slots.">
+
 <rect x="136" y="104" width="572" height="126" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
 <line x1="210" y1="70" x2="201" y2="123" stroke="#3c4043" stroke-width="1.2"/>
 <line x1="210" y1="70" x2="405" y2="123" stroke="#3c4043" stroke-width="1.2"/>

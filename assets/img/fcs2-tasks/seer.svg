@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 300" role="img" aria-label="A contract call passes three state-dependent branches. Each branch has its own predictor in a branch table. A predictor guesses taken, not taken or unsure before the block runs, then learns from the direction the branch really took. The predictors are the part the agent writes.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 18 760 282" role="img" aria-label="A contract call passes three state-dependent branches. Each branch has its own predictor in a branch table. A predictor guesses taken, not taken or unsure before the block runs, then learns from the direction the branch really took. The predictors are the part the agent writes.">
 <defs><marker id="seer-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker><marker id="seer-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#c5221f"/></marker></defs>
-<text x="20" y="24" font-size="12.5" fill="#5f6368">One contract call, replayed from a real Ethereum block</text>
+
 <rect x="30" y="46" width="120" height="28" rx="6" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
 <text x="90" y="64.5" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">JUMPI 0x1a3</text>
 <line x1="90" y1="74" x2="90" y2="114" stroke="#3c4043" stroke-width="1.3" marker-end="url(#seer-ar)"/>
@@ -13,8 +13,8 @@
 <text x="90" y="204.5" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">JUMPI 0x41c</text>
 <line x1="90" y1="214" x2="90" y2="240" stroke="#3c4043" stroke-width="1.3" marker-end="url(#seer-ar)"/>
 <text x="98" y="234" font-size="11.5" fill="#5f6368">taken</text>
-<text x="30" y="262" font-size="12" fill="#5f6368">each branch reads state</text>
-<text x="30" y="280" font-size="12" fill="#5f6368">earlier transactions wrote</text>
+
+
 <text x="214" y="44" font-size="12.5" fill="#5f6368">branch table</text>
 <rect x="214" y="56" width="118" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
 <text x="222" y="73.5" font-size="11.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0x7a25…:1a3</text>

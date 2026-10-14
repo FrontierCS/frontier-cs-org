@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 296" role="img" aria-label="Twelve keys, shown by bucket, must end in three bucket intervals. At the start, region 0 holds 2 keys of bucket 1, region 1 holds 2 of bucket 2 and region 2 holds 2 of bucket 0, a cycle in the region graph. Round 1 swaps positions 2–3 with 6–7, leaving a two-way cycle between regions 0 and 2; round 2 swaps 2–3 with 10–11 and the graph is empty. Planning these swaps and updating the graph is what the agent writes.">
 <defs><marker id="regionssort-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker></defs>
-<text x="24" y="22" font-size="12.5" fill="#5f6368">Each cell shows its key’s bucket: 3 buckets here, 256 in the real sort</text>
+<text x="24" y="22" font-size="12.5" fill="#5f6368">Each cell shows its key’s bucket</text>
 <text x="24" y="86" font-size="12.5" fill="#5f6368">start</text>
 <rect x="116" y="70" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
 <text x="126" y="85.5" font-size="12.5" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>

@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 300" role="img" aria-label="Video tokens from the fixed model enter the attention layer the agent writes. Queries, keys and values are grouped into clusters with one mean each; a block map over query and key clusters marks the pairs computed exactly, and the other pairs are estimated from the cluster means.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 20 760 280" role="img" aria-label="Video tokens from the fixed model enter the attention layer the agent writes. Queries, keys and values are grouped into clusters with one mean each; a block map over query and key clusters marks the pairs computed exactly, and the other pairs are estimated from the cluster means.">
 <defs><marker id="svg-ear-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker></defs>
-<text x="24" y="22" font-size="12.5" fill="#5f6368">Self-attention inside Wan 2.1, the video model</text>
+
 <rect x="56" y="56" width="100" height="58" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
 <rect x="48" y="64" width="100" height="58" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
 <rect x="40" y="72" width="100" height="58" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>

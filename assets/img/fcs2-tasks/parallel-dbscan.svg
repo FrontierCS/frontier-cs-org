@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 300" role="img" aria-label="Points sit on a grid whose cells have diagonal epsilon, so points in one cell are close. Core points are filled. The agent writes the core-cell connectivity: it links neighboring cells that hold core points within epsilon of each other, rejects a pair of cells whose closest core points are farther apart, and gives each core cell a component id, here 1 or 2. The given code then adds border points to every component they touch, such as point 11 in components 1 and 2, and drops noise.">
 <defs><marker id="parallel-dbscan-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker></defs>
-<text x="20" y="22" font-size="12.5" fill="#5f6368">DBSCAN on a grid of cells whose diagonal is ε</text>
+<text x="20" y="22" font-size="12.5" fill="#5f6368">Each cell’s diagonal is ε</text>
 <rect x="24" y="46" width="200" height="160" fill="#fff" stroke="#dadce0"/>
 <line x1="24" y1="46" x2="224" y2="46" stroke="#dadce0"/>
 <line x1="24" y1="86" x2="224" y2="86" stroke="#dadce0"/>

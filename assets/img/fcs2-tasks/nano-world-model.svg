@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 300" role="img" aria-label="Sampling three future frames from one real frame. Frame f0 is the encoded real frame and f1 to f3 start as noise; actions a1 to a3 link consecutive frames. A fixed trained model reads the noisy frames, their noise levels and the actions, and makes a prediction. The part the agent writes is the noise schedule, a matrix of noise levels per frame and step, here sequential so f1 finishes before f2 and f2 before f3 while f0 stays at 0.02, and the update that moves the frames from one row of the schedule to the next.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 22 760 278" role="img" aria-label="Sampling three future frames from one real frame. Frame f0 is the encoded real frame and f1 to f3 start as noise; actions a1 to a3 link consecutive frames. A fixed trained model reads the noisy frames, their noise levels and the actions, and makes a prediction. The part the agent writes is the noise schedule, a matrix of noise levels per frame and step, here sequential so f1 finishes before f2 and f2 before f3 while f0 stays at 0.02, and the update that moves the frames from one row of the schedule to the next.">
 <defs><marker id="nano-world-model-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker></defs>
-<text x="20" y="22" font-size="12.5" fill="#5f6368">Three future frames sampled from one real frame and its actions</text>
+
 <rect x="20" y="40" width="44" height="44" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
 <path d="M30 48V70M30 70H46M54 54V76M40 54H54" stroke="#5f6368" stroke-width="2" fill="none"/>
 <circle cx="42" cy="63" r="3.5" fill="#1f1f1f"/>
@@ -68,8 +68,8 @@
 <text x="34" y="186" font-size="13" fill="#1f1f1f">trained model, fixed</text>
 <text x="34" y="204" font-size="11.5" fill="#5f6368">reads the noisy frames, their noise</text>
 <text x="34" y="220" font-size="11.5" fill="#5f6368">levels and the actions</text>
-<text x="20" y="262" font-size="12" fill="#3c4043">Finished frames are decoded and compared</text>
-<text x="20" y="280" font-size="12" fill="#3c4043">with the recorded ones.</text>
+
+
 <rect x="284" y="36" width="460" height="254" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
 <text x="300" y="60" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: the noise schedule and the update</text>
 <text x="300" y="79" font-size="12.5" fill="#3c4043">sequential mode: finish f1, then f2, then f3</text>

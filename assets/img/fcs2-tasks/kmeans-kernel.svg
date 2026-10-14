@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 300" role="img" aria-label="One Lloyd k-means step. Points, N by D, are compared with centers, K by D, giving an N by K grid of distances. Each row’s smallest distance gives the point’s label. Points are then summed and counted per center to give the new centers, which feed the second step. The whole step, nearest-center search and center update, is the part the agent writes.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 25 760 275" role="img" aria-label="One Lloyd k-means step. Points, N by D, are compared with centers, K by D, giving an N by K grid of distances. Each row’s smallest distance gives the point’s label. Points are then summed and counted per center to give the new centers, which feed the second step. The whole step, nearest-center search and center update, is the part the agent writes.">
 <defs><marker id="kmeans-kernel-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker></defs>
-<text x="20" y="24" font-size="12.5" fill="#5f6368">One Lloyd step on the GPU; the second step starts from its output</text>
+
 <rect x="150" y="44" width="204" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
 <text x="20" y="56" font-size="12.5" fill="#1f1f1f">centers, K × D</text>
 <text x="20" y="73" font-size="11.5" fill="#5f6368">e.g. 1,024 × 128</text>
@@ -69,7 +69,7 @@
 <text x="524" y="234" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0</text>
 <text x="584" y="234" font-size="12" fill="#1f1f1f">keeps the old one</text>
 <line x1="432" y1="185.0" x2="458" y2="185.0" stroke="#3c4043" stroke-width="1.3" marker-end="url(#kmeans-kernel-ar)"/>
-<text x="466" y="276" font-size="12" fill="#5f6368">exact: each point goes to its nearest center</text>
+
 <path d="M730 84 V57 H360" fill="none" stroke="#3c4043" stroke-width="1.3" marker-end="url(#kmeans-kernel-ar)"/>
 <text x="470" y="50" font-size="12" fill="#5f6368">new centers feed the second step</text>
 </svg>

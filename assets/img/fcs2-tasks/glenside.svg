@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 300" role="img" aria-label="Part of a Glenside e-graph for a small convolution. Classes of equal expressions hold the weights access, the data windows, their Cartesian product, and the dot product, which also holds an equivalent systolic-array form. Each class carries a fact of outer shape and item shape; the agent writes how these facts are built and merged.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 291" role="img" aria-label="Part of a Glenside e-graph for a small convolution. Classes of equal expressions hold the weights access, the data windows, their Cartesian product, and the dot product, which also holds an equivalent systolic-array form. Each class carries a fact of outer shape and item shape; the agent writes how these facts are built and merged.">
 <defs><marker id="glenside-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker></defs>
-<text x="20" y="24" font-size="12.5" fill="#5f6368">Part of the e-graph for a small convolution; each grey outline is a class of equal expressions</text>
+<text x="20" y="24" font-size="12.5" fill="#5f6368">Each grey outline is a class of equal expressions</text>
 <rect x="20" y="44" width="190" height="44" rx="10" fill="#fff" stroke="#9aa0a6" stroke-width="1.3"/>
 <rect x="34" y="54" width="162" height="24" rx="5" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
 <text x="115.0" y="70" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">access weights 1</text>
@@ -30,5 +30,5 @@
 <line x1="534" y1="66" x2="484" y2="106" stroke="#3c4043" stroke-width="1.2" marker-end="url(#glenside-ar)"/>
 <text x="20" y="252" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: the facts on each class, built from its children’s facts and merged when classes join</text>
 <text x="20" y="274" font-size="12.5" fill="#5f6368">A fact gives outer shape ‖ item shape, plus known zero regions and whether accelerator calls lie inside.</text>
-<text x="20" y="292" font-size="12.5" fill="#5f6368">The agent may also edit four general rewrite rules.</text>
+
 </svg>

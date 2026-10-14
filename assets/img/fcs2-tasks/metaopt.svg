@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 300" role="img" aria-label="The agent writes the search that picks a demand of 0, 6 or 18 for each of 27 source–destination pairs, nine of them nonzero. Exact linear programs then replay the demands: in this example the optimum carries 96, POP 66 and demand pinning 74, so the gap to the better heuristic is 22.">
-<text x="20" y="24" font-size="12.5" fill="#5f6368">One network instance; the throughputs below are an example</text>
+<text x="20" y="24" font-size="12.5" fill="#5f6368">Example throughputs</text>
 <rect x="20" y="36" width="720" height="98" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
 <text x="36" y="60" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: the search that picks these demands</text>
 <rect x="36" y="72" width="22" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
