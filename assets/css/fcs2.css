@@ -416,6 +416,7 @@ a.pbtn:hover{border-color:var(--teal); color:var(--teal-d)}
 .tsteps b{display:flex; align-items:center; gap:10px}
 .tsteps b span{flex:none; width:22px; height:22px; border-radius:50%; background:#e8f0fe; color:#0b57d0; font-size:12.5px; font-weight:600; display:inline-flex; align-items:center; justify-content:center}
 .pfold{margin:28px 0 0}   /* the patch, folded under the solution (Qiuyang, 2026-10-14); chips in leaderboard order, then the diff in its own box */
+.tsol .tsum + .pfold{margin-top:16px}   /* right under the model line when there are no steps */
 .pfold summary{cursor:pointer; width:fit-content; font-size:14.5px; font-weight:500; color:var(--teal-d)}
 .pfold summary .pd{font-weight:400; color:var(--muted); font-variant-numeric:tabular-nums}
 .pfold .pnote{font-size:14px; color:var(--muted); margin:12px 0 0; line-height:1.5}
