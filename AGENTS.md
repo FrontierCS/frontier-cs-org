@@ -39,6 +39,6 @@ The FrontierCS 2 overview (`index.md`) sets the design; match it everywhere.
 ## Words
 
 - "FrontierCS", never "Frontier-CS" (except in repository names and URLs); "FrontierCS 2", never "2.0".
-- The authors' code is the "human reference". The model at the 0 point of FECI is "Kimi K2.7".
+- The authors' code is the "human reference". The model at the 0 point of FCI is "Kimi K2.7".
 - In headlines and share cards, write no contractions and no possessive apostrophes.
 - Task names show in title case; internal keys never reach the page.

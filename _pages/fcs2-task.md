@@ -16,7 +16,7 @@ page_css: fcs2
       <p class="ptitle" id="tpaper"></p>
       <div class="tkeys" id="tkeys"></div>
       <p class="tfedi" id="tfedi"></p>
-      <a id="howlink" href="{{ '/#feci-how' | relative_url }}" hidden></a>
+      <a id="howlink" href="{{ '/#fci-how' | relative_url }}" hidden></a>
       <div class="links" id="tlinks"></div>
     </header>
     <figure class="tfig" id="tfig" hidden></figure>

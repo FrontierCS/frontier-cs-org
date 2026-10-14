@@ -149,18 +149,18 @@ const DESC = {"dbscan kernel": "DBSCAN groups points into clusters by density. A
 const RAN = new Set(RUNS.map(r => r.t));
 const mean = a => a.reduce((x, y) => x + y, 0) / a.length;
 
-/* FEDI, the FrontierCS Epoch Difficulty Index: the FECI at which a model passes the task half the time (Qiuyang,
+/* FEDI, the FrontierCS Epoch Difficulty Index: the FCI at which a model passes the task half the time (Qiuyang,
    2026-10-14), DIFF[task][0] from bin/fcs2_runs_from_db.py, with its 90% interval in DIFF[task][1] and [2]. The site
    ranks tasks by it everywhere; FRANK[task] is 1 for the hardest. */
 const FEDI = Object.fromEntries(TASKS.filter(t => DIFF[t.s]).map(t => [t.s, DIFF[t.s][0]]));
 const FRANK = Object.fromEntries(Object.keys(FEDI).sort((a, b) => FEDI[b] - FEDI[a]).map((s, i) => [s, i + 1]));
 const f1 = x => x.toFixed(1);
-/* FECI and FEDI values. The scale has ECI_UNIT points per logit, and a hundredth of a logit is the finest step that
+/* FCI and FEDI values. The scale has ECI_UNIT points per logit, and a hundredth of a logit is the finest step that
    means anything; values show one digit fewer when that still keeps every model apart (Qiuyang, 2026-10-14). */
 const ECI_DP = (() => { const fine = Math.max(0, 2 - Math.floor(Math.log10(ECI_UNIT))), coarse = Math.max(0, fine - 1), pts = MODELS.map(m => ECI[m.id][0]);
   return new Set(pts.map(v => v.toFixed(coarse))).size === pts.length ? coarse : fine; })();
 const fe = x => x.toFixed(ECI_DP).replace(/^-(?=.*[1-9])/, '−').replace(/^-/, '');   // a minus sign, and no "-0.00"
-// a grid step for an axis on the FECI scale: 1, 2 or 5 times a power of ten, about n steps over the span; tick text has no float noise
+// a grid step for an axis on the FCI scale: 1, 2 or 5 times a power of ten, about n steps over the span; tick text has no float noise
 const eciStep = (span, n) => { const raw = span / n, p = 10 ** Math.floor(Math.log10(raw)), f = raw / p; return (f < 1.5 ? 1 : f < 3.5 ? 2 : f < 7.5 ? 5 : 10) * p; };
 const tick = v => String(+v.toFixed(6)).replace('-', '−');
 
@@ -174,7 +174,7 @@ const sv = (tag, a = {}, text) => { const e = document.createElementNS(NS, tag);
   for (const k in a) if (a[k] != null) { if (tag === 'text' && /^(fill|font-size|font-weight)$/.test(k)) e.style.setProperty(k, k === 'font-size' ? a[k] + 'px' : a[k]); else e.setAttribute(k, a[k]); }
   if (text != null) e.textContent = text; return e; };
 const MCOL = Object.fromEntries(MODELS.map(m => [m.id, `var(--m-${m.id})`]));
-// Models ranked by FECI, the leaderboard's main number (bin/fcs2_runs_from_db.py fits it).
+// Models ranked by FCI, the leaderboard's main number (bin/fcs2_runs_from_db.py fits it).
 const RANKED = [...MODELS].sort((a, b) => ECI[b.id][0] - ECI[a.id][0]);
 const NTASK = rs => new Set(rs.map(r => r.t)).size;
 const MNAME = Object.fromEntries(MODELS.map(m => [m.id, m.name]));

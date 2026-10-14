@@ -495,7 +495,7 @@ for cand, task, score, state, verdict in rows:
     folder, paper = TASK[task]
     runs.append([MODEL[cand][0], SHOWN.get(folder, folder), paper or task.split(' — ')[0], round(score, 2), int(verdict == 'PASS')])
 dropped = Counter(r[3] for r in rows if r[2] is None and r[0] not in HIDDEN)
-# the hidden models' runs in RUNS's columns, for fits made outside this script: Kimi K2.7 is the FECI 0 point but not on the
+# the hidden models' runs in RUNS's columns, for fits made outside this script: Kimi K2.7 is the FCI 0 point but not on the
 # site (Qiuyang, 2026-10-14). _data/ is never published as a file, and no page reads this one.
 hidden = [[MODEL[c][0], SHOWN.get(TASK[t][0], TASK[t][0]), TASK[t][1] or t.split(' — ')[0], round(s, 2), int(v == 'PASS')]
           for c, t, s, st, v in rows if s is not None and c in HIDDEN]

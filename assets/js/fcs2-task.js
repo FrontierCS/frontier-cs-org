@@ -1,7 +1,7 @@
 // FrontierCS 2 task page (_pages/fcs2-task.md). /task/#<slug> renders one task from fcs2-data.js, loaded first;
 // /task/ with no slug lists every task by domain. For a task with runs: what the agent must do and what it is scored on,
 // a results table (pass or fail, final score against the human reference, cost), the solution each shown model handed in,
-// the pass criteria, every run's development score against its spend, and the task's pass curve on the FECI scale. assets/css/fcs2.css holds the styles.
+// the pass criteria, every run's development score against its spend, and the task's pass curve on the FCI scale. assets/css/fcs2.css holds the styles.
 
 const RANK = Object.fromEntries(RANKED.map((m, i) => [m.id, i]));
 const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;   // the patch counts files
@@ -56,7 +56,7 @@ function drawPage() {
     + (CHECKS[t.s] ? `<section class="tcrit"><h2 class="th2">Pass criteria</h2><p>A run passes only if its final submission beats the human reference on every metric, on every hidden workload. Each cell counts the hidden workloads on which it did.</p>`
       + `<div class="res-scroll"><table class="res ctab" id="ctbl"></table></div></section>` : '')   // no general submission note (owner audit, 2026-10-14)
     + figure('dc', 'Development score against spend')
-    + (TFIT[t.s] && DIFF[t.s] ? figure('fc', 'Chance of passing by FECI') : '')
+    + (TFIT[t.s] && DIFF[t.s] ? figure('fc', 'Chance of passing by FCI') : '')
     + solutionHTML(t, runs);   // the solution last (owner, 2026-10-14)
   drawResults(); if (CHECKS[t.s]) drawCriteria(); drawCharts(); loadPatches(t); loadFig(t); drawPager(t);
   scrollTo(0, 0);
@@ -165,9 +165,9 @@ function drawDev() {
   $('#dcnote').textContent = 'Each line is one run: its score on the development workloads after each submission, against its estimated spend so far. A failed build or check scores 0.';
 }
 
-/* The task's pass curve (TFIT): the chance that a model of a given FECI passes it, 50% at the task's FEDI, whose 90%
-   interval is the whisker there (Qiuyang, 2026-10-14). Dots: each model at its FECI, at the share of its runs here that
-   pass, so at 100% or 0% for a model with one run. The human reference has no FECI and no dot. */
+/* The task's pass curve (TFIT): the chance that a model of a given FCI passes it, 50% at the task's FEDI, whose 90%
+   interval is the whisker there (Qiuyang, 2026-10-14). Dots: each model at its FCI, at the share of its runs here that
+   pass, so at 100% or 0% for a model with one run. The human reference has no FCI and no dot. */
 function drawFit() {
   const {t, runs} = cur, [d, k] = TFIT[t.s], [, dlo, dhi] = DIFF[t.s];
   const svg = $('#fcsvg'), W = Math.max(300, $('#fcplot').clientWidth), narrow = W < 560;
@@ -185,10 +185,10 @@ function drawFit() {
     svg.append(sv('line', {x1:X(v), x2:X(v), y1:H - B, y2:H - B + 5, stroke:'var(--ink-2)', 'stroke-width':1}));
     svg.append(sv('text', {x:X(v), y:H - B + 20, 'text-anchor':'middle'}, tick(v)));
   }
-  svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'FECI'));
+  svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'FCI'));
   const n = 120, path = Array.from({length:n + 1}, (_, i) => { const x = xmin + (xmax - xmin) * i / n; return `${i ? 'L' : 'M'}${X(x).toFixed(1)},${Y(f(x)).toFixed(1)}`; }).join('');
   svg.append(sv('path', {d:path, fill:'none', stroke:'var(--ink-2)', 'stroke-width':2.5}));
-  // the task's FEDI: where the curve crosses 50%, with its 90% interval as a whisker, as on the FECI chart; a dashed drop
+  // the task's FEDI: where the curve crosses 50%, with its 90% interval as a whisker, as on the FCI chart; a dashed drop
   // to the axis marks it there; the label sits above and left of the point, which is off a rising curve
   svg.append(sv('line', {x1:X(d), x2:X(d), y1:Y(50), y2:H - B, stroke:'var(--ink-2)', 'stroke-width':1, 'stroke-dasharray':'3 3', opacity:.7}));
   svg.append(sv('path', {d:`M${X(dlo)},${Y(50)}H${X(dhi)}M${X(dlo)},${Y(50) - 6}v12M${X(dhi)},${Y(50) - 6}v12`, fill:'none', stroke:'var(--ink-2)', 'stroke-width':1.5}));
@@ -199,22 +199,22 @@ function drawFit() {
   const placed = [];
   RANKED.filter(m => runs.some(r => r[0] === m.id)).forEach(m => {
     const rs = runs.filter(r => r[0] === m.id), np = rs.filter(r => r[3]).length, y = np / rs.length * 100, x = ECI[m.id][0];
-    // models with the same passes have the same FECI: a dot that would hide another steps half a dot in from the 0% or
+    // models with the same passes have the same FCI: a dot that would hide another steps half a dot in from the 0% or
     // 100% line, twice at most, so the dots stay on their line and partial overlaps remain
     let cy = Y(y); const dir = y > 50 ? 1 : -1, r = narrow ? 5 : 6;
     for (let k = 0; k < 2 && placed.some(p => Math.hypot(p[0] - X(x), p[1] - cy) < r); k++) cy += dir * (r + 1);
     placed.push([X(x), cy]);
     svg.append(sv('circle', {cx:X(x), cy, r, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':1.5}));
-    pts.push({x:X(x), y:cy, html:`<b>${esc(m.name)}</b><br>FECI ${fe(x)}<br>${rs.length === 1 ? (np ? 'Passes' : 'Does not pass') : `Passes <b>${np} of ${rs.length}</b> runs`} here`
+    pts.push({x:X(x), y:cy, html:`<b>${esc(m.name)}</b><br>FCI ${fe(x)}<br>${rs.length === 1 ? (np ? 'Passes' : 'Does not pass') : `Passes <b>${np} of ${rs.length}</b> runs`} here`
       + `<br>Chance from the curve ${Math.round(f(x))}%`});
   });
   attachTip(svg, W, H, pts, $('#fctip'));
   $('#fclegend').innerHTML = RANKED.filter(m => runs.some(r => r[0] === m.id)).map(m => `<span><i style="background:${MCOL[m.id]}; border-radius:50%"></i>${esc(m.name)}</span>`).join('');
-  $('#fcnote').textContent = 'The curve is the chance of passing at each FECI, from the fit. Dots are the models at their FECI: at 100% if they pass here, at 0% if not.';
+  $('#fcnote').textContent = 'The curve is the chance of passing at each FCI, from the fit. Dots are the models at their FCI: at 100% if they pass here, at 0% if not.';
 }
 
 /* The solution in words (SOLUTION, assets/js/fcs2-solutions.js; owner, 2026-10-14: no code, the idea): which model,
-   whether it passed and its final score, then its steps, laid out as the reasons under How FECI works on the overview. */
+   whether it passed and its final score, then its steps, laid out as the reasons under How FCI works on the overview. */
 function solutionHTML(t, runs) {
   const so = typeof SOLUTION === 'undefined' ? null : SOLUTION[t.s], r = so && runs.find(x => x[0] === so.m);
   if (!so || !r) return '';
