@@ -160,7 +160,7 @@ function drawScore() {
     svg.append(sv('line', {x1:L, x2:W - R, y1:Y(ref), y2:Y(ref), stroke:'var(--ink-2)', 'stroke-width':1.2, 'stroke-dasharray':'4 4'}));
     boxes.push({x:L, y:Y(ref) - 2, w:W - R - L, h:4});
   }
-  $('#sclegend').innerHTML = ref != null ? `<span><i class="dash"></i>Human reference, final score ${f1(ref)}</span>` : '';
+  $('#sclegend').innerHTML = ref != null ? '<span><i class="dash"></i>Human reference</span>' : '';
   // the frontier: the runs no cheaper run matches or beats on final score
   const front = [...rs].sort((p, q) => p[4] - q[4] || q[2] - p[2]).filter((r, i, a) => a.slice(0, i).every(o => o[2] < r[2]));
   const pts = [];
