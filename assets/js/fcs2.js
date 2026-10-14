@@ -554,8 +554,8 @@ function showRun() {
         sv('path', {d:r.p ? `M${cx - R * .46},${cy + R * .04}l${R * .32},${R * .34}l${R * .6},${-R * .7}` : `M${cx - R * .36},${cy - R * .36}l${R * .72},${R * .72}M${cx + R * .36},${cy - R * .36}l${-R * .72},${R * .72}`,
           fill:'none', stroke:r.p ? field : '#fff', 'stroke-width':2, 'stroke-linecap':'round', 'stroke-linejoin':'round', 'stroke-opacity':r.p ? 1 : .85}),
         sv('text', {x:cx + 17, y:cy + 4.5, 'font-size':13.5, 'font-weight':r.p ? 600 : 400, fill:'#fff', 'fill-opacity':r.p ? 1 : .85}, narrow ? m.short : m.name)); });
-  } else {   // difficulty: the FEDI rank (FRANK), and a strip with every task in rank order and this one as a disc; TDIFF gives who passes
-    const D = TDIFF[s] && FRANK[s] ? {...TDIFF[s], rank:FRANK[s]} : null, N = Object.keys(FRANK).length;
+  } else {   // difficulty: the FEDI rank (FRANK), and a strip with every task in rank order and this one as a disc; DIFF gives who passes
+    const D = FRANK[s] ? {rank:FRANK[s], pass:DIFF[s][3], n:DIFF[s][5]} : null, N = Object.keys(FRANK).length;
     panel.append(sv('text', {x:p.x + PX, y:top + 4, 'font-size':13, 'font-weight':500, fill:'#fff', 'fill-opacity':.85}, 'Difficulty'));
     if (!D) panel.append(sv('text', {x:p.x + PX, y:top + 52, 'font-size':16, fill:'#fff'}, 'No runs yet'));
     else { const rank = D.rank, X = r => p.x + PX + (N - r) / (N - 1 || 1) * inner, sy = p.y + p.h - 74;
@@ -604,12 +604,12 @@ document.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse' &&
 function drawRows() {
   const h = hits(); $('#fcount').textContent = picked.size ? `(${picked.size})` : '';
   $('#lhead').innerHTML = `<span>${h.length === TASKS.length ? `${TASKS.length} tasks` : `${h.length} of ${TASKS.length} tasks`}</span><span></span>`
-    + `<span title="FEDI, the FrontierCS Epoch Difficulty Index: the FECI at which a model is expected to score 50 on the task">FEDI</span><span></span>`;
+    + `<span title="FEDI, the FrontierCS Epoch Difficulty Index: the FECI at which a model passes the task half the time">FEDI</span><span></span>`;
   $('#rows').innerHTML = h.map(t => { const s = t.s, v = VENUE[s], goal = GOAL[s], ttl = t.t || (v ? t.name : '');
     // with a goal, the source is the small line under it (venue in bold, then the title); without one (Security), the title is the main line
     const main = goal || ttl, small = goal ? (v && ttl ? `<b>${esc(v)}</b> · ${esc(ttl)}` : esc(v || ttl)) : v ? `<b>${esc(v)}</b>` : '';
     // the task's FEDI in place of the pass rate (owner, 2026-10-14)
-    const pass = FEDI[s] != null ? `<a class="tp" href="${esc(taskHref(s))}" tabindex="-1"><span class="pr">${f1(FEDI[s])}</span></a>` : '<span></span>';
+    const pass = FEDI[s] != null ? `<a class="tp" href="${esc(taskHref(s))}" tabindex="-1"><span class="pr">${fe(FEDI[s])}</span></a>` : '<span></span>';
     return `<article class="trow" data-s="${esc(s)}"><div class="tn"><h3><a class="stretch" href="${esc(taskHref(s))}">${esc(t.name)}</a></h3><span class="td" style="--a:${AINK[AREA_OF[t.d].k]}">${esc(t.d)}</span></div>
     <div class="tx">${main ? `<p>${esc(main)}</p>` : ''}${small ? `<p class="src">${small}</p>` : ''}</div>${pass}
     <div class="lk">${t.p ? `<a href="${esc(t.p)}" target="_blank" rel="noopener">${t.t ? t.src : 'Project'}</a>` : ''}${t.r ? `<a href="${esc(t.r)}" target="_blank" rel="noopener">Code</a>` : ''}</div></article>`; }).join('')

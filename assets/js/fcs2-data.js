@@ -149,32 +149,20 @@ const DESC = {"dbscan kernel": "DBSCAN groups points into clusters by density. A
 const RAN = new Set(RUNS.map(r => r.t));
 const mean = a => a.reduce((x, y) => x + y, 0) / a.length;
 
-/* Task difficulty from who passes (owner, 2026-10-13). The FECI fit's own task difficulty follows the task's raw score
-   scale: a task scored around 10 looks hard and one scored around 80 looks easy, whoever passes it. This one uses only
-   pass and fail. Each model gets a strength and each task a difficulty, fitted together so that
-   P(model passes task) = 1 / (1 + exp(difficulty - strength)), the Rasch model, which is the ECI idea run on pass/fail
-   and read from the task's side. A light pull towards 0 keeps a task nobody passes, or everybody passes, finite.
-   With every model on every task the fit orders tasks by how many pass; ties are then broken by who passes (stronger
-   passers, harder task) and, where nobody passes, by how far the runs fall short of the Human reference.
-   TDIFF[task] = {b: difficulty, rank: 1 for the hardest, pass, n}. */
-const TDIFF = (() => {
-  const ms = [...new Set(RUNS.map(r => r.m))], ts = [...new Set(RUNS.map(r => r.t))], th = Object.fromEntries(ms.map(m => [m, 0])), b = Object.fromEntries(ts.map(t => [t, 0]));
-  const sig = x => 1 / (1 + Math.exp(-x)), LAM = .35;
-  for (let it = 0; it < 80; it++) {   // one Newton step per parameter in turn; the penalised likelihood is concave
-    for (const m of ms) { let g = -LAM * th[m], h = LAM; for (const r of RUNS) if (r.m === m) { const q = sig(th[m] - b[r.t]); g += r.p - q; h += q * (1 - q); } th[m] += g / h; }
-    for (const t of ts) { let g = -LAM * b[t], h = LAM; for (const r of RUNS) if (r.t === t) { const q = sig(th[r.m] - b[t]); g += q - r.p; h += q * (1 - q); } b[t] += g / h; }
-  }
-  const info = Object.fromEntries(ts.map(t => { const rs = RUNS.filter(r => r.t === t), ps = rs.filter(r => r.p), ref = REF[t];
-    return [t, {b:b[t], pass:ps.length, n:rs.length, who:ps.length ? mean(ps.map(r => th[r.m])) : 0, gap:ref ? mean(rs.map(r => (r.s - ref) / ref)) : 0}]; }));
-  [...ts].sort((x, y) => info[y].b - info[x].b || info[y].who - info[x].who || info[x].gap - info[y].gap || x.localeCompare(y)).forEach((t, i) => { info[t].rank = i + 1; });
-  return info;
-})();
-/* FEDI, the FrontierCS Epoch Difficulty Index: a task's difficulty in the FECI fit, the FECI at which a model's expected
-   score on it is 50 (TFIT[task][0]), on the FECI scale (Human = 25). The site ranks tasks by it everywhere (owner,
-   2026-10-14); FRANK[task] is 1 for the hardest. TDIFF above still gives how many models pass. */
-const FEDI = Object.fromEntries(TASKS.filter(t => TFIT[t.s]).map(t => [t.s, TFIT[t.s][0]]));
+/* FEDI, the FrontierCS Epoch Difficulty Index: the FECI at which a model passes the task half the time (Qiuyang,
+   2026-10-14), DIFF[task][0] from bin/fcs2_runs_from_db.py, with its 90% interval in DIFF[task][1] and [2]. The site
+   ranks tasks by it everywhere; FRANK[task] is 1 for the hardest. */
+const FEDI = Object.fromEntries(TASKS.filter(t => DIFF[t.s]).map(t => [t.s, DIFF[t.s][0]]));
 const FRANK = Object.fromEntries(Object.keys(FEDI).sort((a, b) => FEDI[b] - FEDI[a]).map((s, i) => [s, i + 1]));
 const f1 = x => x.toFixed(1);
+/* FECI and FEDI values. The scale has ECI_UNIT points per logit, and a hundredth of a logit is the finest step that
+   means anything; values show one digit fewer when that still keeps every model apart (Qiuyang, 2026-10-14). */
+const ECI_DP = (() => { const fine = Math.max(0, 2 - Math.floor(Math.log10(ECI_UNIT))), coarse = Math.max(0, fine - 1), pts = MODELS.map(m => ECI[m.id][0]);
+  return new Set(pts.map(v => v.toFixed(coarse))).size === pts.length ? coarse : fine; })();
+const fe = x => x.toFixed(ECI_DP).replace(/^-(?=.*[1-9])/, '−').replace(/^-/, '');   // a minus sign, and no "-0.00"
+// a grid step for an axis on the FECI scale: 1, 2 or 5 times a power of ten, about n steps over the span; tick text has no float noise
+const eciStep = (span, n) => { const raw = span / n, p = 10 ** Math.floor(Math.log10(raw)), f = raw / p; return (f < 1.5 ? 1 : f < 3.5 ? 2 : f < 7.5 ? 5 : 10) * p; };
+const tick = v => String(+v.toFixed(6)).replace('-', '−');
 
 
 const esc = s => String(s).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
