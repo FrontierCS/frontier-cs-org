@@ -157,9 +157,9 @@ const FDI = Object.fromEntries(TASKS.filter(t => DIFF[t.s]).map(t => [t.s, DIFF[
 const FRANK = Object.fromEntries(Object.keys(FDI).sort((a, b) => FDI[b] - FDI[a]).map((s, i) => [s, i + 1]));
 const f1 = x => x.toFixed(1);
 /* FCI and FDI values. The scale has ECI_UNIT points per logit, and a hundredth of a logit is the finest step that
-   means anything; values show one digit fewer when that still keeps every model apart (Qiuyang, 2026-10-14). */
-const ECI_DP = (() => { const fine = Math.max(0, 2 - Math.floor(Math.log10(ECI_UNIT))), coarse = Math.max(0, fine - 1), pts = MODELS.map(m => ECI[m.id][0]);
-  return new Set(pts.map(v => v.toFixed(coarse))).size === pts.length ? coarse : fine; })();
+   means anything, so every FCI and FDI shows that many decimals: one at 10 points per logit, as the converter writes
+   them (Qiuyang, 2026-10-14). */
+const ECI_DP = Math.max(0, 2 - Math.floor(Math.log10(ECI_UNIT)));
 const fe = x => x.toFixed(ECI_DP).replace(/^-(?=.*[1-9])/, '−').replace(/^-/, '');   // a minus sign, and no "-0.00"
 // a grid step for an axis on the FCI scale: 1, 2 or 5 times a power of ten, about n steps over the span; tick text has no float noise
 const eciStep = (span, n) => { const raw = span / n, p = 10 ** Math.floor(Math.log10(raw)), f = raw / p; return (f < 1.5 ? 1 : f < 3.5 ? 2 : f < 7.5 ? 5 : 10) * p; };
