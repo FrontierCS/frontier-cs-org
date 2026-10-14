@@ -45,11 +45,13 @@ sigmoid(D + u - beta_tj) N(u; 0, SIGMA_U^2) du = 1/2, with beta at the mode. Its
 of the task's parameters from the Laplace Gaussian (strengths held), weighted by the exact posterior over the Gaussian's
 density (the posterior of a metric nobody beats is one-sided): the weighted 5th and 95th percentiles of D. TFIT's slope
 is that of the logistic matched to the pass curve at D, 4 dP(pass)/dtheta there. All are mapped to FCI points like the
-strengths. PROG gives each task's progress curve for its chart (Qiuyang): the expected share of the task's hidden checks
-a model beats (summed over its final workloads; a run without counts beats none), E[share | theta] = f_t + (1 - f_t)
-integral sigmoid(kappa_t (theta - g_t) + u) N(u; 0, SIGMA_U^2) du, with a floor f_t in [0, 0.95], a slope kappa_t (log
-kappa_t ~ N(0, PROG_K_SD^2)) and g_t (weak prior N(0, PRIOR_SD^2)), fitted by fractional-logit quasi-likelihood with
-strengths and SIGMA_U held at the joint fit.
+strengths. GROUPS gives each task's metric-group difficulties at the mode, on the FCI scale, so the task chart can draw
+the model's own pass curve, which crosses 1/2 at the task's FDI (the script checks this on the rounded values, to 0.05
+points); TFIT's matched logistic stays for the pages that still read it. PROG gives each task's progress curve for its
+chart (Qiuyang): the expected share of the task's hidden checks a model beats (summed over its final workloads; a run
+without counts beats none), E[share | theta] = f_t + (1 - f_t) integral sigmoid(kappa_t (theta - g_t) + u) N(u; 0,
+SIGMA_U^2) du, with a floor f_t in [0, 0.95], a slope kappa_t (log kappa_t ~ N(0, PROG_K_SD^2)) and g_t (weak prior N(0,
+PRIOR_SD^2)), fitted by fractional-logit quasi-likelihood with strengths and SIGMA_U held at the joint fit.
 
 The raw-score fit that the leaderboard showed before 2026-10-14 runs only with --json (feci_score, task_fit_score). It is
 Epoch AI's own ECI code (bin/eci_fitting.py, vendored from epoch-research/eci-public): every task is one benchmark with
@@ -155,7 +157,7 @@ MODEL = {
     'Kimi K3 (Modal)': ('k3', 'Kimi K3', 'Kimi K3', 'Kimi Code', 'Kimi'),
     'Kimi K2.7 Code': ('k27', 'Kimi K2.7', 'Kimi K2.7', 'Kimi CLI', 'Kimi'),   # shown as Kimi K2.7 (owner, 2026-10-14)
     'Qwen 3.8 Max Code': ('qwen', 'Qwen 3.8 Max', 'Qwen 3.8 Max', '', 'Qwen'),   # shown without 'Code' (owner, 2026-10-09)
-    'DeepSeek V4.1 Flash (DSH)': ('ds', 'DeepSeek V4.1 Flash', 'DeepSeek V4.1 Flash', 'DSH', 'DeepSeek'),
+    'DeepSeek V4.1 Flash (DSH)': ('ds', 'DeepSeek V4.1 Flash', 'DeepSeek V4.1 Flash', 'DeepSeek Harness', 'DeepSeek'),   # DSH, DeepSeek's open-source agent harness (Qiuyang, 2026-10-14)
     'GLM 5.3 (ZCode)': ('glm', 'GLM 5.3', 'GLM 5.3', 'ZCode', 'Z.ai'),
     'Claude Code · Opus 5.5 (Subscription, max effort)': ('opus', 'Claude Opus 5.5', 'Opus 5.5', 'Claude Code', 'Anthropic'),
     'Muse Code · Muse Wonder 1.0': ('wonder', 'Muse Wonder 1.0', 'Muse Wonder 1.0', 'Muse Code', 'Meta'),
@@ -656,7 +658,10 @@ fit_rows = db.execute('''select c.name, t.name, r.display_score, r.display_verdi
   join runs r on r.id = ce.run_id join candidates c on c.id = ce.candidate_id join tasks t on t.id = ce.task_id''').fetchall()
 obs, task_ref = fit_data(fit_rows)
 E, THETA, theta0, MT, dfit, dll, dstarts = joint_fit(obs, task_ref, passby())
-TFIT, DIFF, METRIC, GROUPS, DIFF_FIT = task_fits(MT, dfit, theta0)
+TFIT, DIFF, METRIC, MGROUPS, DIFF_FIT = task_fits(MT, dfit, theta0)
+# each task's metric-group difficulties at the mode, on the FCI scale: the task chart draws the exact pass curve from them (Qiuyang);
+# one decimal more than FDI, so the curve from these rounded values still crosses 1/2 within 0.05 points of the rounded FDI
+GROUPS = {short(t): sorted((round(float(v), DEC + 1) for v in on_scale(T['x'][:T['k']], theta0)), reverse=True) for t, T in sorted(MT.items(), key=lambda kv: short(kv[0]))}
 PROG = {short(t): [round(float(on_scale(g, theta0)), DEC), round(k / PASS_UNIT, 4), round(f, 3)] for t, (g, k, f) in sorted(progress(MT, THETA, dfit).items(), key=lambda kv: short(kv[0]))}
 SC, CO = scaling(db, MT, dfit, theta0), cost(db)
 REF = task_reference(db)
@@ -664,8 +669,11 @@ CHECKS = task_checks(db)
 eci_js = {MODEL[c][0]: list(E[c]) for c in MODEL if c not in HIDDEN}
 zero = MODEL[PASS_ZERO][1]
 # no task or model may drop out of the fits in an update, Security tasks included (Qiuyang, 2026-10-14)
-lost = {k: sorted({r[2] for r in runs} - set(v)) for k, v in (('DIFF', DIFF), ('TFIT', TFIT), ('PROG', PROG))}
+lost = {k: sorted({r[2] for r in runs} - set(v)) for k, v in (('DIFF', DIFF), ('TFIT', TFIT), ('PROG', PROG), ('GROUPS', GROUPS))}
 assert not any(lost.values()), f'tasks in RUNS without a fit: {lost}'
+half = {t: float(fdi(np.array([b]) / PASS_UNIT, DIFF_FIT['sigma_u'] / PASS_UNIT)[0]) * PASS_UNIT for t, b in GROUPS.items()}
+gap = max(abs(half[t] - DIFF[t][0]) for t in GROUPS)
+assert gap <= 0.05 + 1e-9, f'the pass curve from GROUPS misses FDI by {gap:.3f} points'
 assert {m[0] for m in models} <= set(eci_js), f'models without an FCI: {sorted({m[0] for m in models} - set(eci_js))}'
 block = (f'// One entry per scored run in the preview results database of {when:%Y-%m-%d} (bin/fcs2_runs_from_db.py):\n'
          f'// model, domain, task, final score (0-100, the task\'s own scale), passed (1 = verdict PASS). Timeouts score 0; {sum(dropped.values())} unscored runs are left out' + ''.join(f'; {MODEL[c][1]} is left out (only the FCI 0 point)' for c in sorted(HIDDEN)) + '.\n'
@@ -680,6 +688,7 @@ block = (f'// One entry per scored run in the preview results database of {when:
          f"// Every scored run: [model, task, final score, passed, US$ at end, hours, [[US$, dev score] per development submission]].\nconst TRAJ = {json.dumps(trajectories(db), separators=(',', ':'), ensure_ascii=False)};\n"
          f"// Per task: the authors' reference score, the median over the task's runs; where the database has none, the converter's REF_DEFAULT (" + ', '.join(f'{k}: {v:g}' for k, v in REF_DEFAULT.items()) + f"), else the task is left out.\nconst REF = {json.dumps(REF, ensure_ascii=False)};\n"
          f"// Per task: [D, slope], the logistic matched to its pass curve at D, P(pass) ~ 1 / (1 + exp(-slope (FCI - D))), slope = 4 x the curve's gradient at D (DIFF has D).\nconst TFIT = {json.dumps(TFIT, ensure_ascii=False)};\n"
+         f"// Per task: its metric groups' difficulties [beta_g, ...], highest first, on the FCI scale. A run passes when it beats every group, so the pass curve is P(pass | FCI) = integral of prod_g 1 / (1 + exp(-((FCI - beta_g) / ECI_UNIT + u))) N(u; 0, (sigma_u / ECI_UNIT)^2) du, sigma_u from DIFF_FIT (24-node Gauss-Hermite); it is 1/2 at the task's FDI.\nconst GROUPS = {json.dumps(GROUPS, ensure_ascii=False)};\n"
          f"// Per task: [D, 90% low, 90% high, passes, wins, runs] in RUNS. D, the difficulty, is the FCI at which a model passes half the time, a pass being every metric beaten at once. It comes from each metric's own difficulty (metrics that pass and fail together share one), fitted on which metrics each run beats and whether its final score beats the human reference (a win; a tie is half; wins is null without a reference), with a run effect shared by both (DIFF_FIT).\nconst DIFF = {json.dumps(DIFF, ensure_ascii=False)};\n"
          f"// The FCI and FDI model's shared parameters, by Laplace marginal likelihood over all tasks: sigma_u, the sd of a run's effect on its metrics and its win; a, the slope of P(win) over that of a metric; delta and tau, the mean and sd of a metric's difficulty above the task's beat-the-human level (these three in FCI points).\nconst DIFF_FIT = {json.dumps(DIFF_FIT)};\n"
          f"// Per task: [g, k, f], the task chart's progress curve, a model's expected share of the task's hidden checks beaten: E[share | FCI] = f + (1 - f) x integral of 1 / (1 + exp(-(k (FCI - g) + v / ECI_UNIT))) N(v; 0, sigma_u^2) dv, sigma_u from DIFF_FIT, all in FCI points (24-node Gauss-Hermite); f the floor (0 to 0.95), k the slope per point, g where the rising part is half way. Fitted to each run's share by fractional-logit quasi-likelihood, with log k ~ N(log(1 / ECI_UNIT), {PROG_K_SD:g}^2) and a weak prior on g.\nconst PROG = {json.dumps(PROG, ensure_ascii=False)};\n"
@@ -695,6 +704,7 @@ open(hid_path, 'w', encoding='utf-8').write(hidden_json(generated, hidden))
 print('PASS', pass_rate(runs))
 print('FCI', eci_js)
 print('DIFF_FIT', DIFF_FIT, '(logits: sigma_u {:.4f}, a {:.4f}, delta {:.4f}, tau {:.4f}; profile log marginal likelihood {:.3f})'.format(*dfit, dll))
+print(f'pass curves from GROUPS reach 1/2 within {gap:.3f} points of FDI')
 print('starts', [(tuple(round(float(v), 4) for v in h), round(float(l), 3)) for h, l in dstarts])
 print('importance sampling: smallest effective sample size', round(min(T['ess'] for T in MT.values())), 'of', IS_DRAWS,
       '; below 200:', [short(t) for t, T in MT.items() if T['ess'] < 200])
@@ -711,7 +721,7 @@ for a in sys.argv[2:]:
                'task_reference': REF, 'task_fit_columns': ['difficulty', 'slope'], 'task_fit': TFIT,
                'task_difficulty_columns': ['difficulty', 'lo90', 'hi90', 'passes', 'wins', 'runs'], 'task_difficulty': DIFF,
                'difficulty_fit': DIFF_FIT, 'progress_curve_columns': ['g', 'k', 'f'], 'progress_curve': PROG, 'metric_difficulty_columns': ['difficulty', 'lo90', 'hi90', 'passes', 'group'], 'metric_difficulty': METRIC,
-               'metric_groups': GROUPS,
+               'metric_groups': MGROUPS, 'group_difficulty': GROUPS,
                'task_checks': CHECKS,
                'feci_score_columns': ['eci', 'lo90', 'hi90'], 'feci_score': {MODEL[c][0]: list(S[c][:3]) for c in MODEL if c not in HIDDEN},
                'feci_score_anchors': {'reference': HUMAN_VALUE, PASS_ZERO: PASS_ZERO_VALUE}, 'feci_score_boot_kept': nboot,
