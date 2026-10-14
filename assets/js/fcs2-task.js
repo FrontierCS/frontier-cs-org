@@ -276,7 +276,7 @@ function marks(d, a) {
 }
 function fileHTML(f, i, all) {
   const w = f.kind === 'Write';
-  const sum = f.binary ? 'Binary file' : w ? `Wrote ${lines(f.add)} to <b>${esc(f.path)}</b>` : f.kind === 'Delete' ? `Removed ${lines(f.del)}`
+  const sum = f.binary ? 'Binary file' : w ? `Wrote ${lines(f.add)}` : f.kind === 'Delete' ? `Removed ${lines(f.del)}`
     : [f.add ? `Added ${lines(f.add)}` : '', f.del ? `${f.add ? 'removed' : 'Removed'} ${lines(f.del)}` : ''].filter(Boolean).join(', ');
   const nw = String(Math.max(1, ...f.rows.map(r => r.n || 0))).length;
   const rows = f.rows.map(r => r.t === 'g' ? '<div class="r g"><span class="n"></span><span class="s"></span><span class="c">…</span></div>'
