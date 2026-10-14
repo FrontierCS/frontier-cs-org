@@ -85,7 +85,8 @@ from datetime import datetime
 # FCI, SCALE, TFIT, DIFF and DIFF_FIT all follow from these three.
 PASS_ZERO = 'Kimi K2.7 Code'   # the 0 point; it is hidden (HIDDEN below) but stays in every fit
 PASS_ZERO_VALUE = 0
-PASS_UNIT = 1.0                # FCI points per logit
+PASS_UNIT = 10                 # FCI points per logit (Qiuyang, 2026-10-14; was 1)
+DEC = max(0, int(np.ceil(2 - np.log10(PASS_UNIT) - 1e-9)))   # decimals of FCI points: a hundredth of a logit or finer, 1 at 10 per logit
 TIE_EPS = 0                    # a final score within TIE_EPS of the human reference is half a win; 0: only an exact tie
 
 # database display name -> (domain folder, paper short name or None)
@@ -228,7 +229,7 @@ def pass_eci(obs):
         d, _ = rasch(mi[idx], np.repeat(np.arange(len(T)), [len(cols[k]) for k in pick]), y[idx], len(M), len(T))
         draws.append(on_scale(d, d[z]))
     point, (lo, hi) = on_scale(th, th[z]), np.percentile(draws, [5, 95], axis=0)
-    out = {m: (round(float(point[i]), 2), round(float(lo[i]), 2), round(float(hi[i]), 2), len({o[1] for o in obs if o[0] == m}))
+    out = {m: (round(float(point[i]), DEC), round(float(lo[i]), DEC), round(float(hi[i]), DEC), len({o[1] for o in obs if o[0] == m}))
            for i, m in enumerate(M)}
     return out, dict(zip(M, th)), dict(zip(T, b)), th[z]
 
@@ -484,7 +485,7 @@ def scaling(db, beta, theta0):
             y = {t: [float(info[r][2] and end.get(r, 0) <= B) for r in runs if info[r][1] == t] for t in tasks}
             eci = lambda ts: float(on_scale(strength([v for t in ts for v in y[t]], [beta[t] for t in ts for _ in y[t]]), theta0))
             lo, hi = np.percentile([eci(rng.choice(tasks, len(tasks))) for _ in range(SCALE_BOOT)], [5, 95])
-            curve.append([float(B), round(eci(tasks), 2), round(float(lo), 2), round(float(hi), 2), round(float(np.mean([e > B for e in ends])), 2)])
+            curve.append([float(B), round(eci(tasks), DEC), round(float(lo), DEC), round(float(hi), DEC), round(float(np.mean([e > B for e in ends])), 2)])
         out[MODEL[c][0]] = curve
     return out
 
@@ -560,10 +561,10 @@ def task_fits(tasks, fit, theta0):
     for t, T in tasks.items():
         shown = [m not in HIDDEN for m in T['models']]
         O, Z, k = T['O'][shown], T['Z'][shown], T['k']
-        e = [round(float(v), 2) for v in on_scale([T['D'], T['lo'], T['hi']], theta0)]
+        e = [round(float(v), DEC) for v in on_scale([T['D'], T['lo'], T['hi']], theta0)]
         TFIT[short(t)] = [e[0], round(4 * T['slope'] / PASS_UNIT, 4)]
         DIFF[short(t)] = e + [int(O[:, :k].all(1).sum()), round(float(O[:, k].sum()), 1) if O.shape[1] > k else None, len(O)]
-        METRIC[short(t)] = {m: [round(float(v), 2) for v in on_scale([T['xf'][g], *T['ci'][g]], theta0)] + [int(Z[:, T['stems'].index(m)].sum()), g + 1]
+        METRIC[short(t)] = {m: [round(float(v), DEC) for v in on_scale([T['xf'][g], *T['ci'][g]], theta0)] + [int(Z[:, T['stems'].index(m)].sum()), g + 1]
                             for g, ms in enumerate(T['groups']) for m in ms}
         GROUPS[short(t)] = T['groups']
     return (dict(sorted(TFIT.items())), dict(sorted(DIFF.items())), dict(sorted(METRIC.items())), dict(sorted(GROUPS.items())),
