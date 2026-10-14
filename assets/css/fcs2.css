@@ -464,14 +464,20 @@ a.pbtn:hover{border-color:var(--teal); color:var(--teal-d)}
 .pmeta > b{color:var(--ink); font-weight:600}
 /* the patch in Claude Code's design (Qiuyang, 2026-10-14): "Update(path)" after a dot, an elbow line with the counts, numbered
    rows in its light theme's diff colours (rows on the dimmed tone, changed words on the full one, signs and numbers in
-   the word tone), no frame; the whole patch scrolls in one box with the task list's rail and fade */
+   the word tone), no frame; each file folds on its own, and an open one scrolls in a box with the task list's rail and fade */
 .cc{--add:rgb(199,225,203); --add-w:rgb(105,219,124); --add-t:rgb(47,157,68); --del:rgb(253,210,216); --del-w:rgb(255,168,180); --del-t:rgb(209,69,75);
   font:13px/1.6 "Google Sans Code",ui-monospace,Menlo,Consolas,monospace; color:var(--ink)}
-.ccf + .ccf{margin-top:24px}
-.cct{position:relative; margin:0; padding-left:18px; overflow-wrap:anywhere}   /* a long path wraps under itself, not under the dot */
+.ccf + .ccf{margin-top:14px}
+.ccf summary{width:fit-content}   /* the site's fold: the file's two head lines, then the plus */
+.ccf[open] summary{margin-bottom:8px}
+/* a closed file inside the open patch keeps its plus and no gap: .fold[open] summary would reach it through the patch's fold */
+.ccf:not([open]) > summary{margin-bottom:0}
+.ccf:not([open]) > summary::after{background-size:14px 1.6px, 1.6px 14px}
+.cch{display:block; min-width:0}
+.cct{display:block; position:relative; padding-left:18px; overflow-wrap:anywhere}   /* a long path wraps under itself, not under the dot */
 .cct::before{content:""; position:absolute; left:0; top:.55em; width:8px; height:8px; border-radius:50%; background:var(--add-t)}
 .cct b{font-weight:700}
-.ccs{position:relative; margin:2px 0 6px; padding-left:18px; color:var(--muted); overflow-wrap:anywhere}
+.ccs{display:block; position:relative; margin-top:2px; padding-left:18px; color:var(--muted); overflow-wrap:anywhere}
 .ccs::before{content:""; position:absolute; left:3px; top:0; width:8px; height:.8em; border-left:1.5px solid var(--faint); border-bottom:1.5px solid var(--faint)}
 .ccs b{color:var(--ink); font-weight:700}
 .ccd{margin-left:18px}

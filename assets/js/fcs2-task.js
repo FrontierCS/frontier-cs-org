@@ -236,8 +236,9 @@ const lines = n => `<b>${n}</b> ${n === 1 ? 'line' : 'lines'}`;
    "Update(path)", or "Write(path)" for a new one, an elbow line with its counts, then numbered rows, the old line's number
    on a removal and the new one's otherwise, "…" between hunks, and Claude Code's light-theme colours. Within a removed
    line and the added line that replaces it, the changed words are marked, unless most of the line changed. A file longer
-   the patch scrolls in one box, as the task list on the overview does: its drawn rail, the foot fading until the end, no
-   frame (Qiuyang, 2026-10-14: no second expand inside the fold). */
+   each file folds on its own, its two head lines as the fold's summary, open when it is the patch's only file (Qiuyang,
+   2026-10-14); an open file's rows scroll in a box as the task list on the overview does: its drawn rail, the foot
+   fading until the end, no frame. */
 function parsePatch(text) {
   const files = []; let f = null, o = 0, n = 0, inHunk = false;
   for (const l of withHeads(text).split('\n')) {
@@ -273,7 +274,7 @@ function marks(d, a) {
   const wrap = (t, m) => esc(t.slice(0, i).join('')) + (m ? `<mark>${esc(m)}</mark>` : '') + esc(t.slice(t.length - j).join(''));
   d.h = wrap(x, mx); a.h = wrap(y, my);
 }
-function fileHTML(f) {
+function fileHTML(f, i, all) {
   const w = f.kind === 'Write';
   const sum = f.binary ? 'Binary file' : w ? `Wrote ${lines(f.add)} to <b>${esc(f.path)}</b>` : f.kind === 'Delete' ? `Removed ${lines(f.del)}`
     : [f.add ? `Added ${lines(f.add)}` : '', f.del ? `${f.add ? 'removed' : 'Removed'} ${lines(f.del)}` : ''].filter(Boolean).join(', ');
@@ -281,8 +282,11 @@ function fileHTML(f) {
   const rows = f.rows.map(r => r.t === 'g' ? '<div class="r g"><span class="n"></span><span class="s"></span><span class="c">…</span></div>'
     : `<div class="r ${w ? 'c' : r.t}"><span class="n">${r.n}</span><span class="s">${w ? '' : r.t === 'a' ? '+' : r.t === 'd' ? '-' : ''}</span>`
       + `<span class="c">${r.h != null ? r.h : cut(r.s)}</span></div>`).join('');
-  return `<div class="ccf"><p class="cct"><b>${f.kind}</b>(${esc(f.path)})</p><p class="ccs">${sum}</p>`
-    + (f.rows.length ? `<div class="ccd" style="--nw:${nw + 2}ch">${rows}</div>` : '') + '</div>';
+  const head = `<span class="cct"><b>${f.kind}</b>(${esc(f.path)})</span><span class="ccs">${sum}</span>`;
+  if (!f.rows.length) return `<div class="ccf"><span class="cch">${head}</span></div>`;   // nothing to unfold: a binary file
+  return `<details class="fold ccf"${all.length === 1 ? ' open' : ''}><summary><span class="cch">${head}</span></summary>`
+    + `<div class="ccwrap"><div class="ccbox" tabindex="0"><div class="ccd" style="--nw:${nw + 2}ch">${rows}</div></div>`
+    + '<div class="rail" hidden><i></i></div></div></details>';
 }
 // a box that scrolls with the overview's drawn rail (fcs2.js, the task list): the thumb's height is the visible share, its
 // top the share scrolled; dragging it scrolls in step, a press on the rail centres the thumb there first; the foot fades
@@ -323,8 +327,8 @@ function drawPatches(d) {
   const who = one && words && words.m !== m0.id ? `${esc(m0.name)}’s patch` : one ? 'The patch' : 'The patches';
   sec.insertAdjacentHTML('beforeend', `<details class="fold pfold"><summary><h3>${who}</h3>`
     + (one && has(m0) ? `<span class="pd">${counts(p0)}</span>` : '') + '</summary>'
-    + `<div class="pchips" id="pchips"${one ? ' hidden' : ''}></div><div class="pmeta" id="pmeta"></div><div class="ccwrap"><div class="cc ccbox" id="pview" tabindex="0"></div><div class="rail" id="prail" hidden><i></i></div></div></details>`);
-  patchEnd = railed($('#pview'), $('#prail')); sec.querySelector('.pfold').addEventListener('toggle', patchEnd);
+    + `<div class="pchips" id="pchips"${one ? ' hidden' : ''}></div><div class="pmeta" id="pmeta"></div><div class="cc" id="pview"></div></details>`);
+  sec.querySelector('.pfold').addEventListener('toggle', () => patchEnd());
   if (!one) $('#pchips').innerHTML = ms.map(m => { const p = d.runs[m.id];
     return `<button type="button" class="pchip" data-m="${m.id}" aria-pressed="false"><i style="background:${MCOL[m.id]}"></i><span>${esc(m.name)}</span>`
       + `<span class="pv ${passed(m) ? 'y' : 'n'}">${passed(m) ? 'Pass' : 'Fail'}</span>`
@@ -336,7 +340,10 @@ function drawPatches(d) {
     $('#pmeta').innerHTML = one ? '' : `<b>${esc(m.name)}</b> · ${esc(p.submission)} · ${counts(p)}`;
     $('#pview').innerHTML = parsePatch(p.patch).map(fileHTML).join('')
       + (p.truncated ? `<p class="ccn">The first ${Math.round(p.patch.length / 1000)} kB of ${Math.round(p.bytes / 1000)} kB</p>` : '');
-    $('#pview').scrollTop = 0; patchEnd();
+    // each file's box gets its rail, redrawn when the file or the whole patch opens, and on a resize
+    const ends = [...$('#pview').querySelectorAll('details.ccf')].map(d => { const at = railed(d.querySelector('.ccbox'), d.querySelector('.rail'));
+      d.addEventListener('toggle', at); return at; });
+    patchEnd = () => ends.forEach(at => at()); patchEnd();
   };
   $('#pchips').onclick = e => { const b = e.target.closest('.pchip'); if (b) pick(b.dataset.m); };
   pick((ms.find(m => passed(m) && has(m)) || ms.find(has) || ms[0]).id);
