@@ -29,20 +29,20 @@ summed over its keys; a run beats it (z = 1) when it beats every workload, and a
 the hidden evaluation) beats none. The script stops unless PASS is exactly "every metric beaten" for every run. A win w
 against the human reference r_t (the median reference_score over the task's runs; 0 or less: the task has none) is 1
 for a final score above r_t + TIE_EPS, 0 below r_t - TIE_EPS, otherwise 1/2. The final score comes from the same
-measurements as the metrics, so a run's metrics and its win share one run effect u ~ N(0, SIGMA_U^2) (Qiuyang): with the
-strengths theta held at the fit above (logits), a run's likelihood is the integral over u, by Gauss-Hermite quadrature
-(24 nodes), of prod_j sigmoid(theta_m + u - beta_tj)^z (1 - sigmoid(.))^(1 - z) times
-sigmoid(a (theta_m + u - h_t))^w (1 - sigmoid(.))^(1 - w), with h_t the task's beat-the-human level. Priors:
-h_t ~ N(mean theta, PRIOR_SD^2) and beta_tj ~ N(h_t + DELTA, TAU^2); a task without a reference has no win and no h_t,
-and beta_tj ~ N(mean theta, PRIOR_SD^2). Each task's parameters are fitted at their posterior mode (Newton's method);
-SIGMA_U, a, DELTA and TAU maximise the sum over tasks of the Laplace approximation to the log marginal likelihood
-(Nelder-Mead from four starts; SIGMA_U, a and TAU on a log scale; SIGMA_U at most 4, where 24 nodes stay accurate).
-D, the task's difficulty, is the strength at which a run beats every metric half the time,
-integral prod_j sigmoid(D + u - beta_tj) N(u; 0, SIGMA_U^2) du = 1/2, with beta at the mode. Its 90% interval comes from
-IS_DRAWS draws of the task's parameters from the Laplace Gaussian, weighted by the exact posterior over the Gaussian's
-density (the posterior of a metric nobody beats is one-sided): the weighted 5th and 95th percentiles of D. TFIT's slope
-is that of the logistic matched to the pass curve at D, 4 dP(pass)/dtheta there. All are mapped to ECI points like the
-strengths.
+measurements as the metrics, so a run's metrics and its win share one run effect u ~ N(0, SIGMA_U^2) (Qiuyang). The strengths theta are held at
+the fit above, which has no run effect, so its slope-1 logits absorb the run noise; the model stretches them by a fitted
+factor c (Qiuyang). A run's likelihood is the integral over u, by Gauss-Hermite quadrature (24 nodes), of
+prod_j sigmoid(c theta_m + u - beta_tj)^z (1 - sigmoid(.))^(1 - z) times sigmoid(a (c theta_m + u - h_t))^w (1 - sigmoid(.))^(1 - w),
+with h_t the task's beat-the-human level. Priors: h_t ~ N(c mean theta, PRIOR_SD^2) and beta_tj ~ N(h_t + DELTA, TAU^2);
+a task without a reference has no win and no h_t, and beta_tj ~ N(c mean theta, PRIOR_SD^2). Each task's parameters are
+fitted at their posterior mode (Newton's method); SIGMA_U, a, DELTA, TAU and c maximise the sum over tasks of the
+Laplace approximation to the log marginal likelihood (Nelder-Mead from four starts; all but DELTA on a log scale;
+SIGMA_U at most 4, where 24 nodes stay accurate). D, the task's difficulty, is the strength at which a run beats every
+metric half the time, integral prod_j sigmoid(c D + u - beta_tj) N(u; 0, SIGMA_U^2) du = 1/2, with beta at the mode.
+Its 90% interval comes from IS_DRAWS draws of the task's parameters from the Laplace Gaussian, weighted by the exact
+posterior over the Gaussian's density (the posterior of a metric nobody beats is one-sided): the weighted 5th and 95th
+percentiles of D. TFIT's slope is that of the logistic matched to the pass curve at D, 4 dP(pass)/dtheta there. All are
+divided by c back to the strengths' logits (a metric's difficulty is beta_tj / c) and mapped to ECI points like them.
 
 The raw-score fit that the leaderboard showed before 2026-10-14 runs only with --json (feci_score, task_fit_score). It is
 Epoch AI's own ECI code (bin/eci_fitting.py, vendored from epoch-research/eci-public): every task is one benchmark with
@@ -326,45 +326,55 @@ def wpct(v, w, qs):
     return np.interp(qs, c / w.sum(), v[o])
 
 
-def metric_fit(obs, ref, theta, PB, su=None):
-    """Task difficulty from per-metric passes, strengths held at theta (see the docstring). Returns per task (database
-    name) its fit in logits ('D', 'lo', 'hi', 'ess', 'slope': dP(pass)/dtheta at D, 'x': the mode, 'ci': per parameter
-    the 90% interval), the hyperparameters (s_u, a, d, tau) and the summed Laplace log marginal likelihood.
-    su fixes the run effect's sd (a check: su=0 drops the run effect)."""
+HYPER = ('s_u', 'a', 'd', 'tau', 'c')   # the difficulty fit's hyperparameters; all but d on a log scale
+
+
+def metric_fit(obs, ref, theta, PB, fixed=None):
+    """Task difficulty from per-metric passes, strengths held at theta (see the docstring). The fit runs on an internal
+    axis c * theta; everything it returns per task (database name) is mapped back to theta's logits by dividing by c:
+    'D', 'lo', 'hi', 'ess', 'slope' (dP(pass)/dtheta at D), 'xf' (the mode) and 'ci' (per parameter, its 90% interval).
+    Also the hyperparameters (s_u, a, d, tau, c), on the internal axis, the summed Laplace log marginal likelihood and
+    each start's result. fixed holds hyperparameters at given values (checks: {'c': 1}, {'s_u': 0})."""
+    fixed = fixed or {}
     tasks, tbar = metric_tasks(obs, ref, PB), float(np.mean(list(theta.values())))
     for T in tasks.values(): T['th'], T['x'] = np.array([theta[m] for m in T['models']]), np.full(T['O'].shape[1], tbar)
-    hyp = (lambda p: (np.exp(p[0]), np.exp(p[1]), p[2], np.exp(p[3]))) if su is None else (lambda p: (su, np.exp(p[0]), p[1], np.exp(p[2])))
+    free = [h for h in HYPER if h not in fixed]
+
+    def hyp(p):
+        v = dict(fixed, **{h: x if h == 'd' else np.exp(x) for h, x in zip(free, p)})
+        return tuple(float(v[h]) for h in HYPER)
 
     def total(p):   # warm-started at the last modes; -inf where 24 nodes are too coarse for s_u (from about 4 up)
-        out = 0.0
+        out, (s_u, a, d, tau, c) = 0.0, hyp(p)
         for T in tasks.values():
-            try: T['x'], lm, _ = task_mode(T['x'], T['th'], T['O'], T['k'], hyp(p), tbar)
+            try: T['x'], lm, _ = task_mode(T['x'], c * T['th'], T['O'], T['k'], (s_u, a, d, tau), c * tbar)
             except ArithmeticError: return -np.inf
             out += lm
         return out
 
-    starts = [(1.0, .7, 3.0, 2.0), (.3, .4, 1.5, 1.0), (2.5, 1.5, 5.0, 3.0), (.5, 1.0, .5, .5)]   # (s_u, a, d, tau)
-    bounds = [(np.log(1e-3), np.log(4)), (np.log(1e-2), np.log(20)), (-20, 30), (np.log(.05), np.log(20))]
-    if su is not None: starts, bounds = [s[1:] for s in starts], bounds[1:]
-    fits = [minimize(lambda p: -total(p), [v if i == len(s) - 2 else np.log(v) for i, v in enumerate(s)], method='Nelder-Mead',
-                     bounds=bounds, options={'xatol': 1e-3, 'fatol': 1e-6, 'maxiter': 3000}) for s in starts]
+    starts = [dict(s_u=1.0, a=.7, d=3.0, tau=2.0, c=1.0), dict(s_u=.3, a=.4, d=1.5, tau=1.0, c=.6),
+              dict(s_u=2.5, a=1.5, d=5.0, tau=3.0, c=2.0), dict(s_u=.5, a=1.0, d=.5, tau=.5, c=1.5)]
+    bounds = dict(s_u=(np.log(1e-3), np.log(4)), a=(np.log(1e-2), np.log(20)), d=(-20, 30), tau=(np.log(.05), np.log(20)), c=(np.log(.1), np.log(10)))
+    fits = [minimize(lambda p: -total(p), [st[h] if h == 'd' else np.log(st[h]) for h in free], method='Nelder-Mead',
+                     bounds=[bounds[h] for h in free], options={'xatol': 1e-3, 'fatol': 1e-6, 'maxiter': 4000}) for st in starts]
     best = min(fits, key=lambda r: r.fun)
-    s_u, a, d, tau = hb = hyp(best.x)
+    s_u, a, d, tau, c = hb = hyp(best.x)
     ll = total(best.x)
     for i, (t, T) in enumerate(tasks.items()):
-        x, _, A = task_mode(T['x'], T['th'], T['O'], T['k'], hb, tbar)
-        k, n = T['k'], len(x)
+        th, k = c * T['th'], T['k']
+        x, _, A = task_mode(T['x'], th, T['O'], k, hb[:4], c * tbar)
+        n = len(x)
         # the Laplace Gaussian, reweighted to the exact posterior: metrics nobody beats have one-sided posteriors
         eps = np.random.default_rng(i).standard_normal((IS_DRAWS, n))
         X = x + eps @ np.linalg.cholesky(np.linalg.inv(A)).T
-        lw = task_lj(X, T['th'], T['O'], k, hb, tbar) + 0.5 * (eps ** 2).sum(1)   # constants cancel when normalised
+        lw = task_lj(X, th, T['O'], k, hb[:4], c * tbar) + 0.5 * (eps ** 2).sum(1)   # constants cancel when normalised
         w = np.exp(lw - lw.max()); w /= w.sum()
-        D = float(fedi(x[None, :k], s_u)[0])
+        D = float(fedi(x[None, :k], s_u)[0])   # on the internal axis
         S = expit(D + s_u * GH_U[:, None] - x[:k])
-        T.update(x=x, D=D, ess=float(1 / (w @ w)), slope=float(np.exp(GH_LW) @ (S.prod(1) * (1 - S).sum(1))),
-                 ci=[tuple(wpct(X[:, j], w, [.05, .95])) for j in range(n)])
-        T['lo'], T['hi'] = wpct(fedi(X[:, :k], s_u), w, [.05, .95])
-    return tasks, (float(s_u), float(a), float(d), float(tau)), ll, [(hyp(r.x), -r.fun) for r in fits]
+        T.update(x=x, xf=x / c, D=D / c, ess=float(1 / (w @ w)), slope=c * float(np.exp(GH_LW) @ (S.prod(1) * (1 - S).sum(1))),
+                 ci=[tuple(wpct(X[:, j], w, [.05, .95]) / c) for j in range(n)])
+        T['lo'], T['hi'] = wpct(fedi(X[:, :k], s_u), w, [.05, .95]) / c
+    return tasks, hb, ll, [(hyp(r.x), -r.fun) for r in fits]
 
 
 def eci_score(rows):
@@ -526,17 +536,17 @@ def task_fits(tasks, fit, theta0):
     TFIT[task] = [D, slope], the logistic matched to the pass curve at D: P(pass) ~ 1 / (1 + exp(-slope (ECI - D))),
     slope = 4 dP/dECI there. DIFF[task] = [D, 90% low, 90% high, passes, wins, runs] and METRIC[task][stem] =
     [difficulty, 90% low, 90% high, runs that beat it], counting the runs the page shows (RUNS); wins null without a reference."""
-    s_u, a, d, tau = fit
+    s_u, a, d, tau, c = fit
     TFIT, DIFF, METRIC = {}, {}, {}
     for t, T in tasks.items():
         O, k = T['O'][[c not in HIDDEN for c in T['models']]], T['k']
         e = [round(float(v), 2) for v in on_scale([T['D'], T['lo'], T['hi']], theta0)]
         TFIT[short(t)] = [e[0], round(4 * T['slope'] / PASS_UNIT, 4)]
         DIFF[short(t)] = e + [int(O[:, :k].all(1).sum()), round(float(O[:, k].sum()), 1) if O.shape[1] > k else None, len(O)]
-        METRIC[short(t)] = {j: [round(float(v), 2) for v in on_scale([T['x'][i], *T['ci'][i]], theta0)] + [int(O[:, i].sum())]
+        METRIC[short(t)] = {j: [round(float(v), 2) for v in on_scale([T['xf'][i], *T['ci'][i]], theta0)] + [int(O[:, i].sum())]
                             for i, j in enumerate(T['stems'])}
     return (dict(sorted(TFIT.items())), dict(sorted(DIFF.items())), dict(sorted(METRIC.items())),
-            {'a': round(a, 3), 'delta': round(PASS_UNIT * d, 2), 'tau': round(PASS_UNIT * tau, 2), 'sigma_u': round(PASS_UNIT * s_u, 2)})
+            {'a': round(a, 3), 'delta': round(PASS_UNIT * d / c, 2), 'tau': round(PASS_UNIT * tau / c, 2), 'sigma_u': round(PASS_UNIT * s_u / c, 2), 'c': round(c, 3)})
 
 
 def task_checks(db):
@@ -596,7 +606,7 @@ block = (f'// One entry per scored run in the preview results database of {when:
          f"// Per task: the authors' reference score, the median over the task's runs (tasks without one are left out).\nconst REF = {json.dumps(REF, ensure_ascii=False)};\n"
          f"// Per task: [D, slope], the logistic matched to its pass curve at D, P(pass) ~ 1 / (1 + exp(-slope (ECI - D))), slope = 4 x the curve's gradient at D (DIFF has D).\nconst TFIT = {json.dumps(TFIT, ensure_ascii=False)};\n"
          f"// Per task: [D, 90% low, 90% high, passes, wins, runs] in RUNS. D, the difficulty, is the ECI at which a model passes half the time, a pass being every metric beaten at once. It comes from each metric's own difficulty, fitted on which metrics each run beats and whether its final score beats the human reference (a win; a tie is half; wins is null without a reference), with a run effect shared by both (DIFF_FIT).\nconst DIFF = {json.dumps(DIFF, ensure_ascii=False)};\n"
-         f"// The difficulty fit's shared parameters, by Laplace marginal likelihood over all tasks: sigma_u, the sd of a run's effect on its metrics and its win; a, the slope of P(win) over that of a metric; delta and tau, the mean and sd of a metric's difficulty above the task's beat-the-human level; all but a in ECI points.\nconst DIFF_FIT = {json.dumps(DIFF_FIT)};\n"
+         f"// The difficulty fit's shared parameters, by Laplace marginal likelihood over all tasks: sigma_u, the sd of a run's effect on its metrics and its win; a, the slope of P(win) over that of a metric; delta and tau, the mean and sd of a metric's difficulty above the task's beat-the-human level (these three in ECI points); c, how much the fit stretches the ECI fit's logits, which have no run effect.\nconst DIFF_FIT = {json.dumps(DIFF_FIT)};\n"
          f"// Per task: the metrics its judge checks and the number of hidden final workloads; a run passes only when every check passes on every final workload.\nconst CHECKS = {json.dumps(CHECKS, ensure_ascii=False, separators=(',', ':'))};\n"
          f"// Task descriptions from the paper repo (bin/fcs2_descriptions.tsv).\nconst DESC = {json.dumps(descriptions(), ensure_ascii=False)};\n")
 js = open(js_path, encoding='utf-8').read()   # read late: the fits above take a while
@@ -608,7 +618,7 @@ hid_path = '_data/fcs2_runs_hidden.json'
 open(hid_path, 'w', encoding='utf-8').write(hidden_json(generated, hidden))
 print('PASS', pass_rate(runs))
 print('ECI', eci_js)
-print('DIFF_FIT', DIFF_FIT, '(logits: sigma_u {:.4f}, a {:.4f}, delta {:.4f}, tau {:.4f}; Laplace log marginal likelihood {:.3f})'.format(*dfit, dll))
+print('DIFF_FIT', DIFF_FIT, '(internal axis: sigma_u {:.4f}, a {:.4f}, delta {:.4f}, tau {:.4f}, c {:.4f}; Laplace log marginal likelihood {:.3f})'.format(*dfit, dll))
 print('starts', [(tuple(round(float(v), 4) for v in h), round(float(l), 3)) for h, l in dstarts])
 print('importance sampling: smallest effective sample size', round(min(T['ess'] for T in MT.values())), 'of', IS_DRAWS,
       '; below 200:', [short(t) for t, T in MT.items() if T['ess'] < 200])
