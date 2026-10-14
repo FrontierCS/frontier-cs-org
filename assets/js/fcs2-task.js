@@ -80,7 +80,7 @@ addEventListener('keydown', e => {
 });
 const ordinal = n => n + ((n % 100 >= 11 && n % 100 <= 13) ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th');
 
-/* One row per run, in leaderboard order: pass or fail, the final score as a bar on the task's own scale, and the run's
+/* One row per run, highest final score first (owner, 2026-10-14; ties keep leaderboard order), under the Human reference: pass or fail, the final score as a bar on the task's own scale, and the run's
    estimated cost; the Human reference (the authors' code; owner, 2026-10-14: that name everywhere) is a bar of its own on top, hatched grey (owners, 2026-10-11: bars, no vertical line;
    2026-10-14: grey hatching).
    This replaces the final-score chart and the runs table (Qiuyang, 2026-10-14: per model, readers want cost, score and
@@ -113,7 +113,7 @@ function drawResults() {
   const short = Object.fromEntries(RANKED.map(m => [m.id, m.short]));
   $('#rtbl').innerHTML = '<thead><tr><th>Model</th><th class="rv">Pass</th><th class="rs">Final score</th><th>Cost</th></tr></thead><tbody>'
     + (ref != null ? `<tr class="rref"><td><span class="sq"></span>Human reference</td><td class="rv"></td><td class="rs">${bar(ref, '')}</td><td></td></tr>` : '')
-    + runs.map(r => `<tr><td><span class="sq" style="background:${MCOL[r[0]]}"></span><span class="full">${esc(MNAME[r[0]])}</span><span class="short">${esc(short[r[0]])}</span></td>`
+    + [...runs].sort((p, q) => q[2] - p[2]).map(r => `<tr><td><span class="sq" style="background:${MCOL[r[0]]}"></span><span class="full">${esc(MNAME[r[0]])}</span><span class="short">${esc(short[r[0]])}</span></td>`
       + `<td class="rv">${r[3] ? TICK : CROSS}</td><td class="rs">${bar(r[2], `background:${MCOL[r[0]]}`)}</td><td>$${r[4].toFixed(2)}</td></tr>`).join('')
     + '</tbody>';
 }
