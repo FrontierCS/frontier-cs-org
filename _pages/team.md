@@ -85,7 +85,7 @@ permalink: /team/
 </div>
 </section>
 
-<section class="journal team-sec">
+<section class="journal team-sec" id="contact">
 <div class="page">
   <div class="sec-head"><div>
     <h2 class="sec-title">Contact</h2>
