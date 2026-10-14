@@ -313,8 +313,6 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 a.pbtn:hover{border-color:var(--teal); color:var(--teal-d)}
 .pbtn.off{opacity:.35}
 .pager .pos{min-width:3.6em; text-align:center; font-variant-numeric:tabular-nums; color:var(--muted)}
-.tfoot{display:flex; justify-content:space-between; gap:16px; margin:64px 0 0; padding-top:20px; border-top:1px solid var(--line); font-size:15px}
-.tfoot a{color:var(--ink-2); text-decoration:none} .tfoot a:hover{color:var(--teal-d)}
 .crumbs .trail a:hover{color:var(--teal-d)}
 .tdom{display:inline-flex; align-items:center; gap:7px; font-size:14px; font-weight:500; color:var(--ink-2)}
 .tdom::before{content:""; width:9px; height:9px; border-radius:2px; background:var(--a)}

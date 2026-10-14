@@ -63,7 +63,7 @@ function loadFig(t) {
       const k = AREA_OF[t.d].k; box.style.setProperty('--a', AINK[k]); box.style.setProperty('--af', AFILL[k]); } }).catch(() => {});
 }
 /* Previous and next problem, in the problem list's first order: hardest first (FEDI), then by domain and name
-   (Qiuyang, 2026-10-14). A pager beside the back link, a larger pair at the foot of the page, and the arrow keys. */
+   (Qiuyang, 2026-10-14). A pager beside the breadcrumb, and the arrow keys. */
 const ORDER = [...TASKS].sort((a, b) => (FRANK[a.s] ?? 1e9) - (FRANK[b.s] ?? 1e9)
   || DOMAINS.indexOf(a.d) - DOMAINS.indexOf(b.d) || a.name.localeCompare(b.name));
 function drawPager(t) {
@@ -73,9 +73,7 @@ function drawPager(t) {
   const btn = (x, cls, icon, word) => x ? `<a class="pbtn ${cls}" href="${href(x)}" title="${word}: ${esc(x.name)}" aria-label="${word} problem: ${esc(x.name)}">${icon}</a>`
     : `<span class="pbtn ${cls} off" aria-hidden="true">${icon}</span>`;
   $('#tpager').innerHTML = btn(prev, 'prev', L, 'Previous') + `<span class="pos">${i + 1} / ${ORDER.length}</span>` + btn(next, 'next', R, 'Next');
-  $('#tbody').insertAdjacentHTML('beforeend', `<nav class="tfoot" aria-label="Previous and next problem">`
-    + (prev ? `<a class="prev" href="${href(prev)}" title="${esc(prev.name)}">‹ Previous problem</a>` : '<span></span>')
-    + (next ? `<a class="next" href="${href(next)}" title="${esc(next.name)}">Next problem ›</a>` : '<span></span>') + '</nav>');
+  // no second pair at the foot (owner, design audit 2A: it repeated the pager with arrow characters); the arrow keys still page
 }
 addEventListener('keydown', e => {
   if (!cur || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey || /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return;
