@@ -53,7 +53,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
       <div class="plot" id="eciplot"><svg id="ecisvg" role="img" aria-label="FECI chart"></svg><div class="tip" id="ecitip" hidden></div></div>
       <div class="cfoot">{% include chart_logo.html %}<span id="ecinote">Human = 25, Kimi K2.7 = 0 · whiskers are 90% intervals</span></div>
     </figure>
-    <p class="pcontact">To put your model on the leaderboard, email its full score on every problem to Qiuyang Mang at <a href="mailto:qmang@berkeley.edu">qmang@berkeley.edu</a> or Wenhao Chai at <a href="mailto:wenhao.chai@princeton.edu">wenhao.chai@princeton.edu</a>. We will refit FECI with it.</p>
+    <p class="pcontact">To add your model, email its score on every problem to both <a class="mail" href="mailto:qmang@berkeley.edu,wenhao.chai@princeton.edu">qmang@berkeley.edu</a> and <a class="mail" href="mailto:qmang@berkeley.edu,wenhao.chai@princeton.edu">wenhao.chai@princeton.edu</a>.</p>
     <details class="fold how" id="feci-how">
       <summary><h3>How FECI works</h3></summary>
       <div class="how-body">

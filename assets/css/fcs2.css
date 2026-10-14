@@ -305,6 +305,9 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 }
 .tbd{color:var(--ink-2); font-size:16px; margin:0}
 .pcontact{color:var(--ink-2); font-size:16px; margin:20px 0 0}
+/* the two addresses, marked; either link writes to both (Qiuyang, 2026-10-14) */
+.pcontact .mail{white-space:nowrap; padding:2px 8px; border-radius:6px; background:#e8f0fe; color:#0b57d0; font-weight:600; text-decoration:none}
+.pcontact .mail:hover{background:#d3e3fd}
 /* private set: blurred task illustrations under locks (the post card's picture) */
 .locked{display:grid; grid-template-columns:repeat(6, minmax(0,1fr)); gap:6px; margin-top:24px}
 .lk-tile{position:relative; aspect-ratio:3/2; border-radius:8px; overflow:hidden}
