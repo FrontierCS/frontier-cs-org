@@ -30,11 +30,11 @@ function drawPage() {
   // assets/img/fcs2-tasks/<slug>.svg and set inline so it takes the page's type (Qiuyang, 2026-10-14)
   const goal = GOAL[t.s], key = KEYM[t.s];
   $('#tgoal').textContent = goal || ''; $('#tgoal').hidden = !goal;
-  // the task's FEDI, its 90% interval and its rank, with a link to what FEDI is (owner, 2026-10-14; the interval: Qiuyang,
+  // the task's FDI, its 90% interval and its rank, with a link to what FDI is (owner, 2026-10-14; the interval: Qiuyang,
   // 2026-10-14); the address comes from a real link in the markup, so it follows the site's base URL and the preview's relative links alike
   const fr = FRANK[t.s], N = Object.keys(FRANK).length;
-  $('#tfedi').innerHTML = fr ? `<span>FEDI</span><b>${fe(FEDI[t.s])}</b><span>the ${fr === N ? 'easiest' : (fr === 1 ? '' : ordinal(fr) + ' ') + 'hardest'} of ${N} tasks,</span>`
-    + `<span>90% interval ${fe(DIFF[t.s][1])}–${fe(DIFF[t.s][2])}</span><a href="${esc($('#howlink').getAttribute('href'))}">What is FEDI?</a>` : '';
+  $('#tfdi').innerHTML = fr ? `<span>FDI</span><b>${fe(FDI[t.s])}</b><span>the ${fr === N ? 'easiest' : (fr === 1 ? '' : ordinal(fr) + ' ') + 'hardest'} of ${N} tasks,</span>`
+    + `<span>90% interval ${fe(DIFF[t.s][1])}–${fe(DIFF[t.s][2])}</span><a href="${esc($('#howlink').getAttribute('href'))}">What is FDI?</a>` : '';
   $('#tkeys').innerHTML = key ? `<span class="lab">Scored on</span>${key.map(k => `<span class="k">${esc(k)}</span>`).join('')}` : '';
   $('#tfig').hidden = true; $('#tfig').innerHTML = ''; $('#thero').classList.add('nofig');
   // a rewritten description (three paragraphs split by ¶) sits under the top block, one column each: the idea, what the
@@ -45,7 +45,7 @@ function drawPage() {
   if (!runs.length) { $('#tbody').innerHTML = lead + '<p class="tbd">No runs on this task yet.</p>'; loadFig(t); drawPager(t); scrollTo(0, 0); return; }
   const ref = REF[t.s], ms = new Set(runs.map(r => r[0])), np = new Set(runs.filter(r => r[3]).map(r => r[0])).size;
   const best = runs.reduce((a, r) => r[2] > a[2] ? r : a);
-  // beside who passes, the wins the FEDI fit counts (DIFF): runs whose final score is above the human reference's, a tie
+  // beside who passes, the wins the FDI fit counts (DIFF): runs whose final score is above the human reference's, a tie
   // counting half; none without a reference (Qiuyang, 2026-10-14)
   const [, , , , dw, dn] = DIFF[t.s] || [];
   const sum = [`<b>${np} of ${ms.size}</b> models pass`]
@@ -69,7 +69,7 @@ function loadFig(t) {
       // the agent's part takes the task's domain colours, as the domain square beside its name does
       const k = AREA_OF[t.d].k; box.style.setProperty('--a', AINK[k]); box.style.setProperty('--af', AFILL[k]); } }).catch(() => {});
 }
-/* Previous and next task, in the task list's first order: hardest first (FEDI), then by domain and name
+/* Previous and next task, in the task list's first order: hardest first (FDI), then by domain and name
    (Qiuyang, 2026-10-14). A pager beside the breadcrumb, and the arrow keys. */
 const ORDER = [...TASKS].sort((a, b) => (FRANK[a.s] ?? 1e9) - (FRANK[b.s] ?? 1e9)
   || DOMAINS.indexOf(a.d) - DOMAINS.indexOf(b.d) || a.name.localeCompare(b.name));
@@ -165,14 +165,14 @@ function drawDev() {
   $('#dcnote').textContent = 'Each line is one run: its score on the development workloads after each submission, against its estimated spend so far. A failed build or check scores 0.';
 }
 
-/* The task's pass curve (TFIT): the chance that a model of a given FCI passes it, 50% at the task's FEDI, whose 90%
+/* The task's pass curve (TFIT): the chance that a model of a given FCI passes it, 50% at the task's FDI, whose 90%
    interval is the whisker there (Qiuyang, 2026-10-14). Dots: each model at its FCI, at the share of its runs here that
    pass, so at 100% or 0% for a model with one run. The human reference has no FCI and no dot. */
 function drawFit() {
   const {t, runs} = cur, [d, k] = TFIT[t.s], [, dlo, dhi] = DIFF[t.s];
   const svg = $('#fcsvg'), W = Math.max(300, $('#fcplot').clientWidth), narrow = W < 560;
   const L = 44, R = narrow ? 12 : 24, T = 12, B = 46, H = narrow ? 280 : 320;
-  // the axis holds 0 (Kimi K2.7), every model, the FEDI's interval and the curve from 10% to 90%
+  // the axis holds 0 (Kimi K2.7), every model, the FDI's interval and the curve from 10% to 90%
   const es = RANKED.map(m => ECI[m.id][0]), lo = Math.min(ECI_LOW_VALUE, dlo, d - 2.2 / k, ...es), hi = Math.max(dhi, d + 2.2 / k, ...es), step = eciStep(hi - lo, narrow ? 4 : 7);
   const xmin = Math.floor(lo / step) * step, xmax = Math.ceil(hi / step) * step;
   const X = v => L + (v - xmin) / (xmax - xmin) * (W - L - R), Y = v => T + (1 - v / 100) * (H - T - B), f = x => 100 / (1 + Math.exp(-k * (x - d)));
@@ -188,14 +188,14 @@ function drawFit() {
   svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'FCI'));
   const n = 120, path = Array.from({length:n + 1}, (_, i) => { const x = xmin + (xmax - xmin) * i / n; return `${i ? 'L' : 'M'}${X(x).toFixed(1)},${Y(f(x)).toFixed(1)}`; }).join('');
   svg.append(sv('path', {d:path, fill:'none', stroke:'var(--ink-2)', 'stroke-width':2.5}));
-  // the task's FEDI: where the curve crosses 50%, with its 90% interval as a whisker, as on the FCI chart; a dashed drop
+  // the task's FDI: where the curve crosses 50%, with its 90% interval as a whisker, as on the FCI chart; a dashed drop
   // to the axis marks it there; the label sits above and left of the point, which is off a rising curve
   svg.append(sv('line', {x1:X(d), x2:X(d), y1:Y(50), y2:H - B, stroke:'var(--ink-2)', 'stroke-width':1, 'stroke-dasharray':'3 3', opacity:.7}));
   svg.append(sv('path', {d:`M${X(dlo)},${Y(50)}H${X(dhi)}M${X(dlo)},${Y(50) - 6}v12M${X(dhi)},${Y(50) - 6}v12`, fill:'none', stroke:'var(--ink-2)', 'stroke-width':1.5}));
   svg.append(sv('circle', {cx:X(d), cy:Y(50), r:4.5, fill:'#fff', stroke:'var(--ink-2)', 'stroke-width':2}));
   const left = X(d) - L > 90;   // near the left edge the label goes right of the point
-  svg.append(sv('text', {class:'val halo', x:X(d) + (left ? -10 : 10), y:Y(50) - 14, 'text-anchor':left ? 'end' : 'start', fill:'var(--ink-2)'}, `FEDI ${fe(d)}`));
-  const pts = [{x:X(d), y:Y(50), html:`<b>FEDI ${fe(d)}</b><br>90% interval ${fe(dlo)}–${fe(dhi)}`}];
+  svg.append(sv('text', {class:'val halo', x:X(d) + (left ? -10 : 10), y:Y(50) - 14, 'text-anchor':left ? 'end' : 'start', fill:'var(--ink-2)'}, `FDI ${fe(d)}`));
+  const pts = [{x:X(d), y:Y(50), html:`<b>FDI ${fe(d)}</b><br>90% interval ${fe(dlo)}–${fe(dhi)}`}];
   const placed = [];
   RANKED.filter(m => runs.some(r => r[0] === m.id)).forEach(m => {
     const rs = runs.filter(r => r[0] === m.id), np = rs.filter(r => r[3]).length, y = np / rs.length * 100, x = ECI[m.id][0];

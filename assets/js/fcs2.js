@@ -4,7 +4,7 @@
 document.querySelectorAll('[data-fill]').forEach(el => { el.textContent = {updated:`Last updated: ${UPDATED}`, runs:String(RUNS.length),
   runtasks:`on ${NTASK(RUNS)} tasks`, models:`${MODELS.length} models from ${new Set(MODELS.map(m => m.lab)).size} labs have run so far.`,
   summary:`${RUNS.length} runs on ${NTASK(RUNS)} tasks by ${MODELS.length} models`,
-  ntasks:String(TASKS.length), ndomains:String(new Set(TASKS.map(t => t.d)).size), dmax:fe(Math.max(...Object.values(FEDI))), zero:tick(ECI_LOW_VALUE)}[el.dataset.fill]; });
+  ntasks:String(TASKS.length), ndomains:String(new Set(TASKS.map(t => t.d)).size), dmax:fe(Math.max(...Object.values(FDI))), zero:tick(ECI_LOW_VALUE)}[el.dataset.fill]; });
 // text in a model's colour, 22% darker: GPT-6.1 Sol, Qwen 3.8 Max and GLM 5.3 Flash are under 3:1 on white at full colour
 const MTXT = id => `color-mix(in srgb, ${MCOL[id]} 78%, #000)`;
 // Bring a tab into view inside its own horizontal strip only. scrollIntoView would also scroll the page,
@@ -315,15 +315,15 @@ function drawTable() {
 const redraws = [];
 
 /* ---------- How FCI works: a fold under the FCI chart (owner, 2026-10-11) ----------
-   Three tasks' pass curves from TFIT, P(pass) = 1 / (1 + exp(-k (FCI - FEDI))) with the task's own k: an easy,
-   a middle and a hard one, the tasks a sixth, a half and five sixths of the way up the FEDI order, so the picture
+   Three tasks' pass curves from TFIT, P(pass) = 1 / (1 + exp(-k (FCI - FDI))) with the task's own k: an easy,
+   a middle and a hard one, the tasks a sixth, a half and five sixths of the way up the FDI order, so the picture
    follows the data (Qiuyang, 2026-10-14). A dashed line marks the scale's fixed point, Kimi K2.7 = 0. */
 function drawHow() {
   const box = $('#fci-how'); if (!box || !box.open) return;
   const INKS = ['#8ab4f8', '#1a73e8', '#174ea6'];   // easy to hard: Google blue 300, 600, 900
   let svg = $('#howasvg'), W = Math.max(300, $('#howaplot').clientWidth), narrow = W < 560;
   let L = 44, R = narrow ? 12 : 24, T = 26, B = 46, H = narrow ? 254 : 284;
-  const up = Object.keys(FEDI).filter(s => TFIT[s]).sort((a, b) => FEDI[a] - FEDI[b]);
+  const up = Object.keys(FDI).filter(s => TFIT[s]).sort((a, b) => FDI[a] - FDI[b]);
   const picks = [1 / 6, 1 / 2, 5 / 6].map(q => up[Math.round(q * (up.length - 1))]).map(s => [s, TFIT[s]]);
   // the axis runs from 10% on the easy curve to 90% on the hard one, with Kimi K2.7 and every model in view
   const es = MODELS.map(m => ECI[m.id][0]), lo = Math.min(ECI_LOW_VALUE, picks[0][1][0] - 2.2 / picks[0][1][1], ...es), hi = Math.max(picks[2][1][0] + 2.2 / picks[2][1][1], ...es);
@@ -339,12 +339,12 @@ function drawHow() {
   picks.forEach(([s, [d, k]], i) => {
     const f = x => 100 / (1 + Math.exp(-k * (x - d)));
     svg.append(sv('path', {d:Array.from({length:n + 1}, (_, j) => { const x = X0 + (X1 - X0) * j / n; return `${j ? 'L' : 'M'}${X(x).toFixed(1)},${Y(f(x)).toFixed(1)}`; }).join(''), fill:'none', stroke:INKS[i], 'stroke-width':2.5}));
-    svg.append(sv('circle', {cx:X(d), cy:Y(50), r:5, fill:INKS[i], stroke:'#fff', 'stroke-width':2}));   // the FEDI: passes half the time
+    svg.append(sv('circle', {cx:X(d), cy:Y(50), r:5, fill:INKS[i], stroke:'#fff', 'stroke-width':2}));   // the FDI: passes half the time
     for (let j = 0; j <= 60; j++) { const x = X0 + (X1 - X0) * j / 60;
-      pts.push({x:X(x), y:Y(f(x)), html:`<b>${esc(NAME(s))}</b><br>FEDI ${fe(d)}<br>At FCI ${fe(x)}: passes <b>${Math.round(f(x))}%</b> of the time`}); }
+      pts.push({x:X(x), y:Y(f(x)), html:`<b>${esc(NAME(s))}</b><br>FDI ${fe(d)}<br>At FCI ${fe(x)}: passes <b>${Math.round(f(x))}%</b> of the time`}); }
   });
   attachTip(svg, W, H, pts, $('#howatip'));
-  $('#howalegend').innerHTML = picks.map(([s, [d]], i) => `<span><i style="background:${INKS[i]}"></i>${esc(NAME(s))}, FEDI ${fe(d)}</span>`).join('');
+  $('#howalegend').innerHTML = picks.map(([s, [d]], i) => `<span><i style="background:${INKS[i]}"></i>${esc(NAME(s))}, FDI ${fe(d)}</span>`).join('');
 }
 $('#fci-how').addEventListener('toggle', drawHow);
 redraws.push(drawHow);
@@ -355,7 +355,7 @@ addEventListener('hashchange', fqHash); fqHash();
 
 /* ---------- task index ----------
    One compact row per task: its name over its domain, what the agent must do (GOAL) over the paper it comes from, its
-   FEDI, and the links. The filter is by domain; the search also
+   FDI, and the links. The filter is by domain; the search also
    reads goals and venues; the order is the reader's choice, hardest first to begin with. */
 let picked = new Set(), q = '', order = 'hard';
 // the domain filter: checkboxes drawn as Material 3 ones, any number checked (owner, design audit: chips did not look good, 4B)
@@ -404,7 +404,7 @@ function hits() {
   const w = q.toLowerCase().split(/\s+/).filter(Boolean);
   const hay = t => [t.s, t.name, t.t, t.n, t.d, GOAL[t.s] || '', VENUE[t.s] || ''].join(' ').toLowerCase();
   const h = TASKS.filter(t => (!picked.size || picked.has(t.d)) && w.every(x => hay(t).includes(x)));
-  // difficulty is the FEDI rank (FRANK, 1 = hardest); a task without a FEDI has none and comes last either way
+  // difficulty is the FDI rank (FRANK, 1 = hardest); a task without a FDI has none and comes last either way
   const rank = t => FRANK[t.s] ?? null, dom = (a, b) => DOMAINS.indexOf(a.d) - DOMAINS.indexOf(b.d), nm = (a, b) => a.name.localeCompare(b.name);
   const hard = (a, b) => (rank(a) ?? 1e9) - (rank(b) ?? 1e9) || dom(a, b) || nm(a, b), easy = (a, b) => (rank(b) ?? -1) - (rank(a) ?? -1) || dom(a, b) || nm(a, b);
   return [...h].sort({hard, easy, domain:(a, b) => dom(a, b) || hard(a, b), name:nm}[order]);
@@ -559,7 +559,7 @@ function showRun() {
         sv('path', {d:r.p ? `M${cx - R * .46},${cy + R * .04}l${R * .32},${R * .34}l${R * .6},${-R * .7}` : `M${cx - R * .36},${cy - R * .36}l${R * .72},${R * .72}M${cx + R * .36},${cy - R * .36}l${-R * .72},${R * .72}`,
           fill:'none', stroke:r.p ? field : '#fff', 'stroke-width':2, 'stroke-linecap':'round', 'stroke-linejoin':'round', 'stroke-opacity':r.p ? 1 : .85}),
         sv('text', {x:cx + 17, y:cy + 4.5, 'font-size':13.5, 'font-weight':r.p ? 600 : 400, fill:'#fff', 'fill-opacity':r.p ? 1 : .85}, narrow ? m.short : m.name)); });
-  } else {   // difficulty: the FEDI rank (FRANK), and a strip with every task in rank order and this one as a disc; DIFF gives who passes
+  } else {   // difficulty: the FDI rank (FRANK), and a strip with every task in rank order and this one as a disc; DIFF gives who passes
     const D = FRANK[s] ? {rank:FRANK[s], pass:DIFF[s][3], n:DIFF[s][5]} : null, N = Object.keys(FRANK).length;
     panel.append(sv('text', {x:p.x + PX, y:top + 4, 'font-size':13, 'font-weight':500, fill:'#fff', 'fill-opacity':.85}, 'Difficulty'));
     if (!D) panel.append(sv('text', {x:p.x + PX, y:top + 52, 'font-size':16, fill:'#fff'}, 'No runs yet'));
@@ -609,12 +609,12 @@ document.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse' &&
 function drawRows() {
   const h = hits(); $('#fcount').textContent = picked.size ? `(${picked.size})` : '';
   $('#lhead').innerHTML = `<span>${h.length === TASKS.length ? `${TASKS.length} tasks` : `${h.length} of ${TASKS.length} tasks`}</span><span></span>`
-    + `<span title="FEDI, the FrontierCS Epoch Difficulty Index: the FCI at which a model passes the task half the time">FEDI</span><span></span>`;
+    + `<span title="FDI, the FrontierCS Difficulty Index: the FCI at which a model passes the task half the time">FDI</span><span></span>`;
   $('#rows').innerHTML = h.map(t => { const s = t.s, v = VENUE[s], goal = GOAL[s], ttl = t.t || (v ? t.name : '');
     // with a goal, the source is the small line under it (venue in bold, then the title); without one (Security), the title is the main line
     const main = goal || ttl, small = goal ? (v && ttl ? `<b>${esc(v)}</b> · ${esc(ttl)}` : esc(v || ttl)) : v ? `<b>${esc(v)}</b>` : '';
-    // the task's FEDI in place of the pass rate (owner, 2026-10-14)
-    const pass = FEDI[s] != null ? `<a class="tp" href="${esc(taskHref(s))}" tabindex="-1"><span class="pr">${fe(FEDI[s])}</span></a>` : '<span></span>';
+    // the task's FDI in place of the pass rate (owner, 2026-10-14)
+    const pass = FDI[s] != null ? `<a class="tp" href="${esc(taskHref(s))}" tabindex="-1"><span class="pr">${fe(FDI[s])}</span></a>` : '<span></span>';
     return `<article class="trow" data-s="${esc(s)}"><div class="tn"><h3><a class="stretch" href="${esc(taskHref(s))}">${esc(t.name)}</a></h3><span class="td" style="--a:${AINK[AREA_OF[t.d].k]}">${esc(t.d)}</span></div>
     <div class="tx">${main ? `<p>${esc(main)}</p>` : ''}${small ? `<p class="src">${small}</p>` : ''}</div>${pass}
     <div class="lk">${t.p ? `<a href="${esc(t.p)}" target="_blank" rel="noopener">${t.t ? t.src : 'Project'}</a>` : ''}${t.r ? `<a href="${esc(t.r)}" target="_blank" rel="noopener">Code</a>` : ''}</div></article>`; }).join('')

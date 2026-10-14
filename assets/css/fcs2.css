@@ -359,10 +359,10 @@ a.pbtn:hover{border-color:var(--teal); color:var(--teal-d)}
 .tkeys:empty{display:none}
 .tkeys .lab{font-size:13.5px; color:var(--muted); margin-right:4px}
 .tkeys .k{font-size:13px; padding:3px 10px; border-radius:100px; background:var(--soft); color:var(--ink-2)}
-.tfedi{display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 10px; margin:12px 0 0; font-size:13.5px; color:var(--muted)}   /* the problem's FEDI, beside what it is scored on */
-.tfedi:empty{display:none}
-.tfedi b{font-size:17px; font-weight:600; color:var(--ink); font-variant-numeric:tabular-nums}
-.tfedi a{color:var(--muted); text-decoration:underline; text-underline-offset:3px; text-decoration-color:var(--line-2)} .tfedi a:hover{color:var(--teal)}
+.tfdi{display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 10px; margin:12px 0 0; font-size:13.5px; color:var(--muted)}   /* the problem's FDI, beside what it is scored on */
+.tfdi:empty{display:none}
+.tfdi b{font-size:17px; font-weight:600; color:var(--ink); font-variant-numeric:tabular-nums}
+.tfdi a{color:var(--muted); text-decoration:underline; text-underline-offset:3px; text-decoration-color:var(--line-2)} .tfdi a:hover{color:var(--teal)}
 /* under it, the rewritten description in three columns: the idea, what the agent writes, how it is judged */
 .tabout{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px 40px; margin:44px 0 0; padding-top:28px; border-top:1px solid var(--line)}
 .tabout h3{margin:0 0 8px; font-size:14px; font-weight:600; color:var(--ink)}

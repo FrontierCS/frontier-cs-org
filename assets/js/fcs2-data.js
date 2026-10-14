@@ -149,13 +149,13 @@ const DESC = {"dbscan kernel": "DBSCAN groups points into clusters by density. A
 const RAN = new Set(RUNS.map(r => r.t));
 const mean = a => a.reduce((x, y) => x + y, 0) / a.length;
 
-/* FEDI, the FrontierCS Epoch Difficulty Index: the FCI at which a model passes the task half the time (Qiuyang,
+/* FDI, the FrontierCS Difficulty Index: the FCI at which a model passes the task half the time (Qiuyang,
    2026-10-14), DIFF[task][0] from bin/fcs2_runs_from_db.py, with its 90% interval in DIFF[task][1] and [2]. The site
    ranks tasks by it everywhere; FRANK[task] is 1 for the hardest. */
-const FEDI = Object.fromEntries(TASKS.filter(t => DIFF[t.s]).map(t => [t.s, DIFF[t.s][0]]));
-const FRANK = Object.fromEntries(Object.keys(FEDI).sort((a, b) => FEDI[b] - FEDI[a]).map((s, i) => [s, i + 1]));
+const FDI = Object.fromEntries(TASKS.filter(t => DIFF[t.s]).map(t => [t.s, DIFF[t.s][0]]));
+const FRANK = Object.fromEntries(Object.keys(FDI).sort((a, b) => FDI[b] - FDI[a]).map((s, i) => [s, i + 1]));
 const f1 = x => x.toFixed(1);
-/* FCI and FEDI values. The scale has ECI_UNIT points per logit, and a hundredth of a logit is the finest step that
+/* FCI and FDI values. The scale has ECI_UNIT points per logit, and a hundredth of a logit is the finest step that
    means anything; values show one digit fewer when that still keeps every model apart (Qiuyang, 2026-10-14). */
 const ECI_DP = (() => { const fine = Math.max(0, 2 - Math.floor(Math.log10(ECI_UNIT))), coarse = Math.max(0, fine - 1), pts = MODELS.map(m => ECI[m.id][0]);
   return new Set(pts.map(v => v.toFixed(coarse))).size === pts.length ? coarse : fine; })();

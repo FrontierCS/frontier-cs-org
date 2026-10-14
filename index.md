@@ -61,7 +61,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
           <div class="how-txt">
             <p class="how-step"><span>1</span>Passes, metric by metric</p>
             <p>FCI comes from pass and fail only. Each model has one FCI, with Kimi K2.7 at <span data-fill="zero"></span>. The human reference has none, since its code cannot beat itself.</p>
-            <p>Each metric a task checks has its own difficulty, and metrics that every run passes or fails together count once. A task passes when every metric does. Its <b>FEDI</b>, the FrontierCS Epoch Difficulty Index, is the FCI at which a model passes it half the time, with a 90% interval on the task’s page. The final score against the human reference’s only places metrics that no model beats.</p>
+            <p>Each metric a task checks has its own difficulty, and metrics that every run passes or fails together count once. A task passes when every metric does. Its <b>FDI</b>, the FrontierCS Difficulty Index, is the FCI at which a model passes it half the time, with a 90% interval on the task’s page. The final score against the human reference’s only places metrics that no model beats.</p>
           </div>
           <figure class="chart how-fig">
             <div class="chead"><span>Chance of passing on three tasks</span></div>
@@ -71,8 +71,8 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
         </div>
         <p class="how-step"><span>2</span>Why FCI</p>
         <ul class="how-why">
-          <li><b>It puts models and tasks on one scale.</b> A task’s FEDI is the FCI a model needs to pass it half the time, so a model’s FCI says which tasks it can be expected to pass.</li>
-          <li><b>It has room at the top.</b> The hardest task sits at FEDI <span data-fill="dmax"></span>, above every model, so the scale does not saturate the way a pass rate does.</li>
+          <li><b>It puts models and tasks on one scale.</b> A task’s FDI is the FCI a model needs to pass it half the time, so a model’s FCI says which tasks it can be expected to pass.</li>
+          <li><b>It has room at the top.</b> The hardest task sits at FDI <span data-fill="dmax"></span>, above every model, so the scale does not saturate the way a pass rate does.</li>
           <li><b>It builds on an established index.</b> FCI is a fork of Epoch AI’s <a href="https://epoch.ai/benchmarks/eci" target="_blank" rel="noopener">Epoch Capabilities Index</a> (ECI) and runs Epoch’s released code; we thank Epoch AI for both. This kind of fit, item response theory, has become a standard for AI capabilities: Anthropic tracks its models with its own fork, the AECI, in its <a href="https://www.anthropic.com/system-cards" target="_blank" rel="noopener">system cards</a>, and Google tracks its Gemini models with the GCI in its <a href="https://storage.googleapis.com/deepmind-media/gemini/gemini_4_safety_report.pdf" target="_blank" rel="noopener">Gemini 4 safety report</a>.</li>
         </ul>
       </div>
