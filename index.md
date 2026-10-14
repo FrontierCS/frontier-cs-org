@@ -115,11 +115,9 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
 <section class="sec" id="tasks">
   <h2>Problems</h2>
   <div class="idx">
-    <div class="filter" id="filter">
-      <h3>Filter</h3>
+    <div class="filter" id="filter" aria-label="Filter by domain">
       <button class="ftoggle" type="button" id="ftoggle" aria-expanded="false">Filter <span id="fcount"></span></button>
       <div class="fbody">
-        <h4>Domain</h4>
         <div class="checks" id="checks"></div>
       </div>
     </div>

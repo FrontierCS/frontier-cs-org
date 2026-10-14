@@ -186,14 +186,11 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 /* task index */
 .idx{display:grid; grid-template-columns:240px minmax(0,1fr); gap:24px 56px}
 @media (max-width:900px){ .idx{grid-template-columns:1fr} }
-.filter h3{font-size:26px; font-weight:500; margin:0 0 22px}
-.filter h4{font-size:21px; font-weight:500; margin:0 0 14px}
 .checks{display:flex; flex-direction:column; gap:7px; font-size:17px}
 .checks label{display:flex; align-items:center; gap:8px; cursor:pointer}
 .checks input{width:14px; height:14px; margin:0; accent-color:var(--ink-2)}
 .ftoggle{display:none}
 @media (max-width:900px){
-  .filter h3{display:none}
   .ftoggle{display:inline-flex; align-items:center; gap:8px; border:1px solid #80868b; background:#fff; border-radius:4px; height:42px; padding-inline:14px; font-weight:600}
   .filter .fbody{display:none; margin-top:14px} .filter.open .fbody{display:block}
   .checks{display:grid; grid-template-columns:1fr 1fr; gap:8px 12px; font-size:15px}
