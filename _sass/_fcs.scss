@@ -835,6 +835,10 @@ nav .pagination {
    ============================================================ */
 .fc-paper-logo img { mix-blend-mode: multiply; }
 .fc-actions { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 8px; }
+/* the 404 page: the overview's pills for its two ways out, a grey eyebrow (owner, design audit 7A) */
+.nf-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+.nf-actions .pill { font-size: 18px; padding: 12px 16px; }
+.page-hero .eyebrow.nf { color: var(--ink-3); }
 .fc-actions a {
   font-family: var(--font-mono);
   font-size: 13px;
