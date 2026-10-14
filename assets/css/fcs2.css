@@ -187,16 +187,21 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 /* task index */
 .idx{display:grid; grid-template-columns:240px minmax(0,1fr); gap:24px 56px}
 @media (max-width:900px){ .idx{grid-template-columns:1fr} }
-.checks{display:flex; flex-wrap:wrap; gap:8px; align-items:flex-start}   /* domain chips, the Group by chips' style */
-.checks .chip{font:inherit; font-size:14px; cursor:pointer; text-align:left}
-.checks .chip:hover{border-color:var(--muted)}
-.checks .chip .cn{margin-left:2px; color:var(--muted); font-variant-numeric:tabular-nums}
-.checks .chip[aria-pressed="true"] .cn{color:inherit; opacity:.7}
+.checks{display:flex; flex-direction:column; gap:8px; font-size:15px}   /* the same type and spacing as the mean-score settings list */
+.checks label{display:flex; align-items:center; gap:10px; cursor:pointer}
+.checks .cn{color:var(--muted); font-variant-numeric:tabular-nums}
+/* a Material 3 checkbox: a 2 px outline with a small radius, filled in the switch's blue with a white tick when checked
+   (owner, design audit 4B; the native box looked like the browser's) */
+.checks input{appearance:none; flex:none; display:grid; place-content:center; width:18px; height:18px; margin:0; border:2px solid var(--muted); border-radius:3px; background:#fff; cursor:pointer}
+.checks input::before{content:""; width:10px; height:5px; margin-top:-3px; border:solid #fff; border-width:0 0 2px 2px; transform:rotate(-45deg) scale(0); transition:transform .12s}
+.checks input:checked{background:var(--teal); border-color:var(--teal)} .checks input:checked::before{transform:rotate(-45deg) scale(1)}
+.checks label:hover input:not(:checked){border-color:var(--ink-2)}
+.checks input:focus-visible{outline:2px solid var(--teal); outline-offset:2px}
 .ftoggle{display:none}
 @media (max-width:900px){
   .ftoggle{display:inline-flex; align-items:center; gap:8px; border:1px solid #80868b; background:#fff; border-radius:4px; height:42px; padding-inline:14px; font-weight:600}
   .filter .fbody{display:none; margin-top:14px} .filter.open .fbody{display:block}
-  .checks{gap:8px}
+  .checks{display:grid; grid-template-columns:1fr 1fr; gap:8px 12px; font-size:15px}
 }
 .bar{display:flex; gap:12px; align-items:center; flex-wrap:wrap}
 .bar .field{flex:1 1 260px}

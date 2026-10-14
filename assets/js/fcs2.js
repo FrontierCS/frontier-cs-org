@@ -351,12 +351,11 @@ addEventListener('hashchange', fqHash); fqHash();
    FEDI, and the links. The filter is by domain; the search also
    reads goals and venues; the order is the reader's choice, hardest first to begin with. */
 let picked = new Set(), q = '', order = 'hard';
-// the domain filter: chips, as for Group by, any number pressed (owner, design audit 4A: no native checkboxes)
-$('#checks').innerHTML = DOMAINS.map(d => `<button type="button" class="chip" data-d="${esc(d)}" aria-pressed="false">${esc(d)} <span class="cn">${N_IN(d)}</span></button>`).join('');
+// the domain filter: checkboxes drawn as Material 3 ones, any number checked (owner, design audit: chips did not look good, 4B)
+$('#checks').innerHTML = DOMAINS.map(d => `<label><input type="checkbox" value="${esc(d)}">${esc(d)} <span class="cn">${N_IN(d)}</span></label>`).join('');
 $('#q').placeholder = `Search ${TASKS.length} problems`;
 const again = () => { drawRows(); $('#rows').scrollTop = 0; atEnd(); };
-$('#checks').addEventListener('click', e => { const c = e.target.closest('.chip'); if (!c) return; const d = c.dataset.d, on = !picked.has(d);
-  on ? picked.add(d) : picked.delete(d); c.setAttribute('aria-pressed', String(on)); again(); });
+$('#checks').addEventListener('change', e => { e.target.checked ? picked.add(e.target.value) : picked.delete(e.target.value); again(); });
 // the sort menu: a button in the search field's style and a menu of its own, as the native list cannot take the page's design
 // (owner, 2026-10-14); arrow keys move, Enter or Space picks, Escape or a click outside closes
 (() => { const dd = $('#tsort'), btn = dd.querySelector('.dd-btn'), menu = dd.querySelector('.dd-menu'), opts = [...menu.children];
