@@ -15,7 +15,7 @@ const AREAS = [
 const DOMAINS = AREAS.flatMap(a => a.d);
 const AREA_OF = Object.fromEntries(AREAS.flatMap(a => a.d.map(d => [d, a])));
 // the name a task is shown under, where its key in the run data is informal
-const SHORT = {'Adaptive attacks':'Adaptive Attacks', 'Approximate-MIPS Query Stopping':'FARGO Query Stopping', 'FARGO paper-aligned query core':'FARGO Query Core',
+const SHORT = {'Adaptive attacks':'Adaptive Attacks', 'egg':'Egg', 'Approximate-MIPS Query Stopping':'FARGO Query Stopping', 'FARGO paper-aligned query core':'FARGO Query Core',
   'Persistent Treap Update Engine':'Persistent Treap', 'kmeans kernel':'FlashLib K-Means', 'dbscan kernel':'FlashLib DBSCAN', 'ivf_pq kernel':'FlashLib IVF-PQ', 'knn kernel':'FlashLib KNN',
   'Robust Image Tokenizer':'DeTok', 'Differentiable Population Statistics':'Representation Fréchet Loss', 'OCR Distillation Trajectory Sampling':'Flow-OPD', 'Residual State Advancement':'JoinBoost',
   'Exact Sequence Alignment':'Edlib', 'CKKS noise':'CKKS Noise', 'Binary Fuse Filter Construction and Lookup':'Binary Fuse Filter', 'Structured LWE':'Structured LWE'};

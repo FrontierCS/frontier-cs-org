@@ -226,7 +226,7 @@ function drawLB() {
   } else {
     // one line per task, one dot per model: the model's mean over its runs on that task
     const ts = [...new Set(runs.map(r => r.t))];
-    rows = ts.map(t => ({label:t, sub:runs.find(r => r.t === t).d, items:MODELS.map(m => ({m:m.id, runs:runs.filter(r => r.t === t && r.m === m.id)})).filter(i => i.runs.length)}));
+    rows = ts.map(t => ({label:NAME(t), sub:runs.find(r => r.t === t).d, items:MODELS.map(m => ({m:m.id, runs:runs.filter(r => r.t === t && r.m === m.id)})).filter(i => i.runs.length)}));
     rows.forEach(r => r.best = Math.max(...r.items.map(i => mean(i.runs.map(x => x.s)))));
   }
   rows.sort((a, b) => b.best - a.best);
@@ -279,7 +279,7 @@ function drawLB() {
       if (showRuns) it.runs.forEach((x, j) => {
         const jy = ((j * 37) % 17 - 8) * (narrow ? .9 : 1.2);
         const c = sv('circle', {cx:X(x.s), cy:yc + jy, r:4.5, fill:MCOL[it.m], opacity:.4});
-        svg.append(c); if (an) mark(c, 'a-pop', d + rank.get(x) * dn); pts.push({x:X(x.s), y:yc + jy, html:`<b>${esc(MNAME[it.m])}</b><br>${esc(x.t)} · ${esc(x.d)}<br><b>${sgn(x.s)}</b>: final score ${f1(x.raw)}, human reference ${f1(REF[x.t])}`});
+        svg.append(c); if (an) mark(c, 'a-pop', d + rank.get(x) * dn); pts.push({x:X(x.s), y:yc + jy, html:`<b>${esc(MNAME[it.m])}</b><br>${esc(NAME(x.t))} · ${esc(x.d)}<br><b>${sgn(x.s)}</b>: final score ${f1(x.raw)}, human reference ${f1(REF[x.t])}`});
       });
       const dot = sv('circle', {cx:X(mu), cy:yc, r:8, fill:MCOL[it.m], stroke:'#fff', 'stroke-width':2});
       pts.push({x:X(mu), y:yc, html:`<b>${esc(MNAME[it.m])}</b><br>Mean <b>${sgn(mu)}</b> against the human reference`, mean:true});
