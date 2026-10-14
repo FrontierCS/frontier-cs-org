@@ -5,8 +5,6 @@ document.querySelectorAll('[data-fill]').forEach(el => { el.textContent = {updat
   runtasks:`on ${NTASK(RUNS)} tasks`, models:`${MODELS.length} models from ${new Set(MODELS.map(m => m.lab)).size} labs have run so far.`,
   summary:`${RUNS.length} runs on ${NTASK(RUNS)} tasks by ${MODELS.length} models`,
   ntasks:String(TASKS.length), ndomains:String(new Set(TASKS.map(t => t.d)).size), dmax:fe(Math.max(...Object.values(FDI))), zero:tick(ECI_LOW_VALUE)}[el.dataset.fill]; });
-// text in a model's colour, 22% darker: GPT-6.1 Sol, Qwen 3.8 Max and GLM 5.3 Flash are under 3:1 on white at full colour
-const MTXT = id => `color-mix(in srgb, ${MCOL[id]} 78%, #000)`;
 // Bring a tab into view inside its own horizontal strip only. scrollIntoView would also scroll the page,
 // which fought the reader's scrolling whenever the section spy fired.
 const reveal = el => { const p = el.parentElement, pr = p.getBoundingClientRect(), er = el.getBoundingClientRect();
@@ -34,7 +32,7 @@ const shown = new Set(), moving = !matchMedia('(prefers-reduced-motion: reduce)'
 const io = moving && new IntersectionObserver(es => es.forEach(e => {
   if (!e.isIntersecting || (e.intersectionRatio < .65 && e.intersectionRect.height < innerHeight * .65)) return;
   const svg = e.target; io.unobserve(svg); shown.add(svg.id); svg.getBoundingClientRect();
-  requestAnimationFrame(() => requestAnimationFrame(() => svg.classList.remove('pre'))); }), {threshold:[...Array(21).keys()].map(k => k / 20)});
+  requestAnimationFrame(() => requestAnimationFrame(() => { svg.classList.remove('pre'); svg.dispatchEvent(new Event('shown')); })); }), {threshold:[...Array(21).keys()].map(k => k / 20)});
 // whether this draw of the chart animates; call before drawing its children
 const animates = svg => { const on = moving && !shown.has(svg.id); svg.classList.toggle('anim', on); svg.classList.toggle('pre', on); if (on) io.observe(svg); return on; };
 // mark an element: kind a-bar | a-wipe | a-fade | a-pop | a-draw (a path with pathLength 1), delay in s, dx a start offset in px (unused for now)
@@ -88,25 +86,7 @@ function drawPassCost() {
     // under it a smaller dot and a regular name, both at full colour (owner, 2026-10-13: keep the chart clean)
     const lead = front.includes(m);
     svg.append(sv('circle', {cx, cy, r:lead ? 7.5 : 5, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':2, 'data-m':m.id}));
-    const lab = sv('text', {class:'lab halo', x:cx, y:cy}, name); svg.append(lab);
-    let w = lab.getComputedTextLength() + 2;
-    // right, left, above, below, the four diagonals, then the same one and two lines further out; the first spot clear of every dot and placed label wins
-    const spots = [[cx + 12, cy + 4.5, 'start'], [cx - 12, cy + 4.5, 'end'], [cx, cy - 13, 'middle'], [cx, cy + 22, 'middle'],
-      [cx + 8, cy - 11, 'start'], [cx - 8, cy - 11, 'end'], [cx + 8, cy + 20, 'start'], [cx - 8, cy + 20, 'end'],
-      [cx, cy - 31, 'middle'], [cx, cy + 40, 'middle'], [cx + 6, cy - 29, 'start'], [cx - 6, cy - 29, 'end'], [cx + 6, cy + 38, 'start'], [cx - 6, cy + 38, 'end'],
-      [cx, cy - 49, 'middle'], [cx, cy + 58, 'middle'], [cx - 6, cy - 47, 'end'], [cx - 6, cy + 56, 'end']];
-    const box = ([x, y, an]) => ({x:an === 'start' ? x : an === 'end' ? x - w : x - w / 2, y:y - 11, w, h:14});   // the glyphs' own height, so a label can sit beside its dot in a tight cluster
-    const hit = q => boxes.some(o => q.x < o.x + o.w && o.x < q.x + q.w && q.y < o.y + o.h && o.y < q.y + q.h) || q.x < L || q.x + q.w > W || q.y < 0;
-    // a name with no spot next to its dot sheds its brand word ("Muse Wonder 1.0" becomes "Wonder 1.0", as Claude Opus 5.5 is "Opus 5.5")
-    // before it moves a line or two away; a label is dropped only when neither form fits anywhere
-    const tight = /^\S+ (\S+ \d[\d.]*)$/.exec(name), forms = tight ? [name, tight[1]] : [name];
-    let spot;
-    for (const [str, from] of [...forms.map(f => [f, spots.slice(0, 8)]), ...forms.map(f => [f, spots])]) {
-      lab.textContent = str; w = lab.getComputedTextLength() + 2; spot = from.find(sp => !hit(box(sp))); if (spot) break; }
-    if (spot) { boxes.push(box(spot)); lab.setAttribute('x', spot[0]); lab.setAttribute('y', spot[1]); lab.setAttribute('text-anchor', spot[2]);
-      // a label wears its dot's colour, darkened to read on white, so a crowded patch still pairs each name with its dot
-      lab.style.fill = MTXT(m.id); if (lead) lab.style.fontWeight = 600; }
-    else lab.remove();
+    labelDot(svg, boxes, cx, cy, name, {l:L, r:W, t:T, b:H - B}, MTXT(m.id), lead);   // fcs2-data.js
     const pct = PASS[m.id][0];
     pts.push({x:cx, y:cy, mean:true, html:`<b>${esc(m.name)}</b><br>Pass rate <b>${f1(pct)}%</b><br>${usdfmt(COST[m.id][0])} per run, mean`});
   });
@@ -152,50 +132,106 @@ function drawECI() {
 
 /* Test-time scaling: the FCI a model would have if every run stopped at a US$ budget (SCALE, from
    bin/fcs2_runs_from_db.py); a run counts as passed only once it has ended within the budget with a pass (Qiuyang,
-   2026-10-14). Values below 0 leave the plot through its bottom edge. The drawing is that of 2026-10-12: straight segments, one legend
-   (owner, 2026-10-13: back to it).
+   2026-10-14). Straight segments and one legend (owner, 2026-10-13).
    Every model with reported spend is in the legend; at first only each lab's model with the highest FCI is drawn and the
    others are greyed in the legend; a click on an entry shows or hides its curve (owner, 2026-10-14). A model's 90% band
-   shows only while the pointer is on its curve or its legend entry (owner, 2026-10-13: no bands otherwise). */
-let ttsHover = null;
+   shows only while the pointer is on its curve or its legend entry (owner, 2026-10-13: no bands otherwise).
+   Each curve starts at its first budget on the scale, FCI 0 or more, as a plain line with no start mark (owner, 2026-10-14; Qiuyang: the
+   values under 0 drew every curve in from the bottom edge as a comb of near-vertical strokes). When the chart first comes
+   into view a moving focus plays (Melissa's and Qiuyang's idea, 2026-10-14): a budget cursor sweeps right, slow where
+   curves start or rise and quick across empty stretches; the view follows it, zoomed in on cheap budgets first and
+   widening to the whole range; curves rising at the cursor are drawn in full and named at their tip while the others
+   step back. At rest nothing is named in the plot: the legend names the curves. */
+let ttsHover = null, ttsRun = 0;
 const TTSM = RANKED.filter(m => SCALE[m.id]);   // a model with no reported spend has no curve
 const ttsOn = new Set(TTSM.filter((m, i, a) => a.findIndex(o => o.lab === m.lab) === i).map(m => m.id));
 const ttsBands = () => document.querySelectorAll('#ttssvg .tband').forEach(b => b.setAttribute('opacity', b.dataset.m === ttsHover ? .12 : 0));
-function drawTTS() {
+const ttsCurve = id => SCALE[id].filter(p => p[1] >= 0);   // [US$, FCI, 90% low, 90% high, share still going], from FCI 0 up
+// a curve up to log budget lx, ending on the point interpolated there
+function ttsUpTo(c, lx) {
+  const out = [];
+  for (let i = 0; i < c.length; i++) {
+    const l = Math.log10(c[i][0]);
+    if (l <= lx) { out.push(c[i]); continue; }
+    if (i) { const a = c[i - 1], la = Math.log10(a[0]), f = (lx - la) / (l - la); out.push([10 ** lx, a[1] + f * (c[i][1] - a[1])]); }
+    break;
+  }
+  return out;
+}
+// the focus's pacing was tuned on the old Human = 25 scale, about 7 of its points to a logit of the pass-based one
+const TTS_PT = 7 / ECI_UNIT;
+const ttsEase = t => t < .5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
+// the cursor's log budget at time t: a stretch takes time in proportion to how much happens in it (curves starting, FCI
+// gained), with a floor, so the sweep slows through the busy stretches and hurries across the empty ones
+function ttsSweep(cs, x0, x1, t) {
+  const n = 240, w = [0], at = (c, lx) => { const v = ttsUpTo(c, lx); return v.length ? v[v.length - 1][1] : null; };
+  for (let k = 1; k <= n; k++) {
+    const a = x0 + (x1 - x0) * (k - 1) / n, b = x0 + (x1 - x0) * k / n;
+    let act = .6;
+    cs.forEach(c => { const s0 = Math.log10(c[0][0]); if (s0 > a && s0 <= b) act += 30;
+      const ya = at(c, a), yb = at(c, b); if (ya != null && yb != null) act += Math.abs(yb - ya) * 6 * TTS_PT; });
+    w.push(w[k - 1] + act);
+  }
+  const target = w[n] * t; let k = 1; while (k < n && w[k] < target) k++;
+  return x0 + (x1 - x0) * (k - 1 + (target - w[k - 1]) / ((w[k] - w[k - 1]) || 1)) / n;
+}
+function ttsPlay(run) {
+  const t0 = performance.now(), D = 3400;
+  const step = now => { if (run !== ttsRun) return; const t = Math.min(1, (now - t0) / D); drawTTS(t); if (t < 1) requestAnimationFrame(step); };
+  requestAnimationFrame(step);
+}
+// drawTTS() draws at rest, or at time 0 waiting to play when the chart has not been seen yet; drawTTS(t) draws one frame
+function drawTTS(t) {
   const svg = $('#ttssvg'), W = Math.max(300, $('#ttsplot').clientWidth), narrow = W < 560;
+  if (t == null) { const run = ++ttsRun; t = 1; if (animates(svg)) { t = 0; svg.addEventListener('shown', () => ttsPlay(run), {once:true}); } }
   const L = 34, R = narrow ? 12 : 24, T = 12, B = 46, H = CHART_H.tts || (narrow ? 300 : 380);
-  const all = TTSM.flatMap(m => SCALE[m.id]);   // the axes hold every model, so showing one moves nothing
-  // the axis starts half a decade before the first budget at which any model rises above 0
-  const x0 = Math.log10(Math.min(...all.filter(p => p[1] >= 0).map(p => p[0]))) - 0.5, x1 = Math.log10(Math.max(...all.map(p => p[0])));
+  const all = TTSM.flatMap(m => ttsCurve(m.id));   // the axes hold every model, so showing one moves nothing
+  const x0 = Math.log10(Math.min(...all.map(p => p[0]))) - .15, x1 = Math.log10(Math.max(...all.map(p => p[0])));
   const ytop = Math.max(...all.map(p => p[3])), ystep = eciStep(ytop, narrow ? 4 : 5), ymax = Math.ceil(ytop / ystep) * ystep;   // about five steps from 0, whatever the scale's unit
-  const X = v => L + (Math.log10(v) - x0) / (x1 - x0) * (W - L - R), Y = v => T + (1 - v / ymax) * (H - T - B);
-  const an = animates(svg);
+  const ms = [...TTSM].reverse().filter(m => ttsOn.has(m.id)), cs = ms.map(m => ttsCurve(m.id));
+  const play = t < 1, sweep = play ? ttsSweep(cs, x0, x1, ttsEase(t)) : x1;
+  const vx1 = play ? Math.min(x1, Math.max(x0 + 1.1, sweep + .45)) : x1;   // the view: at least a decade wide, just past the cursor
+  const X = v => L + (Math.log10(v) - x0) / (vx1 - x0) * (W - L - R), Y = v => T + (1 - v / ymax) * (H - T - B);
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
-  const clip = sv('clipPath', {id:'ttsclip'}), cr = sv('rect', {x:L, y:T - 4, width:W - L - R + 8, height:H - T - B + 4}); clip.append(cr); svg.append(clip);
-  if (an) mark(cr, 'a-wipe');   // the curves and bands are uncovered left to right, along the budget axis
+  const clip = sv('clipPath', {id:'ttsclip'}); clip.append(sv('rect', {x:L, y:T - 6, width:W - L - R + 10, height:H - T - B + 6})); svg.append(clip);
   for (let i = 0, v = 0; v <= ymax + ystep / 2; v = ++i * ystep) {
     svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1}));
     svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, tick(v)));
   }
-  for (let k = Math.ceil(x0); k <= Math.floor(x1); k++) {
+  for (let k = Math.ceil(x0); k <= Math.floor(vx1); k++) {
     svg.append(sv('line', {x1:X(10 ** k), x2:X(10 ** k), y1:H - B, y2:H - B + 5, stroke:'var(--ink-2)', 'stroke-width':1}));
     svg.append(sv('text', {x:X(10 ** k), y:H - B + 20, 'text-anchor':'middle'}, usdfmt(10 ** k)));
   }
   svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'Cost budget per run in US$, log scale'));
   const g = sv('g', {'clip-path':'url(#ttsclip)'}), gb = sv('g'), gl = sv('g'); g.append(gb, gl); svg.append(g);   // bands under every line
-  const pts = [];
-  [...TTSM].reverse().filter(m => ttsOn.has(m.id)).forEach(m => {
-    const c = SCALE[m.id], path = c.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join('');
-    const band = c.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[3]).toFixed(1)}`).join('')
-      + [...c].reverse().map(p => `L${X(p[0]).toFixed(1)},${Y(p[2]).toFixed(1)}`).join('') + 'Z';
-    const bp = sv('path', {class:'tband', 'data-m':m.id, d:band, fill:MCOL[m.id], opacity:0});
-    const lp = sv('path', {d:path, fill:'none', stroke:MCOL[m.id], 'stroke-width':2.2, 'stroke-linejoin':'round'});
-    const e = c[c.length - 1], end = sv('circle', {cx:X(e[0]), cy:Y(e[1]), r:4.5, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':1.5});
-    gb.append(bp); gl.append(lp, end);
-    if (an) mark(end, 'a-fade', 1.3);
-    c.forEach(p => { if (p[1] >= 0) pts.push({x:X(p[0]), y:Y(p[1]), m:m.id, html:`<b>${esc(m.name)}</b><br>FCI <b>${fe(p[1])}</b> at ${usdfmt(p[0])} per run`
-      + `<br>90% interval ${fe(Math.max(p[2], 0))}–${fe(p[3])}<br>${Math.round(p[4] * 100)}% of runs still going`}); });
+  // rising at the cursor: started within the last 0.35 decade, or 2 old points (2 / TTS_PT FCI) gained over it; nothing steps back while nothing rises
+  const rising = c => { const s0 = Math.log10(c[0][0]); if (s0 > sweep) return false; const e = ttsUpTo(c, sweep), b = ttsUpTo(c, sweep - .35);
+    return s0 > sweep - .35 || e[e.length - 1][1] - b[b.length - 1][1] >= 2 / TTS_PT; };
+  const anyRising = play && cs.some(rising), pts = [], tips = [];
+  ms.forEach((m, k) => {
+    const c = cs[k], vis = play ? ttsUpTo(c, sweep) : c;
+    if (!vis.length) return;
+    const lit = !anyRising || rising(c), op = lit ? null : .28;
+    const path = vis.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join('');
+    if (!play) gb.append(sv('path', {class:'tband', 'data-m':m.id, opacity:0, fill:MCOL[m.id],
+      d:c.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[3]).toFixed(1)}`).join('') + [...c].reverse().map(p => `L${X(p[0]).toFixed(1)},${Y(p[2]).toFixed(1)}`).join('') + 'Z'}));
+    const e = vis[vis.length - 1];
+    gl.append(sv('path', {d:path, fill:'none', stroke:MCOL[m.id], 'stroke-width':2.2, 'stroke-linejoin':'round', opacity:op}),
+      sv('circle', {cx:X(e[0]), cy:Y(e[1]), r:4.5, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':1.5, opacity:op}));
+    if (play && anyRising && lit) tips.push({m, e});
+    if (!play) c.forEach(p => pts.push({x:X(p[0]), y:Y(p[1]), m:m.id, html:`<b>${esc(m.name)}</b><br>FCI <b>${fe(p[1])}</b> at ${usdfmt(p[0])} per run`
+      + `<br>90% interval ${fe(Math.max(p[2], 0))}–${fe(p[3])}<br>${Math.round(p[4] * 100)}% of runs still going`}));
   });
+  // while the focus moves, the rising curves are named at their tips, off every line where there is room
+  if (tips.length) {
+    const fr = {l:L, r:W, t:T, b:H - B}, boxes = tips.map(({e}) => ({x:X(e[0]) - 7, y:Y(e[1]) - 7, w:14, h:14})), near = [];
+    gl.querySelectorAll('path').forEach(el => { const n = el.getTotalLength(); for (let l = 0; l <= n; l += 6) { const q = el.getPointAtLength(l); near.push({x:q.x - 2, y:q.y - 2, w:4, h:4}); } });
+    tips.sort((a, b) => b.e[1] - a.e[1]).forEach(({m, e}) => { const both = boxes.concat(near), name = narrow ? m.short : m.name;
+      if (labelDot(svg, both, X(e[0]), Y(e[1]), name, fr, MTXT(m.id), false)) boxes.push(both[both.length - 1]);
+      else labelDot(svg, boxes, X(e[0]), Y(e[1]), name, fr, MTXT(m.id), false); });
+  }
+  $('#ttslegend').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', ttsOn.has(x.dataset.m)));
+  if (play) { svg.onpointermove = svg.onpointerdown = svg.onpointerleave = null; return; }
   attachTip(svg, W, H, pts, $('#ttstip'));
   // the curve under the pointer: the nearest point within 28 px, as the tooltip picks it; set as properties, so a redraw replaces them
   const tipMove = svg.onpointermove, tipLeave = svg.onpointerleave;
@@ -203,7 +239,6 @@ function drawTTS() {
     let best = null, bd = 28; pts.forEach(p => { const d = Math.hypot(p.x - px, p.y - py); if (d < bd) { bd = d; best = p; } });
     const m = best ? best.m : null; if (m !== ttsHover) { ttsHover = m; ttsBands(); } };
   svg.onpointerleave = ev => { tipLeave(ev); ttsHover = null; ttsBands(); };
-  $('#ttslegend').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', ttsOn.has(x.dataset.m)));
   ttsBands();
 }
 $('#ttslegend').innerHTML = TTSM.map(m => `<button type="button" data-m="${m.id}" aria-pressed="false"><i style="background:${MCOL[m.id]}"></i>${esc(m.name)}</button>`).join('');
