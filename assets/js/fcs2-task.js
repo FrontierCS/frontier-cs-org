@@ -1,7 +1,7 @@
 // FrontierCS 2 task page (_pages/fcs2-task.md). /task/#<slug> renders one task from fcs2-data.js, loaded first;
 // /task/ with no slug lists every task by domain. For a task with runs: what the agent must do and what it is scored on,
-// a results table (pass or fail, final score against the Human reference, cost), the solution each shown model handed in,
-// the pass criteria, every run's development score against its spend, and the task's FECI curve. assets/css/fcs2.css holds the styles.
+// a results table (pass or fail, final score against the human reference, cost), the solution each shown model handed in,
+// the pass criteria, every run's development score against its spend, and the task's pass curve on the FECI scale. assets/css/fcs2.css holds the styles.
 
 const RANK = Object.fromEntries(RANKED.map((m, i) => [m.id, i]));
 const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;   // the patch counts files
@@ -30,10 +30,11 @@ function drawPage() {
   // assets/img/fcs2-tasks/<slug>.svg and set inline so it takes the page's type (Qiuyang, 2026-10-14)
   const goal = GOAL[t.s], key = KEYM[t.s];
   $('#tgoal').textContent = goal || ''; $('#tgoal').hidden = !goal;
-  // the task's FEDI and its rank, with a link to what FEDI is (owner, 2026-10-14); the address comes from a real link in the
-  // markup, so it follows the site's base URL and the preview's relative links alike
-  const fr = FRANK[t.s], fe = $('#tfedi');
-  fe.innerHTML = fr ? `<span>FEDI</span><b>${f1(FEDI[t.s])}</b><span>the ${fr === Object.keys(FRANK).length ? 'easiest' : (fr === 1 ? '' : ordinal(fr) + ' ') + 'hardest'} of ${Object.keys(FRANK).length} tasks</span><a href="${esc($('#howlink').getAttribute('href'))}">What is FEDI?</a>` : '';
+  // the task's FEDI, its 90% interval and its rank, with a link to what FEDI is (owner, 2026-10-14; the interval: Qiuyang,
+  // 2026-10-14); the address comes from a real link in the markup, so it follows the site's base URL and the preview's relative links alike
+  const fr = FRANK[t.s], N = Object.keys(FRANK).length;
+  $('#tfedi').innerHTML = fr ? `<span>FEDI</span><b>${fe(FEDI[t.s])}</b><span>the ${fr === N ? 'easiest' : (fr === 1 ? '' : ordinal(fr) + ' ') + 'hardest'} of ${N} tasks,</span>`
+    + `<span>90% interval ${fe(DIFF[t.s][1])}–${fe(DIFF[t.s][2])}</span><a href="${esc($('#howlink').getAttribute('href'))}">What is FEDI?</a>` : '';
   $('#tkeys').innerHTML = key ? `<span class="lab">Scored on</span>${key.map(k => `<span class="k">${esc(k)}</span>`).join('')}` : '';
   $('#tfig').hidden = true; $('#tfig').innerHTML = ''; $('#thero').classList.add('nofig');
   // a rewritten description (three paragraphs split by ¶) sits under the top block, one column each: the idea, what the
@@ -44,14 +45,18 @@ function drawPage() {
   if (!runs.length) { $('#tbody').innerHTML = lead + '<p class="tbd">No runs on this task yet.</p>'; loadFig(t); drawPager(t); scrollTo(0, 0); return; }
   const ref = REF[t.s], ms = new Set(runs.map(r => r[0])), np = new Set(runs.filter(r => r[3]).map(r => r[0])).size;
   const best = runs.reduce((a, r) => r[2] > a[2] ? r : a);
-  const sum = [`<b>${np} of ${ms.size}</b> models pass`, `best final score <b>${f1(best[2])}</b>, by ${esc(MNAME[best[0]])}`]
-    .concat(ref != null ? [`human reference <b>${f1(ref)}</b>`] : [], []);
+  // beside who passes, the wins the FEDI fit counts (DIFF): runs whose final score is above the human reference's, a tie
+  // counting half; none without a reference (Qiuyang, 2026-10-14)
+  const [, , , , dw, dn] = DIFF[t.s] || [];
+  const sum = [`<b>${np} of ${ms.size}</b> models pass`]
+    .concat(dw != null ? [`<b>${+dw.toFixed(1)} of ${dn}</b> score above the human reference`] : [])
+    .concat([`best final score <b>${f1(best[2])}</b>, by ${esc(MNAME[best[0]])}`], ref != null ? [`human reference <b>${f1(ref)}</b>`] : []);
   $('#tbody').innerHTML = lead
     + `<section class="tres"><h2 class="th2">Results</h2><p class="tsum">${sum.join(' · ')}</p><div class="res-scroll"><table class="res rtab" id="rtbl"></table></div></section>`
     + (CHECKS[t.s] ? `<section class="tcrit"><h2 class="th2">Pass criteria</h2><p>A run passes only if its final submission beats the human reference on every metric, on every hidden workload. Each cell counts the hidden workloads on which it did.</p>`
       + `<div class="res-scroll"><table class="res ctab" id="ctbl"></table></div></section>` : '')   // no general submission note (owner audit, 2026-10-14)
     + figure('dc', 'Development score against spend')
-    + (TFIT[t.s] ? figure('fc', 'Expected score by FECI') : '')
+    + (TFIT[t.s] && DIFF[t.s] ? figure('fc', 'Chance of passing by FECI') : '')
     + solutionHTML(t, runs);   // the solution last (owner, 2026-10-14)
   drawResults(); if (CHECKS[t.s]) drawCriteria(); drawCharts(); loadPatches(t); loadFig(t); drawPager(t);
   scrollTo(0, 0);
@@ -124,7 +129,7 @@ function drawResults() {
 
 function drawCharts() {
   if (!cur || !cur.runs.length) return;
-  drawDev(); if (TFIT[cur.t.s]) drawFit();
+  drawDev(); if (TFIT[cur.t.s] && DIFF[cur.t.s]) drawFit();
 }
 
 /* Every run's development score at each submission against its estimated spend so far, US$ on a log scale. */
@@ -160,49 +165,52 @@ function drawDev() {
   $('#dcnote').textContent = 'Each line is one run: its score on the development workloads after each submission, against its estimated spend so far. A failed build or check scores 0.';
 }
 
-/* The task's curve from the FECI fit: the score a model of a given FECI is expected to reach. Dots: each model's mean final
-   score on this task at the model's FECI, and the Human reference at FECI ECI_HUMAN. */
+/* The task's pass curve (TFIT): the chance that a model of a given FECI passes it, 50% at the task's FEDI, whose 90%
+   interval is the whisker there (Qiuyang, 2026-10-14). Dots: each model at its FECI, at the share of its runs here that
+   pass, so at 100% or 0% for a model with one run. The human reference has no FECI and no dot. */
 function drawFit() {
-  const {t, runs} = cur, [d, k] = TFIT[t.s], ref = REF[t.s];
+  const {t, runs} = cur, [d, k] = TFIT[t.s], [, dlo, dhi] = DIFF[t.s];
   const svg = $('#fcsvg'), W = Math.max(300, $('#fcplot').clientWidth), narrow = W < 560;
-  const L = 34, R = narrow ? 12 : 24, T = 12, B = 46, H = narrow ? 280 : 320;
-  // the axis holds 0 to 50, every model, and the task's FEDI with 10 to spare on each side (owner, 2026-10-14: a FEDI
-  // of 57 or of -49 fell off the old 0 to 50 axis); grid every 10, every 20 past a span of 80
-  const es = RANKED.map(m => ECI[m.id][0]), lo = Math.min(0, d - 10, ...es), hi = Math.max(50, d + 10, ...es), step = hi - lo > 80 ? 20 : 10;
+  const L = 44, R = narrow ? 12 : 24, T = 12, B = 46, H = narrow ? 280 : 320;
+  // the axis holds 0 (Kimi K2.7), every model, the FEDI's interval and the curve from 10% to 90%
+  const es = RANKED.map(m => ECI[m.id][0]), lo = Math.min(ECI_LOW_VALUE, dlo, d - 2.2 / k, ...es), hi = Math.max(dhi, d + 2.2 / k, ...es), step = eciStep(hi - lo, narrow ? 4 : 7);
   const xmin = Math.floor(lo / step) * step, xmax = Math.ceil(hi / step) * step;
   const X = v => L + (v - xmin) / (xmax - xmin) * (W - L - R), Y = v => T + (1 - v / 100) * (H - T - B), f = x => 100 / (1 + Math.exp(-k * (x - d)));
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
-  for (let v = 0; v <= 100; v += 20) {
+  for (let v = 0; v <= 100; v += 25) {
     svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1}));
-    svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, v));
+    svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, v + '%'));
   }
-  for (let v = xmin; v <= xmax; v += step) {
+  for (let i = 0, v = xmin; v <= xmax + step / 2; v = xmin + ++i * step) {
     svg.append(sv('line', {x1:X(v), x2:X(v), y1:H - B, y2:H - B + 5, stroke:'var(--ink-2)', 'stroke-width':1}));
-    svg.append(sv('text', {x:X(v), y:H - B + 20, 'text-anchor':'middle'}, v));
+    svg.append(sv('text', {x:X(v), y:H - B + 20, 'text-anchor':'middle'}, tick(v)));
   }
   svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'FECI'));
   const n = 120, path = Array.from({length:n + 1}, (_, i) => { const x = xmin + (xmax - xmin) * i / n; return `${i ? 'L' : 'M'}${X(x).toFixed(1)},${Y(f(x)).toFixed(1)}`; }).join('');
   svg.append(sv('path', {d:path, fill:'none', stroke:'var(--ink-2)', 'stroke-width':2.5}));
-  // the task's FEDI: where the curve crosses an expected score of 50
-  // a dashed drop to the axis marks it there; the label sits above and left of the point, which is off a rising curve
+  // the task's FEDI: where the curve crosses 50%, with its 90% interval as a whisker, as on the FECI chart; a dashed drop
+  // to the axis marks it there; the label sits above and left of the point, which is off a rising curve
   svg.append(sv('line', {x1:X(d), x2:X(d), y1:Y(50), y2:H - B, stroke:'var(--ink-2)', 'stroke-width':1, 'stroke-dasharray':'3 3', opacity:.7}));
+  svg.append(sv('path', {d:`M${X(dlo)},${Y(50)}H${X(dhi)}M${X(dlo)},${Y(50) - 6}v12M${X(dhi)},${Y(50) - 6}v12`, fill:'none', stroke:'var(--ink-2)', 'stroke-width':1.5}));
   svg.append(sv('circle', {cx:X(d), cy:Y(50), r:4.5, fill:'#fff', stroke:'var(--ink-2)', 'stroke-width':2}));
   const left = X(d) - L > 90;   // near the left edge the label goes right of the point
-  svg.append(sv('text', {class:'val halo', x:X(d) + (left ? -10 : 10), y:Y(50) - 12, 'text-anchor':left ? 'end' : 'start', fill:'var(--ink-2)'}, `FEDI ${f1(d)}`));
-  const pts = [];
+  svg.append(sv('text', {class:'val halo', x:X(d) + (left ? -10 : 10), y:Y(50) - 14, 'text-anchor':left ? 'end' : 'start', fill:'var(--ink-2)'}, `FEDI ${fe(d)}`));
+  const pts = [{x:X(d), y:Y(50), html:`<b>FEDI ${fe(d)}</b><br>90% interval ${fe(dlo)}–${fe(dhi)}`}];
+  const placed = [];
   RANKED.filter(m => runs.some(r => r[0] === m.id)).forEach(m => {
-    const sc = mean(runs.filter(r => r[0] === m.id).map(r => r[2])), x = ECI[m.id][0];
-    svg.append(sv('circle', {cx:X(x), cy:Y(sc), r:6, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':1.5}));
-    pts.push({x:X(x), y:Y(sc), html:`<b>${esc(m.name)}</b><br>FECI ${f1(x)}<br>Mean final score here <b>${f1(sc)}</b><br>Expected from the curve ${f1(f(x))}`});
+    const rs = runs.filter(r => r[0] === m.id), np = rs.filter(r => r[3]).length, y = np / rs.length * 100, x = ECI[m.id][0];
+    // models with the same passes have the same FECI: a dot that would hide another steps half a dot in from the 0% or
+    // 100% line, twice at most, so the dots stay on their line and partial overlaps remain
+    let cy = Y(y); const dir = y > 50 ? 1 : -1, r = narrow ? 5 : 6;
+    for (let k = 0; k < 2 && placed.some(p => Math.hypot(p[0] - X(x), p[1] - cy) < r); k++) cy += dir * (r + 1);
+    placed.push([X(x), cy]);
+    svg.append(sv('circle', {cx:X(x), cy, r, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':1.5}));
+    pts.push({x:X(x), y:cy, html:`<b>${esc(m.name)}</b><br>FECI ${fe(x)}<br>${rs.length === 1 ? (np ? 'Passes' : 'Does not pass') : `Passes <b>${np} of ${rs.length}</b> runs`} here`
+      + `<br>Chance from the curve ${Math.round(f(x))}%`});
   });
-  if (ref != null) {
-    svg.append(sv('rect', {x:X(ECI_HUMAN) - 5.5, y:Y(ref) - 5.5, width:11, height:11, fill:'var(--ink)', stroke:'#fff', 'stroke-width':1.5}));
-    pts.push({x:X(ECI_HUMAN), y:Y(ref), html:`<b>Human reference</b><br>FECI ${ECI_HUMAN} by definition<br>Score <b>${f1(ref)}</b>`});
-  }
   attachTip(svg, W, H, pts, $('#fctip'));
-  $('#fclegend').innerHTML = RANKED.filter(m => runs.some(r => r[0] === m.id)).map(m => `<span><i style="background:${MCOL[m.id]}; border-radius:50%"></i>${esc(m.name)}</span>`).join('')
-    + (ref != null ? '<span><i style="background:var(--ink)"></i>Human reference</span>' : '');
-  $('#fcnote').textContent = `The curve is the score expected at each FECI, from the fit. Dots are the models’ final scores here at their FECI.`;
+  $('#fclegend').innerHTML = RANKED.filter(m => runs.some(r => r[0] === m.id)).map(m => `<span><i style="background:${MCOL[m.id]}; border-radius:50%"></i>${esc(m.name)}</span>`).join('');
+  $('#fcnote').textContent = 'The curve is the chance of passing at each FECI, from the fit. Dots are the models at their FECI: at 100% if they pass here, at 0% if not.';
 }
 
 /* The solution in words (SOLUTION, assets/js/fcs2-solutions.js; owner, 2026-10-14: no code, the idea): which model,
