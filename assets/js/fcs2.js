@@ -346,11 +346,30 @@ $('#checks').innerHTML = DOMAINS.map(d => `<label><input type="checkbox" value="
 $('#q').placeholder = `Search ${TASKS.length} problems`;
 const again = () => { drawRows(); $('#rows').scrollTop = 0; atEnd(); };
 $('#checks').addEventListener('change', e => { e.target.checked ? picked.add(e.target.value) : picked.delete(e.target.value); again(); });
-$('#tsort').addEventListener('change', e => { order = e.target.value; again(); });
+// the sort menu: a button in the search field's style and a menu of its own, as the native list cannot take the page's design
+// (owner, 2026-10-14); arrow keys move, Enter or Space picks, Escape or a click outside closes
+(() => { const dd = $('#tsort'), btn = dd.querySelector('.dd-btn'), menu = dd.querySelector('.dd-menu'), opts = [...menu.children];
+  opts.forEach(o => o.tabIndex = -1);
+  const close = (refocus) => { menu.hidden = true; btn.setAttribute('aria-expanded', 'false'); if (refocus) btn.focus(); };
+  const open = () => { menu.hidden = false; btn.setAttribute('aria-expanded', 'true'); (opts.find(o => o.getAttribute('aria-selected') === 'true') || opts[0]).focus(); };
+  const pick = o => { opts.forEach(x => x.setAttribute('aria-selected', String(x === o))); dd.querySelector('.dd-val').textContent = o.textContent;
+    close(true); if (order !== o.dataset.v) { order = o.dataset.v; again(); } };
+  btn.addEventListener('click', () => menu.hidden ? open() : close(false));
+  btn.addEventListener('keydown', e => { if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); open(); } });
+  menu.addEventListener('click', e => { const o = e.target.closest('[role=option]'); if (o) pick(o); });
+  menu.addEventListener('keydown', e => { const i = opts.indexOf(document.activeElement);
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); opts[(i + (e.key === 'ArrowDown' ? 1 : opts.length - 1)) % opts.length].focus(); }
+    else if (e.key === 'Home' || e.key === 'End') { e.preventDefault(); opts[e.key === 'Home' ? 0 : opts.length - 1].focus(); }
+    else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (i >= 0) pick(opts[i]); }
+    else if (e.key === 'Escape' || e.key === 'Tab') close(e.key === 'Escape'); });
+  document.addEventListener('pointerdown', e => { if (!menu.hidden && !dd.contains(e.target)) close(false); });
+})();
 $('#ftoggle').addEventListener('click', () => { const f = $('#filter'), o = !f.classList.contains('open'); f.classList.toggle('open', o); $('#ftoggle').setAttribute('aria-expanded', String(o)); });
 $('#q').addEventListener('input', e => { q = e.target.value; again(); });
 // the list scrolls in its own box, all tasks in it (owner, 2026-10-14: no Show more button); the foot fades until the end is reached
-const atEnd = () => { const r = $('#rows'); r.classList.toggle('at-end', r.scrollTop + r.clientHeight >= r.scrollHeight - 2); };
+const atEnd = () => { const r = $('#rows'); r.classList.toggle('at-end', r.scrollTop + r.clientHeight >= r.scrollHeight - 2);
+  // the head line ends where the rows do: past them sit the list's own padding and its scroll bar, whatever width the browser gives it
+  $('#lhead').style.paddingRight = `${r.offsetWidth - r.clientWidth + parseFloat(getComputedStyle(r).paddingRight)}px`; };
 $('#rows').addEventListener('scroll', atEnd, {passive:true}); addEventListener('resize', atEnd);
 function hits() {
   const w = q.toLowerCase().split(/\s+/).filter(Boolean);
@@ -561,12 +580,13 @@ document.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse' &&
 function drawRows() {
   const h = hits(); $('#fcount').textContent = picked.size ? `(${picked.size})` : '';
   $('#lhead').innerHTML = `<span>${h.length === TASKS.length ? `${TASKS.length} problems` : `${h.length} of ${TASKS.length} problems`}</span><span></span>`
-    + `<span title="The share of the ten models that pass. One dot per model, in leaderboard order; a filled dot passes.">Pass rate</span><span></span>`;
+    + `<span title="The share of the ten models that pass">Pass rate</span><span></span>`;
   $('#rows').innerHTML = h.map(t => { const s = t.s, v = VENUE[s], goal = GOAL[s], ttl = t.t || (v ? t.name : '');
     // with a goal, the source is the small line under it (venue in bold, then the title); without one (Security), the title is the main line
     const main = goal || ttl, small = goal ? (v && ttl ? `<b>${esc(v)}</b> · ${esc(ttl)}` : esc(v || ttl)) : v ? `<b>${esc(v)}</b>` : '';
     const did = DID[s], nr = did.filter(x => x !== null).length, who = RANKED.filter((m, i) => did[i] === 1).map(m => m.name);
-    const pass = nr ? `<a class="tp" href="${esc(taskHref(s))}" tabindex="-1" title="${esc(who.length ? 'Passed by ' + who.join(', ') : 'No model passes')}"><span class="dots" aria-hidden="true">${did.map(x => `<i class="${x === 1 ? 'y' : x === 0 ? 'n' : 'x'}"></i>`).join('')}</span><span class="pr${who.length ? '' : ' none'}">${who.length ? `${Math.round(100 * who.length / nr)}%<span class="vh"> of models pass</span>` : 'None pass'}</span></a>` : '<span></span>';
+    // one number: the share of the models that ran it that pass (owner, 2026-10-14: no dots); the tooltip names them
+    const pass = nr ? `<a class="tp" href="${esc(taskHref(s))}" tabindex="-1" title="${esc(who.length ? 'Passed by ' + who.join(', ') : 'No model passes')}"><span class="pr${who.length ? '' : ' none'}">${Math.round(100 * who.length / nr)}%</span><span class="vh"> of models pass</span></a>` : '<span></span>';
     return `<article class="trow" data-s="${esc(s)}"><div class="tn"><h3><a class="stretch" href="${esc(taskHref(s))}">${esc(t.name)}</a></h3><span class="td" style="--a:${AINK[AREA_OF[t.d].k]}">${esc(t.d)}</span></div>
     <div class="tx">${main ? `<p>${esc(main)}</p>` : ''}${small ? `<p class="src">${small}</p>` : ''}</div>${pass}
     <div class="lk">${t.p ? `<a href="${esc(t.p)}" target="_blank" rel="noopener">${t.t ? t.src : 'Project'}</a>` : ''}${t.r ? `<a href="${esc(t.r)}" target="_blank" rel="noopener">Code</a>` : ''}</div></article>`; }).join('')

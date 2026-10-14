@@ -1,6 +1,6 @@
 // FrontierCS 2 task page (_pages/fcs2-task.md). /task/#<slug> renders one task from fcs2-data.js, loaded first;
 // /task/ with no slug lists every task by domain. For a task with runs: what the agent must do and what it is scored on,
-// a results table (pass or fail, final score against the authors' code, cost), the solution each shown model handed in,
+// a results table (pass or fail, final score against the Human reference, cost), the solution each shown model handed in,
 // the pass criteria, every run's development score against its spend, and the task's FECI curve. assets/css/fcs2.css holds the styles.
 
 const RANK = Object.fromEntries(RANKED.map((m, i) => [m.id, i]));
@@ -40,12 +40,12 @@ function drawPage() {
   const ref = REF[t.s], ms = new Set(runs.map(r => r[0])), np = new Set(runs.filter(r => r[3]).map(r => r[0])).size;
   const best = runs.reduce((a, r) => r[2] > a[2] ? r : a), dif = TDIFF[t.s];
   const sum = [`<b>${np} of ${ms.size}</b> models pass`, `best final score <b>${f1(best[2])}</b>, by ${esc(MNAME[best[0]])}`]
-    .concat(ref != null ? [`authors’ code <b>${f1(ref)}</b>`] : [], dif ? [`${dif.rank === 1 ? 'the' : ordinal(dif.rank)} hardest of ${Object.keys(TDIFF).length} problems`] : []);
+    .concat(ref != null ? [`human reference <b>${f1(ref)}</b>`] : [], dif ? [`${dif.rank === 1 ? 'the' : ordinal(dif.rank)} hardest of ${Object.keys(TDIFF).length} problems`] : []);
   $('#tbody').innerHTML = lead
     + `<section class="tres"><h2 class="th2">Results</h2><p class="tsum">${sum.join(' · ')}</p><div class="res-scroll"><table class="res rtab" id="rtbl"></table></div></section>`
     + `<section class="tpatch" id="tpatch" hidden><h2 class="th2">Solutions</h2><p class="tnote" id="pnote"></p>`
     + `<div class="pchips" id="pchips"></div><div class="pmeta" id="pmeta"></div><div id="pview"></div></section>`
-    + (CHECKS[t.s] ? `<section class="tcrit"><h2 class="th2">Pass criteria</h2><p>A run passes only if its final submission beats the authors’ code on every metric, on every hidden workload. Each cell counts the hidden workloads on which it did.</p>`
+    + (CHECKS[t.s] ? `<section class="tcrit"><h2 class="th2">Pass criteria</h2><p>A run passes only if its final submission beats the human reference on every metric, on every hidden workload. Each cell counts the hidden workloads on which it did.</p>`
       + `<div class="res-scroll"><table class="res ctab" id="ctbl"></table></div></section>` : '')   // no general submission note (owner audit, 2026-10-14)
     + figure('dc', 'Development score against spend')
     + (TFIT[t.s] ? figure('fc', 'Expected score by FECI') : '');
@@ -81,7 +81,7 @@ addEventListener('keydown', e => {
 const ordinal = n => n + ((n % 100 >= 11 && n % 100 <= 13) ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th');
 
 /* One row per run, in leaderboard order: pass or fail, the final score as a bar on the task's own scale, and the run's
-   estimated cost; the authors' code is a bar of its own on top, hatched grey (owners, 2026-10-11: bars, no vertical line;
+   estimated cost; the Human reference (the authors' code; owner, 2026-10-14: that name everywhere) is a bar of its own on top, hatched grey (owners, 2026-10-11: bars, no vertical line;
    2026-10-14: grey hatching).
    This replaces the final-score chart and the runs table (Qiuyang, 2026-10-14: per model, readers want cost, score and
    pass or fail). */
@@ -90,7 +90,7 @@ const METRIC = {"accuracy_qualified":"Estimate accuracy", "action_rate":"Action 
 const metric = m => METRIC[m] || m.replace(/_/g, ' ').replace(/^./, c => c.toUpperCase());
 
 /* Per model (rows, leaderboard order, with its verdict) and metric (columns): on how many hidden workloads its final
-   submission beat the authors' code (PASSBY, bin/fcs2_checks_from_platform.py, the same runs as the scores). A full count
+   submission beat the Human reference (PASSBY, bin/fcs2_checks_from_platform.py, the same runs as the scores). A full count
    is green, a short one red; a run with no hidden evaluation has a dash. */
 function drawCriteria() {
   const {t, runs} = cur, ms = CHECKS[t.s].metrics, by = (typeof PASSBY === 'undefined' ? {} : PASSBY)[t.s] || {};
@@ -107,10 +107,12 @@ const TICK = '<svg class="ri y" viewBox="0 0 16 16" aria-hidden="true"><path d="
 const CROSS = '<svg class="ri n" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.3 4.3l7.4 7.4M11.7 4.3l-7.4 7.4"/></svg><span class="vh">Fail</span>';
 function drawResults() {
   const {t, runs} = cur, ref = REF[t.s], xmax = Math.max(100, ref ?? 0, ...runs.map(r => r[2]));
-  const bar = (v, style) => `<span class="rbw"><span class="rb"><i style="width:${(Math.max(0, v) / xmax * 100).toFixed(1)}%;${style}"></i></span><span class="rn">${f1(v)}</span></span>`;
+  // the score sits at the end of its bar (owner, 2026-10-14: beside the bar, not at the right edge of the column)
+  const bar = (v, style) => { const w = (Math.max(0, v) / xmax * 100).toFixed(1);
+    return `<span class="rb"><i style="width:${w}%;${style}"></i><span class="rn" style="left:${w}%">${f1(v)}</span></span>`; };
   const short = Object.fromEntries(RANKED.map(m => [m.id, m.short]));
-  $('#rtbl').innerHTML = '<thead><tr><th>Model</th><th class="rv">Result</th><th class="rs">Final score</th><th>Cost</th></tr></thead><tbody>'
-    + (ref != null ? `<tr class="rref"><td><span class="sq"></span>Authors’ code</td><td class="rv"></td><td class="rs">${bar(ref, '')}</td><td></td></tr>` : '')
+  $('#rtbl').innerHTML = '<thead><tr><th>Model</th><th class="rv">Pass</th><th class="rs">Final score</th><th>Cost</th></tr></thead><tbody>'
+    + (ref != null ? `<tr class="rref"><td><span class="sq"></span>Human reference</td><td class="rv"></td><td class="rs">${bar(ref, '')}</td><td></td></tr>` : '')
     + runs.map(r => `<tr><td><span class="sq" style="background:${MCOL[r[0]]}"></span><span class="full">${esc(MNAME[r[0]])}</span><span class="short">${esc(short[r[0]])}</span></td>`
       + `<td class="rv">${r[3] ? TICK : CROSS}</td><td class="rs">${bar(r[2], `background:${MCOL[r[0]]}`)}</td><td>$${r[4].toFixed(2)}</td></tr>`).join('')
     + '</tbody>';
@@ -167,7 +169,7 @@ function drawDev() {
 }
 
 /* The task's curve from the FECI fit: the score a model of a given FECI is expected to reach. Dots: each model's mean final
-   score on this task at the model's FECI, and the authors' code at Human (ECI_HUMAN). */
+   score on this task at the model's FECI, and the Human reference at FECI ECI_HUMAN. */
 function drawFit() {
   const {t, runs} = cur, [d, k] = TFIT[t.s], ref = REF[t.s];
   const svg = $('#fcsvg'), W = Math.max(300, $('#fcplot').clientWidth), narrow = W < 560;
@@ -201,11 +203,11 @@ function drawFit() {
   });
   if (ref != null) {
     svg.append(sv('rect', {x:X(ECI_HUMAN) - 5.5, y:Y(ref) - 5.5, width:11, height:11, fill:'var(--ink)', stroke:'#fff', 'stroke-width':1.5}));
-    pts.push({x:X(ECI_HUMAN), y:Y(ref), html:`<b>Authors’ code</b>, the human baseline<br>FECI ${ECI_HUMAN} by definition<br>Score <b>${f1(ref)}</b>`});
+    pts.push({x:X(ECI_HUMAN), y:Y(ref), html:`<b>Human reference</b><br>FECI ${ECI_HUMAN} by definition<br>Score <b>${f1(ref)}</b>`});
   }
   attachTip(svg, W, H, pts, $('#fctip'));
   $('#fclegend').innerHTML = RANKED.filter(m => runs.some(r => r[0] === m.id)).map(m => `<span><i style="background:${MCOL[m.id]}; border-radius:50%"></i>${esc(m.name)}</span>`).join('')
-    + (ref != null ? '<span><i style="background:var(--ink)"></i>Authors’ code</span>' : '');
+    + (ref != null ? '<span><i style="background:var(--ink)"></i>Human reference</span>' : '');
   $('#fcnote').textContent = `The curve is the score expected at each FECI, from the fit. Dots are the models’ final scores here at their FECI.`;
 }
 
