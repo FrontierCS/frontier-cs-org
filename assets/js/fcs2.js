@@ -599,11 +599,12 @@ function showRun() {
     panel.append(sv('text', {x:p.x + PX, y:top + 4, 'font-size':13, 'font-weight':500, fill:'#fff', 'fill-opacity':.85}, 'Difficulty'));
     if (!D) panel.append(sv('text', {x:p.x + PX, y:top + 52, 'font-size':16, fill:'#fff'}, 'No runs yet'));
     else { const rank = D.rank, X = r => p.x + PX + (N - r) / (N - 1 || 1) * inner, sy = p.y + p.h - 74;
-      const ord = `${rank}${[, 'st', 'nd', 'rd'][rank % 100 > 10 && rank % 100 < 14 ? 0 : rank % 10] || 'th'}`;
-      panel.append(sv('text', {x:p.x + PX, y:top + 62, 'font-size':52, 'font-weight':600, fill:'#fff'}, rank === 1 ? 'Hardest' : ord),
-        sv('text', {x:p.x + PX, y:top + 90, 'font-size':14, fill:'#fff', 'fill-opacity':.92}, `${rank === 1 ? '' : 'hardest '}of ${N} tasks · ${D.pass} of ${D.n} models pass`),
+      // the hardest and the easiest are named as the task page names them; tasks of the same shown FDI share a rank
+      const end = rank === 1 ? 'Hardest' : rank === FLAST ? 'Easiest' : null;
+      panel.append(sv('text', {x:p.x + PX, y:top + 62, 'font-size':52, 'font-weight':600, fill:'#fff'}, end || ordinal(rank)),
+        sv('text', {x:p.x + PX, y:top + 90, 'font-size':14, fill:'#fff', 'fill-opacity':.92}, `${end ? '' : 'hardest '}of ${N} tasks · ${D.pass} of ${D.n} models pass`),
         sv('line', {x1:p.x + PX, x2:p.x + PX + inner, y1:sy, y2:sy, stroke:'#fff', 'stroke-opacity':.45, 'stroke-width':1.5}));
-      for (let r = 1; r <= N; r++) panel.append(sv('line', {x1:X(r), x2:X(r), y1:sy - 5, y2:sy + 5, stroke:'#fff', 'stroke-opacity':.5, 'stroke-width':1.5}));
+      Object.values(FRANK).forEach(r => panel.append(sv('line', {x1:X(r), x2:X(r), y1:sy - 5, y2:sy + 5, stroke:'#fff', 'stroke-opacity':.5, 'stroke-width':1.5})));   // a tick per task
       panel.append(sv('circle', {cx:X(rank), cy:sy, r:8, fill:'#fff'}),
         sv('text', {x:p.x + PX, y:sy + 26, 'font-size':12, fill:'#fff', 'fill-opacity':.85}, 'easier'), sv('text', {x:p.x + PX + inner, y:sy + 26, 'text-anchor':'end', 'font-size':12, fill:'#fff', 'fill-opacity':.85}, 'harder')); }
   }

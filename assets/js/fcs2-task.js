@@ -33,7 +33,7 @@ function drawPage() {
   // the task's FDI, its 90% interval and its rank, with a link to what FDI is (owner, 2026-10-14; the interval: Qiuyang,
   // 2026-10-14); the address comes from a real link in the markup, so it follows the site's base URL and the preview's relative links alike
   const fr = FRANK[t.s], N = Object.keys(FRANK).length;
-  $('#tfdi').innerHTML = fr ? `<span>FDI</span><b>${fe(FDI[t.s])}</b><span>the ${fr === N ? 'easiest' : (fr === 1 ? '' : ordinal(fr) + ' ') + 'hardest'} of ${N} tasks,</span>`
+  $('#tfdi').innerHTML = fr ? `<span>FDI</span><b>${fe(FDI[t.s])}</b><span>the ${fr === FLAST ? 'easiest' : (fr === 1 ? '' : ordinal(fr) + ' ') + 'hardest'} of ${N} tasks,</span>`
     + `<span>90% interval ${fe(DIFF[t.s][1])}–${fe(DIFF[t.s][2])}</span><a href="${esc($('#howlink').getAttribute('href'))}">What is FDI?</a>` : '';
   $('#tkeys').innerHTML = key ? `<span class="lab">Scored on</span>${key.map(k => `<span class="k">${esc(k)}</span>`).join('')}` : '';
   $('#tfig').hidden = true; $('#tfig').innerHTML = ''; $('#thero').classList.add('nofig');
@@ -87,7 +87,6 @@ addEventListener('keydown', e => {
   const i = ORDER.indexOf(cur.t), to = e.key === 'ArrowLeft' ? ORDER[i - 1] : e.key === 'ArrowRight' ? ORDER[i + 1] : null;
   if (to) location.hash = slug(to.s);
 });
-const ordinal = n => n + ((n % 100 >= 11 && n % 100 <= 13) ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th');
 
 /* One row per run, highest final score first (owner, 2026-10-14; ties keep leaderboard order), under the Human reference: pass or fail, the final score as a bar on the task's own scale, and the run's
    estimated cost; the Human reference (the authors' code; owner, 2026-10-14: that name everywhere) is a bar of its own on top, hatched grey (owners, 2026-10-11: bars, no vertical line;

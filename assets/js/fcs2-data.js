@@ -152,9 +152,8 @@ const mean = a => a.reduce((x, y) => x + y, 0) / a.length;
 
 /* FDI, the FrontierCS Difficulty Index: the FCI at which a model passes the task half the time (Qiuyang,
    2026-10-14), DIFF[task][0] from bin/fcs2_runs_from_db.py, with its 90% interval in DIFF[task][1] and [2]. The site
-   ranks tasks by it everywhere; FRANK[task] is 1 for the hardest. */
+   ranks tasks by it everywhere (FRANK, below). */
 const FDI = Object.fromEntries(TASKS.filter(t => DIFF[t.s]).map(t => [t.s, DIFF[t.s][0]]));
-const FRANK = Object.fromEntries(Object.keys(FDI).sort((a, b) => FDI[b] - FDI[a]).map((s, i) => [s, i + 1]));
 const f1 = x => x.toFixed(1);
 /* FCI and FDI values. The scale has ECI_UNIT points per logit, and a hundredth of a logit is the finest step that
    means anything, so every FCI and FDI shows that many decimals: one at 10 points per logit, as the converter writes
@@ -164,6 +163,13 @@ const fe = x => x.toFixed(ECI_DP).replace(/^-(?=.*[1-9])/, '−').replace(/^-/, 
 // a grid step for an axis on the FCI scale: 1, 2 or 5 times a power of ten, about n steps over the span; tick text has no float noise
 const eciStep = (span, n) => { const raw = span / n, p = 10 ** Math.floor(Math.log10(raw)), f = raw / p; return (f < 1.5 ? 1 : f < 3.5 ? 2 : f < 7.5 ? 5 : 10) * p; };
 const tick = v => String(+v.toFixed(6)).replace('-', '−');
+/* FRANK[task]: the task's rank by FDI, 1 for the hardest. Tasks whose FDI shows the same value share a rank, so the
+   page never calls two tasks of the same shown FDI 20th and 21st hardest; FLAST is the easiest rank (Qiuyang,
+   2026-10-14). */
+const FRANK = (() => { const shown = s => +FDI[s].toFixed(ECI_DP), ks = Object.keys(FDI);
+  return Object.fromEntries(ks.map(s => [s, 1 + ks.filter(o => shown(o) > shown(s)).length])); })();
+const FLAST = Math.max(...Object.values(FRANK));
+const ordinal = n => n + ((n % 100 >= 11 && n % 100 <= 13) ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th');   // 1st, 2nd, 3rd, 11th, 21st
 
 
 const esc = s => String(s).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
