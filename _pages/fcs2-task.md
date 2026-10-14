@@ -24,7 +24,7 @@ page_css: fcs2
   <div id="tbody"></div>
 </div>
 </div>
-<script>window.FIG_DIR = "{{ '/assets/img/fcs2-tasks/' | relative_url }}";</script>
+<script>window.PATCH_DIR = "{{ '/assets/patches/' | relative_url }}"; window.FIG_DIR = "{{ '/assets/img/fcs2-tasks/' | relative_url }}";</script>
 <script defer src="{{ '/assets/js/fcs2-data.js' | relative_url }}"></script>
 <script defer src="{{ '/assets/js/fcs2-checks.js' | relative_url }}"></script>
 <script defer src="{{ '/assets/js/fcs2-solutions.js' | relative_url }}"></script>
