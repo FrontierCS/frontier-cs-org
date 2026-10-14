@@ -116,7 +116,7 @@ h2{font-weight:600; font-size:clamp(25px,2.4vw,30px); line-height:1.2; margin:0}
 .fold summary::after{content:""; flex:none; width:14px; height:14px; background:linear-gradient(currentColor,currentColor) center/14px 1.6px no-repeat, linear-gradient(currentColor,currentColor) center/1.6px 14px no-repeat; transition:background-size .2s}
 .fold[open] summary::after{background-size:14px 1.6px, 1.6px 0}
 .fold[open] summary{margin-bottom:14px}
-/* How FECI works (fold under the FECI chart): numbered steps, each text beside its figure, top aligned on a hairline */
+/* How FCI works (fold under the FCI chart): numbered steps, each text beside its figure, top aligned on a hairline */
 .how{margin-top:28px}
 .how summary h3{font-size:18px}
 .how-row{display:grid; grid-template-columns:minmax(0,5fr) minmax(0,7fr); gap:16px 56px; align-items:start; padding-top:24px; margin-bottom:36px; border-top:1px solid var(--line)}
@@ -439,7 +439,7 @@ a.pbtn:hover{border-color:var(--teal); color:var(--teal-d)}
 .crit li{border-radius:4px; padding:3px 8px; background:var(--soft); color:var(--ink-2)}
 .crit code{font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
 /* task page: the patch each model handed in; chips in leaderboard order, then the chosen diff in its own scrolling box */
-.tsol{margin:48px 0 8px}   /* the solution in words: a model line, then numbered steps in the How FECI works list style */
+.tsol{margin:48px 0 8px}   /* the solution in words: a model line, then numbered steps in the How FCI works list style */
 .tsol .tsum .sq{display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:8px; vertical-align:0}
 .tsteps{margin-top:18px; counter-reset:none}
 .tsteps b{display:flex; align-items:center; gap:10px}
@@ -504,7 +504,7 @@ a.pbtn:hover{border-color:var(--teal); color:var(--teal-d)}
 .th2{margin:72px 0 14px}
 #rtbl td:first-child{white-space:nowrap}
 
-/* scroll-in animation of the mean-score, FECI and test-time scaling charts (fcs2.js: animates, mark); .pre is the state before the chart comes into view */
+/* scroll-in animation of the mean-score, FCI and test-time scaling charts (fcs2.js: animates, mark); .pre is the state before the chart comes into view */
 .anim .a-bar{transform-box:fill-box; transform-origin:left center; transition:transform .8s cubic-bezier(.2,.7,.2,1) var(--d,0s)}
 .anim.pre .a-bar{transform:scaleX(0)}
 .anim .a-fade{transition:opacity .45s ease var(--d,0s)}

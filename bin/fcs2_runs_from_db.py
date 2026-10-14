@@ -13,7 +13,7 @@ Tasks are matched to the paper's task list by display name (TASK below): the dom
 task's folder under tasks/frontier-cs-2.0-demo/problems/ in FrontierCS-2.0-Preview, and the
 short name is the paper's name for the task, or the database name when the paper list has none.
 
-FECI, the leaderboard's main number, is fitted with Epoch AI's own ECI code (bin/eci_fitting.py, vendored
+FCI, the leaderboard's main number, is fitted with Epoch AI's own ECI code (bin/eci_fitting.py, vendored
 from epoch-research/eci-public): every task is one benchmark with score/100 = sigmoid(slope_t * (capability_m - difficulty_t)),
 fitted by bounded least squares with Epoch's defaults (L2 penalty 0.1 over the parameter count, scores clipped to [0.001, 0.999]).
 Epoch pins one benchmark's slope to 1; here that is the task with the most observations (ties: first by name).
@@ -30,7 +30,7 @@ workloads while the agent runs; a failed build or validation scores 0), or nothi
 passes the run's end, its hidden final score (owner, 2026-10-09; restored 2026-10-13). No dev-to-hidden calibration is
 applied: the platform pairs no development score with the final patch.
 ECI(model, B) keeps every task's curve from the leaderboard fit and solves one capability per (model, budget) by
-least squares, so it is on the FECI scale and equals the leaderboard value at full budget. Its 90% interval
+least squares, so it is on the FCI scale and equals the leaderboard value at full budget. Its 90% interval
 resamples the model's tasks (SCALE_BOOT draws, task curves held fixed).
 
 Pass rate is the share of scored runs whose verdict is PASS: the final submission meets the task's
@@ -260,7 +260,7 @@ for cand, task, score, state, verdict in rows:
     folder, short = TASK[task]
     runs.append([MODEL[cand][0], SHOWN.get(folder, folder), short or task.split(' — ')[0], round(score, 2), int(verdict == 'PASS')])
 dropped = Counter(r[3] for r in rows if r[2] is None and r[0] not in HIDDEN)
-# the hidden models' runs in RUNS's columns, for fits made outside this script: Kimi K2.7 is the FECI 0 point but not on the
+# the hidden models' runs in RUNS's columns, for fits made outside this script: Kimi K2.7 is the FCI 0 point but not on the
 # site (Qiuyang, 2026-10-14). _data/ is never published as a file, and no page reads this one.
 hidden = [[MODEL[c][0], SHOWN.get(TASK[t][0], TASK[t][0]), TASK[t][1] or t.split(' — ')[0], round(s, 2), int(v == 'PASS')]
           for c, t, s, st, v in rows if s is not None and c in HIDDEN]
@@ -286,7 +286,7 @@ def trajectories(db):
 
 def task_facts(db, curves):
     """Per task short name: the authors' reference score (median reference_score over its runs, left out when 0) and the
-    task's FECI curve from the leaderboard fit, [difficulty, slope]: expected score = 100 / (1 + exp(-slope (FECI - difficulty)))."""
+    task's FCI curve from the leaderboard fit, [difficulty, slope]: expected score = 100 / (1 + exp(-slope (FCI - difficulty)))."""
     ref = defaultdict(list)
     for t, fj in db.execute('select t.name, r.feedback_json from cells ce join runs r on r.id = ce.run_id join tasks t on t.id = ce.task_id'):
         f = json.loads(fj) if fj else {}
@@ -340,13 +340,13 @@ block = (f'// One entry per scored run in the preview results database of {when:
          f'const RUNS = {json.dumps(runs, ensure_ascii=False)}.map(([m, d, t, s, p]) => ({{m, d, t, s, p}}));\n'
          'const MODELS = [\n' + ''.join(f"  {{id:'{i}', name:'{n}', short:'{s}', h:'{h}', lab:'{l}'}},\n" for i, n, s, h, l in models) + '];\n'
          f"const UPDATED = '{when:%B} {when.day}, {when.year}';\n"
-         f"// FECI per model: [point, 90% low, 90% high, tasks]; Human (the authors' reference) is {HUMAN_VALUE:g} and {LOW_ANCHOR} is {LOW_VALUE:g} ({nboot} bootstrap draws kept, {nbad} dropped with the anchors inverted; pinned slope: {pinned}).\n"
+         f"// FCI per model: [point, 90% low, 90% high, tasks]; Human (the authors' reference) is {HUMAN_VALUE:g} and {LOW_ANCHOR} is {LOW_VALUE:g} ({nboot} bootstrap draws kept, {nbad} dropped with the anchors inverted; pinned slope: {pinned}).\n"
          f"// Pass rate per model: [percent, runs that pass, runs].\nconst PASS = {json.dumps(pass_rate(runs))};\n"
          f"const ECI = {json.dumps(eci_js)};\nconst ECI_HUMAN = {HUMAN_VALUE:g}, ECI_LOW = '{MODEL[LOW_ANCHOR][0]}', ECI_LOW_NAME = '{MODEL[LOW_ANCHOR][1]}', ECI_LOW_VALUE = {LOW_VALUE:g}, ECI_REF_TASKS = {E['reference'][3]};\n"
          f"// Test-time scaling per model: [US$ budget per run, ECI, 90% low, 90% high, share of runs still going] (see the converter's docstring).\nconst SCALE = {json.dumps(SC, separators=(',', ':'))};\n"
          f"// Cost per model: [mean US$ per scored run, runs]; output tokens x output price + every token x cache-read price (PRICE above).\nconst COST = {json.dumps(CO)};\nconst PRICE = {json.dumps(PRICE)};\n"
          f"// Every scored run: [model, task, final score, passed, US$ at end, hours, [[US$, dev score] per development submission]].\nconst TRAJ = {json.dumps(trajectories(db), separators=(',', ':'), ensure_ascii=False)};\n"
-         f"// Per task: the authors' reference score, and its FECI curve [difficulty, slope] (score = 100 / (1 + exp(-slope (FECI - difficulty)))).\nconst REF = {json.dumps(REF, ensure_ascii=False)};\nconst TFIT = {json.dumps(TFIT, ensure_ascii=False)};\n"
+         f"// Per task: the authors' reference score, and its FCI curve [difficulty, slope] (score = 100 / (1 + exp(-slope (FCI - difficulty)))).\nconst REF = {json.dumps(REF, ensure_ascii=False)};\nconst TFIT = {json.dumps(TFIT, ensure_ascii=False)};\n"
          f"// Per task: the metrics its judge checks and the number of hidden final workloads; a run passes only when every check passes on every final workload.\nconst CHECKS = {json.dumps(CHECKS, ensure_ascii=False, separators=(',', ':'))};\n"
          f"// Task descriptions from the paper repo (bin/fcs2_descriptions.tsv).\nconst DESC = {json.dumps(descriptions(), ensure_ascii=False)};\n")
 js = open(js_path, encoding='utf-8').read()   # read late: the fits above take minutes
