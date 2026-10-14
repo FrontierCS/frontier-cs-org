@@ -21,7 +21,7 @@ A strength is shown as FCI = PASS_ZERO_VALUE + PASS_UNIT * (theta_m - theta of P
 The 90% interval resamples task columns with replacement (BOOT draws, seeds 0..BOOT-1), refits, maps each draw the same
 way, and takes the 5th and 95th percentiles.
 
-Task difficulty (DIFF, TFIT) is built from per-metric passes (Qiuyang, 2026-10-14): a run passes only when it beats the
+Task difficulty, FDI (the FrontierCS Difficulty Index; DIFF, TFIT), is built from per-metric passes (Qiuyang, 2026-10-14): a run passes only when it beats the
 human reference on every workload of every metric its task checks, and each metric has its own difficulty. The counts
 come from assets/js/fcs2-checks.js (PASSBY), which bin/fcs2_checks_from_platform.py must refresh before this script
 runs. Keys of development workloads ('dev/...', which Yannakakis lists) are dropped: PASS is judged on the hidden final
@@ -312,7 +312,7 @@ def p_pass(D, B, s_u):
     return np.exp(logsumexp(log_expit(D[:, None, None] + s_u * GH_U[:, None] - B[:, None, :]).sum(2) + GH_LW, axis=1))
 
 
-def fedi(B, s_u):
+def fdi(B, s_u):
     """Per row of metric difficulties B: the strength D at which P(pass) = 1/2, by bisection (P rises with D)."""
     lo, hi = B.min(1) - 40 - 8 * s_u, B.max(1) + 40 + 8 * s_u
     for _ in range(64):
@@ -370,11 +370,11 @@ def metric_fit(obs, ref, theta, PB, fixed=None):
         X = x + eps @ np.linalg.cholesky(np.linalg.inv(A)).T
         lw = task_lj(X, th, T['O'], k, hb[:4], c * tbar) + 0.5 * (eps ** 2).sum(1)   # constants cancel when normalised
         w = np.exp(lw - lw.max()); w /= w.sum()
-        D = float(fedi(x[None, :k], s_u)[0])   # on the internal axis
+        D = float(fdi(x[None, :k], s_u)[0])   # on the internal axis
         S = expit(D + s_u * GH_U[:, None] - x[:k])
         T.update(x=x, xf=x / c, D=D / c, ess=float(1 / (w @ w)), slope=c * float(np.exp(GH_LW) @ (S.prod(1) * (1 - S).sum(1))),
                  ci=[tuple(wpct(X[:, j], w, [.05, .95]) / c) for j in range(n)])
-        T['lo'], T['hi'] = wpct(fedi(X[:, :k], s_u), w, [.05, .95]) / c
+        T['lo'], T['hi'] = wpct(fdi(X[:, :k], s_u), w, [.05, .95]) / c
     return tasks, hb, ll, [(hyp(r.x), -r.fun) for r in fits]
 
 
