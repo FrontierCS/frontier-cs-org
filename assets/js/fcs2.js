@@ -160,11 +160,9 @@ function smooth(P) {
     d += `C${(P[i][0] + h).toFixed(1)},${(P[i][1] + h * t[i]).toFixed(1)} ${(P[i + 1][0] - h).toFixed(1)},${(P[i + 1][1] - h * t[i + 1]).toFixed(1)} ${P[i + 1][0].toFixed(1)},${P[i + 1][1].toFixed(1)}`; }
   return d;
 }
-// The curves plotted are the running maximum of SCALE over the budget (value and both ends of its interval): the best level a
-// model has reached by that budget. The converter already holds each run at its best development score so far, capped
-// at its hidden final score; the running maximum here only removes what little the capability fit can still wobble.
-const TTS = Object.fromEntries(Object.entries(SCALE).map(([id, c]) => { let v = -Infinity, lo = -Infinity, hi = -Infinity;
-  return [id, c.map(p => [p[0], v = Math.max(v, p[1]), lo = Math.max(lo, p[2]), hi = Math.max(hi, p[3]), p[4]])]; }));
+// The curves plotted are SCALE as the converter writes it: a run stopped at a budget counts its latest valid submission,
+// so a curve can dip where a later submission scores below an earlier one (owner, 2026-10-13: back to this rule, no running maximum).
+const TTS = SCALE;
 const TTS_Y0 = 40, ttsOn = new Set(RANKED.filter(m => SCALE[m.id]).map(m => m.id));
 let ttsHover = null;
 function drawTTS() {
@@ -541,7 +539,7 @@ function showRun() {
   p.t = setTimeout(() => {
     const go = () => { if (play !== p) return; p.k = (p.k + 1) % n; showRun(); };
     if (calm) go(); else panel.animate([{opacity:1}, {opacity:0}], {duration:220, fill:'forwards'}).onfinish = go;
-  }, p.k === 0 ? 4200 : 3200);
+  }, p.k === 0 ? 3400 : 2600);   // owner, 2026-10-13: a little faster (was 4.2 s and 3.2 s)
 }
 $('#mapsvg').addEventListener('pointermove', e => {
   if (e.pointerType !== 'mouse') return;

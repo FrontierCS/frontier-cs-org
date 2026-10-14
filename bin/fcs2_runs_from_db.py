@@ -24,11 +24,11 @@ The 90% interval follows Epoch's bootstrap: each respondent's task results are r
 is redone from the central solution (BOOT draws, seeds 0..BOOT-1). Epoch's code raises when a draw puts the anchors in the
 wrong order; those draws are left out and counted.
 
-Test-time scaling (SCALE): at a budget B of US$ (usd() below), a run stands at the best valid development score it has
-reached by then (a development score is what a submission gets on the task's development workloads while the agent
-runs; a failed build or validation scores 0 and does not count), capped at the run's hidden final score, or at 0 if it
-has no valid submission yet; once B passes the run's end, at its hidden final score (owner, 2026-10-13). A run's value
-never falls as B grows. No dev-to-hidden calibration is applied.
+Test-time scaling (SCALE): at a budget B of US$ (usd() below), a run's submission is its latest valid submission, the
+latest with a development score above 0 (a development score is what a submission gets on the task's development
+workloads while the agent runs; a failed build or validation scores 0), or nothing (score 0) if it has none yet; once B
+passes the run's end, its hidden final score (owner, 2026-10-09; restored 2026-10-13). No dev-to-hidden calibration is
+applied: the platform pairs no development score with the final patch.
 ECI(model, B) keeps every task's curve from the leaderboard fit and solves one capability per (model, budget) by
 least squares, so it is on the FECI scale and equals the leaderboard value at full budget. Its 90% interval
 resamples the model's tasks (SCALE_BOOT draws, task curves held fixed).
@@ -202,7 +202,7 @@ def scaling(db, curves):
         dev = {ph: pts[(r, sid)][0] for sid, kind, ph in subs[r] if kind == 'train' and (r, sid) in pts}
         fin = [ph for sid, kind, ph in subs[r] if kind == 'final']
         if fin and fin[0] in dev: gaps[t].append(hidden - dev[fin[0]])
-    g, off = 0.0, {}   # no dev-to-hidden calibration; the hidden final score caps a run's value instead (owner, 2026-10-13)
+    g, off = 0.0, {}   # no dev-to-hidden calibration: the platform pairs no development score with the final patch
 
     def cap(ys):
         t = list(ys); y = np.clip(np.array([ys[k] for k in t]) / 100, 1e-3, 1 - 1e-3)
@@ -219,12 +219,9 @@ def scaling(db, curves):
                 p = pts[(r, sid)]; end = usd(MODEL[c][0], p[1], p[2])
                 if kind == 'train' and p[0] > 0: seq.append((end, float(np.clip(p[0] + off.get(t, g), 0, 100))))
             traj[r] = (seq, end, hidden)
-        # stopped at B, the run's result is its latest valid submission: the latest with a dev score above 0 (owner, 2026-10-09)
-        # stopped at B, a run stands at the best valid development score it has reached, capped at its hidden final score;
-        # once B passes the run's end it stands at the hidden final score itself. A run's value therefore never falls as
-        # B grows, and at full budget every run is at its final score, so the curve ends on the leaderboard FECI
-        # (owner, 2026-10-13: running maximum, capped by the hidden score, right end aligned)
-        at = lambda r, B: traj[r][2] if B >= traj[r][1] else min(traj[r][2], max((d for spend, d in traj[r][0] if spend <= B), default=0.0))
+        # stopped at B, the run's result is its latest valid submission: the latest with a dev score above 0 (owner, 2026-10-09;
+        # restored 2026-10-13 after a day of best-so-far capped at the hidden score)
+        at = lambda r, B: traj[r][2] if B >= traj[r][1] else next((d for spend, d in reversed(traj[r][0]) if spend <= B), 0.0)
         out[axis] = {}
         for c in sorted({v[0] for v in info.values()}, key=lambda c: MODEL[c][0]):
             runs = [r for r in info if info[r][0] == c]; tasks = sorted({info[r][1] for r in runs}); ends = [traj[r][1] for r in runs]
