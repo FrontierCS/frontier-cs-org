@@ -8,12 +8,13 @@ middle_name:
 last_name: Blog
 email: 
 description: > # the ">" symbol means to ignore newlines until "footer_text:"
-  Home to FrontierCS blog posts
+  FrontierCS builds open-ended benchmarks that evaluate AI agents on computer science research.
 footer_text: >
   Powered by <a href="https://jekyllrb.com/" target="_blank">Jekyll</a>.
   Hosted by <a href="https://pages.github.com/" target="_blank">GitHub Pages</a>.
-keywords: machine-learning, ml, deep-learning, frontier-cs, blog  # add your own keywords or leave empty
+keywords: FrontierCS, AI agents, benchmark, computer science research, open-ended evaluation
 
+author: FrontierCS team
 lang: en # the language of your site (for example: en, fr, cn, ru, etc.)
 icon: frontier-favicon.png  # the emoji used as the favicon (alternatively, provide image name in /assets/img/)
 
@@ -62,7 +63,7 @@ max_width: 1000px
 # Display links to the page with a preview object on social media.
 serve_og_meta: true # Include Open Graph meta tags in the HTML head
 serve_schema_org: false # Include Schema.org in the HTML head
-og_image: assets/img/frontier-favicon.png # Site-wide default Open Graph preview image (post-level page.og_image / page.image override this)
+og_image: assets/img/fcs2-card.png # Site-wide default link-preview image (page.og_image / page.image override it); per-page cards are in assets/img/cards/
 
 # -----------------------------------------------------------------------------
 # Social integration
@@ -70,7 +71,7 @@ og_image: assets/img/frontier-favicon.png # Site-wide default Open Graph preview
 
 github_username: # your GitHub user name
 gitlab_username: # your GitLab user name
-twitter_username: # your Twitter handle
+twitter_username: wenhaocha1 # the X account named in link previews (twitter:site, twitter:creator); owner, 2026-10-14
 linkedin_username: # your LinkedIn user name
 scholar_userid: # your Google Scholar ID
 semanticscholar_id: # your Semantic Scholar ID

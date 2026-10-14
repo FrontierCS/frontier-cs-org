@@ -1,6 +1,8 @@
 ---
 layout: default
 title: Research
+description: Papers from the FrontierCS team, and research that builds on the FrontierCS benchmarks.
+og_image: assets/img/cards/research.png
 permalink: /paper/
 ---
 

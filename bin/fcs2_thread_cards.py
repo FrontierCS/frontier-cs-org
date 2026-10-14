@@ -81,7 +81,6 @@ window.card = (layout, h, sub, note) => {
 };
 // the visual's free height; charts are drawn to it (fcs2.js and fcs2-task.js read window.CHART_H at draw time)
 window.fit = (v, key, minus = 0) => { CHART_H[key] = Math.floor(v.clientHeight - minus); };
-window.PRE = 'Preliminary results';
 // row charts (mean score, FECI): drop the harness line under each model name and centre the name on its row
 window.oneLine = svg => svg.querySelectorAll('text.lab').forEach(l => { const n = l.nextElementSibling;
   if (n && n.tagName === 'text' && /12px/.test(n.getAttribute('style') || '')) { l.setAttribute('y', +l.getAttribute('y') + 7); n.remove(); } });
@@ -201,7 +200,7 @@ OVERVIEW = {
     '03-pass-cost': """() => {
       const v = card('stack', 'Pass rate vs. price',
         'One dot per model.',
-        `${PRE} · a pass beats the original code on every hidden workload`);
+        'A pass beats the human reference on every metric of every hidden workload.');
       fit(v, 'pc'); v.append(document.getElementById('pcplot')); drawPassCost();
     }""",
     # mean final score: the overview's chart, grouped by model
@@ -209,9 +208,9 @@ OVERVIEW = {
       const sc = m => RUNS.filter(r => r.m === m.id).map(r => r.s), mu = m => mean(sc(m)), top = [...MODELS].sort((a, b) => mu(b) - mu(a));
       const hi = Math.floor(Math.min(...MODELS.map(m => Math.max(...sc(m))))), lo = Math.ceil(Math.max(...MODELS.map(m => Math.min(...sc(m)))));
       console.assert(hi >= 95 && lo <= 10, 'mean-score wording', hi, lo);
-      const v = card('stack', 'Mean score by model',
-        'One dot per run.',
-        `${PRE} · the large dot is the mean of each model`);
+      const v = card('stack', 'Score against the human reference',   // owner, 2026-10-14: the overview's mean score is the difference
+        'One dot per run, the large dot the mean of each model.',
+        '');   /* the axis title already says what the score is */
       CHART_H.lbLane = Math.floor((v.clientHeight - 54) / MODELS.length); v.append(document.getElementById('lbplot')); drawLB(); oneLine(document.getElementById('lbsvg')); sideVals(document.getElementById('lbsvg'));
     }""",
     # FECI: the overview's chart; the headline counts the models whose whole 90% interval is above Human, the line under
@@ -221,8 +220,8 @@ OVERVIEW = {
       const NUM = ['No', 'One', 'Two', 'Three', 'Four', 'Five', 'Six'], and = a => a.length < 3 ? a.join(' and ') : a.slice(0, -1).join(', ') + ' and ' + a.at(-1);
       console.assert(above.length >= 1 && above.length < NUM.length, 'FECI wording', above, below);
       const v = card('stack', 'FECI (FrontierCS Epoch Capabilities Index)',   // owner, 2026-10-13: the index's name as the headline
-        `${and(above)} clear${above.length > 1 ? '' : 's'} the original code.${below.length ? ` ${and(below)} fall${below.length > 1 ? '' : 's'} short.` : ''} The rest are within noise.`,
-        `${PRE} · FECI, fitted with the ECI code of Epoch AI`);
+        `${and(above)} clear${above.length > 1 ? '' : 's'} the human reference.${below.length ? ` ${and(below)} fall${below.length > 1 ? '' : 's'} short.` : ''} The rest are within noise.`,
+        'FECI, fitted with the ECI code of Epoch AI. Human = 25, Kimi K2.7 = 0.');
       CHART_H.eciLane = Math.floor((v.clientHeight - 60) / MODELS.length); v.append(document.getElementById('eciplot')); drawECI(); oneLine(document.getElementById('ecisvg')); sideVals(document.getElementById('ecisvg'));
     }""",
     # test-time scaling: the overview's chart; budgets where two models come within 1 point of their final FECI
@@ -231,8 +230,9 @@ OVERVIEW = {
       const ds = reach('ds'), astra = reach('astra'); console.assert(ds < 1 && astra > 5, 'scaling wording', ds, astra);
       const v = card('stack', 'FECI vs. budget per run',
         'Each run counts its latest valid submission at the budget.',
-        PRE);
-      fit(v, 'tts', 62); /* room for two legend rows (ten models) */ v.append(document.getElementById('ttsplot'), document.getElementById('ttslegend')); drawTTS();
+        'One curve per lab, its model with the highest FECI, as on the site.');
+      fit(v, 'tts', 62); v.append(document.getElementById('ttsplot'), document.getElementById('ttslegend')); drawTTS();
+      document.querySelectorAll('#ttslegend button[aria-pressed="false"]').forEach(b => b.remove());   // a still card: the hidden models leave the legend
     }""",
     # the private set (owner, 2026-10-10: a separate set of unreleased tasks; no count on the card): task illustrations
     # blurred past recognition, each under a white lock, in the closing card's grid

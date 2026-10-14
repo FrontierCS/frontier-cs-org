@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Team
+og_image: assets/img/cards/team.png
 description: The authors of FrontierCS, the institutions they come from, and the sponsors who support the project.
 permalink: /team/
 ---
@@ -85,7 +86,7 @@ permalink: /team/
 </div>
 </section>
 
-<section class="journal team-sec">
+<section class="journal team-sec" id="contact">
 <div class="page">
   <div class="sec-head"><div>
     <h2 class="sec-title">Contact</h2>

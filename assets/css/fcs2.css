@@ -144,6 +144,11 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 .res td.e{color:var(--faint)}
 .res td .sq{display:inline-block; width:10px; height:10px; margin-right:9px; vertical-align:0}
 .res tr.all td{font-weight:600; border-bottom:1px solid var(--ink-2)}
+#restbl th.dom{white-space:normal; line-height:1.25}   /* domains across: a long name wraps over its count */
+#restbl th .tk{display:block; font-weight:400; margin-top:2px}
+#restbl{font-size:14px} #restbl th, #restbl td{padding-inline:7px} #restbl th:first-child, #restbl td:first-child{padding-left:0}   /* fourteen columns fit the overview's width */
+#restbl td:first-child{white-space:nowrap}   /* model names on one line; the table scrolls sideways on phones */
+#restbl td.all, #restbl th.all{font-weight:600; border-right:1px solid var(--line)}
 .res .tk{color:var(--muted)}
 .res .best{font-weight:700}
 .res th .mn{display:inline-block; width:9px; height:9px; margin-right:6px}
@@ -438,6 +443,35 @@ a.pbtn:hover{border-color:var(--teal); color:var(--teal-d)}
 .tsteps{margin-top:18px; counter-reset:none}
 .tsteps b{display:flex; align-items:center; gap:10px}
 .tsteps b span{flex:none; width:22px; height:22px; border-radius:50%; background:#e8f0fe; color:#0b57d0; font-size:12.5px; font-weight:600; display:inline-flex; align-items:center; justify-content:center}
+.pfold{margin:28px 0 0}   /* the patch, folded under the solution (Qiuyang, 2026-10-14); chips in leaderboard order, then the diff in its own box */
+.tsol .tsum + .pfold{margin-top:16px}   /* right under the model line when there are no steps */
+.pfold summary{width:fit-content}   /* the overview's fold, as Problem details on Security pages: ink heading, then the size, then the plus */
+.pfold summary h3{font-size:16px; font-weight:600; color:var(--ink)}
+.pfold summary .pd{font-size:14.5px; color:var(--muted); font-variant-numeric:tabular-nums}
+.pfold .pnote{font-size:14px; color:var(--muted); margin:12px 0 0; line-height:1.5}
+.pchips{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px}
+.pchip{display:inline-flex; align-items:center; gap:8px; height:36px; padding:0 12px; border:1px solid var(--line); border-radius:18px; background:var(--bg); font:inherit; font-size:14px; color:var(--ink-2); cursor:pointer}
+.pchip:hover{border-color:var(--muted)}
+.pchip i{width:9px; height:9px; border-radius:2px; flex:none}
+.pchip[aria-pressed="true"]{border-color:var(--ink); color:var(--ink); box-shadow:inset 0 0 0 1px var(--ink)}
+.pfold .pv{font-weight:600} .pchip .pv{font-size:12px} .pfold .pv.y{color:#137333} .pfold .pv.n{color:var(--muted)}
+.pchips[hidden]{display:none}
+.pchip .pd, .pmeta{font-variant-numeric:tabular-nums}
+.pchip .pd{font-size:12.5px; color:var(--muted)}
+.pfold b.a{color:#137333; font-weight:500} .pfold b.d{color:#b3261e; font-weight:500}
+.pmeta{margin:12px 0 10px; font-size:14px; color:var(--ink-2); line-height:1.5}
+.pmeta:empty{margin:12px 0 0}
+.pmeta > b{color:var(--ink); font-weight:600}
+.pfiles{display:flex; flex-wrap:wrap; gap:2px 16px; margin-top:6px; font:12.5px/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.pfiles a{color:var(--teal); text-decoration:none} .pfiles a:hover{text-decoration:underline}
+.pdiff{margin:0; max-height:72vh; overflow:auto; border:1px solid var(--line); border-radius:8px; background:#fff; font:12.5px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; color:var(--ink-2)}
+.pdiff code{display:block; min-width:max-content; padding-bottom:6px; font:inherit}
+.pdiff span{display:block; padding:0 16px; white-space:pre}
+.pdiff .df{position:sticky; top:0; z-index:1; padding:7px 16px; background:var(--soft); color:var(--ink); font-weight:600; border-bottom:1px solid var(--line)}
+.pdiff .dm{color:var(--faint)} .pdiff .dh{color:var(--muted); background:#f8f9fa}
+.pdiff .da{background:#e6f4ea; color:#0d652d} .pdiff .dd{background:#fce8e6; color:#a50e0e}
+.pdiff .dmore{font-style:normal; color:var(--muted)}
+.pempty{margin:0; padding:28px; color:var(--muted); border:1px dashed var(--line); border-radius:8px}
 .tchart{margin:64px 0 0}
 .cnote{font-size:13.5px; line-height:1.45; color:var(--muted-2); margin:10px 0 0; max-width:60em}
 .cnote:empty{display:none}

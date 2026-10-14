@@ -12,28 +12,18 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>
-    {%- if site.title == "blank" -%}
-        {%- capture title -%}{{ site.first_name }} {{ site.middle_name }} {{ site.last_name }}{%- endcapture -%}
-    {%- else -%}
-        {%- capture title -%}{{ site.title }}{%- endcapture -%}
-    {%- endif -%}
-    {% if page.url == '/blog/index.html' or page.url == '/blog/' %}
-        {{ title }}
-    {%- elsif page.title != "blank" -%}
-        {%- if page.title contains title -%}
-            {{ page.title }}
-        {%- elsif page.title == nil or page.title == "" -%}
-            {{ page.date | date: "%Y" }} | {{ title }}
-        {%- else -%}
-            {{ page.title }} | {{ title }}
-        {%- endif -%}
-    {%- else -%}
-        {{ title }}
-    {%- endif -%}
-    </title>
-    <meta name="author" content="{{ site.first_name }} {{ site.middle_name }} {{ site.last_name }}" />
+    {%- comment -%} One page title for the tab, search results and link previews (owner, 2026-10-14: they disagreed) {%- endcomment -%}
+    {%- capture title -%}{{ site.title }}{%- endcapture -%}
+    {%- if page.url == '/blog/index.html' or page.url == '/blog/' -%}{%- capture page_title -%}Blog | {{ title }}{%- endcapture -%}
+    {%- elsif page.title == nil or page.title == "" or page.title == "blank" -%}{%- capture page_title -%}{%- if page.date -%}{{ page.date | date: "%Y" }} | {% endif -%}{{ title }}{%- endcapture -%}
+    {%- elsif page.title contains title -%}{%- assign page_title = page.title -%}
+    {%- else -%}{%- capture page_title -%}{{ page.title }} | {{ title }}{%- endcapture -%}{%- endif %}
+    <title>{{ page_title }}</title>
+    <meta name="author" content="{{ site.author }}" />
     <meta name="description" content="{%- if page.description -%}{{ page.description }}{%- else -%}{{ site.description }}{%- endif -%}" />
+{%- if page.robots %}
+    <meta name="robots" content="{{ page.robots }}" />
+{%- endif %}
 {%- if page.keywords or site.keywords %}
     <meta name="keywords" content="{%- if page.keywords -%}{{ page.keywords }}{%- else -%}{{ site.keywords }}{%- endif -%}" />
 {%- endif %}
@@ -49,21 +39,26 @@
 
     <!-- OpenGraph -->
     <meta property="og:site_name" content="{{ title }}" />
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="{%- if page.title -%}{{ title }} | {{ page.title }}{%- else -%}{{ title }}{%- endif -%}" />
+    <meta property="og:type" content="{% if page.collection == 'posts' %}article{% else %}website{% endif %}" />
+    <meta property="og:title" content="{{ page_title }}" />
     <meta property="og:url" content="{{ page.url | prepend: site.baseurl | prepend: site.url | remove_first: 'index.html' }}" />
     <meta property="og:description" content="{%- if page.description -%}{{ page.description }}{%- else -%}{{ site.description }}{%- endif -%}" />
     {% if og_img_abs -%}
     <meta property="og:image" content="{{ og_img_abs }}" />
+    <meta property="og:image:alt" content="{{ page_title }}" />
     {%- endif %}
     <meta property="og:locale" content="{{ site.lang }}" />
+    {%- if page.collection == 'posts' %}
+    <meta property="article:published_time" content="{{ page.date | date_to_xmlschema }}" />
+    {%- endif %}
 
     <!-- Twitter card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="{%- if page.title -%}{{ page.title }}{%- else -%}{{ title }}{%- endif -%}" />
+    <meta name="twitter:title" content="{{ page_title }}" />
     <meta name="twitter:description" content="{%- if page.description -%}{{ page.description }}{%- else -%}{{ site.description }}{%- endif -%}" />
     {% if og_img_abs -%}
     <meta name="twitter:image" content="{{ og_img_abs }}" />
+    <meta name="twitter:image:alt" content="{{ page_title }}" />
     {%- endif %}
     {% if site.twitter_username -%}
     <meta name="twitter:site" content="@{{ site.twitter_username }}" />

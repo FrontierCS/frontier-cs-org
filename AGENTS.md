@@ -1,177 +1,44 @@
 # AGENTS.md
 
-This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.
+Guidance for coding agents (Codex and others) when working in this repository. `README.md` describes the site, its pages, deployment and the FrontierCS 2 data pipeline; read it first. This file says how to work here.
 
-## Overview
+## Workflow
 
-This repository hosts the ICLR 2025 Blogposts Track website, built on the al-folio Jekyll theme. It's designed to publish and showcase academic blog posts submitted to the ICLR conference. The site uses Jekyll for static site generation and supports both Markdown and HTML blog posts with rich features like citations, interactive HTML figures, and math typesetting.
+- Work on `redesign`. `main` is the live site: never push to it. Never force-push any branch.
+- Fetch before every edit and before every push; collaborators push to the same branches. If the branch moved, merge it in first.
+- One change per commit. The message says what changed and why, and credits who asked for it (for example "(owner)").
+- Open pull requests against `redesign`, one topic each. The body states what changed, what you checked, and a preview link. Do not merge a pull request unless the owner asks.
+- To fix a conflicting pull request, add commits to its branch (revert what is not wanted, merge `redesign` in, resolve) and push without force.
 
-## Key Commands
+## Build and check
 
-### Local Development
+- Build with `bundle exec jekyll build`, or serve with `bundle exec jekyll serve`.
+- Before calling a change done, open every page it touches in a browser at 1280 px and at 390 px. Check for script errors, horizontal overflow, clipped or overlapping text, and look at a screenshot of what changed.
+- Task pages load their diagrams with `fetch`, so check them over HTTP, not from `file://`.
+- Put a site URL that a script needs in a real link (`<a href=... hidden>`) and read its `href`. A URL in a `data-` attribute or a string is not rewritten for previews or base URLs.
 
-**Using Docker (Recommended):**
-```bash
-./bin/docker_run.sh
-```
-This builds a Docker container and serves the site locally at `http://localhost:8080` using `_config_local.yml`.
+## Data
 
-**Using Jekyll directly:**
-```bash
-bundle install
-bundle exec jekyll serve --future
-```
-Serves the site locally at `http://localhost:4000` using `_config.yml`.
+- The FrontierCS 2 numbers come from `bin/fcs2_runs_from_db.py` and the other `bin/fcs2_*` scripts (see README). Change the scripts, not their output. If a hand edit of the converter block in `assets/js/fcs2-data.js` is unavoidable, make the converter produce the same result, so the next run keeps it.
+- Task descriptions live in `bin/fcs2_descriptions.tsv` and in the `DESC` copy in `fcs2-data.js`; edit both.
+- The platform API is read-only for this site. Never commit credentials, private evaluation data or raw model output beyond what a page shows. `_data/fcs2_runs_hidden.json` is for fits only and is never shown.
+- Fill numbers in page text from the data (`data-fill`) where you can, so they cannot drift from the charts.
 
-### Building
+## Design
 
-```bash
-bundle exec jekyll build
-```
-Generates the static site in the `_site/` directory. For production builds, set `JEKYLL_ENV=production` first.
+The FrontierCS 2 overview (`index.md`) sets the design; match it everywhere.
 
-### Deployment
+- Type is Hanken Grotesk; colours are Google Material tones. A model's colour is its `--m-<id>` in `_sass/_fcs.scss`, nothing else.
+- Links are underlined text or pills. Never use arrow characters (← → ‹ › ↗) as links or separators; breadcrumbs use "/".
+- Draw checkboxes, radios and menus in Material 3 style; never leave the browser's default. The task filter's checkboxes and the mean-score settings' radios share one look.
+- The same kind of element looks the same on every page.
+- Subtract. Do not add a second way to do the same thing, and do not add grey notes that repeat a chart title, a legend or the questions.
+- Charts follow Epoch AI's grammar: a light grid, labels on the marks, the source note and wordmark under the chart. Model names are never shortened.
+- Task diagrams (`assets/img/fcs2-tasks/<slug>.svg`) use only the `fig2` classes in `assets/css/fcs2.css`: what is given on grey, the agent's part on its domain's tone, 760 wide, no frame, and no text outside its region.
 
-```bash
-./bin/deploy
-```
-Manual deployment script that builds the site and pushes to the `gh-pages` branch. The script will prompt for confirmation and checks for uncommitted changes.
+## Words
 
-**Automated deployment:** The repository uses GitHub Actions to automatically deploy when changes are pushed. Check `.github/workflows/deploy.yml` for configuration.
-
-## Blog Post Structure
-
-### File Organization
-
-Each blog post requires files in specific locations:
-
-1. **Main post file:** `_posts/2025-04-28-[SUBMISSION_NAME].md` (or `.html`)
-2. **Images:** `assets/img/2025-04-28-[SUBMISSION_NAME]/`
-3. **Interactive HTML figures:** `assets/html/2025-04-28-[SUBMISSION_NAME]/`
-4. **Bibliography:** `assets/bibliography/2025-04-28-[SUBMISSION_NAME].bib`
-
-The date prefix `2025-04-28` is standardized for all ICLR 2025 submissions.
-
-### Post Front Matter
-
-Every post must have YAML front matter with required fields:
-- `layout:` (typically `distill` or `post`)
-- `title:` Post title
-- `description:` Brief description
-- `date:` Publication date
-- `authors:` List of authors with names and affiliations
-- `bibliography:` Path to .bib file (e.g., `2025-04-28-[SUBMISSION_NAME].bib`)
-
-### Citations
-
-- Use BibTeX format in `assets/bibliography/2025-04-28-[SUBMISSION_NAME].bib`
-- Reference citations in posts using `<d-cite key="citation_key"></d-cite>` tags
-- Jekyll Scholar plugin automatically processes citations
-
-### Interactive Content
-
-- Place interactive HTML visualizations in `assets/html/2025-04-28-[SUBMISSION_NAME]/`
-- Embed using `<iframe>` tags in the post
-- Supports Plotly, D3.js, and other JavaScript-based visualizations
-
-## Configuration Files
-
-### `_config.yml`
-
-Main configuration file for production deployment:
-- `url:` https://iclr-blogposts.github.io
-- `baseurl:` /2025
-- Site metadata, theme settings, and plugin configuration
-
-### `_config_local.yml`
-
-Used for local development with Docker. Overrides production settings for localhost serving.
-
-## Architecture
-
-### Collections
-
-- **`_news/`**: News items displayed on homepage
-- **`_projects/`**: Project showcase pages (not heavily used in this blog track)
-- **`_posts/`**: Main blog posts collection
-
-### Layouts
-
-- **`distill.html`**: Primary layout for blog posts with distill.pub styling
-- **`post.html`**: Standard blog post layout
-- **`about.html`**: Used for the about page
-- **`page.html`**: Generic page layout
-
-### Key Directories
-
-- **`_includes/`**: Reusable HTML components (headers, footers, citations, etc.)
-- **`_layouts/`**: Page templates
-- **`_sass/`**: SCSS styling files
-- **`assets/`**: All static assets (images, CSS, JS, bibliography, HTML embeds)
-- **`_pages/`**: Standalone pages (about, call, submitting, reviewer guidelines)
-
-### Jekyll Plugins
-
-Important plugins configured in `_config.yml`:
-- **jekyll-scholar**: Handles BibTeX citations
-- **jekyll-paginate-v2**: Pagination for blog listing
-- **jekyll-archives**: Tag/category archives
-- **jekyll-feed**: RSS feed generation
-- **jekyll-imagemagick**: Responsive image processing
-- **jekyll-minifier**: Asset minification
-
-## Submission Workflow
-
-### For New Submissions
-
-1. Fork the repository or work on a branch
-2. Create post files following the naming convention: `2025-04-28-[SUBMISSION_NAME]`
-3. Add all assets (images, HTML, bibliography) in corresponding directories
-4. **DO NOT modify any files outside your submission's specific directories**
-5. Test locally using Docker or Jekyll
-6. Create a pull request with title: `_posts/2025-04-28-[SUBMISSION_NAME]`
-7. Automated GitHub Action builds the post and comments the preview URL
-
-### File Filtering
-
-The repository uses `bin/filterpaths.py` to validate pull requests. Only changes to:
-- New files in `_posts/`
-- New directories/files in `assets/img/`, `assets/html/`, `assets/bibliography/`
-
-Any other modifications will cause the PR to be rejected automatically.
-
-## Important Notes
-
-### Math Support
-
-MathJax 3.2.0 is enabled for LaTeX math rendering. Use `$$...$$` for display math and `$...$` for inline math.
-
-### Dark Mode
-
-The theme includes dark mode support (`enable_darkmode: true`). Custom visualizations should consider both light and dark themes.
-
-### Responsive Images
-
-The `jekyll-imagemagick` plugin automatically generates responsive WebP versions of images. Original images in `.jpg`, `.jpeg`, `.png`, `.tiff` formats are processed.
-
-### Review Process
-
-Blog posts are submitted via pull request AND OpenReview. The GitHub PR generates a public preview URL for reviewers while maintaining double-blind review on OpenReview. Authors should ensure no identifying information in the post content during review.
-
-## Common Issues
-
-### Port Already in Use
-
-If Docker can't start due to port 8080 being in use, edit `bin/docker_run.sh` to change the port mapping.
-
-### Build Failures
-
-- Check that all image paths are relative and use correct directory structure
-- Ensure `.bib` file exists and is properly formatted
-- Verify all required front matter fields are present
-
-### GitHub Actions Failing
-
-- Confirm PR only modifies allowed files (use `git diff` to check)
-- Ensure post filename matches directory names in assets
-- Check that no sensitive files or large binaries are committed
+- "FrontierCS", never "Frontier-CS" (except in repository names and URLs); "FrontierCS 2", never "2.0".
+- The authors' code is the "human reference". The model at the 0 point of FECI is "Kimi K2.7".
+- In headlines and share cards, write no contractions and no possessive apostrophes.
+- Task names show in title case; internal keys never reach the page.

@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Workshop
+og_image: assets/img/cards/workshop.png
 description: "How Far Are AI Agents from Becoming Computer Scientists? A proposed ICLR 2027 workshop on how a research agent learns what to improve, what to trust, and what to explore."
 permalink: /workshop/
 page_css: fcs2
