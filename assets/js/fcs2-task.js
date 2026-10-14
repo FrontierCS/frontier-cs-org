@@ -4,6 +4,7 @@
 // the pass criteria, every run's development score against its spend, and the task's FECI curve. assets/css/fcs2.css holds the styles.
 
 const RANK = Object.fromEntries(RANKED.map((m, i) => [m.id, i]));
+const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;   // the patch counts files
 const figure = (id, head, right = '') => `<figure class="chart tchart"><div class="chead"><span>${head}</span><span class="r">${right}</span></div>
   <div class="plot" id="${id}plot"><svg id="${id}svg" role="img" aria-label="${esc(head)}"></svg><div class="tip" id="${id}tip" hidden></div></div>
   <div class="legend" id="${id}legend"></div><p class="cnote" id="${id}note"></p></figure>`;
@@ -50,7 +51,7 @@ function drawPage() {
     + figure('dc', 'Development score against spend')
     + (TFIT[t.s] ? figure('fc', 'Expected score by FECI') : '')
     + solutionHTML(t, runs);   // the solution last (owner, 2026-10-14)
-  drawResults(); if (CHECKS[t.s]) drawCriteria(); drawCharts(); loadFig(t); drawPager(t);
+  drawResults(); if (CHECKS[t.s]) drawCriteria(); drawCharts(); loadPatches(t); loadFig(t); drawPager(t);
   scrollTo(0, 0);
 }
 const NEWDESC = s => (DESC[s] || '').includes('¶');
@@ -224,6 +225,71 @@ function solutionHTML(t, runs) {
   return `<section class="tsol"><h2 class="th2">Solution</h2><p class="tsum"><span class="sq" style="background:${MCOL[so.m]}"></span>`
     + `<b>${esc(MNAME[so.m])}</b> · ${r[3] ? 'passes' : 'does not pass'} · final score <b>${f1(r[2])}</b></p>`
     + `<ol class="how-why tsteps">${so.steps.map(([h, x], i) => `<li><b><span>${i + 1}</span>${esc(h)}</b>${esc(x)}</li>`).join('')}</ol></section>`;
+}
+
+/* ---------- the patch ----------
+   The patch each model handed in, from assets/patches/<slug>.json (bin/fcs2_patches_from_platform.py), fetched when the
+   problem is opened, folded under the solution in words (Qiuyang, 2026-10-14: the patch stays on the page, folded). A
+   problem with no words gets a Solution section of its own, the model line and the folded patch. One chip per model when
+   the file holds more than one; for now it holds Claude Opus 5.5 alone. A problem with no file (Security) shows neither. */
+const PATCHES = {};
+function loadPatches(t) {
+  const s = slug(t.s), show = d => { if (cur && cur.t === t) drawPatches(d); };
+  if (PATCHES[s]) return show(PATCHES[s]);
+  fetch(`${window.PATCH_DIR || '/assets/patches/'}${s}.json`).then(r => r.ok ? r.json() : null).then(d => { if (d) { PATCHES[s] = d; show(d); } }).catch(() => {});
+}
+const DIFF_META = /^(index |--- |\+\+\+ |new file mode|deleted file mode|similarity index|rename (from|to) |old mode|new mode|Binary files|GIT binary patch)/;
+// a patch without git's own header (a plain unified diff) gets one per file, so it shows its file names too
+const withHeads = t => t.includes('diff --git ') ? t : t.replace(/^--- (?:a\/)?(.+)\n\+\+\+ (?:b\/)?(.+)$/gm, (m, a, b) => `diff --git a/${b} b/${b}\n${m}`);
+const filesOf = p => p.files.length ? p.files : [...p.patch.matchAll(/^\+\+\+ (?:b\/)?(.+)$/gm)].map(m => m[1]);
+// a line longer than LONG characters (one-line JSON answers) shows its start and how much follows
+const LONG = 600, cut = l => l.length > LONG ? `${esc(l.slice(0, LONG))}<i class="dmore"> … ${(l.length - LONG).toLocaleString('en-US')} more characters</i>` : esc(l) || ' ';
+function diffHTML(text) {
+  let n = 0;
+  return withHeads(text).split('\n').map(l => l.startsWith('diff --git ') ? `<span class="df" id="pf${n++}">${esc(l.replace(/^diff --git a\/(.*?) b\/.*$/, '$1'))}</span>`
+    : DIFF_META.test(l) ? `<span class="dm">${esc(l)}</span>` : l.startsWith('@@') ? `<span class="dh">${esc(l)}</span>`
+    : l.startsWith('+') ? `<span class="da">${cut(l)}</span>` : l.startsWith('-') ? `<span class="dd">${cut(l)}</span>` : `<span>${cut(l)}</span>`).join('');
+}
+const counts = (p, files) => `${plural(files.length, 'file')} changed, <b class="a">+${p.add}</b> <b class="d">−${p.del}</b>`;
+function drawPatches(d) {
+  const ms = RANKED.filter(m => d.runs[m.id]);
+  if (!ms.length) return;
+  const passed = m => d.runs[m.id].verdict === 'PASS', has = m => d.runs[m.id].patch != null, one = ms.length === 1;
+  let sec = $('#tbody .tsol');
+  if (!sec) {   // no words for this problem: the section holds the model line, as the words' section does, and the patch
+    const m = ms[0], p = d.runs[m.id];
+    $('#tbody').insertAdjacentHTML('beforeend', `<section class="tsol"><h2 class="th2">Solution</h2>` + (one
+      ? `<p class="tsum"><span class="sq" style="background:${MCOL[m.id]}"></span><b>${esc(m.name)}</b> · ${passed(m) ? 'passes' : 'does not pass'}`
+        + (p.score != null ? ` · final score <b>${f1(p.score)}</b>` : '') + '</p>' : '') + '</section>');
+    sec = $('#tbody .tsol');
+  }
+  sec.querySelectorAll('.pfold').forEach(x => x.remove());
+  // folded: the summary names whose patch it is when the words above are another model's, and its size
+  const words = typeof SOLUTION !== 'undefined' && SOLUTION[cur.t.s], m0 = ms[0], p0 = d.runs[m0.id];
+  const who = one && words && words.m !== m0.id ? `${esc(m0.name)}’s patch` : one ? 'The patch' : 'The patches';
+  sec.insertAdjacentHTML('beforeend', `<details class="pfold"><summary>${who}`
+    + (one && has(m0) ? `<span class="pd"> · ${counts(p0, filesOf(p0))}</span>` : '') + '</summary>'
+    + `<p class="pnote">${one ? 'A' : 'Each model’s final submission as a'} diff against the code the problem starts from.</p>`
+    + `<div class="pchips" id="pchips"${one ? ' hidden' : ''}></div><div class="pmeta" id="pmeta"></div><div id="pview"></div></details>`);
+  if (!one) $('#pchips').innerHTML = ms.map(m => { const p = d.runs[m.id];
+    return `<button type="button" class="pchip" data-m="${m.id}" aria-pressed="false"><i style="background:${MCOL[m.id]}"></i><span>${esc(m.short)}</span>`
+      + `<span class="pv ${passed(m) ? 'y' : 'n'}">${passed(m) ? 'Pass' : 'Fail'}</span>`
+      + (has(m) ? `<span class="pd"><b class="a">+${p.add}</b> <b class="d">−${p.del}</b></span>` : '<span class="pd">no solution</span>') + '</button>'; }).join('');
+  const pick = id => {
+    const m = ms.find(x => x.id === id), p = d.runs[id];
+    $('#pchips').querySelectorAll('.pchip').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.m === id)));
+    if (!has(m)) { $('#pmeta').innerHTML = ''; $('#pview').innerHTML = `<p class="pempty">${esc(m.name)} handed in no solution on this problem (${esc(p.missing || 'none')}).</p>`; return; }
+    const files = filesOf(p);
+    $('#pmeta').innerHTML = (one ? '' : `<b>${esc(m.name)}</b> · ${esc(p.submission)} · ${counts(p, files)}`)
+      + (p.truncated ? `${one ? '' : ' · '}the first ${Math.round(p.patch.length / 1000)} kB of ${Math.round(p.bytes / 1000)} kB shown` : '')
+      + (files.length > 1 ? `<div class="pfiles">${files.map((f, i) => `<a href="#pf${i}" data-i="${i}">${esc(f)}</a>`).join('')}</div>` : '');
+    $('#pview').innerHTML = `<pre class="pdiff" tabindex="0"><code>${diffHTML(p.patch)}</code></pre>`;
+  };
+  $('#pchips').onclick = e => { const b = e.target.closest('.pchip'); if (b) pick(b.dataset.m); };
+  // a file name scrolls the diff, not the page, to that file
+  $('#pmeta').onclick = e => { const a = e.target.closest('.pfiles a'); if (!a) return; e.preventDefault();
+    const pre = $('#pview .pdiff'), h = pre && pre.querySelector(`#pf${a.dataset.i}`); if (h) pre.scrollTop = h.offsetTop - pre.offsetTop; };
+  pick((ms.find(m => passed(m) && has(m)) || ms.find(has) || ms[0]).id);
 }
 
 addEventListener('hashchange', drawPage);
