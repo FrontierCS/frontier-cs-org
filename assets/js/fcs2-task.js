@@ -134,19 +134,20 @@ function drawDev() {
 }
 
 /* The task's curve from the FECI fit: the score a model of a given FECI is expected to reach. Dots: each model's mean final
-   score on this task at the model's FECI, and the authors' code at Human = 60. */
+   score on this task at the model's FECI, and the authors' code at Human (ECI_HUMAN). */
 function drawFit() {
   const {t, runs} = cur, [d, k] = TFIT[t.s], ref = REF[t.s];
   const svg = $('#fcsvg'), W = Math.max(300, $('#fcplot').clientWidth), narrow = W < 560;
   const L = 34, R = narrow ? 12 : 24, T = 12, B = 46, H = narrow ? 280 : 320;
-  const xmax = Math.max(100, Math.ceil(Math.max(...RANKED.map(m => ECI[m.id][0])) / 20) * 20);
+  // the axis runs to 5/3 of Human (as 0 to 100 did when Human was 60), further if a model is past it; grid every 10
+  const xmax = Math.max(Math.ceil(ECI_HUMAN * 5 / 3 / 10) * 10, Math.ceil(Math.max(...RANKED.map(m => ECI[m.id][0])) / 10) * 10);
   const X = v => L + v / xmax * (W - L - R), Y = v => T + (1 - v / 100) * (H - T - B), f = x => 100 / (1 + Math.exp(-k * (x - d)));
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
   for (let v = 0; v <= 100; v += 20) {
     svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1}));
     svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, v));
   }
-  for (let v = 0; v <= xmax; v += 20) {
+  for (let v = 0; v <= xmax; v += 10) {
     svg.append(sv('line', {x1:X(v), x2:X(v), y1:H - B, y2:H - B + 5, stroke:'var(--ink-2)', 'stroke-width':1}));
     svg.append(sv('text', {x:X(v), y:H - B + 20, 'text-anchor':'middle'}, v));
   }

@@ -118,7 +118,8 @@ function drawECI() {
   const order = [...MODELS].sort((a, b) => ECI[b.id][0] - ECI[a.id][0]);
   const svg = $('#ecisvg'), W = Math.max(300, $('#eciplot').clientWidth), narrow = W < 560;
   const L = narrow ? nameCol(svg) : 190, R = 34, T = 14, B = 46, lane = CHART_H.eciLane || (narrow ? 56 : 64);
-  const xmax = Math.ceil(Math.max(...MODELS.map(m => ECI[m.id][2])) / 20) * 20, step = narrow && xmax > 120 ? 40 : 20;
+  // grid every 10 on the Human = 25 scale (owner, 2026-10-13); every 20 or 40 if the scale is ever wider
+  const top = Math.max(...MODELS.map(m => ECI[m.id][2])), step = top > 120 ? (narrow ? 40 : 20) : top > 60 ? 20 : 10, xmax = Math.ceil(top / step) * step;
   const H = T + order.length * lane + B, an = animates(svg), bh = narrow ? 16 : 18;
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
   const X = v => L + v / xmax * (W - L - R);
@@ -135,7 +136,7 @@ function drawECI() {
     if (m.h) svg.append(sv('text', {x:0, y:yc + 14, 'font-size':12}, m.h));
     const bar = sv('rect', {class:'ebar', x:X(0), y:yc - bh / 2, width:Math.max(0, X(e) - X(0)), height:bh, fill:MCOL[m.id], 'data-m':m.id});
     const wk = sv('path', {class:'ewhisk', d:`M${X(lo)},${yc}H${X(hi)}M${X(lo)},${yc - 5}v10M${X(hi)},${yc - 5}v10`, fill:'none', stroke:'var(--ink)', 'stroke-width':1.5});
-    const val = sv('text', {class:'val halo', x:X(e), y:yc - bh / 2 - 6, fill:MCOL[m.id], 'text-anchor':'middle'}, String(Math.round(e)));
+    const val = sv('text', {class:'val halo', x:X(e), y:yc - bh / 2 - 6, fill:MCOL[m.id], 'text-anchor':'middle'}, f1(e));   // one decimal: on this scale whole numbers tie
     svg.append(bar, wk, val);
     if (an) { mark(bar, 'a-bar', i * .07); mark(wk, 'a-fade', .55 + i * .07); mark(val, 'a-fade', .55 + i * .07); }
     pts.push({x:X(e), y:yc, mean:true, html:`<b>${esc(m.name)}</b><br>FECI <b>${f1(e)}</b><br>90% interval ${Math.round(lo)}–${Math.round(hi)}`});
@@ -144,45 +145,22 @@ function drawECI() {
 }
 
 /* Test-time scaling: FECI when every run stops at a US$ budget (SCALE, from bin/fcs2_runs_from_db.py).
-   Every model's curve is drawn in its colour, with no band: eight 90% bands on one plot read as mud (owner, 2026-10-13).
-   The legend is the control: hovering a name shows that model alone with its band, the others in light grey; a click takes
-   a model off (grey) or puts it back. On first view the curves draw one after another, from the cheapest model to the
-   dearest. Values below 0 leave the plot through its bottom edge. */
-// A curve through every point with no overshoot (monotone cubic, Fritsch-Carlson, as d3's curveMonotoneX): between two
-// samples it never goes above the higher or below the lower, so the smoothing adds no value the data does not have.
-function smooth(P) {
-  const n = P.length; if (n < 3) return P.map((p, i) => `${i ? 'L' : 'M'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join('');
-  const dx = [], sl = []; for (let i = 0; i < n - 1; i++) { dx.push(P[i + 1][0] - P[i][0]); sl.push((P[i + 1][1] - P[i][1]) / (dx[i] || 1)); }
-  const t = [sl[0]]; for (let i = 1; i < n - 1; i++) t.push(sl[i - 1] * sl[i] <= 0 ? 0 : 3 * (dx[i - 1] + dx[i]) / ((2 * dx[i] + dx[i - 1]) / sl[i - 1] + (dx[i] + 2 * dx[i - 1]) / sl[i]));
-  t.push(sl[n - 2]);
-  let d = `M${P[0][0].toFixed(1)},${P[0][1].toFixed(1)}`;
-  for (let i = 0; i < n - 1; i++) { const h = dx[i] / 3;
-    d += `C${(P[i][0] + h).toFixed(1)},${(P[i][1] + h * t[i]).toFixed(1)} ${(P[i + 1][0] - h).toFixed(1)},${(P[i + 1][1] - h * t[i + 1]).toFixed(1)} ${P[i + 1][0].toFixed(1)},${P[i + 1][1].toFixed(1)}`; }
-  return d;
-}
-// The curves plotted are SCALE as the converter writes it: a run stopped at a budget counts its latest valid submission,
-// so a curve can dip where a later submission scores below an earlier one (owner, 2026-10-13: back to this rule, no running maximum).
-const TTS = SCALE;
-const TTS_Y0 = 40, ttsOn = new Set(RANKED.filter(m => SCALE[m.id]).map(m => m.id));
-let ttsHover = null;
+   Values below 0 leave the plot through its bottom edge. The drawing is that of 2026-10-12: straight segments, every band at
+   12%, one legend (owner, 2026-10-13: back to it). A run stopped at a budget counts its latest valid submission, so a curve can dip. */
 function drawTTS() {
   const svg = $('#ttssvg'), W = Math.max(300, $('#ttsplot').clientWidth), narrow = W < 560;
   const L = 34, R = narrow ? 12 : 24, T = 12, B = 46, H = CHART_H.tts || (narrow ? 300 : 380);
-  const all = Object.values(TTS).flat(), shown = m => ttsHover ? ttsHover === m.id : ttsOn.has(m.id), band1 = m => ttsHover === m.id || ttsOn.size === 1 && ttsOn.has(m.id);
-  // the axis starts a little before the first budget at which any model rises above 0
-  const x0 = Math.log10(Math.min(...all.filter(p => p[1] >= 0).map(p => p[0]))) - 0.3, x1 = Math.log10(Math.max(...all.map(p => p[0])));
-  const ymax = Math.max(65, Math.ceil((Math.max(...all.map(p => p[1])) + 2) / 5) * 5);
-  // the value axis widens as it goes up: 0 to 40 takes the bottom 10% of the plot, 40 to 50 the next 10%, 50 to 60 the next
-  // 26%, and 60 to the top the remaining 54%, since the curves finish and crowd between 50 and 70; each curve's climb
-  // from 0 still shows (owner, 2026-10-13)
-  const KN = [[0, 0], [TTS_Y0, .10], [50, .20], [60, .46], [ymax, 1]];
-  const yf = v => { let i = 1; while (i < KN.length - 1 && v > KN[i][0]) i++; const [a, fa] = KN[i - 1], [b, fb] = KN[i]; return fa + (v - a) / (b - a) * (fb - fa); };
-  const X = v => L + (Math.log10(v) - x0) / (x1 - x0) * (W - L - R), Y = v => T + (1 - yf(v)) * (H - T - B);
+  const all = Object.values(SCALE).flat();
+  // the axis starts half a decade before the first budget at which any model rises above 0
+  const x0 = Math.log10(Math.min(...all.filter(p => p[1] >= 0).map(p => p[0]))) - 0.5, x1 = Math.log10(Math.max(...all.map(p => p[0])));
+  const ytop = Math.max(...all.map(p => p[3])), ystep = ytop > 60 ? 20 : 10, ymax = Math.ceil(ytop / ystep) * ystep;   // grid every 10 on the Human = 25 scale
+  const X = v => L + (Math.log10(v) - x0) / (x1 - x0) * (W - L - R), Y = v => T + (1 - v / ymax) * (H - T - B);
   const an = animates(svg);
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
-  const clip = sv('clipPath', {id:'ttsclip'}), cr = sv('rect', {x:L, y:T - 4, width:W - L - R + 11, height:H - T - B + 5}); clip.append(cr); svg.append(clip);
-  for (const v of [0, 20, 40, ...Array.from({length:(ymax - 50) / 5 + 1}, (_, i) => 50 + i * 5)]) {
-    svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:v === 50 || v === 60 ? 'var(--line)' : 'var(--grid)', 'stroke-width':1}));
+  const clip = sv('clipPath', {id:'ttsclip'}), cr = sv('rect', {x:L, y:T - 4, width:W - L - R + 8, height:H - T - B + 4}); clip.append(cr); svg.append(clip);
+  if (an) mark(cr, 'a-wipe');   // the curves and bands are uncovered left to right, along the budget axis
+  for (let v = 0; v <= ymax; v += ystep) {
+    svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1}));
     svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, v));
   }
   for (let k = Math.ceil(x0); k <= Math.floor(x1); k++) {
@@ -191,39 +169,22 @@ function drawTTS() {
   }
   svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'Cost budget per run in US$, log scale'));
   const g = sv('g', {'clip-path':'url(#ttsclip)'}); svg.append(g);
-  const pts = [], ms = [...RANKED].reverse().filter(m => SCALE[m.id]);   // a model with no reported spend has no curve
-  const ends = [];
-  const seq = [...ms].sort((p, q) => TTS[p.id].at(-1)[0] - TTS[q.id].at(-1)[0]).map(m => m.id);   // drawing order: by final spend
-  // the grey curves first, then the picked ones over them, the leader last
-  [...ms.filter(m => !shown(m)), ...ms.filter(shown)].forEach(m => {
-    const c = TTS[m.id], on = shown(m), path = smooth(c.map(p => [X(p[0]), Y(p[1])]));
-    const e = c[c.length - 1];
-    const focus = band1(m);
-    if (focus) {   // the band's edges take the same curve as the line
-      const hi = smooth(c.map(p => [X(p[0]), Y(p[3])])), lo = smooth([...c].reverse().map(p => [X(p[0]), Y(p[2])]));
-      g.append(sv('path', {d:hi + 'L' + lo.slice(1) + 'Z', fill:MCOL[m.id], opacity:.13}));
-    }
-    // a white casing under each line keeps crossings legible; the line itself has round ends and joins
-    const wd = !on ? 1.5 : focus ? 3.6 : 2.8;
-    if (on) g.append(mark(sv('path', {d:path, pathLength:1, fill:'none', stroke:'#fff', 'stroke-width':wd + 3, 'stroke-linejoin':'round', 'stroke-linecap':'round'}), 'a-draw', an ? .15 + seq.indexOf(m.id) * .42 : 0));
-    const lp = sv('path', {d:path, pathLength:1, fill:'none', stroke:on ? MCOL[m.id] : '#c9ccd1', 'stroke-width':wd, 'stroke-linejoin':'round', 'stroke-linecap':'round'});
-    // the end of a curve: the same white-ringed dot as on the pass-rate chart
-    const end = sv('circle', {cx:X(e[0]), cy:Y(e[1]), r:!on ? 3 : focus ? 7.5 : 6.5, fill:on ? MCOL[m.id] : '#c9ccd1', stroke:'#fff', 'stroke-width':on ? 2 : 1});
-    g.append(lp); ends.push(end);   // the dots go on last, over every line
-    if (an) { const t0 = .15 + seq.indexOf(m.id) * .42; mark(lp, 'a-draw', t0); mark(end, 'a-fade', t0 + .8); }   // one curve after another
+  const pts = [];
+  [...RANKED].reverse().filter(m => SCALE[m.id]).forEach(m => {   // a model with no reported spend has no curve
+    const c = SCALE[m.id], path = c.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join('');
+    const band = c.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[3]).toFixed(1)}`).join('')
+      + [...c].reverse().map(p => `L${X(p[0]).toFixed(1)},${Y(p[2]).toFixed(1)}`).join('') + 'Z';
+    const bp = sv('path', {d:band, fill:MCOL[m.id], opacity:.12});
+    const lp = sv('path', {d:path, fill:'none', stroke:MCOL[m.id], 'stroke-width':2.2, 'stroke-linejoin':'round'});
+    const e = c[c.length - 1], end = sv('circle', {cx:X(e[0]), cy:Y(e[1]), r:4.5, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':1.5});
+    g.append(bp, lp, end);
+    if (an) mark(end, 'a-fade', 1.3);
     c.forEach(p => { if (p[1] >= 0) pts.push({x:X(p[0]), y:Y(p[1]), html:`<b>${esc(m.name)}</b><br>FECI <b>${f1(p[1])}</b> at ${usdfmt(p[0])} per run`
       + `<br>90% interval ${Math.round(Math.max(p[2], 0))}–${Math.round(p[3])}<br>${Math.round(p[4] * 100)}% of runs still going`}); });
   });
-  g.append(...ends);
   attachTip(svg, W, H, pts, $('#ttstip'));
-  $('#ttslegend').querySelectorAll('button').forEach(b => { const on = ttsOn.has(b.dataset.m); b.setAttribute('aria-pressed', on); b.classList.toggle('off', !on); });
 }
-// the legend is the chart's control: a button per model, in its colour when picked
-$('#ttslegend').innerHTML = RANKED.filter(m => SCALE[m.id]).map(m => `<button type="button" data-m="${m.id}"><i style="background:${MCOL[m.id]}"></i>${esc(m.name)}</button>`).join('');
-$('#ttslegend').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; const id = b.dataset.m;
-  if (ttsOn.has(id)) ttsOn.delete(id); else ttsOn.add(id); ttsHover = null; drawTTS(); });
-$('#ttslegend').addEventListener('pointerover', e => { const b = e.target.closest('button'); if (!b || e.pointerType !== 'mouse' || ttsHover === b.dataset.m) return; ttsHover = b.dataset.m; drawTTS(); });
-$('#ttslegend').addEventListener('pointerleave', () => { if (ttsHover) { ttsHover = null; drawTTS(); } });
+$('#ttslegend').innerHTML = RANKED.map(m => `<span><i style="background:${MCOL[m.id]}"></i>${esc(m.name)}</span>`).join('');
 
 const TASK_OF = Object.fromEntries(TASKS.map(t => [t.s, t]));
 const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -323,7 +284,7 @@ const redraws = [];
    (owner, 2026-10-11: the second step, task difficulties beside the models' FECI, is gone) */
 function drawHow() {
   const box = $('#feci-how'); if (!box || !box.open) return;
-  const fits = Object.entries(TFIT), clear = fits.filter(([, [, k]]) => k >= .03);
+  const fits = Object.entries(TFIT), clear = fits.filter(([, [, k]]) => k >= .072);   // slope .03 per point on the Human = 60 scale
   const counts = RANKED.map(m => ECI[m.id][3]);
   $('#how-ntasks').textContent = `${Math.min(...counts)} to ${Math.max(...counts)}`;
   $('#how-nall').textContent = fits.length;
@@ -332,18 +293,18 @@ function drawHow() {
   // A
   let svg = $('#howasvg'), W = Math.max(300, $('#howaplot').clientWidth), narrow = W < 560;
   let L = 34, R = narrow ? 12 : 24, T = 12, B = 46, H = narrow ? 240 : 270;
-  const X = v => L + v / 160 * (W - L - R), Y = v => T + (1 - v / 100) * (H - T - B);
+  const XM = 70, X = v => L + v / XM * (W - L - R), Y = v => T + (1 - v / 100) * (H - T - B);   // FECI 0 to 70 on the Human = 25 scale
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
   for (let v = 0; v <= 100; v += 25) { svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1})); svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, v)); }
-  for (let v = 0; v <= 160; v += 40) svg.append(sv('text', {x:X(v), y:H - B + 20, 'text-anchor':'middle'}, v));
+  for (let v = 0; v <= XM; v += 10) svg.append(sv('text', {x:X(v), y:H - B + 20, 'text-anchor':'middle'}, v));
   svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'FECI'));
-  const picks = [20, 60, 110].map(t => clear.slice().sort((a, b) => Math.abs(a[1][0] - t) - Math.abs(b[1][0] - t))[0]);
+  const picks = [8, 25, 46].map(t => clear.slice().sort((a, b) => Math.abs(a[1][0] - t) - Math.abs(b[1][0] - t))[0]);
   const pts = [];
   picks.forEach(([s, [d, k]], i) => {
     const f = x => 100 / (1 + Math.exp(-k * (x - d)));
-    svg.append(sv('path', {d:Array.from({length:161}, (_, x) => `${x ? 'L' : 'M'}${X(x).toFixed(1)},${Y(f(x)).toFixed(1)}`).join(''), fill:'none', stroke:INKS[i], 'stroke-width':2.5}));
+    svg.append(sv('path', {d:Array.from({length:141}, (_, i) => { const x = i / 2; return `${i ? 'L' : 'M'}${X(x).toFixed(1)},${Y(f(x)).toFixed(1)}`; }).join(''), fill:'none', stroke:INKS[i], 'stroke-width':2.5}));
     svg.append(sv('circle', {cx:X(d), cy:Y(50), r:5, fill:INKS[i], stroke:'#fff', 'stroke-width':2}));   // the difficulty: expected score 50
-    for (let x = 0; x <= 160; x += 4) pts.push({x:X(x), y:Y(f(x)), html:`<b>${esc(NAME(s))}</b><br>Difficulty ${f1(d)}, slope ${k.toFixed(3)}<br>At FECI ${x}: expected score <b>${f1(f(x))}</b>`});
+    for (let x = 0; x <= XM; x += 2) pts.push({x:X(x), y:Y(f(x)), html:`<b>${esc(NAME(s))}</b><br>Difficulty ${f1(d)}, slope ${k.toFixed(3)}<br>At FECI ${x}: expected score <b>${f1(f(x))}</b>`});
   });
   attachTip(svg, W, H, pts, $('#howatip'));
   $('#howalegend').innerHTML = picks.map(([s, [d]], i) => `<span><i style="background:${INKS[i]}"></i>${esc(NAME(s))}, difficulty ${Math.round(d)}</span>`).join('');
@@ -539,7 +500,7 @@ function showRun() {
   p.t = setTimeout(() => {
     const go = () => { if (play !== p) return; p.k = (p.k + 1) % n; showRun(); };
     if (calm) go(); else panel.animate([{opacity:1}, {opacity:0}], {duration:220, fill:'forwards'}).onfinish = go;
-  }, p.k === 0 ? 3400 : 2600);   // owner, 2026-10-13: a little faster (was 4.2 s and 3.2 s)
+  }, p.k === 0 ? 2500 : 1800);   // owner, 2026-10-13: faster (was 4.2 s and 3.2 s, then 3.4 s and 2.6 s)
 }
 $('#mapsvg').addEventListener('pointermove', e => {
   if (e.pointerType !== 'mouse') return;
