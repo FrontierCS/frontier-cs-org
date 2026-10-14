@@ -232,16 +232,17 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
    undesigned): a 2 px grey rail the height of the list and a rounded thumb on it, grey 500, grey 800 and wider on hover or
    while dragged; a click on the rail jumps there. The foot fades until the last row. Hidden when the list fits. */
 .rwrap{position:relative}
-.rows{margin-top:0; max-height:min(68vh,760px); overflow-y:auto; padding-right:28px; outline:0; scrollbar-width:none}
-.rows::-webkit-scrollbar{display:none}
-.rows::after{content:""; position:sticky; bottom:0; display:block; height:56px; margin-top:-56px; background:linear-gradient(rgba(255,255,255,0), var(--bg)); pointer-events:none; transition:opacity .2s}
-.rows.at-end::after{opacity:0}
+.rows, .ccbox{max-height:min(68vh,760px); overflow-y:auto; padding-right:28px; outline:0; scrollbar-width:none}   /* .ccbox: a task's patch */
+.rows{margin-top:0}
+.rows::-webkit-scrollbar, .ccbox::-webkit-scrollbar{display:none}
+.rows::after, .ccbox::after{content:""; position:sticky; bottom:0; display:block; height:56px; margin-top:-56px; background:linear-gradient(rgba(255,255,255,0), var(--bg)); pointer-events:none; transition:opacity .2s}
+.rows.at-end::after, .ccbox.at-end::after{opacity:0}
 .rail{position:absolute; top:0; right:0; bottom:0; width:14px; cursor:pointer; touch-action:none}
 .rail::before{content:""; position:absolute; top:0; bottom:0; left:6px; width:2px; border-radius:1px; background:#e8eaed}
 .rail i{position:absolute; left:4px; width:6px; min-height:36px; border-radius:3px; background:#9aa0a6; transition:background .15s, width .15s, left .15s}
 .rail:hover i, .rail.drag i{left:3px; width:8px; border-radius:4px; background:#3c4043}
 .rail[hidden]{display:none}
-.rows:focus-visible{box-shadow:0 0 0 2px var(--teal)}
+.rows:focus-visible, .ccbox:focus-visible{box-shadow:0 0 0 2px var(--teal)}
 /* task index: a head line (how many problems), then one compact row per problem on a shared grid, so names, goals,
    pass rates and links line up from row to row: name over domain, goal over source, pass rate, links */
 .lhead, .trow{display:grid; grid-template-columns:minmax(0,12.5em) minmax(0,1fr) 72px 86px; gap:4px 24px; align-items:center}
@@ -463,7 +464,7 @@ a.pbtn:hover{border-color:var(--teal); color:var(--teal-d)}
 .pmeta > b{color:var(--ink); font-weight:600}
 /* the patch in Claude Code's design (Qiuyang, 2026-10-14): "Update(path)" after a dot, an elbow line with the counts, numbered
    rows in its light theme's diff colours (rows on the dimmed tone, changed words on the full one, signs and numbers in
-   the word tone), no box; a long file shows FOLD rows and a line that opens the rest */
+   the word tone), no frame; the whole patch scrolls in one box with the task list's rail and fade */
 .cc{--add:rgb(199,225,203); --add-w:rgb(105,219,124); --add-t:rgb(47,157,68); --del:rgb(253,210,216); --del-w:rgb(255,168,180); --del-t:rgb(209,69,75);
   font:13px/1.6 "Google Sans Code",ui-monospace,Menlo,Consolas,monospace; color:var(--ink)}
 .ccf + .ccf{margin-top:24px}
@@ -482,12 +483,10 @@ a.pbtn:hover{border-color:var(--teal); color:var(--teal-d)}
 .ccd .d{background:var(--del)} .ccd .d .n, .ccd .d .s{color:var(--del-t)}
 .ccd mark{color:inherit; border-radius:2px} .ccd .a mark{background:var(--add-w)} .ccd .d mark{background:var(--del-w)}
 .ccd .g .c{color:var(--faint)}
-.ccd.cut .r:nth-child(n+13){display:none}
-.ccx{margin:4px 0 0 18px; padding:0; border:0; background:none; font:inherit; color:var(--muted); cursor:pointer}
-.ccx:hover{color:var(--ink)}
+.ccwrap{position:relative}   /* holds the patch's box and its rail */
 .ccn{margin:20px 0 0; color:var(--muted)}
 .cc .dmore{font-style:normal; color:var(--muted)}
-@media (max-width:640px){ .cc{font-size:12px} .ccd, .ccx{margin-left:0} }
+@media (max-width:640px){ .cc{font-size:12px} .ccd{margin-left:0} }
 .pempty{margin:0; padding:28px; color:var(--muted); border:1px dashed var(--line); border-radius:8px}
 .tchart{margin:64px 0 0}
 .cnote{font-size:13.5px; line-height:1.45; color:var(--muted-2); margin:10px 0 0; max-width:60em}

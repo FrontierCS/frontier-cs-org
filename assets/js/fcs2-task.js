@@ -236,7 +236,8 @@ const lines = n => `<b>${n}</b> ${n === 1 ? 'line' : 'lines'}`;
    "Update(path)", or "Write(path)" for a new one, an elbow line with its counts, then numbered rows, the old line's number
    on a removal and the new one's otherwise, "…" between hunks, and Claude Code's light-theme colours. Within a removed
    line and the added line that replaces it, the changed words are marked, unless most of the line changed. A file longer
-   than FOLD rows shows its first FOLD and how many more, which a click opens. */
+   the patch scrolls in one box, as the task list on the overview does: its drawn rail, the foot fading until the end, no
+   frame (Qiuyang, 2026-10-14: no second expand inside the fold). */
 function parsePatch(text) {
   const files = []; let f = null, o = 0, n = 0, inHunk = false;
   for (const l of withHeads(text).split('\n')) {
@@ -272,9 +273,8 @@ function marks(d, a) {
   const wrap = (t, m) => esc(t.slice(0, i).join('')) + (m ? `<mark>${esc(m)}</mark>` : '') + esc(t.slice(t.length - j).join(''));
   d.h = wrap(x, mx); a.h = wrap(y, my);
 }
-const FOLD = 12;
 function fileHTML(f) {
-  const w = f.kind === 'Write', more = f.rows.length - FOLD > 3 ? f.rows.length - FOLD : 0;
+  const w = f.kind === 'Write';
   const sum = f.binary ? 'Binary file' : w ? `Wrote ${lines(f.add)} to <b>${esc(f.path)}</b>` : f.kind === 'Delete' ? `Removed ${lines(f.del)}`
     : [f.add ? `Added ${lines(f.add)}` : '', f.del ? `${f.add ? 'removed' : 'Removed'} ${lines(f.del)}` : ''].filter(Boolean).join(', ');
   const nw = String(Math.max(1, ...f.rows.map(r => r.n || 0))).length;
@@ -282,8 +282,27 @@ function fileHTML(f) {
     : `<div class="r ${w ? 'c' : r.t}"><span class="n">${r.n}</span><span class="s">${w ? '' : r.t === 'a' ? '+' : r.t === 'd' ? '-' : ''}</span>`
       + `<span class="c">${r.h != null ? r.h : cut(r.s)}</span></div>`).join('');
   return `<div class="ccf"><p class="cct"><b>${f.kind}</b>(${esc(f.path)})</p><p class="ccs">${sum}</p>`
-    + (f.rows.length ? `<div class="ccd${more ? ' cut' : ''}" style="--nw:${nw + 2}ch">${rows}</div>` : '')
-    + (more ? `<button type="button" class="ccx" data-more="${more}">… +${more} lines (click to expand)</button>` : '') + '</div>';
+    + (f.rows.length ? `<div class="ccd" style="--nw:${nw + 2}ch">${rows}</div>` : '') + '</div>';
+}
+// a box that scrolls with the overview's drawn rail (fcs2.js, the task list): the thumb's height is the visible share, its
+// top the share scrolled; dragging it scrolls in step, a press on the rail centres the thumb there first; the foot fades
+// until the end. Returns the function that redraws it, for a scroll, an opened fold or a resize.
+let patchEnd = () => {};
+function railed(box, rail) {
+  const th = rail.firstElementChild;
+  const at = () => { box.classList.toggle('at-end', box.scrollTop + box.clientHeight >= box.scrollHeight - 2);
+    const over = box.scrollHeight > box.clientHeight + 1; rail.hidden = !over;
+    if (over) { const h = Math.max(36, box.clientHeight * box.clientHeight / box.scrollHeight); th.style.height = `${h}px`;
+      th.style.top = `${(box.clientHeight - h) * box.scrollTop / (box.scrollHeight - box.clientHeight)}px`; } };
+  box.addEventListener('scroll', at, {passive:true});
+  rail.addEventListener('pointerdown', e => { const r = rail.getBoundingClientRect(), span = box.clientHeight - th.offsetHeight;
+    const per = (box.scrollHeight - box.clientHeight) / (span || 1);
+    if (e.target !== th) box.scrollTop = (e.clientY - r.top - th.offsetHeight / 2) * per;
+    const y0 = e.clientY, s0 = box.scrollTop; rail.classList.add('drag'); rail.setPointerCapture(e.pointerId); e.preventDefault();
+    const move = ev => { box.scrollTop = s0 + (ev.clientY - y0) * per; };
+    const up = () => { rail.classList.remove('drag'); rail.removeEventListener('pointermove', move); rail.removeEventListener('pointerup', up); rail.removeEventListener('pointercancel', up); };
+    rail.addEventListener('pointermove', move); rail.addEventListener('pointerup', up); rail.addEventListener('pointercancel', up); });
+  return at;
 }
 const counts = p => `${plural(p.files.length || parsePatch(p.patch).length, 'file')} changed, <b class="a">+${p.add}</b> <b class="d">−${p.del}</b>`;
 function drawPatches(d) {
@@ -304,7 +323,8 @@ function drawPatches(d) {
   const who = one && words && words.m !== m0.id ? `${esc(m0.name)}’s patch` : one ? 'The patch' : 'The patches';
   sec.insertAdjacentHTML('beforeend', `<details class="fold pfold"><summary><h3>${who}</h3>`
     + (one && has(m0) ? `<span class="pd">${counts(p0)}</span>` : '') + '</summary>'
-    + `<div class="pchips" id="pchips"${one ? ' hidden' : ''}></div><div class="pmeta" id="pmeta"></div><div class="cc" id="pview"></div></details>`);
+    + `<div class="pchips" id="pchips"${one ? ' hidden' : ''}></div><div class="pmeta" id="pmeta"></div><div class="ccwrap"><div class="cc ccbox" id="pview" tabindex="0"></div><div class="rail" id="prail" hidden><i></i></div></div></details>`);
+  patchEnd = railed($('#pview'), $('#prail')); sec.querySelector('.pfold').addEventListener('toggle', patchEnd);
   if (!one) $('#pchips').innerHTML = ms.map(m => { const p = d.runs[m.id];
     return `<button type="button" class="pchip" data-m="${m.id}" aria-pressed="false"><i style="background:${MCOL[m.id]}"></i><span>${esc(m.name)}</span>`
       + `<span class="pv ${passed(m) ? 'y' : 'n'}">${passed(m) ? 'Pass' : 'Fail'}</span>`
@@ -316,15 +336,12 @@ function drawPatches(d) {
     $('#pmeta').innerHTML = one ? '' : `<b>${esc(m.name)}</b> · ${esc(p.submission)} · ${counts(p)}`;
     $('#pview').innerHTML = parsePatch(p.patch).map(fileHTML).join('')
       + (p.truncated ? `<p class="ccn">The first ${Math.round(p.patch.length / 1000)} kB of ${Math.round(p.bytes / 1000)} kB</p>` : '');
+    $('#pview').scrollTop = 0; patchEnd();
   };
   $('#pchips').onclick = e => { const b = e.target.closest('.pchip'); if (b) pick(b.dataset.m); };
-  // a file's fold line opens the rest of its rows, and closes them again
-  $('#pview').onclick = e => { const b = e.target.closest('.ccx'); if (!b) return;
-    const shut = b.previousElementSibling.classList.toggle('cut');
-    b.textContent = shut ? `… +${b.dataset.more} lines (click to expand)` : '(click to collapse)'; };
   pick((ms.find(m => passed(m) && has(m)) || ms.find(has) || ms[0]).id);
 }
 
 addEventListener('hashchange', drawPage);
 drawPage();
-let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(drawCharts, 120); });
+let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { drawCharts(); patchEnd(); }, 120); });
