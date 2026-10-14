@@ -23,32 +23,32 @@ way, and takes the 5th and 95th percentiles.
 
 Task difficulty, FDI (the FrontierCS Difficulty Index; DIFF, TFIT), is built from per-metric passes (Qiuyang,
 2026-10-14): a run passes only when it beats the human reference on every workload of every metric its task checks, and
-each metric has its own difficulty. The counts come from assets/js/fcs2-checks.js (PASSBY), which
-bin/fcs2_checks_from_platform.py must refresh before this script runs. Keys of development workloads ('dev/...', which
-Yannakakis lists) are dropped: PASS is judged on the hidden final workloads. A metric is a check key's stem, the text
-after its last '/', with its counts summed over its keys; a run beats it (z = 1) when it beats every workload, and a run
-without counts (it failed before the hidden evaluation) beats none. The script stops unless PASS is exactly "every
-metric beaten" for every run. Metrics that pass and fail together cannot be told apart by the data, and counting each
-separately makes a task look harder than it is (Qiuyang): metrics whose outcomes over the task's runs differ in at most
-GROUP_TOL runs are linked, a group is a connected set of them (recomputed from the data on every run), and the fit
-treats each group as one item that a run beats when it beats every member. A win w against the human reference r_t (the
-median reference_score over the task's runs; 0 or less: REF_DEFAULT's value, else the task has none) is 1 for a final
-score above r_t + TIE_EPS, 0 below r_t - TIE_EPS, otherwise 1/2. The final score comes from the same measurements as the
-metrics, so a run's metrics and its win share one run effect u ~ N(0, SIGMA_U^2) (Qiuyang). The strengths theta are held
-at the fit above, which has no run effect, so its slope-1 logits absorb the run noise; the model stretches them by a
-fitted factor c (Qiuyang). A run's likelihood is the integral over u, by Gauss-Hermite quadrature (24 nodes), of prod_j
-sigmoid(c theta_m + u - beta_tj)^z (1 - sigmoid(.))^(1 - z), j over the task's metric groups, times sigmoid(a (c theta_m
-+ u - h_t))^w (1 - sigmoid(.))^(1 - w), with h_t the task's beat-the-human level. Priors: h_t ~ N(c mean theta,
-PRIOR_SD^2) and beta_tj ~ N(h_t + DELTA, TAU^2); a task without a reference has no win and no h_t, and beta_tj ~ N(c
-mean theta, PRIOR_SD^2). Each task's parameters are fitted at their posterior mode (Newton's method); SIGMA_U, a, DELTA,
-TAU and c maximise the sum over tasks of the Laplace approximation to the log marginal likelihood (Nelder-Mead from four
-starts; all but DELTA on a log scale; SIGMA_U at most 4, where 24 nodes stay accurate). D, the task's difficulty, is the
-strength at which a run beats every metric half the time, integral prod_j sigmoid(c D + u - beta_tj) N(u; 0, SIGMA_U^2)
-du = 1/2, with beta at the mode. Its 90% interval comes from IS_DRAWS draws of the task's parameters from the Laplace
-Gaussian, weighted by the exact posterior over the Gaussian's density (the posterior of a metric nobody beats is
-one-sided): the weighted 5th and 95th percentiles of D. TFIT's slope is that of the logistic matched to the pass curve
-at D, 4 dP(pass)/dtheta there. All are divided by c back to the strengths' logits (a metric's difficulty is its group's
-beta_tj / c) and mapped to FCI points like them.
+each metric has its own difficulty. The counts come from PASSBY in assets/js/fcs2-checks.js and, for hidden models,
+_data/fcs2_checks_hidden.json, which bin/fcs2_checks_from_platform.py must refresh before this script runs. Keys of
+development workloads ('dev/...', which Yannakakis lists) are dropped: PASS is judged on the hidden final workloads. A
+metric is a check key's stem, the text after its last '/', with its counts summed over its keys; a run beats it (z = 1)
+when it beats every workload, and a run without counts (it failed before the hidden evaluation) beats none. The script
+stops unless PASS is exactly "every metric beaten" for every run. Metrics that pass and fail together cannot be told
+apart by the data, and counting each separately makes a task look harder than it is (Qiuyang): metrics whose outcomes
+over the task's runs differ in at most GROUP_TOL runs are linked, a group is a connected set of them (recomputed from
+the data on every run), and the fit treats each group as one item that a run beats when it beats every member. A win w
+against the human reference r_t (the median reference_score over the task's runs; 0 or less: REF_DEFAULT's value, else
+the task has none) is 1 for a final score above r_t + TIE_EPS, 0 below r_t - TIE_EPS, otherwise 1/2. The final score
+comes from the same measurements as the metrics, so a run's metrics and its win share one run effect u ~ N(0, SIGMA_U^2)
+(Qiuyang). The strengths theta are held at the fit above, which has no run effect, so its slope-1 logits absorb the run
+noise; the model stretches them by a fitted factor c (Qiuyang). A run's likelihood is the integral over u, by
+Gauss-Hermite quadrature (24 nodes), of prod_j sigmoid(c theta_m + u - beta_tj)^z (1 - sigmoid(.))^(1 - z), j over the
+task's metric groups, times sigmoid(a (c theta_m + u - h_t))^w (1 - sigmoid(.))^(1 - w), with h_t the task's
+beat-the-human level. Priors: h_t ~ N(c mean theta, PRIOR_SD^2) and beta_tj ~ N(h_t + DELTA, TAU^2); a task without a
+reference has no win and no h_t, and beta_tj ~ N(c mean theta, PRIOR_SD^2). Each task's parameters are fitted at their
+posterior mode (Newton's method); SIGMA_U, a, DELTA, TAU and c maximise the sum over tasks of the Laplace approximation
+to the log marginal likelihood (Nelder-Mead from four starts; all but DELTA on a log scale; SIGMA_U at most 4, where 24
+nodes stay accurate). D, the task's difficulty, is the strength at which a run beats every metric half the time,
+integral prod_j sigmoid(c D + u - beta_tj) N(u; 0, SIGMA_U^2) du = 1/2, with beta at the mode. Its 90% interval comes
+from IS_DRAWS draws of the task's parameters from the Laplace Gaussian, weighted by the exact posterior over the
+Gaussian's density (the posterior of a metric nobody beats is one-sided): the weighted 5th and 95th percentiles of D.
+TFIT's slope is that of the logistic matched to the pass curve at D, 4 dP(pass)/dtheta there. All are divided by c back
+to the strengths' logits (a metric's difficulty is its group's beta_tj / c) and mapped to FCI points like them.
 
 The raw-score fit that the leaderboard showed before 2026-10-14 runs only with --json (feci_score, task_fit_score). It is
 Epoch AI's own ECI code (bin/eci_fitting.py, vendored from epoch-research/eci-public): every task is one benchmark with
@@ -237,10 +237,13 @@ def pass_eci(obs):
 
 
 def passby():
-    """PASSBY from assets/js/fcs2-checks.js (bin/fcs2_checks_from_platform.py, run before this script): per task short
-    name and model id, per check key, [hidden workloads on which the final submission beat the reference, in all]."""
-    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'assets', 'js', 'fcs2-checks.js')
-    return json.loads(re.search(r'^const PASSBY = (.*);$', open(path, encoding='utf-8').read(), re.M).group(1))
+    """PASSBY from bin/fcs2_checks_from_platform.py (run before this script): per task short name and model id, per check
+    key, [hidden workloads on which the final submission beat the reference, in all]. The models on the site are in
+    assets/js/fcs2-checks.js, the hidden ones in _data/fcs2_checks_hidden.json; the fit uses both."""
+    root = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
+    shown = json.loads(re.search(r'^const PASSBY = (.*);$', open(os.path.join(root, 'assets', 'js', 'fcs2-checks.js'), encoding='utf-8').read(), re.M).group(1))
+    hidden = json.load(open(os.path.join(root, '_data', 'fcs2_checks_hidden.json'), encoding='utf-8'))['passby']
+    return {t: {**shown.get(t, {}), **hidden.get(t, {})} for t in {**shown, **hidden}}
 
 
 def metric_tasks(obs, ref, PB):
