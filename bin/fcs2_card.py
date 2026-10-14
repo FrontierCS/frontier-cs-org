@@ -42,7 +42,7 @@ svg#map text{{font-family:'Hanken Grotesk',sans-serif}}
 </div>
 <svg id="map" xmlns="http://www.w3.org/2000/svg"></svg>
 </div><script>
-document.getElementById('lead').textContent = `${{TASKS.length}} open-ended problems in ${{DOMAINS.length}} domains, each built from a published paper. The human reference, the code released with each paper, is the bar to beat.`;
+document.getElementById('lead').textContent = `${{TASKS.length}} open-ended tasks in ${{DOMAINS.length}} domains, each built from a published paper. The human reference, the code released with each paper, is the bar to beat.`;
 function squarify(vals, x, y, w, h) {{
   const tot = vals.reduce((a, b) => a + b, 0), areas = vals.map(v => v * w * h / tot), out = [];
   const worst = (row, side) => {{ const s = row.reduce((a, b) => a + b, 0); return Math.max(...row.map(r => Math.max(side * side * r / (s * s), s * s / (side * side * r)))); }};
