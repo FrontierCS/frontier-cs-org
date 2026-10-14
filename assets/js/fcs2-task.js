@@ -56,7 +56,7 @@ function drawPage() {
     + (CHECKS[t.s] ? `<section class="tcrit"><h2 class="th2">Pass criteria</h2><p>A run passes only if its final submission beats the human reference on every metric, on every hidden workload. Each cell counts the hidden workloads on which it did.</p>`
       + `<div class="res-scroll"><table class="res ctab" id="ctbl"></table></div></section>` : '')   // no general submission note (owner audit, 2026-10-14)
     + figure('sc', 'Final score against cost')
-    + (TFIT[t.s] && DIFF[t.s] ? figure('fc', 'Chance of passing by FCI') : '')
+    + (DIFF[t.s] && passChance(t.s, 0) != null ? figure('fc', 'Chance of passing by FCI') : '')
     + solutionHTML(t, runs);   // the solution last (owner, 2026-10-14)
   drawResults(); if (CHECKS[t.s]) drawCriteria(); drawCharts(); loadPatches(t); loadFig(t); drawPager(t);
   scrollTo(0, 0);
@@ -128,7 +128,7 @@ function drawResults() {
 
 function drawCharts() {
   if (!cur || !cur.runs.length) return;
-  drawScore(); if (TFIT[cur.t.s] && DIFF[cur.t.s]) drawFit();
+  drawScore(); if (DIFF[cur.t.s] && passChance(cur.t.s, 0) != null) drawFit();
 }
 
 /* Final score against cost (Qiuyang, 2026-10-14: in place of the development score against spend, drawn as the overview's
@@ -177,18 +177,18 @@ function drawScore() {
   attachTip(svg, W, H, pts, $('#sctip'));
 }
 
-/* The task's pass curve (TFIT): the chance that a model of a given FCI passes it, 50% at the task's FDI (Qiuyang,
+/* The task's pass curve, the joint model's own (passChance, fcs2-data.js): the chance that a model of a given FCI passes it, 50% at the task's FDI (Qiuyang,
    2026-10-14). No interval is drawn: the FDI's 90% interval is given in words in the head line only (Qiuyang,
    2026-10-14). Dots: each model at its FCI, at the share of its runs here that
    pass, so at 100% or 0% for a model with one run. The human reference has no FCI and no dot. */
 function drawFit() {
-  const {t, runs} = cur, [d, k] = TFIT[t.s];
+  const {t, runs} = cur, d = FDI[t.s];
   const svg = $('#fcsvg'), W = Math.max(300, $('#fcplot').clientWidth), narrow = W < 560;
   const L = 44, R = narrow ? 12 : 24, T = 12, B = 46, H = narrow ? 280 : 320;
   // the axis holds 0 (Kimi K2.7), every model and the FDI, nothing more, so a hard task does not stretch it
   const es = RANKED.map(m => ECI[m.id][0]), lo = Math.min(ECI_LOW_VALUE, d, ...es), hi = Math.max(d, ...es), step = eciStep(hi - lo, narrow ? 4 : 7);
   const xmin = Math.floor(lo / step) * step, xmax = Math.ceil(hi / step) * step, top = Math.max(ECI_LOW_VALUE, ...es), PW = W - L - R;
-  const Y = v => T + (1 - v / 100) * (H - T - B), f = x => 100 / (1 + Math.exp(-k * (x - d)));
+  const Y = v => T + (1 - v / 100) * (H - T - B), f = x => 100 * passChance(t.s, x);
   /* A broken axis (Qiuyang, 2026-10-14): on a phone, when reaching the FDI would leave the models less than 60% of the
      plot, the axis runs to a little past the strongest model, breaks, and shows a short stretch around the FDI at the
      same scale, with a tick of its own at the FDI. The gap is marked by two slanted strokes on the axis line and on the

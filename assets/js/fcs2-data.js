@@ -170,6 +170,29 @@ const FRANK = (() => { const shown = s => +FDI[s].toFixed(ECI_DP), ks = Object.k
   return Object.fromEntries(ks.map(s => [s, 1 + ks.filter(o => shown(o) > shown(s)).length])); })();
 const FLAST = Math.max(...Object.values(FRANK));
 const ordinal = n => n + ((n % 100 >= 11 && n % 100 <= 13) ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th');   // 1st, 2nd, 3rd, 11th, 21st
+/* The joint model's own pass curve (Qiuyang, 2026-10-14): a run passes a task when it beats every metric group, and
+   a run's groups share one run effect u, so
+     P(pass | FCI) = integral of prod_g sigmoid((FCI - beta_g) / ECI_UNIT + u) N(u; 0, (sigma_u / ECI_UNIT)^2) du,
+   with beta_g = GROUPS[task] and sigma_u = DIFF_FIT.sigma_u, both in FCI points. The integral is 24-node Gauss-Hermite
+   quadrature: GH24.t are the 12 positive roots of the physicists' Hermite polynomial H_24 and GH24.w their weights
+   (the rule is symmetric, so each node is used with both signs), giving E[h(u)] = sum_i w_i (h(a t_i) + h(-a t_i)) / sqrt(pi)
+   with a = sqrt(2) sigma_u / ECI_UNIT. passChance(task, fci) is that probability, from 0 to 1, or null without GROUPS;
+   a task's FDI is where it is one half. */
+const GH24 = {t:[0.2244145474725156, 0.6741711070372123, 1.126760817611245, 1.584250010961694, 2.049003573661699, 2.523881017011427,
+  3.012546137565565, 3.520006813034525, 4.05366440244815, 4.625662756423787, 5.259382927668044, 6.01592556142574],
+  w:[0.4269311638686991, 0.2861795353464429, 0.1277396217845592, 0.03744547050323075, 0.007048355810072666, 0.0008236924826884198,
+  5.688691636404385e-05, 2.158245704902334e-06, 4.018971174941463e-08, 3.046254269987579e-10, 6.584620243078192e-13, 1.6643684964891e-16]};
+function passChance(task, fci) {
+  const bs = (typeof GROUPS === 'undefined' ? {} : GROUPS)[task]; if (!bs) return null;
+  const a = Math.SQRT2 * DIFF_FIT.sigma_u / ECI_UNIT, z = bs.map(b => (fci - b) / ECI_UNIT), all = u => z.reduce((p, v) => p / (1 + Math.exp(-(v + u))), 1);
+  return GH24.t.reduce((s, t, i) => s + GH24.w[i] * (all(a * t) + all(-a * t)), 0) / Math.sqrt(Math.PI);
+}
+// the FCI at which a task's chance of passing is p (0 to 1), by bisection on the rising curve; for the axes of the pass charts
+function passAt(task, p) {
+  let lo = FDI[task] - 100 * ECI_UNIT, hi = FDI[task] + 100 * ECI_UNIT;
+  for (let i = 0; i < 60; i++) { const m = (lo + hi) / 2; if (passChance(task, m) < p) lo = m; else hi = m; }
+  return (lo + hi) / 2;
+}
 
 
 const esc = s => String(s).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));

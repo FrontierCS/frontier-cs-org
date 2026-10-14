@@ -350,18 +350,18 @@ function drawTable() {
 const redraws = [];
 
 /* ---------- How FCI works: a fold under the FCI chart (owner, 2026-10-11) ----------
-   Three tasks' pass curves from TFIT, P(pass) = 1 / (1 + exp(-k (FCI - FDI))) with the task's own k: an easy,
-   a middle and a hard one, the tasks a sixth, a half and five sixths of the way up the FDI order, so the picture
+   Three tasks' pass curves, the joint model's own (passChance, fcs2-data.js): an easy, a middle and a hard one, the tasks a sixth, a half and five sixths of the way up the FDI order, so the picture
    follows the data (Qiuyang, 2026-10-14). A dashed line marks the scale's fixed point, Kimi K2.7 = 0. */
 function drawHow() {
   const box = $('#fci-how'); if (!box || !box.open) return;
   const INKS = ['#8ab4f8', '#1a73e8', '#174ea6'];   // easy to hard: Google blue 300, 600, 900
   let svg = $('#howasvg'), W = Math.max(300, $('#howaplot').clientWidth), narrow = W < 560;
   let L = 44, R = narrow ? 12 : 24, T = 26, B = 46, H = narrow ? 254 : 284;
-  const up = Object.keys(FDI).filter(s => TFIT[s]).sort((a, b) => FDI[a] - FDI[b]);
-  const picks = [1 / 6, 1 / 2, 5 / 6].map(q => up[Math.round(q * (up.length - 1))]).map(s => [s, TFIT[s]]);
+  const up = Object.keys(FDI).filter(s => passChance(s, FDI[s]) != null).sort((a, b) => FDI[a] - FDI[b]);
+  if (up.length < 3) return;   // no pass curves in the data
+  const picks = [1 / 6, 1 / 2, 5 / 6].map(q => up[Math.round(q * (up.length - 1))]);
   // the axis runs from 10% on the easy curve to 90% on the hard one, with Kimi K2.7 and every model in view
-  const es = MODELS.map(m => ECI[m.id][0]), lo = Math.min(ECI_LOW_VALUE, picks[0][1][0] - 2.2 / picks[0][1][1], ...es), hi = Math.max(picks[2][1][0] + 2.2 / picks[2][1][1], ...es);
+  const es = MODELS.map(m => ECI[m.id][0]), lo = Math.min(ECI_LOW_VALUE, passAt(picks[0], .1), ...es), hi = Math.max(passAt(picks[2], .9), ...es);
   const step = eciStep(hi - lo, narrow ? 4 : 6), X0 = Math.floor(lo / step) * step, X1 = Math.ceil(hi / step) * step;
   const X = v => L + (v - X0) / (X1 - X0) * (W - L - R), Y = v => T + (1 - v / 100) * (H - T - B);
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
@@ -371,15 +371,15 @@ function drawHow() {
   svg.append(sv('line', {x1:X(ECI_LOW_VALUE), x2:X(ECI_LOW_VALUE), y1:T - 4, y2:H - B, stroke:'var(--ink-2)', 'stroke-width':1, 'stroke-dasharray':'3 3', opacity:.6}),
     sv('text', {x:X(ECI_LOW_VALUE), y:T - 10, 'text-anchor':'middle'}, `${ECI_LOW_NAME} = ${tick(ECI_LOW_VALUE)}`));
   const pts = [], n = 240;
-  picks.forEach(([s, [d, k]], i) => {
-    const f = x => 100 / (1 + Math.exp(-k * (x - d)));
+  picks.forEach((s, i) => {
+    const d = FDI[s], f = x => 100 * passChance(s, x);
     svg.append(sv('path', {d:Array.from({length:n + 1}, (_, j) => { const x = X0 + (X1 - X0) * j / n; return `${j ? 'L' : 'M'}${X(x).toFixed(1)},${Y(f(x)).toFixed(1)}`; }).join(''), fill:'none', stroke:INKS[i], 'stroke-width':2.5}));
     svg.append(sv('circle', {cx:X(d), cy:Y(50), r:5, fill:INKS[i], stroke:'#fff', 'stroke-width':2}));   // the FDI: passes half the time
     for (let j = 0; j <= 60; j++) { const x = X0 + (X1 - X0) * j / 60;
       pts.push({x:X(x), y:Y(f(x)), html:`<b>${esc(NAME(s))}</b><br>FDI ${fe(d)}<br>At FCI ${fe(x)}: passes <b>${Math.round(f(x))}%</b> of the time`}); }
   });
   attachTip(svg, W, H, pts, $('#howatip'));
-  $('#howalegend').innerHTML = picks.map(([s, [d]], i) => `<span><i style="background:${INKS[i]}"></i>${esc(NAME(s))}, FDI ${fe(d)}</span>`).join('');
+  $('#howalegend').innerHTML = picks.map((s, i) => `<span><i style="background:${INKS[i]}"></i>${esc(NAME(s))}, FDI ${fe(FDI[s])}</span>`).join('');
 }
 $('#fci-how').addEventListener('toggle', drawHow);
 redraws.push(drawHow);
