@@ -39,7 +39,7 @@ or, with Docker, `./bin/docker_run.sh` (http://localhost:8080). A production bui
 The FrontierCS 2 pages read static files; nothing on the site calls the evaluation platform. The files come from the platform's read-only API through these scripts, run in order:
 
 1. `bin/fcs2_db_from_platform.py out.db` collects the formal evaluations into a SQLite database.
-2. `bin/fcs2_runs_from_db.py out.db` rewrites the block between the converter markers in `assets/js/fcs2-data.js`: runs, costs, FECI, test-time scaling, per-task fits and descriptions. It also writes `_data/fcs2_runs_hidden.json`, the runs of models kept off the leaderboard (Kimi K2.7, the 0 point of FECI). Files in `_data/` are not published.
+2. `bin/fcs2_runs_from_db.py out.db` rewrites the block between the converter markers in `assets/js/fcs2-data.js`: runs, costs, FECI, test-time scaling, task difficulty and descriptions. It also writes `_data/fcs2_runs_hidden.json`, the runs of models kept off the leaderboard (Kimi K2.7, the 0 point of FECI). Files in `_data/` are not published. With `--json=out.json` it also writes every number for the paper's figures, and keeps there the earlier FECI fitted on raw scores (`feci_score`), which the site no longer shows.
 3. `bin/fcs2_checks_from_platform.py out.db` writes `assets/js/fcs2-checks.js`: for each run and metric, on how many hidden workloads the final submission beat the human reference.
 4. `bin/fcs2_patches_from_platform.py` writes `assets/patches/<slug>.json`, the final patch of each run. The site does not show patches; they are the source for the solutions below.
 
@@ -54,8 +54,9 @@ These files are written by hand:
 ### Definitions
 
 - **Pass**: the final submission beats the human reference on every metric the task checks and on every hidden workload.
-- **FECI** (FrontierCS Epoch Capabilities Index): fitted with Epoch AI's ECI code (`bin/eci_fitting.py`) on each model's mean score per task and the human reference's score, then scaled so that Human = 25 and Kimi K2.7 = 0. Intervals are 90% bootstrap intervals.
-- **FEDI** (FrontierCS Epoch Difficulty Index): a task's difficulty on the FECI scale.
+- **FECI** (FrontierCS Epoch Capabilities Index): Epoch AI's ECI idea fitted on pass and fail. Every run of every model, Kimi K2.7 included, is one observation of P(model passes task) = 1 / (1 + exp(−(strength − difficulty))); strengths and task difficulties are fitted together with a light L2 penalty. A model's FECI is its strength with Kimi K2.7 at 0 and one point per logit (`PASS_ZERO`, `PASS_ZERO_VALUE` and `PASS_UNIT` in the converter). Intervals are 90% bootstrap intervals over tasks.
+- **FEDI** (FrontierCS Epoch Difficulty Index): a task's difficulty on the FECI scale, the FECI at which a model passes it half the time. Passes come first. A run's final score enters only as a win or a loss against the human reference, through an easier threshold for beating the reference that sits a fitted, task-varying gap below the pass threshold. FEDI is the posterior median of the pass threshold, with a 90% interval.
+- **Test-time scaling**: a model's FECI with every run stopped at a budget in US$. A run counts as passed only if it ended within the budget with a pass; task difficulties stay as in the leaderboard fit, so at full budget it is the model's FECI.
 - **Cost**: how each model's cost is estimated is stated on the site under "How is cost estimated?".
 
 ## Images for sharing
