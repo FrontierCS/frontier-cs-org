@@ -207,6 +207,13 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 .checks input:checked{background:var(--teal); border-color:var(--teal)} .checks input:checked::before{transform:rotate(-45deg) scale(1)}
 .checks label:hover input:not(:checked){border-color:var(--ink-2)}
 .checks input:focus-visible{outline:2px solid var(--teal); outline-offset:2px}
+/* the cost charts' "Pareto frontier" in the head: a legend item for the line it brings up; pointing at it shows the
+   frontier, a click or tap keeps it (Qiuyang, 2026-10-14) */
+.fhov{display:inline-flex; align-items:center; gap:8px; padding:2px 0; border:0; background:none; font:inherit; font-size:13px; font-weight:400; color:var(--muted); cursor:pointer}
+.fhov i{width:18px; height:0; border-top:1.25px solid var(--ink-2); opacity:.4}
+.fhov:hover, .fhov.on{color:var(--ink)} .fhov.on i{opacity:.9}
+.fhov[aria-pressed="true"]{font-weight:600}
+.fhov:focus-visible{outline:2px solid var(--teal); outline-offset:2px; border-radius:2px}
 .ftoggle{display:none}
 @media (max-width:900px){
   .ftoggle{display:inline-flex; align-items:center; gap:8px; border:1px solid #80868b; background:#fff; border-radius:4px; height:42px; padding-inline:14px; font-weight:600}
