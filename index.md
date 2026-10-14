@@ -8,7 +8,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
 ---
 <div class="fcs2">
 <nav class="sub" aria-label="Sections"><div class="col" id="subnav">
-  <a href="#overview" class="on"><span>Overview</span></a><a href="#leaderboard"><span>Leaderboard</span></a><a href="#tasks"><span>Tasks</span></a><a href="#cases"><span>Case studies</span></a><a href="#private"><span>Private set</span></a><a href="#sponsors"><span>Sponsors</span></a><a href="#questions"><span>Questions</span></a>
+  <a href="#overview" class="on">Overview</a><a href="#leaderboard">Leaderboard</a><a href="#tasks">Tasks</a><a href="#cases">Case studies</a><a href="#private">Private set</a><a href="#sponsors">Sponsors</a><a href="#questions">Questions</a>
 </div></nav>
 
 <div class="col" id="main" tabindex="-1">

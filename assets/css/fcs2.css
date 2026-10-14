@@ -3,7 +3,7 @@
    then chart + settings panel, an activity list, a filterable task index, questions, deep-teal footer.
    Single light theme on purpose (the reference site has none). */
 [hidden]{display:none!important}
-html{scroll-padding-top:28px}
+html{scroll-padding-top:60px}
 @media (prefers-reduced-motion: no-preference){ html{scroll-behavior:smooth} }
 .fcs2{padding-inline:var(--gutter)}
 a{color:inherit}
@@ -12,16 +12,11 @@ button{font:inherit; color:inherit; cursor:pointer}
 .col{max-width:1320px; margin-inline:auto}
 .num{font-variant-numeric:tabular-nums}
 
-/* Section links: a rail of dots fixed to the right edge, so the page keeps one row of header (owner, 2026-10-14). The dot
-   of the section on screen is filled and named; hovering or focusing the rail names them all. Not shown below 900px. */
-.sub{position:fixed; right:14px; top:50%; transform:translateY(-50%); z-index:25}
-.sub .col{display:flex; flex-direction:column; align-items:flex-end; gap:2px; max-width:none; padding:0}
-.sub a{display:flex; align-items:center; gap:10px; padding:6px 4px; text-decoration:none; color:var(--ink-2); font-size:13.5px; white-space:nowrap}
-.sub a::after{content:""; width:9px; height:9px; border-radius:50%; border:1.5px solid var(--ink-2); box-sizing:border-box; flex:none}
-.sub a span{opacity:0; padding:3px 9px; border-radius:12px; background:var(--bg); box-shadow:0 1px 4px rgba(32,33,36,.16); transition:opacity .15s}
-.sub a.on{color:var(--ink)} .sub a.on::after{background:var(--teal); border-color:var(--teal)}
-.sub a.on span, .sub:hover a span, .sub:focus-within a span{opacity:1}
-@media (max-width:900px){ .sub{display:none} }
+.sub{position:sticky; top:env(safe-area-inset-top,0px); z-index:25; background:var(--bg); margin-inline:clamp(-60px, -4.2vw, -20px); padding-inline:var(--gutter); border-bottom:1px solid var(--line)}
+.sub .col{display:flex; gap:30px; overflow-x:auto; scrollbar-width:none; -webkit-overflow-scrolling:touch}
+.sub .col::-webkit-scrollbar{display:none}
+.sub a{flex:none; text-decoration:none; color:var(--ink-2); font-size:16px; padding:15px 0 13px; border-bottom:2px solid transparent; white-space:nowrap}
+.sub a.on{border-bottom-color:var(--teal); color:var(--ink)}
 
 /* intro */
 .intro{padding-block:72px 0}

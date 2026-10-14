@@ -11,12 +11,12 @@ const reveal = el => { const p = el.parentElement, pr = p.getBoundingClientRect(
 
 /* ---------- sub-nav scrollspy ---------- */
 const subLinks = [...document.querySelectorAll('#subnav a')];
-// The section on screen is the last one whose top has come within 120px of the top of the window (or of the header, while it shows); at the page's end, the last section.
+// The section on screen is the last one whose top has passed just under the sticky bar; at the page's end, the last section.
 // (A band in mid-screen picked the next section whenever a short one, like the case-studies placeholder, sat at the top.)
 const SECS = ['overview','leaderboard','tasks','cases','private','sponsors','questions'].map(id => document.getElementById(id));
 let spyRaf = 0;
 const spy = () => { spyRaf = 0;
-  const bar = Math.max(0, document.querySelector('.topbar')?.getBoundingClientRect().bottom || 0) + 120, end = innerHeight + scrollY >= document.documentElement.scrollHeight - 2;
+  const bar = $('.sub').getBoundingClientRect().bottom + 24, end = innerHeight + scrollY >= document.documentElement.scrollHeight - 2;
   const cur = end ? SECS[SECS.length - 1] : SECS.filter(e => e.getBoundingClientRect().top <= bar).pop() || SECS[0];
   subLinks.forEach(a => a.classList.toggle('on', a.getAttribute('href') === '#' + cur.id));
   const on = subLinks.find(a => a.classList.contains('on')); on && reveal(on); };
