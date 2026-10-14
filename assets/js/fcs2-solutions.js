@@ -1,6 +1,6 @@
-// FrontierCS 2 problem pages: how a model's final submission solves the problem, in words, in place of its diff
-// (owner, 2026-10-14). Keyed by the problem's short name; m is the model, steps are [title, text]. Written from the
-// patch in assets/patches/<slug>.json (bin/fcs2_patches_from_platform.py). A problem with no entry shows no Solution section.
+// FrontierCS 2 task pages: how a model's final submission solves the task, in words, in place of its diff
+// (owner, 2026-10-14). Keyed by the task's short name; m is the model, steps are [title, text]. Written from the
+// patch in assets/patches/<slug>.json (bin/fcs2_patches_from_platform.py). A task with no entry shows no Solution section.
 const SOLUTION = {
   "RAGEN": {m:'opus', steps:[
     ["Finding the turns", "The packed row is one chat: the system prompt, then the user and the model in turn. It counts the chat template’s turn-start tokens along the row, so every token knows which turn it belongs to. The loss mask covers everything after the system prompt, and the response mask covers only the model’s replies."],

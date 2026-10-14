@@ -2,8 +2,8 @@
 // Data and shared helpers are in fcs2-data.js, loaded first; assets/css/fcs2.css holds the styles.
 /* numbers in the page text come from the data, so they cannot drift from the chart */
 document.querySelectorAll('[data-fill]').forEach(el => { el.textContent = {updated:`Last updated: ${UPDATED}`, runs:String(RUNS.length),
-  runtasks:`on ${NTASK(RUNS)} problems`, models:`${MODELS.length} models from ${new Set(MODELS.map(m => m.lab)).size} labs have run so far.`,
-  summary:`${RUNS.length} runs on ${NTASK(RUNS)} problems by ${MODELS.length} models`,
+  runtasks:`on ${NTASK(RUNS)} tasks`, models:`${MODELS.length} models from ${new Set(MODELS.map(m => m.lab)).size} labs have run so far.`,
+  summary:`${RUNS.length} runs on ${NTASK(RUNS)} tasks by ${MODELS.length} models`,
   ntasks:String(TASKS.length), ndomains:String(new Set(TASKS.map(t => t.d)).size)}[el.dataset.fill]; });
 // text in a model's colour, 22% darker: GPT-6.1 Sol, Qwen 3.8 Max and GLM 5.3 Flash are under 3:1 on white at full colour
 const MTXT = id => `color-mix(in srgb, ${MCOL[id]} 78%, #000)`;
@@ -212,7 +212,7 @@ const TASK_OF = Object.fromEntries(TASKS.map(t => [t.s, t]));
 const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* Mean score, as the difference from the human reference (owner, 2026-10-14): each run's final score minus the human
-   reference's score on the same problem, in points of that problem's 0-100 scale; 0 is the human reference. Problems
+   reference's score on the same task, in points of that task's 0-100 scale; 0 is the human reference. Tasks
    without a human reference score are left out. s holds the difference, raw the score itself. */
 const sgn = v => (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(1);
 function drawLB() {
@@ -295,12 +295,12 @@ function drawLB() {
 
 /* ---------- results by domain ---------- */
 function drawTable() {
-  const head = `<tr><th>Domain</th><th class="tk">Problems</th>${RANKED.map(m => `<th><span class="mn" style="background:${MCOL[m.id]}"></span><span class="full">${m.name}</span><span class="short">${m.short}</span></th>`).join('')}</tr>`;
+  const head = `<tr><th>Domain</th><th class="tk">Tasks</th>${RANKED.map(m => `<th><span class="mn" style="background:${MCOL[m.id]}"></span><span class="full">${m.name}</span><span class="short">${m.short}</span></th>`).join('')}</tr>`;
   const line = (d, cls) => {
     const vals = RANKED.map(m => { const s = RUNS.filter(r => r.m === m.id && (d === 'All' || r.d === d)).map(r => r.p * 100); return s.length ? mean(s) : null; });
     const best = Math.max(...vals.filter(v => v != null));
     const n = NTASK(RUNS.filter(r => d === 'All' || r.d === d));
-    return `<tr class="${cls || ''}"><td>${d === 'All' ? 'All problems' : esc(d)}</td><td class="tk">${n}</td>${vals.map(v => v == null ? '<td class="e">–</td>' : `<td class="${v === best && vals.filter(x => x != null).length > 1 ? 'best' : ''}">${Math.round(v)}%</td>`).join('')}</tr>`;
+    return `<tr class="${cls || ''}"><td>${d === 'All' ? 'All tasks' : esc(d)}</td><td class="tk">${n}</td>${vals.map(v => v == null ? '<td class="e">–</td>' : `<td class="${v === best && vals.filter(x => x != null).length > 1 ? 'best' : ''}">${Math.round(v)}%</td>`).join('')}</tr>`;
   };
   $('#restbl').innerHTML = head + DOMS_WITH_RUNS.map(d => line(d)).join('') + line('All', 'all');
 }
@@ -309,8 +309,8 @@ function drawTable() {
 const redraws = [];
 
 /* ---------- How FECI works: a fold under the FECI chart (owner, 2026-10-11) ----------
-   Three problems' fitted curves, expected score = 100 / (1 + exp(-k (FECI - FEDI))) from TFIT: an easy one, one at the
-   human reference and a hard one, picked in code as the problems with a clear S (slope .07 to .3) whose FEDI is nearest
+   Three tasks' fitted curves, expected score = 100 / (1 + exp(-k (FECI - FEDI))) from TFIT: an easy one, one at the
+   human reference and a hard one, picked in code as the tasks with a clear S (slope .07 to .3) whose FEDI is nearest
    -15, 25 and 50, so the picture follows the data (owner, 2026-10-14). Dashed lines mark the two fixed points of the
    scale, Kimi K2.7 = 0 and Human = 25. */
 function drawHow() {
@@ -353,7 +353,7 @@ addEventListener('hashchange', fqHash); fqHash();
 let picked = new Set(), q = '', order = 'hard';
 // the domain filter: checkboxes drawn as Material 3 ones, any number checked (owner, design audit: chips did not look good, 4B)
 $('#checks').innerHTML = DOMAINS.map(d => `<label><input type="checkbox" value="${esc(d)}"><span>${esc(d)} <span class="cn">${N_IN(d)}</span></span></label>`).join('');
-$('#q').placeholder = `Search ${TASKS.length} problems`;
+$('#q').placeholder = `Search ${TASKS.length} tasks`;
 const again = () => { drawRows(); $('#rows').scrollTop = 0; atEnd(); };
 $('#checks').addEventListener('change', e => { e.target.checked ? picked.add(e.target.value) : picked.delete(e.target.value); again(); });
 // the sort menu: a button in the search field's style and a menu of its own, as the native list cannot take the page's design
@@ -397,7 +397,7 @@ function hits() {
   const w = q.toLowerCase().split(/\s+/).filter(Boolean);
   const hay = t => [t.s, t.name, t.t, t.n, t.d, GOAL[t.s] || '', VENUE[t.s] || ''].join(' ').toLowerCase();
   const h = TASKS.filter(t => (!picked.size || picked.has(t.d)) && w.every(x => hay(t).includes(x)));
-  // difficulty is the FEDI rank (FRANK, 1 = hardest); a problem without a FEDI has none and comes last either way
+  // difficulty is the FEDI rank (FRANK, 1 = hardest); a task without a FEDI has none and comes last either way
   const rank = t => FRANK[t.s] ?? null, dom = (a, b) => DOMAINS.indexOf(a.d) - DOMAINS.indexOf(b.d), nm = (a, b) => a.name.localeCompare(b.name);
   const hard = (a, b) => (rank(a) ?? 1e9) - (rank(b) ?? 1e9) || dom(a, b) || nm(a, b), easy = (a, b) => (rank(b) ?? -1) - (rank(a) ?? -1) || dom(a, b) || nm(a, b);
   return [...h].sort({hard, easy, domain:(a, b) => dom(a, b) || hard(a, b), name:nm}[order]);
@@ -427,7 +427,7 @@ function drawMap() {
     squarify(doms.map(N_IN), ...ar).forEach(([x, y, w, h], j) => {
       const d = doms[j], n = N_IN(d);
       const x0 = x + (x > tol ? G / 2 : 0), y0 = y + (y > tol ? G / 2 : 0), x1 = x + w - (x + w < W - tol ? G / 2 : 0), y1 = y + h - (y + h < H - tol ? G / 2 : 0), bw = x1 - x0, bh = y1 - y0;
-      const g = sv('g', {class:'blk', 'aria-label':`${d}, ${n} problem${n > 1 ? 's' : ''}`, 'data-d':d});
+      const g = sv('g', {class:'blk', 'aria-label':`${d}, ${n} task${n > 1 ? 's' : ''}`, 'data-d':d});
       // the block holds one illustration per task (fcs2-art.js), in rows that keep each tile closest to 3:2, framed by thin white seams
       const ts = TASKS.filter(t => t.d === d), gap = 2, cid = `mapclip${k}_${j}`;
       let rows = 1, sc = 1e9; for (let r = 1; r <= n; r++) { const c = Math.ceil(n / r), v = Math.abs(Math.log((bw / c) / (bh / r) / 1.5)); if (v < sc) { sc = v; rows = r; } }
@@ -552,14 +552,14 @@ function showRun() {
         sv('path', {d:r.p ? `M${cx - R * .46},${cy + R * .04}l${R * .32},${R * .34}l${R * .6},${-R * .7}` : `M${cx - R * .36},${cy - R * .36}l${R * .72},${R * .72}M${cx + R * .36},${cy - R * .36}l${-R * .72},${R * .72}`,
           fill:'none', stroke:r.p ? field : '#fff', 'stroke-width':2, 'stroke-linecap':'round', 'stroke-linejoin':'round', 'stroke-opacity':r.p ? 1 : .85}),
         sv('text', {x:cx + 17, y:cy + 4.5, 'font-size':13.5, 'font-weight':r.p ? 600 : 400, fill:'#fff', 'fill-opacity':r.p ? 1 : .85}, narrow ? m.short : m.name)); });
-  } else {   // difficulty: the FEDI rank (FRANK), and a strip with every problem in rank order and this one as a disc; TDIFF gives who passes
+  } else {   // difficulty: the FEDI rank (FRANK), and a strip with every task in rank order and this one as a disc; TDIFF gives who passes
     const D = TDIFF[s] && FRANK[s] ? {...TDIFF[s], rank:FRANK[s]} : null, N = Object.keys(FRANK).length;
     panel.append(sv('text', {x:p.x + PX, y:top + 4, 'font-size':13, 'font-weight':500, fill:'#fff', 'fill-opacity':.85}, 'Difficulty'));
     if (!D) panel.append(sv('text', {x:p.x + PX, y:top + 52, 'font-size':16, fill:'#fff'}, 'No runs yet'));
     else { const rank = D.rank, X = r => p.x + PX + (N - r) / (N - 1 || 1) * inner, sy = p.y + p.h - 74;
       const ord = `${rank}${[, 'st', 'nd', 'rd'][rank % 100 > 10 && rank % 100 < 14 ? 0 : rank % 10] || 'th'}`;
       panel.append(sv('text', {x:p.x + PX, y:top + 62, 'font-size':52, 'font-weight':600, fill:'#fff'}, rank === 1 ? 'Hardest' : ord),
-        sv('text', {x:p.x + PX, y:top + 90, 'font-size':14, fill:'#fff', 'fill-opacity':.92}, `${rank === 1 ? '' : 'hardest '}of ${N} problems · ${D.pass} of ${D.n} models pass`),
+        sv('text', {x:p.x + PX, y:top + 90, 'font-size':14, fill:'#fff', 'fill-opacity':.92}, `${rank === 1 ? '' : 'hardest '}of ${N} tasks · ${D.pass} of ${D.n} models pass`),
         sv('line', {x1:p.x + PX, x2:p.x + PX + inner, y1:sy, y2:sy, stroke:'#fff', 'stroke-opacity':.45, 'stroke-width':1.5}));
       for (let r = 1; r <= N; r++) panel.append(sv('line', {x1:X(r), x2:X(r), y1:sy - 5, y2:sy + 5, stroke:'#fff', 'stroke-opacity':.5, 'stroke-width':1.5}));
       panel.append(sv('circle', {cx:X(rank), cy:sy, r:8, fill:'#fff'}),
@@ -601,17 +601,17 @@ document.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse' &&
 
 function drawRows() {
   const h = hits(); $('#fcount').textContent = picked.size ? `(${picked.size})` : '';
-  $('#lhead').innerHTML = `<span>${h.length === TASKS.length ? `${TASKS.length} problems` : `${h.length} of ${TASKS.length} problems`}</span><span></span>`
-    + `<span title="FEDI, the FrontierCS Epoch Difficulty Index: the FECI at which a model is expected to score 50 on the problem">FEDI</span><span></span>`;
+  $('#lhead').innerHTML = `<span>${h.length === TASKS.length ? `${TASKS.length} tasks` : `${h.length} of ${TASKS.length} tasks`}</span><span></span>`
+    + `<span title="FEDI, the FrontierCS Epoch Difficulty Index: the FECI at which a model is expected to score 50 on the task">FEDI</span><span></span>`;
   $('#rows').innerHTML = h.map(t => { const s = t.s, v = VENUE[s], goal = GOAL[s], ttl = t.t || (v ? t.name : '');
     // with a goal, the source is the small line under it (venue in bold, then the title); without one (Security), the title is the main line
     const main = goal || ttl, small = goal ? (v && ttl ? `<b>${esc(v)}</b> · ${esc(ttl)}` : esc(v || ttl)) : v ? `<b>${esc(v)}</b>` : '';
-    // the problem's FEDI in place of the pass rate (owner, 2026-10-14)
+    // the task's FEDI in place of the pass rate (owner, 2026-10-14)
     const pass = FEDI[s] != null ? `<a class="tp" href="${esc(taskHref(s))}" tabindex="-1"><span class="pr">${f1(FEDI[s])}</span></a>` : '<span></span>';
     return `<article class="trow" data-s="${esc(s)}"><div class="tn"><h3><a class="stretch" href="${esc(taskHref(s))}">${esc(t.name)}</a></h3><span class="td" style="--a:${AINK[AREA_OF[t.d].k]}">${esc(t.d)}</span></div>
     <div class="tx">${main ? `<p>${esc(main)}</p>` : ''}${small ? `<p class="src">${small}</p>` : ''}</div>${pass}
     <div class="lk">${t.p ? `<a href="${esc(t.p)}" target="_blank" rel="noopener">${t.t ? t.src : 'Project'}</a>` : ''}${t.r ? `<a href="${esc(t.r)}" target="_blank" rel="noopener">Code</a>` : ''}</div></article>`; }).join('')
-    || `<p class="empty">No problem matches. Clear the filter or try another word.</p>`;
+    || `<p class="empty">No task matches. Clear the filter or try another word.</p>`;
   atEnd();
 }
 
