@@ -88,6 +88,7 @@ h2{font-weight:600; font-size:clamp(25px,2.4vw,30px); line-height:1.2; margin:0}
 .chips{display:flex; flex-wrap:wrap; gap:8px}
 .chip{border:1px solid #bdc1c6; background:#fff; border-radius:100px; padding:5px 11px; font-size:14px; color:var(--ink-2)}
 .chip[aria-pressed="true"]{background:var(--ink-2); border-color:var(--ink-2); color:#fff}
+.chip:focus-visible{outline:2px solid var(--teal); outline-offset:2px}
 .radios{display:flex; flex-direction:column; gap:8px; font-size:15px}
 .radios label{display:flex; align-items:center; gap:9px; cursor:pointer}
 .radios input{accent-color:var(--teal); width:15px; height:15px; margin:0}
@@ -186,14 +187,16 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 /* task index */
 .idx{display:grid; grid-template-columns:240px minmax(0,1fr); gap:24px 56px}
 @media (max-width:900px){ .idx{grid-template-columns:1fr} }
-.checks{display:flex; flex-direction:column; gap:7px; font-size:17px}
-.checks label{display:flex; align-items:center; gap:8px; cursor:pointer}
-.checks input{width:14px; height:14px; margin:0; accent-color:var(--ink-2)}
+.checks{display:flex; flex-wrap:wrap; gap:8px; align-items:flex-start}   /* domain chips, the Group by chips' style */
+.checks .chip{font:inherit; font-size:14px; cursor:pointer; text-align:left}
+.checks .chip:hover{border-color:var(--muted)}
+.checks .chip .cn{margin-left:2px; color:var(--muted); font-variant-numeric:tabular-nums}
+.checks .chip[aria-pressed="true"] .cn{color:inherit; opacity:.7}
 .ftoggle{display:none}
 @media (max-width:900px){
   .ftoggle{display:inline-flex; align-items:center; gap:8px; border:1px solid #80868b; background:#fff; border-radius:4px; height:42px; padding-inline:14px; font-weight:600}
   .filter .fbody{display:none; margin-top:14px} .filter.open .fbody{display:block}
-  .checks{display:grid; grid-template-columns:1fr 1fr; gap:8px 12px; font-size:15px}
+  .checks{gap:8px}
 }
 .bar{display:flex; gap:12px; align-items:center; flex-wrap:wrap}
 .bar .field{flex:1 1 260px}
