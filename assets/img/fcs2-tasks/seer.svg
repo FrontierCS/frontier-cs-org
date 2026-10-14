@@ -1,69 +1,69 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 18 760 282" role="img" aria-label="A contract call passes three state-dependent branches. Each branch has its own predictor in a branch table. A predictor guesses taken, not taken or unsure before the block runs, then learns from the direction the branch really took. The predictors are the part the agent writes.">
-<defs><marker id="seer-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker><marker id="seer-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#c5221f"/></marker></defs>
-
-<rect x="30" y="46" width="120" height="28" rx="6" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="90" y="64.5" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">JUMPI 0x1a3</text>
-<line x1="90" y1="74" x2="90" y2="114" stroke="#3c4043" stroke-width="1.3" marker-end="url(#seer-ar)"/>
-<text x="98" y="99" font-size="11.5" fill="#5f6368">taken</text>
-<rect x="30" y="116" width="120" height="28" rx="6" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="90" y="134.5" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">JUMPI 0x2f0</text>
-<line x1="90" y1="144" x2="90" y2="184" stroke="#3c4043" stroke-width="1.3" marker-end="url(#seer-ar)"/>
-<text x="98" y="169" font-size="11.5" fill="#5f6368">not taken</text>
-<rect x="30" y="186" width="120" height="28" rx="6" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="90" y="204.5" font-size="12" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">JUMPI 0x41c</text>
-<line x1="90" y1="214" x2="90" y2="240" stroke="#3c4043" stroke-width="1.3" marker-end="url(#seer-ar)"/>
-<text x="98" y="234" font-size="11.5" fill="#5f6368">taken</text>
-
-
-<text x="214" y="44" font-size="12.5" fill="#5f6368">branch table</text>
-<rect x="214" y="56" width="118" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="222" y="73.5" font-size="11.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0x7a25…:1a3</text>
-<rect x="342" y="56" width="40" height="26" rx="5" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
-<text x="362" y="73.5" font-size="12.5" font-weight="600" text-anchor="middle" fill="#0b57d0" font-family="ui-monospace,Menlo,monospace">T</text>
-<rect x="214" y="92" width="118" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="222" y="109.5" font-size="11.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0x7a25…:2f0</text>
-<rect x="342" y="92" width="40" height="26" rx="5" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
-<text x="362" y="109.5" font-size="12.5" font-weight="600" text-anchor="middle" fill="#0b57d0" font-family="ui-monospace,Menlo,monospace">T</text>
-<rect x="214" y="128" width="118" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="222" y="145.5" font-size="11.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0x7a25…:41c</text>
-<rect x="342" y="128" width="40" height="26" rx="5" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
-<text x="362" y="145.5" font-size="12.5" font-weight="600" text-anchor="middle" fill="#0b57d0" font-family="ui-monospace,Menlo,monospace">?</text>
-<rect x="214" y="164" width="118" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="222" y="181.5" font-size="11.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0xa0b8…:0c4</text>
-<rect x="342" y="164" width="40" height="26" rx="5" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
-<text x="362" y="181.5" font-size="12.5" font-weight="600" text-anchor="middle" fill="#0b57d0" font-family="ui-monospace,Menlo,monospace">N</text>
-<rect x="214" y="200" width="118" height="26" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="222" y="217.5" font-size="11.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0xdac1…:1f2</text>
-<rect x="342" y="200" width="40" height="26" rx="5" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
-<text x="362" y="217.5" font-size="12.5" font-weight="600" text-anchor="middle" fill="#0b57d0" font-family="ui-monospace,Menlo,monospace">T</text>
-<path d="M150 60 C 180 60, 184 69, 212 69" fill="none" stroke="#9aa0a6" stroke-width="1.1"/>
-<path d="M150 130 C 180 130, 184 105, 212 105" fill="none" stroke="#9aa0a6" stroke-width="1.1"/>
-<path d="M150 200 C 180 200, 184 141, 212 141" fill="none" stroke="#9aa0a6" stroke-width="1.1"/>
-<text x="214" y="252" font-size="11.5" fill="#5f6368">contract : branch → its predictor</text>
-<text x="214" y="270" font-size="11.5" fill="#5f6368">T taken · N not taken · ? unsure</text>
-<line x1="382" y1="92" x2="452" y2="40" stroke="#0b57d0" stroke-width="1" stroke-dasharray="2 3"/>
-<line x1="382" y1="118" x2="452" y2="282" stroke="#0b57d0" stroke-width="1" stroke-dasharray="2 3"/>
-<rect x="452" y="36" width="290" height="250" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
-<text x="468" y="60" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: the branch predictor</text>
-<text x="468" y="79" font-size="12.5" fill="#3c4043">its state, its guess, and how it learns</text>
-<text x="468" y="110" font-size="12" fill="#5f6368">state, for example the recent directions</text>
-<rect x="468" y="120" width="26" height="24" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="481" y="136.5" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">T</text>
-<rect x="498" y="120" width="26" height="24" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="511" y="136.5" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">T</text>
-<rect x="528" y="120" width="26" height="24" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="541" y="136.5" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">N</text>
-<rect x="558" y="120" width="26" height="24" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="571" y="136.5" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">T</text>
-<rect x="588" y="120" width="26" height="24" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="601" y="136.5" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">T</text>
-<rect x="618" y="120" width="26" height="24" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="631" y="136.5" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">T</text>
-<text x="468" y="176" font-size="12.5" fill="#1f1f1f">1. guess, before the block runs</text>
-<text x="726" y="176" font-size="12.5" font-weight="600" text-anchor="end" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">taken</text>
-<text x="468" y="202" font-size="12.5" fill="#1f1f1f">2. real direction, as it runs</text>
-<text x="726" y="202" font-size="12.5" font-weight="600" text-anchor="end" fill="#c5221f" font-family="ui-monospace,Menlo,monospace">not taken</text>
-<text x="468" y="228" font-size="12.5" fill="#c5221f">a miss</text>
-<text x="468" y="258" font-size="12.5" fill="#1f1f1f">3. learn: update the state</text>
-<text x="468" y="276" font-size="11.5" fill="#5f6368">or answer unsure when the branch is hard to call</text>
+<svg xmlns="http://www.w3.org/2000/svg" class="fig2" viewBox="0 0 760 288" role="img" aria-label="Left, what is given: a contract call passes three state-dependent branches, and a branch table maps each contract and branch to its own predictor, whose answer is T for taken, N for not taken or ? for unsure. Right, the branch predictor the agent writes: it keeps state, for example the recent directions; it guesses taken before the block runs, sees the real direction, here not taken, a miss, and then learns by updating its state, or answers unsure when the branch is hard to call.">
+<defs><marker id="seer-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arh" d="M0 0L10 5L0 10z"/></marker></defs>
+<rect class="given" x="0" y="0" width="350" height="288" rx="10"/>
+<text class="k" x="18" y="30">GIVEN</text>
+<rect class="chip" x="18" y="62" width="118" height="28" rx="6"/>
+<text class="code mid" x="77.0" y="80.5">JUMPI 0x1a3</text>
+<rect class="chip" x="18" y="126" width="118" height="28" rx="6"/>
+<text class="code mid" x="77.0" y="144.5">JUMPI 0x2f0</text>
+<rect class="chip" x="18" y="190" width="118" height="28" rx="6"/>
+<text class="code mid" x="77.0" y="208.5">JUMPI 0x41c</text>
+<line class="ar" x1="77.0" y1="92" x2="77.0" y2="122" marker-end="url(#seer-ar)"/>
+<text class="n sm" x="86.0" y="111.0">taken</text>
+<line class="ar" x1="77.0" y1="156" x2="77.0" y2="186" marker-end="url(#seer-ar)"/>
+<text class="n sm" x="86.0" y="175.0">not taken</text>
+<line class="ar" x1="77.0" y1="220" x2="77.0" y2="244" marker-end="url(#seer-ar)"/>
+<text class="n sm" x="86.0" y="236.0">taken</text>
+<text class="n" x="166" y="53">Branch table</text>
+<rect class="chip" x="166" y="62" width="116" height="28" rx="6"/>
+<text class="code sm" x="178" y="80.5">0x7a25…:1a3</text>
+<rect class="chip on" x="288" y="62" width="34" height="28" rx="6"/>
+<text class="code ak b mid" x="305.0" y="80.5">T</text>
+<rect class="chip" x="166" y="96" width="116" height="28" rx="6"/>
+<text class="code sm" x="178" y="114.5">0x7a25…:2f0</text>
+<rect class="chip on" x="288" y="96" width="34" height="28" rx="6"/>
+<text class="code ak b mid" x="305.0" y="114.5">T</text>
+<rect class="chip" x="166" y="130" width="116" height="28" rx="6"/>
+<text class="code sm" x="178" y="148.5">0x7a25…:41c</text>
+<rect class="chip on" x="288" y="130" width="34" height="28" rx="6"/>
+<text class="code ak b mid" x="305.0" y="148.5">?</text>
+<rect class="chip" x="166" y="164" width="116" height="28" rx="6"/>
+<text class="code sm" x="178" y="182.5">0xa0b8…:0c4</text>
+<rect class="chip on" x="288" y="164" width="34" height="28" rx="6"/>
+<text class="code ak b mid" x="305.0" y="182.5">N</text>
+<rect class="chip" x="166" y="198" width="116" height="28" rx="6"/>
+<text class="code sm" x="178" y="216.5">0xdac1…:1f2</text>
+<rect class="chip on" x="288" y="198" width="34" height="28" rx="6"/>
+<text class="code ak b mid" x="305.0" y="216.5">T</text>
+<path class="ln" d="M138 76 C 152 76, 150 76, 164 76"/>
+<path class="ln" d="M138 140 C 152 140, 150 110, 164 110"/>
+<path class="ln" d="M138 204 C 152 204, 150 144, 164 144"/>
+<text class="n sm" x="166" y="248">T taken, N not taken,</text>
+<text class="n sm" x="166" y="266">? unsure</text>
+<rect class="agent" x="366" y="0" width="394" height="288" rx="10"/>
+<text class="k ak" x="386" y="30">THE AGENT WRITES</text>
+<text class="h" x="386" y="53">The branch predictor, one per branch</text>
+<text class="n" x="386" y="86">State, for example the recent directions</text>
+<rect class="chip" x="386" y="98" width="28" height="26" rx="5"/>
+<text class="code mid" x="400" y="116">T</text>
+<rect class="chip" x="418" y="98" width="28" height="26" rx="5"/>
+<text class="code mid" x="432" y="116">T</text>
+<rect class="chip" x="450" y="98" width="28" height="26" rx="5"/>
+<text class="code mid" x="464" y="116">N</text>
+<rect class="chip" x="482" y="98" width="28" height="26" rx="5"/>
+<text class="code mid" x="496" y="116">T</text>
+<rect class="chip" x="514" y="98" width="28" height="26" rx="5"/>
+<text class="code mid" x="528" y="116">T</text>
+<rect class="chip" x="546" y="98" width="28" height="26" rx="5"/>
+<text class="code mid" x="560" y="116">T</text>
+<circle class="chip" cx="395" cy="155.5" r="9"/><text class="sn ak" x="395" y="160" text-anchor="middle">1</text>
+<text x="412" y="160">Guess, before the block runs</text>
+<text class="code b end" x="740" y="160">taken</text>
+<circle class="chip" cx="395" cy="191.5" r="9"/><text class="sn ak" x="395" y="196" text-anchor="middle">2</text>
+<text x="412" y="196">Real direction, as it runs</text>
+<text class="code b bad end" x="740" y="196">not taken</text>
+<text class="sm bad end" x="740" y="216">a miss</text>
+<circle class="chip" cx="395" cy="243.5" r="9"/><text class="sn ak" x="395" y="248" text-anchor="middle">3</text>
+<text x="412" y="248">Learn: update the state</text>
+<text class="n sm" x="412" y="268">or answer unsure when the branch is hard to call</text>
 </svg>

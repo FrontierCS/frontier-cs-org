@@ -1,84 +1,82 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 20 760 284" role="img" aria-label="The student turns noise x0 into a latent x10 in ten noisy steps; a fixed decoder makes the image, and optical character recognition reads its words. The agent writes the sampler, which runs and records the chain, and the step, which draws the next state from a Gaussian around the mean and returns its log-probability; replay must give the same mean and log-probability again.">
-<defs><marker id="ocr-distillation-trajectory-sampling-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker></defs>
-
-<rect x="24" y="34" width="496" height="120" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
-<text x="40" y="58" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: the sampler that runs and records the chain</text>
-<rect x="44" y="76" width="24" height="24" rx="3" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<line x1="70" y1="88" x2="84" y2="88" stroke="#3c4043" stroke-width="1.2" marker-end="url(#ocr-distillation-trajectory-sampling-ar)"/>
-<rect x="86" y="76" width="24" height="24" rx="3" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<line x1="112" y1="88" x2="126" y2="88" stroke="#3c4043" stroke-width="1.2" marker-end="url(#ocr-distillation-trajectory-sampling-ar)"/>
-<rect x="128" y="76" width="24" height="24" rx="3" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<line x1="154" y1="88" x2="168" y2="88" stroke="#3c4043" stroke-width="1.2" marker-end="url(#ocr-distillation-trajectory-sampling-ar)"/>
-<rect x="170" y="76" width="24" height="24" rx="3" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<line x1="196" y1="88" x2="210" y2="88" stroke="#3c4043" stroke-width="1.2" marker-end="url(#ocr-distillation-trajectory-sampling-ar)"/>
-<rect x="212" y="76" width="24" height="24" rx="3" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<line x1="238" y1="88" x2="252" y2="88" stroke="#3c4043" stroke-width="1.2" marker-end="url(#ocr-distillation-trajectory-sampling-ar)"/>
-<rect x="254" y="76" width="24" height="24" rx="3" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<line x1="280" y1="88" x2="294" y2="88" stroke="#3c4043" stroke-width="1.2" marker-end="url(#ocr-distillation-trajectory-sampling-ar)"/>
-<rect x="296" y="76" width="24" height="24" rx="3" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<line x1="322" y1="88" x2="336" y2="88" stroke="#3c4043" stroke-width="1.2" marker-end="url(#ocr-distillation-trajectory-sampling-ar)"/>
-<rect x="338" y="76" width="24" height="24" rx="3" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<line x1="364" y1="88" x2="378" y2="88" stroke="#3c4043" stroke-width="1.2" marker-end="url(#ocr-distillation-trajectory-sampling-ar)"/>
-<rect x="380" y="76" width="24" height="24" rx="3" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<line x1="406" y1="88" x2="420" y2="88" stroke="#3c4043" stroke-width="1.2" marker-end="url(#ocr-distillation-trajectory-sampling-ar)"/>
-<rect x="422" y="76" width="24" height="24" rx="3" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<line x1="448" y1="88" x2="462" y2="88" stroke="#3c4043" stroke-width="1.2" marker-end="url(#ocr-distillation-trajectory-sampling-ar)"/>
-<rect x="464" y="76" width="24" height="24" rx="3" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<circle cx="51.8" cy="88.7" r="1.3" fill="#9aa0a6"/>
-<circle cx="53.9" cy="89.7" r="1.3" fill="#9aa0a6"/>
-<circle cx="58.0" cy="81.0" r="1.3" fill="#9aa0a6"/>
-<circle cx="48.2" cy="93.4" r="1.3" fill="#9aa0a6"/>
-<circle cx="52.1" cy="83.7" r="1.3" fill="#9aa0a6"/>
-<circle cx="63.9" cy="87.5" r="1.3" fill="#9aa0a6"/>
-<circle cx="61.4" cy="87.6" r="1.3" fill="#9aa0a6"/>
-<circle cx="58.2" cy="82.4" r="1.3" fill="#9aa0a6"/>
-<circle cx="58.2" cy="93.9" r="1.3" fill="#9aa0a6"/>
-<circle cx="98.4" cy="91.9" r="1.3" fill="#9aa0a6"/>
-<circle cx="100.7" cy="81.0" r="1.3" fill="#9aa0a6"/>
-<circle cx="102.1" cy="89.5" r="1.3" fill="#9aa0a6"/>
-<circle cx="94.8" cy="80.5" r="1.3" fill="#9aa0a6"/>
-<circle cx="103.8" cy="87.6" r="1.3" fill="#9aa0a6"/>
-<circle cx="101.5" cy="94.1" r="1.3" fill="#9aa0a6"/>
-<circle cx="101.4" cy="94.7" r="1.3" fill="#9aa0a6"/>
-<circle cx="138.3" cy="92.8" r="1.3" fill="#9aa0a6"/>
-<circle cx="139.1" cy="95.0" r="1.3" fill="#9aa0a6"/>
-<circle cx="146.1" cy="81.6" r="1.3" fill="#9aa0a6"/>
-<circle cx="134.2" cy="83.5" r="1.3" fill="#9aa0a6"/>
-<circle cx="147.4" cy="87.0" r="1.3" fill="#9aa0a6"/>
-<circle cx="184.0" cy="84.8" r="1.3" fill="#9aa0a6"/>
-<circle cx="182.1" cy="86.2" r="1.3" fill="#9aa0a6"/>
-<circle cx="179.6" cy="89.4" r="1.3" fill="#9aa0a6"/>
-<circle cx="225.3" cy="94.5" r="1.3" fill="#9aa0a6"/>
-<circle cx="226.9" cy="94.9" r="1.3" fill="#9aa0a6"/>
-<text x="56" y="118" font-size="12.5" text-anchor="middle" fill="#5f6368">x<tspan dy="3" font-size="11.5">0</tspan></text>
-<text x="476" y="118" font-size="12.5" text-anchor="middle" fill="#5f6368">x<tspan dy="3" font-size="11.5">10</tspan></text>
-<text x="287" y="118" font-size="12.5" text-anchor="middle" fill="#1f1f1f" font-weight="600">one step</text>
-<text x="40" y="142" font-size="12.5" fill="#3c4043">returns every state, each step’s log-probability, and the image</text>
-<line x1="490" y1="88" x2="540" y2="88" stroke="#3c4043" stroke-width="1.2" marker-end="url(#ocr-distillation-trajectory-sampling-ar)"/>
-<path d="M543 70 L583 78 L583 98 L543 106 Z" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="563" y="124" font-size="12" text-anchor="middle" fill="#5f6368">decoder</text>
-<line x1="585" y1="88" x2="600" y2="88" stroke="#3c4043" stroke-width="1.2" marker-end="url(#ocr-distillation-trajectory-sampling-ar)"/>
-<rect x="604" y="40" width="132" height="96" rx="4" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<rect x="626" y="52" width="88" height="74" rx="10" fill="#fff" stroke="#9aa0a6" stroke-width="1.2"/>
-<rect x="634" y="70" width="72" height="40" fill="#fff" stroke="#3c4043" stroke-width="1"/>
-<text x="670" y="86" font-size="11.5" font-weight="600" text-anchor="middle" fill="#1f1f1f">Take With</text>
-<text x="670" y="101" font-size="11.5" font-weight="600" text-anchor="middle" fill="#1f1f1f">Food</text>
-<text x="604" y="152" font-size="12.5" fill="#5f6368">OCR reads the words</text>
-<rect x="24" y="168" width="712" height="128" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
-<text x="40" y="192" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: the step that draws the next state and scores it</text>
-<rect x="44" y="234" width="24" height="24" rx="3" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="56" y="276" font-size="12.5" text-anchor="middle" fill="#5f6368">x<tspan dy="3" font-size="11.5">t</tspan></text>
-<text x="82" y="232" font-size="12.5" fill="#3c4043">student’s prediction</text>
-<line x1="74" y1="246" x2="226" y2="246" stroke="#3c4043" stroke-width="1.2" marker-end="url(#ocr-distillation-trajectory-sampling-ar)"/>
-<text x="82" y="266" font-size="12.5" fill="#3c4043">sets the mean</text>
-<line x1="236" y1="268" x2="426" y2="268" stroke="#3c4043" stroke-width="1.2"/>
-<polyline points="238,267.6 242,267.4 246,267.1 250,266.7 254,266.1 258,265.4 262,264.5 266,263.3 270,261.8 274,259.9 278,257.8 282,255.2 286,252.3 290,249.1 294,245.6 298,242.0 302,238.2 306,234.6 310,231.2 314,228.1 318,225.5 322,223.6 326,222.4 330,222.0 334,222.4 338,223.6 342,225.5 346,228.1 350,231.2 354,234.6 358,238.2 362,242.0 366,245.6 370,249.1 374,252.3 378,255.2 382,257.8 386,259.9 390,261.8 394,263.3 398,264.5 402,265.4 406,266.1 410,266.7 414,267.1 418,267.4 422,267.6" fill="none" stroke="#0b57d0" stroke-width="2"/>
-<line x1="330" y1="268" x2="330" y2="218" stroke="#5f6368" stroke-width="1.1" stroke-dasharray="3 3"/>
-<line x1="366" y1="268" x2="366" y2="245.6" stroke="#3c4043" stroke-width="1.1" stroke-dasharray="2 2"/>
-<circle cx="366" cy="268" r="4" fill="#3c4043"/>
-<text x="326" y="286" font-size="12.5" text-anchor="middle" fill="#5f6368">mean</text>
-<text x="374" y="286" font-size="12.5" text-anchor="middle" fill="#1f1f1f">x<tspan dy="3" font-size="11.5">t+1</tspan></text>
-<text x="448" y="226" font-size="12.5" fill="#3c4043">draws the next state from a Gaussian</text>
-<text x="448" y="246" font-size="12.5" fill="#3c4043">returns its log-probability for training</text>
-<text x="448" y="266" font-size="12.5" fill="#3c4043">on replay, gives the same mean and score</text>
+<svg xmlns="http://www.w3.org/2000/svg" class="fig2" viewBox="0 0 760 310" role="img" aria-label="Left, what is given: the student, Stable Diffusion 3.5 Medium, and a prompt that quotes the text to draw, such as Take With Food. Middle, what the agent writes. Step 1, the sampler: it runs the student from noise x0 to the latent x10 in ten steps and returns every state and each step’s log-probability. Step 2, the step: the student’s prediction sets the mean of a Gaussian, the step draws the next state from it and returns its log-probability, and replay gives the same mean and score. Right, how it is judged: a fixed decoder makes the image and optical character recognition reads its words.">
+<defs><marker id="ocr-distillation-trajectory-sampling-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arh" d="M0 0L10 5L0 10z"/></marker></defs>
+<rect class="given" x="0" y="0" width="170" height="310" rx="10"/>
+<text class="k" x="18" y="30">GIVEN</text>
+<text x="18" y="62">The student, Stable</text>
+<text x="18" y="80">Diffusion 3.5 Medium,</text>
+<text x="18" y="98">and a prompt that</text>
+<text x="18" y="116">quotes the text</text>
+<rect class="chip" x="18" y="150" width="134" height="34" rx="6"/>
+<text class="mid" x="85" y="172">“Take With Food”</text>
+<rect class="agent" x="186" y="0" width="418" height="310" rx="10"/>
+<text class="k ak" x="206" y="30">THE AGENT WRITES</text>
+<text class="h" x="206" y="53">The trajectory sampler and its step</text>
+<circle class="chip" cx="215" cy="81.5" r="9"/><text class="sn ak" x="215" y="86" text-anchor="middle">1</text>
+<text x="232" y="86">Run the student from noise, record every state</text>
+<rect class="chip" x="206" y="102" width="22" height="22" rx="4"/>
+<circle class="g5" cx="213.856" cy="113.531" r="1.4"/>
+<circle class="g5" cx="215.439" cy="114.247" r="1.4"/>
+<circle class="g5" cx="218.509" cy="107.786" r="1.4"/>
+<circle class="g5" cx="211.158" cy="117.05" r="1.4"/>
+<circle class="g5" cx="214.112" cy="109.812" r="1.4"/>
+<line class="ar" x1="230" y1="113" x2="239.6" y2="113" marker-end="url(#ocr-distillation-trajectory-sampling-ar)"/>
+<rect class="chip" x="241.6" y="102" width="22" height="22" rx="4"/>
+<circle class="g5" cx="258.548" cy="112.643" r="1.4"/>
+<circle class="g5" cx="256.638" cy="112.716" r="1.4"/>
+<circle class="g5" cx="254.269" cy="108.807" r="1.4"/>
+<circle class="g5" cx="254.218" cy="117.417" r="1.4"/>
+<line class="ar" x1="265.6" y1="113" x2="275.2" y2="113" marker-end="url(#ocr-distillation-trajectory-sampling-ar)"/>
+<rect class="chip" x="277.2" y="102" width="22" height="22" rx="4"/>
+<circle class="g5" cx="288.478" cy="115.895" r="1.4"/>
+<circle class="g5" cx="290.257" cy="107.768" r="1.4"/>
+<circle class="g5" cx="291.299" cy="114.093" r="1.4"/>
+<line class="ar" x1="301.2" y1="113" x2="310.8" y2="113" marker-end="url(#ocr-distillation-trajectory-sampling-ar)"/>
+<rect class="chip" x="312.8" y="102" width="22" height="22" rx="4"/>
+<circle class="g5" cx="321.415" cy="107.372" r="1.4"/>
+<circle class="g5" cx="328.186" cy="112.673" r="1.4"/>
+<line class="ar" x1="336.8" y1="113" x2="346.4" y2="113" marker-end="url(#ocr-distillation-trajectory-sampling-ar)"/>
+<rect class="chip" x="348.4" y="102" width="22" height="22" rx="4"/>
+<circle class="g5" cx="362.026" cy="117.546" r="1.4"/>
+<line class="ar" x1="372.4" y1="113" x2="382" y2="113" marker-end="url(#ocr-distillation-trajectory-sampling-ar)"/>
+<rect class="chip on" x="384" y="102" width="22" height="22" rx="4"/>
+<line class="ar" x1="408" y1="113" x2="417.6" y2="113" marker-end="url(#ocr-distillation-trajectory-sampling-ar)"/>
+<rect class="chip on" x="419.6" y="102" width="22" height="22" rx="4"/>
+<line class="ar" x1="443.6" y1="113" x2="453.2" y2="113" marker-end="url(#ocr-distillation-trajectory-sampling-ar)"/>
+<rect class="chip" x="455.2" y="102" width="22" height="22" rx="4"/>
+<line class="ar" x1="479.2" y1="113" x2="488.8" y2="113" marker-end="url(#ocr-distillation-trajectory-sampling-ar)"/>
+<rect class="chip" x="490.8" y="102" width="22" height="22" rx="4"/>
+<line class="ar" x1="514.8" y1="113" x2="524.4" y2="113" marker-end="url(#ocr-distillation-trajectory-sampling-ar)"/>
+<rect class="chip" x="526.4" y="102" width="22" height="22" rx="4"/>
+<line class="ar" x1="550.4" y1="113" x2="560" y2="113" marker-end="url(#ocr-distillation-trajectory-sampling-ar)"/>
+<rect class="chip" x="562" y="102" width="22" height="22" rx="4"/>
+<text class="mid" x="217" y="142">x₀</text>
+<text class="mid" x="573" y="142">x₁₀</text>
+<text class="b mid" x="412.8" y="142">one step</text>
+<text class="n" x="206" y="166">It returns every state and each step’s log-probability.</text>
+<circle class="chip" cx="215" cy="195.5" r="9"/><text class="sn ak" x="215" y="200" text-anchor="middle">2</text>
+<text x="232" y="200">Draw the next state from a Gaussian and score it</text>
+<rect class="chip" x="206" y="226" width="22" height="22" rx="4"/>
+<text class="mid" x="217" y="266">xₜ</text>
+<line class="ar" x1="236" y1="237" x2="362" y2="237" marker-end="url(#ocr-distillation-trajectory-sampling-ar)"/>
+<text class="n sm" x="242" y="230">student’s prediction</text>
+<text class="n sm" x="242" y="259">sets the mean</text>
+<line class="ln2" x1="364" y1="262" x2="566" y2="262"/>
+<path class="sa" d="M370.0 261.7 L373.2 261.6 L376.3 261.5 L379.5 261.3 L382.7 261.0 L385.8 260.7 L389.0 260.3 L392.2 259.7 L395.3 259.1 L398.5 258.3 L401.7 257.3 L404.8 256.1 L408.0 254.7 L411.2 253.1 L414.3 251.3 L417.5 249.2 L420.7 246.9 L423.8 244.4 L427.0 241.7 L430.2 238.9 L433.3 236.0 L436.5 233.0 L439.7 230.0 L442.8 227.2 L446.0 224.5 L449.2 222.1 L452.3 220.0 L455.5 218.3 L458.7 217.0 L461.8 216.3 L465.0 216.0 L468.2 216.3 L471.3 217.0 L474.5 218.3 L477.7 220.0 L480.8 222.1 L484.0 224.5 L487.2 227.2 L490.3 230.0 L493.5 233.0 L496.7 236.0 L499.8 238.9 L503.0 241.7 L506.2 244.4 L509.3 246.9 L512.5 249.2 L515.7 251.3 L518.8 253.1 L522.0 254.7 L525.2 256.1 L528.3 257.3 L531.5 258.3 L534.7 259.1 L537.8 259.7 L541.0 260.3 L544.2 260.7 L547.3 261.0 L550.5 261.3 L553.7 261.5 L556.8 261.6 L560.0 261.7"/>
+<line class="ln dash" x1="465" y1="216" x2="465" y2="262"/>
+<line class="ln dash" x1="501" y1="239.948" x2="501" y2="262"/>
+<circle class="fa" cx="501" cy="262" r="4"/>
+<text class="n end" x="459" y="280">mean</text>
+<text class="mid" x="501" y="280">xₜ₊₁</text>
+<text class="n" x="206" y="296">Replay gives the same mean and score.</text>
+<rect class="result" x="620" y="0" width="140" height="310" rx="10"/>
+<text class="k" x="638" y="30">JUDGED ON</text>
+<path class="g3" d="M674.0 50 L706.0 50 L724.0 84 L656.0 84 Z"/>
+<text class="n mid" x="690" y="104">decoder</text>
+<line class="ar" x1="690" y1="112" x2="690" y2="132" marker-end="url(#ocr-distillation-trajectory-sampling-ar)"/>
+<rect class="chip" x="638" y="138" width="104" height="80" rx="6"/>
+<rect class="ln2" x="650" y="152" width="80" height="52"/>
+<text class="b mid" x="690" y="174">Take With</text>
+<text class="b mid" x="690" y="192">Food</text>
+<text class="n" x="638" y="246">OCR reads the</text>
+<text class="n" x="638" y="264">words</text>
 </svg>

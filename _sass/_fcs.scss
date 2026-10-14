@@ -835,6 +835,10 @@ nav .pagination {
    ============================================================ */
 .fc-paper-logo img { mix-blend-mode: multiply; }
 .fc-actions { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 8px; }
+/* the 404 page: the overview's pills for its two ways out, a grey eyebrow (owner, design audit 7A) */
+.nf-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+.nf-actions .pill { font-size: 18px; padding: 12px 16px; }
+.page-hero .eyebrow.nf { color: var(--ink-3); }
 .fc-actions a {
   font-family: var(--font-mono);
   font-size: 13px;
@@ -1536,7 +1540,7 @@ footer.foot { margin-top: 120px; padding: 56px 0 28px; background: #202124; colo
 .fcs1 .sbar i { display: block; height: 100%; }
 .fcs1 .sbar.hatch i { background: repeating-linear-gradient(135deg, #9aa0a6 0 4px, var(--grid) 4px 8px) !important; }
 .fcs1 .mdl { display: inline-flex; align-items: center; gap: 10px; white-space: nowrap; }
-.fcs1 .mdl small { font-size: 13px; color: var(--muted); margin-left: 4px; } .fcs1 .mdl small a { color: var(--teal); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--link-line); }
+.fcs1 .mdl small { font-size: 13px; color: var(--muted); margin-left: 4px; } .fcs1 .mdl small a { color: var(--ink-2); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--line-2); }   /* the site's ink link (owner, design audit 8A) */
 .fcs1 .mlogo { flex: none; width: 20px; height: 20px; }
 .fcs1 .mlogo.human { border-radius: 50%; border: 1.5px dashed var(--muted); }
 .fcs1 .res .hum td { color: var(--ink-2); }
@@ -1569,7 +1573,7 @@ footer.foot { margin-top: 120px; padding: 56px 0 28px; background: #202124; colo
 .fcs1 .ptile canvas { display: block; width: 100%; height: 100%; }
 .fcs1 .ptile figcaption { position: absolute; left: 0; bottom: 6px; display: flex; flex-direction: column; gap: 1px; font-variant-numeric: tabular-nums; }
 .fcs1 .ptile figcaption b { font-size: 15px; font-weight: 600; color: var(--ink); } .fcs1 .ptile figcaption span { font-size: 12.5px; color: var(--muted); }
-.fcs1 .prob .lk span { color: var(--ink-2); } .fcs1 .prob .lk span a { color: var(--teal); text-decoration-color: var(--link-line); }
+.fcs1 .prob .lk span { color: var(--ink-2); } .fcs1 .prob .lk span a { color: var(--ink-2); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--line-2); }   /* as Statement and Checker beside it (owner, design audit 8A) */
 .fcs1 .prob h3 { font-size: clamp(22px, 2.2vw, 28px); font-weight: 500; margin: 0 0 10px; }
 .fcs1 .prob p { margin: 0; color: var(--ink-2); font-size: 17px; line-height: 1.5; max-width: 36em; }
 .fcs1 .prob .lk { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 14px; margin-top: 16px; }
@@ -1609,16 +1613,16 @@ footer.foot { margin-top: 120px; padding: 56px 0 28px; background: #202124; colo
 .ws2 .lv-g li.on { background: var(--l); color: var(--ink); }
 .ws2 .lv p { margin: 0; font-size: 16.5px; line-height: 1.45; color: var(--ink-2); max-width: 26em; }
 /* topics: one row that drifts slowly sideways; it stops under the pointer, and wraps to a grid without motion */
-.ws2 .tpw { overflow: hidden; padding: 14px 0; -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent); mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent); }
-.ws2 .tpr { list-style: none; margin: 0; padding: 0; display: flex; gap: 8px; padding-right: 8px !important; width: max-content; animation: tpdrift 80s linear infinite; }
-.ws2 .tpw:hover .tpr { animation-play-state: paused; }
+/* the topics carousel steps one card at a time and rests on whole cards: the frame is a whole number of cards wide, no
+   edge fade (owner, design audit 10B: the drifting row always cut a card in half at the edges); workshop.md steps it */
+.ws2 .tpw { overflow: hidden; padding: 14px 0; margin-inline: auto; }
+.ws2 .tpr { list-style: none; margin: 0; padding: 0; display: flex; gap: 8px; width: max-content; transition: transform .7s cubic-bezier(.4, 0, .2, 1); }
 .ws2 .tpr li { flex: none; width: 236px; }
 .ws2 .tpr p { margin: 6px auto 0; max-width: 200px; text-align: center; font-size: 14.5px; line-height: 1.4; color: var(--ink-2); }
 .ws2 .tpr svg { display: block; width: 100%; height: auto; overflow: visible; }
 .ws2 .tpr .ic { fill: none; stroke: var(--h); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .ws2 .tpr text { font-family: var(--sans); font-size: 15.5px; font-weight: 600; fill: var(--ink); letter-spacing: .01em; }
-@keyframes tpdrift { to { transform: translateX(-50%); } }   /* the row's right padding makes half its width exactly one set of cards */
-@media (prefers-reduced-motion: reduce) { .ws2 .tpw { -webkit-mask-image: none; mask-image: none; } .ws2 .tpr { width: auto; flex-wrap: wrap; justify-content: center; animation: none; } .ws2 .tpr li[aria-hidden] { display: none; } }
+@media (prefers-reduced-motion: reduce) { .ws2 .tpw { width: auto !important; } .ws2 .tpr { width: auto; flex-wrap: wrap; justify-content: center; transition: none; transform: none !important; } .ws2 .tpr li[aria-hidden] { display: none; } }
 .ws2 .ppl { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(232px, 1fr)); gap: 28px 24px; }
 .ws2 .ppl li { display: flex; flex-direction: column; gap: 3px; border-top: 1px solid var(--ink-2); padding-top: 12px; }
 .ws2 .ppl b { font-size: 18px; font-weight: 500; } .ws2 .ppl b a { text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--line-2); } .ws2 .ppl b a:hover { color: var(--teal-d); }

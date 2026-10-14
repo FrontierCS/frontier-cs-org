@@ -1,45 +1,52 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 22 760 268" role="img" aria-label="One training step. The generator’s images pass through a frozen feature model, giving new features x = [2, 3]. The agent writes the feature queue: x replaces one row and keeps its gradient, while stored rows carry no graph. The queue gives the mean [1.00, 1.25] and a covariance, which feed a Fréchet distance to target statistics. The loss gradient flows back only through the new features.">
-<defs><marker id="differentiable-population-statistics-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker><marker id="differentiable-population-statistics-ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#5f6368"/></marker></defs>
-
-<rect x="20" y="44" width="130" height="36" rx="8" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="85" y="67" font-size="14" text-anchor="middle" fill="#1f1f1f">Generator</text>
-<line x1="85" y1="80" x2="85" y2="102" stroke="#3c4043" stroke-width="1.3" marker-end="url(#differentiable-population-statistics-ar)"/>
-<rect x="20" y="104" width="130" height="36" rx="8" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="85" y="127" font-size="14" text-anchor="middle" fill="#1f1f1f">Frozen model</text>
-<line x1="85" y1="140" x2="85" y2="160" stroke="#3c4043" stroke-width="1.3" marker-end="url(#differentiable-population-statistics-ar)"/>
-<text x="85" y="178" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">x = [2, 3]</text>
-<text x="85" y="196" font-size="12" text-anchor="middle" fill="#5f6368">new features</text>
-<rect x="210" y="36" width="290" height="214" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
-<path d="M134 173 H180 V88 H236" fill="none" stroke="#3c4043" stroke-width="1.3" marker-end="url(#differentiable-population-statistics-ar)"/>
-<text x="226" y="60" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: the feature queue</text>
-<rect x="240" y="76" width="40" height="24" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="260" y="93" font-size="13" text-anchor="middle" fill="#1f1f1f" font-weight="600" font-family="ui-monospace,Menlo,monospace">2</text>
-<rect x="280" y="76" width="40" height="24" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="300" y="93" font-size="13" text-anchor="middle" fill="#1f1f1f" font-weight="600" font-family="ui-monospace,Menlo,monospace">3</text>
-<rect x="240" y="100" width="40" height="24" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="260" y="117" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
-<rect x="280" y="100" width="40" height="24" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="300" y="117" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0</text>
-<rect x="240" y="124" width="40" height="24" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="260" y="141" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">0</text>
-<rect x="280" y="124" width="40" height="24" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="300" y="141" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
-<rect x="240" y="148" width="40" height="24" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="260" y="165" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
-<rect x="280" y="148" width="40" height="24" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="300" y="165" font-size="13" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
-<text x="334" y="93" font-size="12.5" fill="#1f1f1f">new row, keeps its gradient</text>
-<path d="M328 103 H332 V170 H328" fill="none" stroke="#9aa0a6" stroke-width="1.2"/>
-<text x="340" y="141" font-size="12.5" fill="#5f6368">stored rows, no graph</text>
-<text x="240" y="198" font-size="12.5" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">μ = [1.00, 1.25]</text>
-<text x="240" y="218" font-size="12.5" fill="#1f1f1f">Σ = 2 × 2 covariance</text>
-<text x="226" y="240" font-size="12" fill="#5f6368">state saves and loads with the model</text>
-<line x1="500" y1="139" x2="546" y2="139" stroke="#3c4043" stroke-width="1.3" marker-end="url(#differentiable-population-statistics-ar)"/>
-<rect x="548" y="110" width="192" height="58" rx="8" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="644" y="134" font-size="14" text-anchor="middle" fill="#1f1f1f">Fréchet distance</text>
-<text x="644" y="154" font-size="12.5" text-anchor="middle" fill="#5f6368">to the target μ, Σ</text>
-<line x1="644" y1="168" x2="644" y2="190" stroke="#3c4043" stroke-width="1.3" marker-end="url(#differentiable-population-statistics-ar)"/>
-<text x="644" y="207" font-size="14" text-anchor="middle" fill="#1f1f1f">loss</text>
-<path d="M644 214 V262 H85 V206" fill="none" stroke="#5f6368" stroke-width="1.3" stroke-dasharray="5 4" marker-end="url(#differentiable-population-statistics-ag)"/>
-<text x="364" y="282" font-size="12" text-anchor="middle" fill="#5f6368">gradient reaches only the new features</text>
+<svg xmlns="http://www.w3.org/2000/svg" class="fig2" viewBox="0 0 760 270" role="img" aria-label="One training step. Left, what is given: the generator and a frozen feature model, which turn generated images into new features x = [2, 3]. Middle, the feature queue the agent writes: x replaces one row and keeps its gradient, while the stored rows carry no graph. The queue gives the mean [1.00, 1.25] and a 2 by 2 covariance, and its state saves and loads with the model. Right, the loss: a Fréchet distance to the target statistics, whose gradient reaches only the new features.">
+<defs><marker id="differentiable-population-statistics-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arh" d="M0 0L10 5L0 10z"/></marker></defs>
+<rect class="given" x="0" y="0" width="172" height="270" rx="10"/>
+<text class="k" x="18" y="30">GIVEN</text>
+<rect class="chip" x="18" y="46" width="136" height="30" rx="6"/>
+<text class="mid" x="86.0" y="65.5">Generator</text>
+<line class="ar" x1="86.0" y1="78" x2="86.0" y2="96" marker-end="url(#differentiable-population-statistics-ar)"/>
+<rect class="chip" x="18" y="98" width="136" height="30" rx="6"/>
+<text class="mid" x="86.0" y="117.5">Frozen model</text>
+<line class="ar" x1="86.0" y1="130" x2="86.0" y2="148" marker-end="url(#differentiable-population-statistics-ar)"/>
+<rect class="chip" x="18" y="150" width="136" height="30" rx="6"/>
+<text class="code mid" x="86.0" y="169.5">x = [2, 3]</text>
+<text class="n mid" x="86.0" y="202">new features</text>
+<rect class="agent" x="188" y="0" width="370" height="270" rx="10"/>
+<text class="k ak" x="208" y="30">THE AGENT WRITES</text>
+<text class="h" x="208" y="53">The feature queue of past features</text>
+<rect class="chip on" x="208" y="74" width="42" height="26" rx="5"/>
+<text class="code num b ak mid" x="229.0" y="91.5">2</text>
+<rect class="chip on" x="253" y="74" width="42" height="26" rx="5"/>
+<text class="code num b ak mid" x="274.0" y="91.5">3</text>
+<rect class="chip" x="208" y="103" width="42" height="26" rx="5"/>
+<text class="code num mid" x="229.0" y="120.5">1</text>
+<rect class="chip" x="253" y="103" width="42" height="26" rx="5"/>
+<text class="code num mid" x="274.0" y="120.5">0</text>
+<rect class="chip" x="208" y="132" width="42" height="26" rx="5"/>
+<text class="code num mid" x="229.0" y="149.5">0</text>
+<rect class="chip" x="253" y="132" width="42" height="26" rx="5"/>
+<text class="code num mid" x="274.0" y="149.5">1</text>
+<rect class="chip" x="208" y="161" width="42" height="26" rx="5"/>
+<text class="code num mid" x="229.0" y="178.5">1</text>
+<rect class="chip" x="253" y="161" width="42" height="26" rx="5"/>
+<text class="code num mid" x="274.0" y="178.5">1</text>
+<line class="ar" x1="313" y1="87.0" x2="301" y2="87.0" marker-end="url(#differentiable-population-statistics-ar)"/>
+<text x="317" y="91.5">new row, keeps its gradient</text>
+<path class="ln" d="M303 105 H309 V185 H303"/>
+<text class="n" x="317" y="149.5">stored rows, no graph</text>
+<text class="code" x="208" y="214">μ = [1.00, 1.25]</text>
+<text x="358" y="214">Σ = 2 × 2 covariance</text>
+<text class="n" x="208" y="246">The state saves and loads with the model.</text>
+<rect class="result" x="574" y="0" width="186" height="270" rx="10"/>
+<text class="k" x="592" y="30">THE LOSS</text>
+<rect class="chip" x="592" y="62" width="150" height="50" rx="6"/>
+<text class="mid" x="667.0" y="83">Fréchet distance</text>
+<text class="n mid" x="667.0" y="102">to the target μ, Σ</text>
+<line class="ar" x1="667.0" y1="114" x2="667.0" y2="136" marker-end="url(#differentiable-population-statistics-ar)"/>
+<rect class="chip" x="633.0" y="138" width="68" height="28" rx="6"/>
+<text class="mid" x="667.0" y="156.5">loss</text>
+<text class="n" x="592" y="206">The gradient reaches</text>
+<text class="n" x="592" y="224">only the new features.</text>
+<path class="ar" d="M156 165 H180 V87.0 H205" fill="none" marker-end="url(#differentiable-population-statistics-ar)"/>
+<path class="ar" d="M508 209.5 H538 V87 H590" fill="none" marker-end="url(#differentiable-population-statistics-ar)"/>
 </svg>

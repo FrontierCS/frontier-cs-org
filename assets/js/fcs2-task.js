@@ -4,7 +4,6 @@
 // the pass criteria, every run's development score against its spend, and the task's FECI curve. assets/css/fcs2.css holds the styles.
 
 const RANK = Object.fromEntries(RANKED.map((m, i) => [m.id, i]));
-const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;   // the Solutions line counts files
 const figure = (id, head, right = '') => `<figure class="chart tchart"><div class="chead"><span>${head}</span><span class="r">${right}</span></div>
   <div class="plot" id="${id}plot"><svg id="${id}svg" role="img" aria-label="${esc(head)}"></svg><div class="tip" id="${id}tip" hidden></div></div>
   <div class="legend" id="${id}legend"></div><p class="cnote" id="${id}note"></p></figure>`;
@@ -12,13 +11,14 @@ let cur = null;   // the task on show and its runs
 
 function drawPage() {
   const t = TASK_BY_SLUG[decodeURIComponent(location.hash.slice(1))];
-  if (!t) return drawIndex();
+  // no problem named (or an unknown one): the list on the overview is the index (owner, design audit 11A)
+  if (!t) { location.replace($('#tolist').href); return; }
   const runs = TRAJ.filter(r => r[1] === t.s).sort((a, b) => RANK[a[0]] - RANK[b[0]] || b[2] - a[2]);
   cur = {t, runs};
   document.title = `${t.name} · FrontierCS 2`;
   // the domain above the name, with its square in the map's colour, as in the task list; a back link replaces the breadcrumb
   $('#tmeta').innerHTML = `<span class="tdom" style="--a:${AINK[AREA_OF[t.d].k]}">${esc(t.d)}</span>`;
-  $('#tname').textContent = t.name;
+  $('#tname').textContent = t.name; $('#tcrumb').textContent = t.name; $('#tcsep').hidden = false;
   // the source as the task list gives it: venue in bold, then the title
   const v = VENUE[t.s], ttl = t.t || (v ? t.name : '');
   $('#tpaper').innerHTML = v && ttl ? `<b>${esc(v)}</b> · ${esc(ttl)}` : esc(v || ttl);
@@ -29,27 +29,30 @@ function drawPage() {
   // assets/img/fcs2-tasks/<slug>.svg and set inline so it takes the page's type (Qiuyang, 2026-10-14)
   const goal = GOAL[t.s], key = KEYM[t.s];
   $('#tgoal').textContent = goal || ''; $('#tgoal').hidden = !goal;
+  // the problem's FEDI and its rank, with a link to what FEDI is (owner, 2026-10-14); the address comes from a real link in the
+  // markup, so it follows the site's base URL and the preview's relative links alike
+  const fr = FRANK[t.s], fe = $('#tfedi');
+  fe.innerHTML = fr ? `<span>FEDI</span><b>${f1(FEDI[t.s])}</b><span>the ${fr === Object.keys(FRANK).length ? 'easiest' : (fr === 1 ? '' : ordinal(fr) + ' ') + 'hardest'} of ${Object.keys(FRANK).length} problems</span><a href="${esc($('#howlink').getAttribute('href'))}">What is FEDI?</a>` : '';
   $('#tkeys').innerHTML = key ? `<span class="lab">Scored on</span>${key.map(k => `<span class="k">${esc(k)}</span>`).join('')}` : '';
   $('#tfig').hidden = true; $('#tfig').innerHTML = ''; $('#thero').classList.add('nofig');
   // a rewritten description (three paragraphs split by ¶) sits under the top block, one column each: the idea, what the
   // agent writes, how it is judged; an older one stays folded (open when there is no goal line, as on Security problems)
   const parts = NEWDESC(t.s) ? DESC[t.s].split(/\s*¶\s*/) : [];
   const lead = parts.length ? `<section class="tabout">${parts.map((p, i) => `<div><h3>${['The idea', 'What the agent writes', 'How it is judged'][i] || ''}</h3><p>${esc(p)}</p></div>`).join('')}</section>`
-    : DESC[t.s] ? `<details class="tdet"${goal ? '' : ' open'}><summary>Problem details</summary><p>${esc(DESC[t.s])}</p></details>` : '';
+    : DESC[t.s] ? `<details class="fold tdet"${goal ? '' : ' open'}><summary><h3>Problem details</h3></summary><p>${esc(DESC[t.s])}</p></details>` : '';
   if (!runs.length) { $('#tbody').innerHTML = lead + '<p class="tbd">No runs on this problem yet.</p>'; loadFig(t); drawPager(t); scrollTo(0, 0); return; }
   const ref = REF[t.s], ms = new Set(runs.map(r => r[0])), np = new Set(runs.filter(r => r[3]).map(r => r[0])).size;
-  const best = runs.reduce((a, r) => r[2] > a[2] ? r : a), rk = FRANK[t.s];
+  const best = runs.reduce((a, r) => r[2] > a[2] ? r : a);
   const sum = [`<b>${np} of ${ms.size}</b> models pass`, `best final score <b>${f1(best[2])}</b>, by ${esc(MNAME[best[0]])}`]
-    .concat(ref != null ? [`human reference <b>${f1(ref)}</b>`] : [], rk ? [`FEDI <b>${f1(FEDI[t.s])}</b>, the ${rk === 1 ? '' : ordinal(rk) + ' '}hardest of ${Object.keys(FRANK).length} problems`] : []);
+    .concat(ref != null ? [`human reference <b>${f1(ref)}</b>`] : [], []);
   $('#tbody').innerHTML = lead
     + `<section class="tres"><h2 class="th2">Results</h2><p class="tsum">${sum.join(' · ')}</p><div class="res-scroll"><table class="res rtab" id="rtbl"></table></div></section>`
-    + `<section class="tpatch" id="tpatch" hidden><h2 class="th2">Solutions</h2><p class="tnote" id="pnote"></p>`
-    + `<div class="pchips" id="pchips"></div><div class="pmeta" id="pmeta"></div><div id="pview"></div></section>`
     + (CHECKS[t.s] ? `<section class="tcrit"><h2 class="th2">Pass criteria</h2><p>A run passes only if its final submission beats the human reference on every metric, on every hidden workload. Each cell counts the hidden workloads on which it did.</p>`
       + `<div class="res-scroll"><table class="res ctab" id="ctbl"></table></div></section>` : '')   // no general submission note (owner audit, 2026-10-14)
     + figure('dc', 'Development score against spend')
-    + (TFIT[t.s] ? figure('fc', 'Expected score by FECI') : '');
-  drawResults(); if (CHECKS[t.s]) drawCriteria(); drawCharts(); loadPatches(t); loadFig(t); drawPager(t);
+    + (TFIT[t.s] ? figure('fc', 'Expected score by FECI') : '')
+    + solutionHTML(t, runs);   // the solution last (owner, 2026-10-14)
+  drawResults(); if (CHECKS[t.s]) drawCriteria(); drawCharts(); loadFig(t); drawPager(t);
   scrollTo(0, 0);
 }
 const NEWDESC = s => (DESC[s] || '').includes('¶');
@@ -61,7 +64,7 @@ function loadFig(t) {
       const k = AREA_OF[t.d].k; box.style.setProperty('--a', AINK[k]); box.style.setProperty('--af', AFILL[k]); } }).catch(() => {});
 }
 /* Previous and next problem, in the problem list's first order: hardest first (FEDI), then by domain and name
-   (Qiuyang, 2026-10-14). A pager beside the back link, a larger pair at the foot of the page, and the arrow keys. */
+   (Qiuyang, 2026-10-14). A pager beside the breadcrumb, and the arrow keys. */
 const ORDER = [...TASKS].sort((a, b) => (FRANK[a.s] ?? 1e9) - (FRANK[b.s] ?? 1e9)
   || DOMAINS.indexOf(a.d) - DOMAINS.indexOf(b.d) || a.name.localeCompare(b.name));
 function drawPager(t) {
@@ -71,9 +74,7 @@ function drawPager(t) {
   const btn = (x, cls, icon, word) => x ? `<a class="pbtn ${cls}" href="${href(x)}" title="${word}: ${esc(x.name)}" aria-label="${word} problem: ${esc(x.name)}">${icon}</a>`
     : `<span class="pbtn ${cls} off" aria-hidden="true">${icon}</span>`;
   $('#tpager').innerHTML = btn(prev, 'prev', L, 'Previous') + `<span class="pos">${i + 1} / ${ORDER.length}</span>` + btn(next, 'next', R, 'Next');
-  $('#tbody').insertAdjacentHTML('beforeend', `<nav class="tfoot" aria-label="Previous and next problem">`
-    + (prev ? `<a class="prev" href="${href(prev)}" title="${esc(prev.name)}">‹ Previous problem</a>` : '<span></span>')
-    + (next ? `<a class="next" href="${href(next)}" title="${esc(next.name)}">Next problem ›</a>` : '<span></span>') + '</nav>');
+  // no second pair at the foot (owner, design audit 2A: it repeated the pager with arrow characters); the arrow keys still page
 }
 addEventListener('keydown', e => {
   if (!cur || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey || /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return;
@@ -120,18 +121,6 @@ function drawResults() {
     + '</tbody>';
 }
 
-function drawIndex() {
-  cur = null;
-  document.title = 'Problems · FrontierCS 2';
-  $('#tmeta').innerHTML = ''; $('#tlinks').innerHTML = ''; $('#tkeys').innerHTML = ''; $('#tgoal').hidden = true; $('#tpager').innerHTML = '';
-  $('#tfig').hidden = true; $('#tfig').innerHTML = ''; $('#thero').classList.add('nofig');
-  $('#tname').textContent = 'Problems';
-  $('#tpaper').textContent = `${TASKS.length} problems in ${DOMAINS.filter(d => N_IN(d)).length} domains. Select a problem for its description and results.`;
-  $('#tbody').innerHTML = DOMAINS.filter(d => N_IN(d)).map(d => `<section class="tgroup"><h2>${esc(d)}</h2><ul>`
-    + TASKS.filter(t => t.d === d).map(t => `<li><a href="#${slug(t.s)}">${esc(t.name)}</a></li>`).join('')
-    + '</ul></section>').join('');
-}
-
 function drawCharts() {
   if (!cur || !cur.runs.length) return;
   drawDev(); if (TFIT[cur.t.s]) drawFit();
@@ -176,27 +165,29 @@ function drawFit() {
   const {t, runs} = cur, [d, k] = TFIT[t.s], ref = REF[t.s];
   const svg = $('#fcsvg'), W = Math.max(300, $('#fcplot').clientWidth), narrow = W < 560;
   const L = 34, R = narrow ? 12 : 24, T = 12, B = 46, H = narrow ? 280 : 320;
-  // the axis runs to 5/3 of Human (as 0 to 100 did when Human was 60), further if a model is past it; grid every 10
-  const xmax = Math.max(Math.ceil(ECI_HUMAN * 5 / 3 / 10) * 10, Math.ceil(Math.max(...RANKED.map(m => ECI[m.id][0])) / 10) * 10);
-  const X = v => L + v / xmax * (W - L - R), Y = v => T + (1 - v / 100) * (H - T - B), f = x => 100 / (1 + Math.exp(-k * (x - d)));
+  // the axis holds 0 to 50, every model, and the problem's FEDI with 10 to spare on each side (owner, 2026-10-14: a FEDI
+  // of 57 or of -49 fell off the old 0 to 50 axis); grid every 10, every 20 past a span of 80
+  const es = RANKED.map(m => ECI[m.id][0]), lo = Math.min(0, d - 10, ...es), hi = Math.max(50, d + 10, ...es), step = hi - lo > 80 ? 20 : 10;
+  const xmin = Math.floor(lo / step) * step, xmax = Math.ceil(hi / step) * step;
+  const X = v => L + (v - xmin) / (xmax - xmin) * (W - L - R), Y = v => T + (1 - v / 100) * (H - T - B), f = x => 100 / (1 + Math.exp(-k * (x - d)));
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
   for (let v = 0; v <= 100; v += 20) {
     svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1}));
     svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, v));
   }
-  for (let v = 0; v <= xmax; v += 10) {
+  for (let v = xmin; v <= xmax; v += step) {
     svg.append(sv('line', {x1:X(v), x2:X(v), y1:H - B, y2:H - B + 5, stroke:'var(--ink-2)', 'stroke-width':1}));
     svg.append(sv('text', {x:X(v), y:H - B + 20, 'text-anchor':'middle'}, v));
   }
   svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'FECI'));
-  const n = 120, path = Array.from({length:n + 1}, (_, i) => { const x = xmax * i / n; return `${i ? 'L' : 'M'}${X(x).toFixed(1)},${Y(f(x)).toFixed(1)}`; }).join('');
+  const n = 120, path = Array.from({length:n + 1}, (_, i) => { const x = xmin + (xmax - xmin) * i / n; return `${i ? 'L' : 'M'}${X(x).toFixed(1)},${Y(f(x)).toFixed(1)}`; }).join('');
   svg.append(sv('path', {d:path, fill:'none', stroke:'var(--ink-2)', 'stroke-width':2.5}));
   // the problem's FEDI: where the curve crosses an expected score of 50
-  if (d >= 0 && d <= xmax) {
-    svg.append(sv('circle', {cx:X(d), cy:Y(50), r:4.5, fill:'#fff', stroke:'var(--ink-2)', 'stroke-width':2}));
-    // above and left of its point, which is off a rising curve
-    svg.append(sv('text', {class:'val halo', x:X(d) - 10, y:Y(50) - 12, 'text-anchor':'end', fill:'var(--ink-2)'}, `FEDI ${f1(d)}`));
-  }
+  // a dashed drop to the axis marks it there; the label sits above and left of the point, which is off a rising curve
+  svg.append(sv('line', {x1:X(d), x2:X(d), y1:Y(50), y2:H - B, stroke:'var(--ink-2)', 'stroke-width':1, 'stroke-dasharray':'3 3', opacity:.7}));
+  svg.append(sv('circle', {cx:X(d), cy:Y(50), r:4.5, fill:'#fff', stroke:'var(--ink-2)', 'stroke-width':2}));
+  const left = X(d) - L > 90;   // near the left edge the label goes right of the point
+  svg.append(sv('text', {class:'val halo', x:X(d) + (left ? -10 : 10), y:Y(50) - 12, 'text-anchor':left ? 'end' : 'start', fill:'var(--ink-2)'}, `FEDI ${f1(d)}`));
   const pts = [];
   RANKED.filter(m => runs.some(r => r[0] === m.id)).forEach(m => {
     const sc = mean(runs.filter(r => r[0] === m.id).map(r => r[2])), x = ECI[m.id][0];
@@ -213,56 +204,14 @@ function drawFit() {
   $('#fcnote').textContent = `The curve is the score expected at each FECI, from the fit. Dots are the models’ final scores here at their FECI.`;
 }
 
-/* ---------- patches ----------
-   The patch each model handed in, from assets/patches/<slug>.json (bin/fcs2_patches_from_platform.py), fetched when the
-   task is opened: the chosen model's diff, with one chip per model (leaderboard order, verdict, line counts) when there is
-   more than one. For now the file holds Claude Opus 5.5 alone (owner, 2026-10-14: task versions still change, and other
-   models' runs may be of earlier versions). A task with no file (Security) shows no section. */
-const PATCHES = {};
-function loadPatches(t) {
-  const s = slug(t.s), show = d => { if (cur && cur.t === t) drawPatches(d); };
-  if (PATCHES[s]) return show(PATCHES[s]);
-  fetch(`${window.PATCH_DIR || '/assets/patches/'}${s}.json`).then(r => r.ok ? r.json() : null).then(d => { if (d) { PATCHES[s] = d; show(d); } }).catch(() => {});
-}
-const DIFF_META = /^(index |--- |\+\+\+ |new file mode|deleted file mode|similarity index|rename (from|to) |old mode|new mode|Binary files|GIT binary patch)/;
-// a patch without git's own header (a plain unified diff) gets one per file, so it shows its file names too
-const withHeads = t => t.includes('diff --git ') ? t : t.replace(/^--- (?:a\/)?(.+)\n\+\+\+ (?:b\/)?(.+)$/gm, (m, a, b) => `diff --git a/${b} b/${b}\n${m}`);
-const filesOf = p => p.files.length ? p.files : [...p.patch.matchAll(/^\+\+\+ (?:b\/)?(.+)$/gm)].map(m => m[1]);
-// a line longer than LONG characters (one-line JSON answers) shows its start and how much follows
-const LONG = 600, cut = l => l.length > LONG ? `${esc(l.slice(0, LONG))}<i class="dmore"> … ${(l.length - LONG).toLocaleString('en-US')} more characters</i>` : esc(l) || ' ';
-function diffHTML(text) {
-  let n = 0;
-  return withHeads(text).split('\n').map(l => l.startsWith('diff --git ') ? `<span class="df" id="pf${n++}">${esc(l.replace(/^diff --git a\/(.*?) b\/.*$/, '$1'))}</span>`
-    : DIFF_META.test(l) ? `<span class="dm">${esc(l)}</span>` : l.startsWith('@@') ? `<span class="dh">${esc(l)}</span>`
-    : l.startsWith('+') ? `<span class="da">${cut(l)}</span>` : l.startsWith('-') ? `<span class="dd">${cut(l)}</span>` : `<span>${cut(l)}</span>`).join('');
-}
-function drawPatches(d) {
-  const ms = RANKED.filter(m => d.runs[m.id]);
-  if (!ms.length) return;
-  $('#tpatch').hidden = false;
-  const passed = m => d.runs[m.id].verdict === 'PASS', has = m => d.runs[m.id].patch != null, one = ms.length === 1;
-  $('#pnote').textContent = one ? `What ${ms[0].name} handed in on this problem, as a diff against the code the problem starts from.`
-    : 'What each model handed in on this problem, as a diff against the code the problem starts from.';
-  $('#pchips').hidden = one;
-  $('#pchips').innerHTML = ms.map(m => { const p = d.runs[m.id];
-    return `<button type="button" class="pchip" data-m="${m.id}" aria-pressed="false"><i style="background:${MCOL[m.id]}"></i><span>${esc(m.short)}</span>`
-      + `<span class="pv ${passed(m) ? 'y' : 'n'}">${passed(m) ? 'Pass' : 'Fail'}</span>`
-      + (has(m) ? `<span class="pd"><b class="a">+${p.add}</b> <b class="d">−${p.del}</b></span>` : '<span class="pd">no solution</span>') + '</button>'; }).join('');
-  const pick = id => {
-    const m = ms.find(x => x.id === id), p = d.runs[id];
-    $('#pchips').querySelectorAll('.pchip').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.m === id)));
-    if (!has(m)) { $('#pmeta').innerHTML = ''; $('#pview').innerHTML = `<p class="pempty">${esc(m.name)} handed in no solution on this problem (${esc(p.missing || 'none')}).</p>`; return; }
-    const files = filesOf(p);
-    $('#pmeta').innerHTML = `<b>${esc(m.name)}</b> · ${esc(p.submission)} · ${plural(files.length, 'file')} changed, `
-      + `<b class="a">+${p.add}</b> <b class="d">−${p.del}</b>${p.truncated ? ` · the first ${Math.round(p.patch.length / 1000)} kB of ${Math.round(p.bytes / 1000)} kB shown` : ''}`
-      + (files.length > 1 ? `<div class="pfiles">${files.map((f, i) => `<a href="#pf${i}" data-i="${i}">${esc(f)}</a>`).join('')}</div>` : '');
-    $('#pview').innerHTML = `<pre class="pdiff" tabindex="0"><code>${diffHTML(p.patch)}</code></pre>`;
-  };
-  $('#pchips').onclick = e => { const b = e.target.closest('.pchip'); if (b) pick(b.dataset.m); };
-  // a file name scrolls the diff, not the page, to that file
-  $('#pmeta').onclick = e => { const a = e.target.closest('.pfiles a'); if (!a) return; e.preventDefault();
-    const pre = $('#pview .pdiff'), h = pre && pre.querySelector(`#pf${a.dataset.i}`); if (h) pre.scrollTop = h.offsetTop - pre.offsetTop; };
-  pick((ms.find(m => passed(m) && has(m)) || ms.find(has) || ms[0]).id);
+/* The solution in words (SOLUTION, assets/js/fcs2-solutions.js; owner, 2026-10-14: no code, the idea): which model,
+   whether it passed and its final score, then its steps, laid out as the reasons under How FECI works on the overview. */
+function solutionHTML(t, runs) {
+  const so = typeof SOLUTION === 'undefined' ? null : SOLUTION[t.s], r = so && runs.find(x => x[0] === so.m);
+  if (!so || !r) return '';
+  return `<section class="tsol"><h2 class="th2">Solution</h2><p class="tsum"><span class="sq" style="background:${MCOL[so.m]}"></span>`
+    + `<b>${esc(MNAME[so.m])}</b> · ${r[3] ? 'passes' : 'does not pass'} · final score <b>${f1(r[2])}</b></p>`
+    + `<ol class="how-why tsteps">${so.steps.map(([h, x], i) => `<li><b><span>${i + 1}</span>${esc(h)}</b>${esc(x)}</li>`).join('')}</ol></section>`;
 }
 
 addEventListener('hashchange', drawPage);

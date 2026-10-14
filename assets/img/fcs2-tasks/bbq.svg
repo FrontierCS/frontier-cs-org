@@ -1,117 +1,135 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 20 760 265" role="img" aria-label="A bitmap tree of width 4 over 16 priority buckets. A set bit marks a subtree that still holds packets. Dequeue-min follows the first set bit at each level to priority 6; dequeue-max follows the last set bit to priority 11. The logic of the bitmap levels, generated as hardware, is the part the agent writes; the buckets below are given.">
-
-<rect x="24" y="34" width="480" height="142" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
-<text x="40" y="58" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: each bitmap level’s enqueue and dequeue logic</text>
-<line x1="262" y1="96" x2="136" y2="138" stroke="#9aa0a6" stroke-width="1"/>
-<line x1="322" y1="96" x2="448" y2="138" stroke="#9aa0a6" stroke-width="1"/>
-<line x1="106" y1="160" x2="106" y2="200" stroke="#dadce0" stroke-width="1"/>
-<line x1="126" y1="160" x2="126" y2="200" stroke="#dadce0" stroke-width="1"/>
-<line x1="146" y1="160" x2="146" y2="200" stroke="#dadce0" stroke-width="1"/>
-<line x1="166" y1="160" x2="166" y2="200" stroke="#dadce0" stroke-width="1"/>
-<line x1="210" y1="160" x2="210" y2="200" stroke="#dadce0" stroke-width="1"/>
-<line x1="230" y1="160" x2="230" y2="200" stroke="#dadce0" stroke-width="1"/>
-<line x1="270" y1="160" x2="270" y2="200" stroke="#dadce0" stroke-width="1"/>
-<line x1="314" y1="160" x2="314" y2="200" stroke="#dadce0" stroke-width="1"/>
-<line x1="334" y1="160" x2="334" y2="200" stroke="#dadce0" stroke-width="1"/>
-<line x1="354" y1="160" x2="354" y2="200" stroke="#dadce0" stroke-width="1"/>
-<line x1="418" y1="160" x2="418" y2="200" stroke="#dadce0" stroke-width="1"/>
-<line x1="438" y1="160" x2="438" y2="200" stroke="#dadce0" stroke-width="1"/>
-<line x1="458" y1="160" x2="458" y2="200" stroke="#dadce0" stroke-width="1"/>
-<line x1="478" y1="160" x2="478" y2="200" stroke="#dadce0" stroke-width="1"/>
-<path d="M282 96 L240 138" stroke="#3c4043" stroke-width="2" fill="none"/>
-<path d="M250 160 V200" stroke="#3c4043" stroke-width="2" fill="none"/>
-<path d="M302 96 L344 138" stroke="#3c4043" stroke-width="1.6" stroke-dasharray="4 3" fill="none"/>
-<path d="M374 160 V200" stroke="#3c4043" stroke-width="1.6" stroke-dasharray="4 3" fill="none"/>
-<rect x="252" y="74" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="262" y="90" font-size="12.5" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
-<rect x="272" y="74" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="282" y="90" font-size="12.5" font-weight="600" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
-<rect x="292" y="74" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="302" y="90" font-size="12.5" font-weight="600" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
-<rect x="312" y="74" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="322" y="90" font-size="12.5" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
-<rect x="96" y="138" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="106" y="154" font-size="12.5" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
-<rect x="116" y="138" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="126" y="154" font-size="12.5" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
-<rect x="136" y="138" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="146" y="154" font-size="12.5" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
-<rect x="156" y="138" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="166" y="154" font-size="12.5" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
-<rect x="200" y="138" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="210" y="154" font-size="12.5" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
-<rect x="220" y="138" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="230" y="154" font-size="12.5" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
-<rect x="240" y="138" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="250" y="154" font-size="12.5" font-weight="600" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
-<rect x="260" y="138" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="270" y="154" font-size="12.5" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
-<rect x="304" y="138" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="314" y="154" font-size="12.5" font-weight="600" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
-<rect x="324" y="138" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="334" y="154" font-size="12.5" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
-<rect x="344" y="138" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="354" y="154" font-size="12.5" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
-<rect x="364" y="138" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="374" y="154" font-size="12.5" font-weight="600" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1</text>
-<rect x="408" y="138" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="418" y="154" font-size="12.5" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
-<rect x="428" y="138" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="438" y="154" font-size="12.5" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
-<rect x="448" y="138" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="458" y="154" font-size="12.5" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
-<rect x="468" y="138" width="20" height="22" fill="#fff" stroke="#3c4043" stroke-width="1.2"/>
-<text x="478" y="154" font-size="12.5" text-anchor="middle" fill="#9aa0a6" font-family="ui-monospace,Menlo,monospace">0</text>
-<text x="40" y="90" font-size="12.5" fill="#5f6368">level 1</text>
-<text x="40" y="154" font-size="12.5" fill="#5f6368">level 2</text>
-<text x="40" y="229" font-size="12.5" fill="#5f6368">buckets</text>
-<rect x="99" y="200" width="14" height="50" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="106" y="268" font-size="11.5" text-anchor="middle" fill="#5f6368">0</text>
-<rect x="119" y="200" width="14" height="50" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="126" y="268" font-size="11.5" text-anchor="middle" fill="#5f6368">1</text>
-<rect x="139" y="200" width="14" height="50" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="146" y="268" font-size="11.5" text-anchor="middle" fill="#5f6368">2</text>
-<rect x="159" y="200" width="14" height="50" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="166" y="268" font-size="11.5" text-anchor="middle" fill="#5f6368">3</text>
-<rect x="203" y="200" width="14" height="50" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="210" y="268" font-size="11.5" text-anchor="middle" fill="#5f6368">4</text>
-<rect x="223" y="200" width="14" height="50" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="230" y="268" font-size="11.5" text-anchor="middle" fill="#5f6368">5</text>
-<rect x="243" y="200" width="14" height="50" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<rect x="245.5" y="240" width="9" height="7" fill="#5f6368"/>
-<rect x="245.5" y="229" width="9" height="7" fill="#5f6368"/>
-<text x="250" y="268" font-size="11.5" text-anchor="middle" fill="#5f6368">6</text>
-<rect x="263" y="200" width="14" height="50" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="270" y="268" font-size="11.5" text-anchor="middle" fill="#5f6368">7</text>
-<rect x="307" y="200" width="14" height="50" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<rect x="309.5" y="240" width="9" height="7" fill="#5f6368"/>
-<text x="314" y="268" font-size="11.5" text-anchor="middle" fill="#5f6368">8</text>
-<rect x="327" y="200" width="14" height="50" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="334" y="268" font-size="11.5" text-anchor="middle" fill="#5f6368">9</text>
-<rect x="347" y="200" width="14" height="50" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="354" y="268" font-size="11.5" text-anchor="middle" fill="#5f6368">10</text>
-<rect x="367" y="200" width="14" height="50" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<rect x="369.5" y="240" width="9" height="7" fill="#5f6368"/>
-<rect x="369.5" y="229" width="9" height="7" fill="#5f6368"/>
-<rect x="369.5" y="218" width="9" height="7" fill="#5f6368"/>
-<text x="374" y="268" font-size="11.5" text-anchor="middle" fill="#5f6368">11</text>
-<rect x="411" y="200" width="14" height="50" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="418" y="268" font-size="11.5" text-anchor="middle" fill="#5f6368">12</text>
-<rect x="431" y="200" width="14" height="50" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="438" y="268" font-size="11.5" text-anchor="middle" fill="#5f6368">13</text>
-<rect x="451" y="200" width="14" height="50" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="458" y="268" font-size="11.5" text-anchor="middle" fill="#5f6368">14</text>
-<rect x="471" y="200" width="14" height="50" fill="#fff" stroke="#3c4043" stroke-width="1.1"/>
-<text x="478" y="268" font-size="11.5" text-anchor="middle" fill="#5f6368">15</text>
-<line x1="528" y1="70" x2="552" y2="70" stroke="#3c4043" stroke-width="2"/>
-<text x="560" y="75" font-size="13" font-weight="600" fill="#1f1f1f">dequeue-min</text>
-<text x="528" y="94" font-size="12.5" fill="#5f6368">follows the first set bit down</text>
-<line x1="528" y1="118" x2="552" y2="118" stroke="#3c4043" stroke-width="1.6" stroke-dasharray="4 3"/>
-<text x="560" y="123" font-size="13" font-weight="600" fill="#1f1f1f">dequeue-max</text>
-<text x="528" y="142" font-size="12.5" fill="#5f6368">follows the last set bit down</text>
-<text x="528" y="171" font-size="13" font-weight="600" fill="#1f1f1f">enqueue</text>
-<text x="528" y="190" font-size="12.5" fill="#5f6368">sets the bits along its path</text>
-<text x="528" y="222" font-size="13" font-weight="600" fill="#1f1f1f">throughput</text>
-<text x="528" y="241" font-size="12.5" fill="#5f6368">operations per cycle × clock rate;</text>
-<text x="528" y="259" font-size="12.5" fill="#5f6368">the longest logic path sets the clock</text>
+<svg xmlns="http://www.w3.org/2000/svg" class="fig2" viewBox="0 0 760 322" role="img" aria-label="Left, what is given: one first-in first-out bucket per priority and the program that generates the queue’s hardware. Middle, what the agent writes: each bitmap level’s enqueue and dequeue logic. Level 1 holds the bits 0 1 1 0; level 2 holds four bitmaps, 0 0 0 0, 0 0 1 0, 1 0 0 1 and 0 0 0 0, over buckets 0 to 15, where buckets 6, 8 and 11 hold packets. Dequeue-min follows the first set bit down, to bucket 6; dequeue-max follows the last set bit down, to bucket 11; enqueue sets the bits along its path. Right, what it is judged on: throughput, operations per cycle times clock rate, where the longest logic path sets the clock rate.">
+<defs><marker id="bbq-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arh" d="M0 0L10 5L0 10z"/></marker></defs>
+<rect class="given" x="0" y="0" width="150" height="322" rx="10"/>
+<text class="k" x="18" y="30">GIVEN</text>
+<rect class="chip" x="18" y="50" width="16" height="46" rx="2"/>
+<rect class="g7" x="22" y="86" width="8" height="6" rx="1"/>
+<rect class="g7" x="22" y="77" width="8" height="6" rx="1"/>
+<rect class="g7" x="22" y="68" width="8" height="6" rx="1"/>
+<text class="n" x="46" y="78">bucket</text>
+<text x="18" y="134">A FIFO bucket of</text>
+<text x="18" y="152">packets for each</text>
+<text x="18" y="170">priority, and the</text>
+<text x="18" y="188">program that</text>
+<text x="18" y="206">generates the</text>
+<text x="18" y="224">queue’s hardware</text>
+<rect class="agent" x="166" y="0" width="438" height="322" rx="10"/>
+<text class="k ak" x="186" y="30">THE AGENT WRITES</text>
+<text class="h" x="186" y="53">Each bitmap level’s enqueue and dequeue logic</text>
+<line class="ln" x1="385.0" y1="98" x2="280" y2="128"/>
+<line class="sa" x1="403.0" y1="98" x2="368" y2="128"/>
+<line class="sa dash" x1="421.0" y1="98" x2="456" y2="128"/>
+<line class="ln" x1="439.0" y1="98" x2="544" y2="128"/>
+<line class="ln" x1="253.0" y1="148" x2="253.0" y2="172"/>
+<line class="ln" x1="271.0" y1="148" x2="271.0" y2="172"/>
+<line class="ln" x1="289.0" y1="148" x2="289.0" y2="172"/>
+<line class="ln" x1="307.0" y1="148" x2="307.0" y2="172"/>
+<line class="ln" x1="341.0" y1="148" x2="341.0" y2="172"/>
+<line class="ln" x1="359.0" y1="148" x2="359.0" y2="172"/>
+<line class="sa" x1="377.0" y1="148" x2="377.0" y2="172"/>
+<line class="ln" x1="395.0" y1="148" x2="395.0" y2="172"/>
+<line class="ln" x1="429.0" y1="148" x2="429.0" y2="172"/>
+<line class="ln" x1="447.0" y1="148" x2="447.0" y2="172"/>
+<line class="ln" x1="465.0" y1="148" x2="465.0" y2="172"/>
+<line class="sa dash" x1="483.0" y1="148" x2="483.0" y2="172"/>
+<line class="ln" x1="517.0" y1="148" x2="517.0" y2="172"/>
+<line class="ln" x1="535.0" y1="148" x2="535.0" y2="172"/>
+<line class="ln" x1="553.0" y1="148" x2="553.0" y2="172"/>
+<line class="ln" x1="571.0" y1="148" x2="571.0" y2="172"/>
+<rect class="chip pad" x="376.5" y="78" width="17" height="20" rx="2"/>
+<text class="code n mid" x="385.0" y="92.5">0</text>
+<rect class="chip" x="394.5" y="78" width="17" height="20" rx="2"/>
+<text class="code b mid" x="403.0" y="92.5">1</text>
+<rect class="chip" x="412.5" y="78" width="17" height="20" rx="2"/>
+<text class="code b mid" x="421.0" y="92.5">1</text>
+<rect class="chip pad" x="430.5" y="78" width="17" height="20" rx="2"/>
+<text class="code n mid" x="439.0" y="92.5">0</text>
+<rect class="chip pad" x="244.5" y="128" width="17" height="20" rx="2"/>
+<text class="code n mid" x="253.0" y="142.5">0</text>
+<rect class="chip pad" x="262.5" y="128" width="17" height="20" rx="2"/>
+<text class="code n mid" x="271.0" y="142.5">0</text>
+<rect class="chip pad" x="280.5" y="128" width="17" height="20" rx="2"/>
+<text class="code n mid" x="289.0" y="142.5">0</text>
+<rect class="chip pad" x="298.5" y="128" width="17" height="20" rx="2"/>
+<text class="code n mid" x="307.0" y="142.5">0</text>
+<rect class="chip pad" x="332.5" y="128" width="17" height="20" rx="2"/>
+<text class="code n mid" x="341.0" y="142.5">0</text>
+<rect class="chip pad" x="350.5" y="128" width="17" height="20" rx="2"/>
+<text class="code n mid" x="359.0" y="142.5">0</text>
+<rect class="chip" x="368.5" y="128" width="17" height="20" rx="2"/>
+<text class="code b mid" x="377.0" y="142.5">1</text>
+<rect class="chip pad" x="386.5" y="128" width="17" height="20" rx="2"/>
+<text class="code n mid" x="395.0" y="142.5">0</text>
+<rect class="chip" x="420.5" y="128" width="17" height="20" rx="2"/>
+<text class="code b mid" x="429.0" y="142.5">1</text>
+<rect class="chip pad" x="438.5" y="128" width="17" height="20" rx="2"/>
+<text class="code n mid" x="447.0" y="142.5">0</text>
+<rect class="chip pad" x="456.5" y="128" width="17" height="20" rx="2"/>
+<text class="code n mid" x="465.0" y="142.5">0</text>
+<rect class="chip" x="474.5" y="128" width="17" height="20" rx="2"/>
+<text class="code b mid" x="483.0" y="142.5">1</text>
+<rect class="chip pad" x="508.5" y="128" width="17" height="20" rx="2"/>
+<text class="code n mid" x="517.0" y="142.5">0</text>
+<rect class="chip pad" x="526.5" y="128" width="17" height="20" rx="2"/>
+<text class="code n mid" x="535.0" y="142.5">0</text>
+<rect class="chip pad" x="544.5" y="128" width="17" height="20" rx="2"/>
+<text class="code n mid" x="553.0" y="142.5">0</text>
+<rect class="chip pad" x="562.5" y="128" width="17" height="20" rx="2"/>
+<text class="code n mid" x="571.0" y="142.5">0</text>
+<rect class="chip" x="246.5" y="172" width="13" height="44" rx="2"/>
+<text class="sm n mid" x="253.0" y="233">0</text>
+<rect class="chip" x="264.5" y="172" width="13" height="44" rx="2"/>
+<text class="sm n mid" x="271.0" y="233">1</text>
+<rect class="chip" x="282.5" y="172" width="13" height="44" rx="2"/>
+<text class="sm n mid" x="289.0" y="233">2</text>
+<rect class="chip" x="300.5" y="172" width="13" height="44" rx="2"/>
+<text class="sm n mid" x="307.0" y="233">3</text>
+<rect class="chip" x="334.5" y="172" width="13" height="44" rx="2"/>
+<text class="sm n mid" x="341.0" y="233">4</text>
+<rect class="chip" x="352.5" y="172" width="13" height="44" rx="2"/>
+<text class="sm n mid" x="359.0" y="233">5</text>
+<rect class="chip" x="370.5" y="172" width="13" height="44" rx="2"/>
+<rect class="g7" x="373.0" y="207" width="8" height="6" rx="1"/>
+<rect class="g7" x="373.0" y="199" width="8" height="6" rx="1"/>
+<text class="sm n mid" x="377.0" y="233">6</text>
+<rect class="chip" x="388.5" y="172" width="13" height="44" rx="2"/>
+<text class="sm n mid" x="395.0" y="233">7</text>
+<rect class="chip" x="422.5" y="172" width="13" height="44" rx="2"/>
+<rect class="g7" x="425.0" y="207" width="8" height="6" rx="1"/>
+<text class="sm n mid" x="429.0" y="233">8</text>
+<rect class="chip" x="440.5" y="172" width="13" height="44" rx="2"/>
+<text class="sm n mid" x="447.0" y="233">9</text>
+<rect class="chip" x="458.5" y="172" width="13" height="44" rx="2"/>
+<text class="sm n mid" x="465.0" y="233">10</text>
+<rect class="chip" x="476.5" y="172" width="13" height="44" rx="2"/>
+<rect class="g7" x="479.0" y="207" width="8" height="6" rx="1"/>
+<rect class="g7" x="479.0" y="199" width="8" height="6" rx="1"/>
+<rect class="g7" x="479.0" y="191" width="8" height="6" rx="1"/>
+<text class="sm n mid" x="483.0" y="233">11</text>
+<rect class="chip" x="510.5" y="172" width="13" height="44" rx="2"/>
+<text class="sm n mid" x="517.0" y="233">12</text>
+<rect class="chip" x="528.5" y="172" width="13" height="44" rx="2"/>
+<text class="sm n mid" x="535.0" y="233">13</text>
+<rect class="chip" x="546.5" y="172" width="13" height="44" rx="2"/>
+<text class="sm n mid" x="553.0" y="233">14</text>
+<rect class="chip" x="564.5" y="172" width="13" height="44" rx="2"/>
+<text class="sm n mid" x="571.0" y="233">15</text>
+<text class="n" x="186" y="92.5">level 1</text>
+<text class="n" x="186" y="142.5">level 2</text>
+<text class="n" x="186" y="199">buckets</text>
+<line class="sa" x1="186" y1="257.5" x2="214" y2="257.5"/>
+<text x="224" y="262"><tspan class="b">dequeue-min</tspan> follows the first set bit down</text>
+<line class="sa dash" x1="186" y1="280" x2="214" y2="280"/>
+<text x="224" y="284.5"><tspan class="b">dequeue-max</tspan> follows the last set bit down</text>
+<text x="224" y="307"><tspan class="b">enqueue</tspan> sets the bits along its path</text>
+<rect class="result" x="620" y="0" width="140" height="322" rx="10"/>
+<text class="k" x="638" y="30">JUDGED ON</text>
+<text class="b" x="638" y="60">throughput</text>
+<text class="n" x="638" y="84">operations per</text>
+<text class="n" x="638" y="102">cycle times</text>
+<text class="n" x="638" y="120">clock rate</text>
+<text class="b" x="638" y="164">clock rate</text>
+<text class="n" x="638" y="188">set by the</text>
+<text class="n" x="638" y="206">longest logic</text>
+<text class="n" x="638" y="224">path</text>
 </svg>

@@ -1,46 +1,54 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 300" role="img" aria-label="Version 0 of a treap holds keys 10 to 60. Inserting 65 creates version 1 by copying the path 40, 60 and adding 65, while the subtree of 10, 20 and 30 is shared. Each node shows its key and the total count beneath it. The agent writes the update routines and their scheduler; readers query any version at any time.">
-<defs><marker id="persistent-treap-update-engine-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3c4043"/></marker></defs>
-<text x="20" y="24" font-size="12.5" fill="#5f6368">Insert 65 creates version 1: copy the path to the change, share the rest</text>
-<rect x="300" y="36" width="300" height="254" rx="12" fill="#e8f0fe" stroke="#0b57d0" stroke-width="1.5" stroke-dasharray="6 5"/>
-<text x="316" y="60" font-size="14" font-weight="600" fill="#0b57d0">The agent writes: the update engine</text>
-<text x="316" y="79" font-size="12.5" fill="#3c4043">inserts, deletes and their scheduler;</text>
-<text x="316" y="96" font-size="12.5" fill="#3c4043">several threads, one whole tree per version</text>
-<line x1="166" y1="167" x2="121" y2="209" stroke="#3c4043" stroke-width="1.3"/>
-<line x1="194" y1="167" x2="236" y2="188" stroke="#3c4043" stroke-width="1.3"/>
-<line x1="414" y1="167" x2="456" y2="188" stroke="#3c4043" stroke-width="1.3"/>
-<line x1="484" y1="222" x2="516" y2="241" stroke="#3c4043" stroke-width="1.3"/>
-<path d="M386 168 C 330 300, 200 300, 152 244" fill="none" stroke="#3c4043" stroke-width="1.3" marker-end="url(#persistent-treap-update-engine-ar)"/>
-<path d="M110 196 L158 252 L62 252 Z" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="110" y="228" font-size="11.5" text-anchor="middle" fill="#5f6368">Σ3</text>
-<text x="110" y="246" font-size="11.5" text-anchor="middle" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">10 20 30</text>
-<text x="110" y="272" font-size="12" text-anchor="middle" fill="#5f6368">shared</text>
-<circle cx="180" cy="150" r="22" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="180" y="149" font-size="13" font-weight="600" text-anchor="middle" fill="#1f1f1f">40</text>
-<text x="180" y="163" font-size="11.5" text-anchor="middle" fill="#5f6368">Σ5</text>
-<circle cx="250" cy="205" r="22" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="250" y="204" font-size="13" font-weight="600" text-anchor="middle" fill="#1f1f1f">60</text>
-<text x="250" y="218" font-size="11.5" text-anchor="middle" fill="#5f6368">Σ1</text>
-<circle cx="400" cy="150" r="22" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="400" y="149" font-size="13" font-weight="600" text-anchor="middle" fill="#1f1f1f">40</text>
-<text x="400" y="163" font-size="11.5" text-anchor="middle" fill="#5f6368">Σ6</text>
-<circle cx="470" cy="205" r="22" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="470" y="204" font-size="13" font-weight="600" text-anchor="middle" fill="#1f1f1f">60</text>
-<text x="470" y="218" font-size="11.5" text-anchor="middle" fill="#5f6368">Σ2</text>
-<circle cx="530" cy="258" r="22" fill="#fff" stroke="#3c4043" stroke-width="1.3"/>
-<text x="530" y="257" font-size="13" font-weight="600" text-anchor="middle" fill="#1f1f1f">65</text>
-<text x="530" y="271" font-size="11.5" text-anchor="middle" fill="#5f6368">Σ1</text>
-<text x="180" y="116" font-size="13" font-weight="600" text-anchor="middle" fill="#1f1f1f">v0</text>
-<line x1="180" y1="120" x2="180" y2="126" stroke="#3c4043" stroke-width="1.3" marker-end="url(#persistent-treap-update-engine-ar)"/>
-<text x="400" y="116" font-size="13" font-weight="600" text-anchor="middle" fill="#1f1f1f">v1</text>
-<line x1="400" y1="120" x2="400" y2="126" stroke="#3c4043" stroke-width="1.3" marker-end="url(#persistent-treap-update-engine-ar)"/>
-<text x="622" y="60" font-size="12" fill="#5f6368">transactions</text>
-<text x="622" y="82" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">1 insert 65</text>
-<text x="622" y="100" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">2 delete 10</text>
-<text x="622" y="118" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">3 query 50–70</text>
-<text x="622" y="136" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">…</text>
-<line x1="614" y1="78" x2="603" y2="78" stroke="#3c4043" stroke-width="1.3" marker-end="url(#persistent-treap-update-engine-ar)"/>
-<text x="622" y="186" font-size="12" fill="#5f6368">readers, any time</text>
-<text x="622" y="208" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">v0 [50,70]: 1</text>
-<text x="622" y="226" font-size="12" fill="#1f1f1f" font-family="ui-monospace,Menlo,monospace">v1 [50,70]: 2</text>
-<text x="20" y="48" font-size="12" fill="#5f6368">node: key and Σ, the count beneath it</text>
+<svg xmlns="http://www.w3.org/2000/svg" class="fig2" viewBox="0 0 760 320" role="img" aria-label="Left, what is given: a stream of transactions such as insert 65, delete 10 and query 50 to 70. Middle, the update engine and its scheduler, which the agent writes: on several threads it publishes one whole tree per version. Inserting 65 into version 0, whose keys are 10 to 60, creates version 1 by copying the path 40, 60 and adding 65, while the subtree of 10, 20 and 30 is shared. Each node shows its key and the count of keys beneath it. Right, readers query any version at any time: 50 to 70 holds 1 key in version 0 and 2 in version 1.">
+<defs><marker id="persistent-treap-update-engine-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arh" d="M0 0L10 5L0 10z"/></marker></defs>
+<rect class="given" x="0" y="0" width="164" height="320" rx="10"/>
+<text class="k" x="18" y="30">GIVEN</text>
+<text class="n" x="18" y="58">Transactions</text>
+<text class="code" x="18" y="84">1 insert 65</text>
+<text class="code" x="18" y="104">2 delete 10</text>
+<text class="code" x="18" y="124">3 query 50–70</text>
+<text class="code" x="18" y="144">…</text>
+<text class="n" x="18" y="186">A node shows its key</text>
+<text class="n" x="18" y="204">and Σ, the count of</text>
+<text class="n" x="18" y="222">keys beneath it.</text>
+<rect class="agent" x="180" y="0" width="416" height="320" rx="10"/>
+<text class="k ak" x="200" y="30">THE AGENT WRITES</text>
+<text class="h" x="200" y="53">The update engine and its scheduler</text>
+<text class="n" x="200" y="78">Several threads, one whole tree per version.</text>
+<text class="n" x="200" y="96">Insert 65 copies the path and shares the rest.</text>
+<line class="ln2" x1="314.289" y1="179.389" x2="337.03" y2="203.879"/>
+<line class="ln2" x1="476.289" y1="179.389" x2="499.03" y2="203.879"/>
+<line class="ln2" x1="527.986" y1="235.665" x2="549.348" y2="259.589"/>
+<line class="ln2" x1="286" y1="179" x2="256" y2="232"/>
+<path class="chip" d="M250 228 L304.0 284 L196.0 284 Z"/>
+<text class="n sm mid" x="250" y="258">Σ3</text>
+<text class="code mid" x="250" y="275">10 20 30</text>
+<text class="n mid" x="250" y="306">shared</text>
+<path class="ln2" d="M450 182 C 422 314, 350 304, 290 262" marker-end="url(#persistent-treap-update-engine-ar)"/>
+<circle class="chip" cx="300" cy="164" r="21"/>
+<text class="b mid" x="300" y="163">40</text>
+<text class="n sm mid" x="300" y="178">Σ5</text>
+<circle class="chip" cx="352" cy="220" r="21"/>
+<text class="b mid" x="352" y="219">60</text>
+<text class="n sm mid" x="352" y="234">Σ1</text>
+<circle class="chip on" cx="462" cy="164" r="21"/>
+<text class="b mid" x="462" y="163">40</text>
+<text class="n sm mid" x="462" y="178">Σ6</text>
+<circle class="chip on" cx="514" cy="220" r="21"/>
+<text class="b mid" x="514" y="219">60</text>
+<text class="n sm mid" x="514" y="234">Σ2</text>
+<circle class="chip on" cx="564" cy="276" r="21"/>
+<text class="b mid" x="564" y="275">65</text>
+<text class="n sm mid" x="564" y="290">Σ1</text>
+<text class="b mid" x="300" y="121">v0</text>
+<line class="ar" x1="300" y1="126" x2="300" y2="140" marker-end="url(#persistent-treap-update-engine-ar)"/>
+<text class="b mid" x="462" y="121">v1</text>
+<line class="ar" x1="462" y1="126" x2="462" y2="140" marker-end="url(#persistent-treap-update-engine-ar)"/>
+<rect class="result" x="612" y="0" width="148" height="320" rx="10"/>
+<text class="k" x="630" y="30">READERS</text>
+<text class="n" x="630" y="58">Query any version</text>
+<text class="code" x="630" y="84">v0 [50,70]: 1</text>
+<text class="code" x="630" y="104">v1 [50,70]: 2</text>
+<text class="n" x="630" y="140">Each reader sees a</text>
+<text class="n" x="630" y="158">whole tree, never a</text>
+<text class="n" x="630" y="176">half-built one.</text>
 </svg>

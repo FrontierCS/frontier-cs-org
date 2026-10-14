@@ -8,7 +8,7 @@ written against it continue to apply.
 <div class="ar-page post distill">
 
   <div class="ar-head" id="main" tabindex="-1">
-    <div class="ar-crumb"><b><a href="{{ '/blog/' | relative_url }}">Blog</a></b><span>›</span><span>{{ page.title }}</span></div>
+    <div class="ar-crumb"><b><a href="{{ '/blog/' | relative_url }}">Blog</a></b><span>/</span><span>{{ page.title }}</span></div>
     <div class="ar-eyebrow">
       {%- if primary_tag %}<span class="ar-badge">{{ primary_tag }}</span>{% endif -%}
       <span>{% if page.date_display %}{{ page.date_display }}{% else %}{{ page.date | date: "%b %-d, %Y" }}{% endif %}</span>
