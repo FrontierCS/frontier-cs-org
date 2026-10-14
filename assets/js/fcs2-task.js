@@ -64,12 +64,14 @@ const ORDER = [...TASKS].sort((a, b) => (TDIFF[a.s] ? TDIFF[a.s].rank : 1e9) - (
   || DOMAINS.indexOf(a.d) - DOMAINS.indexOf(b.d) || a.name.localeCompare(b.name));
 function drawPager(t) {
   const i = ORDER.indexOf(t), prev = ORDER[i - 1], next = ORDER[i + 1], href = x => `#${slug(x.s)}`;
-  $('#tpager').innerHTML = (prev ? `<a class="prev" href="${href(prev)}" title="Previous: ${esc(prev.name)}">‹ <span>${esc(prev.name)}</span></a>` : '<span class="prev"></span>')
-    + `<span class="pos">${i + 1} / ${ORDER.length}</span>`
-    + (next ? `<a class="next" href="${href(next)}" title="Next: ${esc(next.name)}"><span>${esc(next.name)}</span> ›</a>` : '<span class="next"></span>');
+  // two chevron buttons around the position (Qiuyang, 2026-10-14: icons over names); the names show on hover
+  const chev = d => `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="${d}"/></svg>`, L = chev('M10 3.5 5.5 8l4.5 4.5'), R = chev('M6 3.5l4.5 4.5L6 12.5');
+  const btn = (x, cls, icon, word) => x ? `<a class="pbtn ${cls}" href="${href(x)}" title="${word}: ${esc(x.name)}" aria-label="${word} problem: ${esc(x.name)}">${icon}</a>`
+    : `<span class="pbtn ${cls} off" aria-hidden="true">${icon}</span>`;
+  $('#tpager').innerHTML = btn(prev, 'prev', L, 'Previous') + `<span class="pos">${i + 1} / ${ORDER.length}</span>` + btn(next, 'next', R, 'Next');
   $('#tbody').insertAdjacentHTML('beforeend', `<nav class="tfoot" aria-label="Previous and next problem">`
-    + (prev ? `<a class="prev" href="${href(prev)}"><small>Previous problem</small><b>‹ ${esc(prev.name)}</b></a>` : '<span></span>')
-    + (next ? `<a class="next" href="${href(next)}"><small>Next problem</small><b>${esc(next.name)} ›</b></a>` : '<span></span>') + '</nav>');
+    + (prev ? `<a class="prev" href="${href(prev)}" title="${esc(prev.name)}">‹ Previous problem</a>` : '<span></span>')
+    + (next ? `<a class="next" href="${href(next)}" title="${esc(next.name)}">Next problem ›</a>` : '<span></span>') + '</nav>');
 }
 addEventListener('keydown', e => {
   if (!cur || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey || /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return;
@@ -219,11 +221,16 @@ function loadPatches(t) {
   fetch(`${window.PATCH_DIR || '/assets/patches/'}${s}.json`).then(r => r.ok ? r.json() : null).then(d => { if (d) { PATCHES[s] = d; show(d); } }).catch(() => {});
 }
 const DIFF_META = /^(index |--- |\+\+\+ |new file mode|deleted file mode|similarity index|rename (from|to) |old mode|new mode|Binary files|GIT binary patch)/;
+// a patch without git's own header (a plain unified diff) gets one per file, so it shows its file names too
+const withHeads = t => t.includes('diff --git ') ? t : t.replace(/^--- (?:a\/)?(.+)\n\+\+\+ (?:b\/)?(.+)$/gm, (m, a, b) => `diff --git a/${b} b/${b}\n${m}`);
+const filesOf = p => p.files.length ? p.files : [...p.patch.matchAll(/^\+\+\+ (?:b\/)?(.+)$/gm)].map(m => m[1]);
+// a line longer than LONG characters (one-line JSON answers) shows its start and how much follows
+const LONG = 600, cut = l => l.length > LONG ? `${esc(l.slice(0, LONG))}<i class="dmore"> … ${(l.length - LONG).toLocaleString('en-US')} more characters</i>` : esc(l) || ' ';
 function diffHTML(text) {
   let n = 0;
-  return text.split('\n').map(l => l.startsWith('diff --git ') ? `<span class="df" id="pf${n++}">${esc(l.replace(/^diff --git a\/(.*?) b\/.*$/, '$1'))}</span>`
+  return withHeads(text).split('\n').map(l => l.startsWith('diff --git ') ? `<span class="df" id="pf${n++}">${esc(l.replace(/^diff --git a\/(.*?) b\/.*$/, '$1'))}</span>`
     : DIFF_META.test(l) ? `<span class="dm">${esc(l)}</span>` : l.startsWith('@@') ? `<span class="dh">${esc(l)}</span>`
-    : l.startsWith('+') ? `<span class="da">${esc(l)}</span>` : l.startsWith('-') ? `<span class="dd">${esc(l)}</span>` : `<span>${esc(l) || ' '}</span>`).join('');
+    : l.startsWith('+') ? `<span class="da">${cut(l)}</span>` : l.startsWith('-') ? `<span class="dd">${cut(l)}</span>` : `<span>${cut(l)}</span>`).join('');
 }
 function drawPatches(d) {
   const ms = RANKED.filter(m => d.runs[m.id]);
@@ -241,9 +248,10 @@ function drawPatches(d) {
     const m = ms.find(x => x.id === id), p = d.runs[id];
     $('#pchips').querySelectorAll('.pchip').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.m === id)));
     if (!has(m)) { $('#pmeta').innerHTML = ''; $('#pview').innerHTML = `<p class="pempty">${esc(m.name)} handed in no solution on this problem (${esc(p.missing || 'none')}).</p>`; return; }
-    $('#pmeta').innerHTML = `<b>${esc(m.name)}</b> · ${esc(p.submission)} · ${plural(p.files.length, 'file')} changed, `
+    const files = filesOf(p);
+    $('#pmeta').innerHTML = `<b>${esc(m.name)}</b> · ${esc(p.submission)} · ${plural(files.length, 'file')} changed, `
       + `<b class="a">+${p.add}</b> <b class="d">−${p.del}</b>${p.truncated ? ` · the first ${Math.round(p.patch.length / 1000)} kB of ${Math.round(p.bytes / 1000)} kB shown` : ''}`
-      + (p.files.length > 1 ? `<div class="pfiles">${p.files.map((f, i) => `<a href="#pf${i}" data-i="${i}">${esc(f)}</a>`).join('')}</div>` : '');
+      + (files.length > 1 ? `<div class="pfiles">${files.map((f, i) => `<a href="#pf${i}" data-i="${i}">${esc(f)}</a>`).join('')}</div>` : '');
     $('#pview').innerHTML = `<pre class="pdiff" tabindex="0"><code>${diffHTML(p.patch)}</code></pre>`;
   };
   $('#pchips').onclick = e => { const b = e.target.closest('.pchip'); if (b) pick(b.dataset.m); };

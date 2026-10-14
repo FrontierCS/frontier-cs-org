@@ -270,16 +270,14 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 .crumbs a{display:inline-flex; align-items:center; gap:6px; color:var(--muted); text-decoration:none}
 .crumbs a.back::before{content:"←"}
 /* previous and next problem: beside the back link, and at the foot of the page */
-.pager{display:flex; align-items:center; gap:14px; min-width:0; color:var(--muted)}
-.pager a{color:var(--ink-2); text-decoration:none; white-space:nowrap; max-width:16em; overflow:hidden; text-overflow:ellipsis}
-.pager a:hover{color:var(--teal-d)}
-.pager .pos{font-variant-numeric:tabular-nums; color:var(--faint)}
-@media (max-width:640px){ .pager a span{display:none} }
-.tfoot{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:64px 0 0; padding-top:24px; border-top:1px solid var(--line)}
-.tfoot a{display:flex; flex-direction:column; gap:4px; padding:14px 18px; border:1px solid var(--line); border-radius:10px; text-decoration:none; color:var(--ink)}
-.tfoot a:hover{border-color:var(--teal); color:var(--teal-d)}
-.tfoot a.next{text-align:right; align-items:flex-end; grid-column:2}
-.tfoot small{font-size:13px; color:var(--muted)} .tfoot b{font-size:17px; font-weight:500}
+.pager{display:flex; align-items:center; gap:10px; color:var(--muted)}
+.pbtn{display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; border:1px solid var(--line); border-radius:50%; color:var(--ink-2); background:var(--bg)}
+.pbtn svg{width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round}
+a.pbtn:hover{border-color:var(--teal); color:var(--teal-d)}
+.pbtn.off{opacity:.35}
+.pager .pos{min-width:3.6em; text-align:center; font-variant-numeric:tabular-nums; color:var(--muted)}
+.tfoot{display:flex; justify-content:space-between; gap:16px; margin:64px 0 0; padding-top:20px; border-top:1px solid var(--line); font-size:15px}
+.tfoot a{color:var(--ink-2); text-decoration:none} .tfoot a:hover{color:var(--teal-d)}
 .crumbs a:hover{color:var(--teal-d)}
 .tdom{display:inline-flex; align-items:center; gap:7px; font-size:14px; font-weight:500; color:var(--ink-2)}
 .tdom::before{content:""; width:9px; height:9px; border-radius:2px; background:var(--a)}
@@ -366,6 +364,7 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 .pdiff .df{position:sticky; top:0; z-index:1; padding:7px 16px; background:var(--soft); color:var(--ink); font-weight:600; border-bottom:1px solid var(--line)}
 .pdiff .dm{color:var(--faint)} .pdiff .dh{color:var(--muted); background:#f8f9fa}
 .pdiff .da{background:#e6f4ea; color:#0d652d} .pdiff .dd{background:#fce8e6; color:#a50e0e}
+.pdiff .dmore{font-style:normal; color:var(--muted)}
 .pempty{margin:0; padding:28px; color:var(--muted); border:1px dashed var(--line); border-radius:8px}
 .tchart{margin:64px 0 0}
 .cnote{font-size:13.5px; line-height:1.45; color:var(--muted-2); margin:10px 0 0; max-width:60em}
