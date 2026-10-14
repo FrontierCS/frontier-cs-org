@@ -236,8 +236,9 @@ function drawLB() {
   const rowH = () => lane;
   const H = T + rows.reduce((a, r) => a + rowH(r), 0) + B, an = animates(svg) && group === 'model';
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
-  // the axis covers every dot drawn, on a grid of 20 points, with 0 always in view
-  const vs = showRuns || group === 'task' ? runs.map(r => r.s) : rows.map(r => r.best), step = 20;
+  // the axis covers every run, shown or not, on a grid of 20 points with 0 in view: each model's range line spans its runs
+  // either way, and the axis stays put when the runs are switched off (owner, 2026-10-14: the lines ran off the chart)
+  const vs = runs.map(r => r.s), step = 20;
   const xlo = Math.min(0, Math.floor(Math.min(...vs) / step) * step), xhi = Math.max(0, Math.ceil(Math.max(...vs) / step) * step);
   const X = v => L + (v - xlo) / (xhi - xlo) * (W - L - R);
   for (let v = xlo; v <= xhi; v += step) {
