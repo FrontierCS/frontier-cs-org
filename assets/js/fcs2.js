@@ -86,7 +86,7 @@ function drawPassCost() {
     // under it a smaller dot and a regular name, both at full colour (owner, 2026-10-13: keep the chart clean)
     const lead = front.includes(m);
     svg.append(sv('circle', {cx, cy, r:lead ? 7.5 : 5, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':2, 'data-m':m.id}));
-    labelDot(svg, boxes, cx, cy, name, {l:L, r:W, t:T, b:H - B}, MTXT(m.id), lead);   // fcs2-data.js
+    labelDot(svg, boxes, cx, cy, name, L, W, MTXT(m.id), lead);   // fcs2-data.js
     const pct = PASS[m.id][0];
     pts.push({x:cx, y:cy, mean:true, html:`<b>${esc(m.name)}</b><br>Pass rate <b>${f1(pct)}%</b><br>${usdfmt(COST[m.id][0])} per run, mean`});
   });
