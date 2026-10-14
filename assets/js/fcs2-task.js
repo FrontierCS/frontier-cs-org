@@ -178,15 +178,16 @@ function drawScore() {
   attachTip(svg, W, H, pts, $('#sctip'));
 }
 
-/* The task's pass curve (TFIT): the chance that a model of a given FCI passes it, 50% at the task's FDI, whose 90%
-   interval is the whisker there (Qiuyang, 2026-10-14). Dots: each model at its FCI, at the share of its runs here that
+/* The task's pass curve (TFIT): the chance that a model of a given FCI passes it, 50% at the task's FDI (Qiuyang,
+   2026-10-14). No interval is drawn: the FDI's 90% interval is given in words in the head line only (Qiuyang,
+   2026-10-14). Dots: each model at its FCI, at the share of its runs here that
    pass, so at 100% or 0% for a model with one run. The human reference has no FCI and no dot. */
 function drawFit() {
-  const {t, runs} = cur, [d, k] = TFIT[t.s], [, dlo, dhi] = DIFF[t.s];
+  const {t, runs} = cur, [d, k] = TFIT[t.s];
   const svg = $('#fcsvg'), W = Math.max(300, $('#fcplot').clientWidth), narrow = W < 560;
   const L = 44, R = narrow ? 12 : 24, T = 12, B = 46, H = narrow ? 280 : 320;
-  // the axis holds 0 (Kimi K2.7), every model, the FDI's interval and the curve from 10% to 90%
-  const es = RANKED.map(m => ECI[m.id][0]), lo = Math.min(ECI_LOW_VALUE, dlo, d - 2.2 / k, ...es), hi = Math.max(dhi, d + 2.2 / k, ...es), step = eciStep(hi - lo, narrow ? 4 : 7);
+  // the axis holds 0 (Kimi K2.7), every model and the FDI, nothing more, so a hard task does not stretch it
+  const es = RANKED.map(m => ECI[m.id][0]), lo = Math.min(ECI_LOW_VALUE, d, ...es), hi = Math.max(d, ...es), step = eciStep(hi - lo, narrow ? 4 : 7);
   const xmin = Math.floor(lo / step) * step, xmax = Math.ceil(hi / step) * step;
   const X = v => L + (v - xmin) / (xmax - xmin) * (W - L - R), Y = v => T + (1 - v / 100) * (H - T - B), f = x => 100 / (1 + Math.exp(-k * (x - d)));
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
@@ -201,14 +202,13 @@ function drawFit() {
   svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'FCI'));
   const n = 120, path = Array.from({length:n + 1}, (_, i) => { const x = xmin + (xmax - xmin) * i / n; return `${i ? 'L' : 'M'}${X(x).toFixed(1)},${Y(f(x)).toFixed(1)}`; }).join('');
   svg.append(sv('path', {d:path, fill:'none', stroke:'var(--ink-2)', 'stroke-width':2.5}));
-  // the task's FDI: where the curve crosses 50%, with its 90% interval as a whisker, as on the FCI chart; a dashed drop
+  // the task's FDI: where the curve crosses 50%, an open circle; a dashed drop
   // to the axis marks it there; the label sits above and left of the point, which is off a rising curve
   svg.append(sv('line', {x1:X(d), x2:X(d), y1:Y(50), y2:H - B, stroke:'var(--ink-2)', 'stroke-width':1, 'stroke-dasharray':'3 3', opacity:.7}));
-  svg.append(sv('path', {d:`M${X(dlo)},${Y(50)}H${X(dhi)}M${X(dlo)},${Y(50) - 6}v12M${X(dhi)},${Y(50) - 6}v12`, fill:'none', stroke:'var(--ink-2)', 'stroke-width':1.5}));
   svg.append(sv('circle', {cx:X(d), cy:Y(50), r:4.5, fill:'#fff', stroke:'var(--ink-2)', 'stroke-width':2}));
   const left = X(d) - L > 90;   // near the left edge the label goes right of the point
   svg.append(sv('text', {class:'val halo', x:X(d) + (left ? -10 : 10), y:Y(50) - 14, 'text-anchor':left ? 'end' : 'start', fill:'var(--ink-2)'}, `FDI ${fe(d)}`));
-  const pts = [{x:X(d), y:Y(50), html:`<b>FDI ${fe(d)}</b><br>90% interval ${fe(dlo)}–${fe(dhi)}`}];
+  const pts = [{x:X(d), y:Y(50), html:`<b>FDI ${fe(d)}</b><br>The FCI at which a model passes half the time`}];
   const placed = [];
   RANKED.filter(m => runs.some(r => r[0] === m.id)).forEach(m => {
     const rs = runs.filter(r => r[0] === m.id), np = rs.filter(r => r[3]).length, y = np / rs.length * 100, x = ECI[m.id][0];
