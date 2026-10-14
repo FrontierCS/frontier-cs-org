@@ -81,11 +81,11 @@ window.card = (layout, h, sub, note) => {
 };
 // the visual's free height; charts are drawn to it (fcs2.js and fcs2-task.js read window.CHART_H at draw time)
 window.fit = (v, key, minus = 0) => { CHART_H[key] = Math.floor(v.clientHeight - minus); };
-// row charts (mean score, FECI): drop the harness line under each model name and centre the name on its row
+// row charts (mean score, FCI): drop the harness line under each model name and centre the name on its row
 window.oneLine = svg => svg.querySelectorAll('text.lab').forEach(l => { const n = l.nextElementSibling;
   if (n && n.tagName === 'text' && /12px/.test(n.getAttribute('style') || '')) { l.setAttribute('y', +l.getAttribute('y') + 7); n.remove(); } });
 // row charts on a card: the lanes are too tight for a value above its mark (it would sit in the row above), so each value
-// moves beside its row's mark, to the right of the mean dot (mean score) or of the whisker's end (FECI)
+// moves beside its row's mark, to the right of the mean dot (mean score) or of the whisker's end (FCI)
 window.sideVals = svg => svg.querySelectorAll('text.val').forEach(v => { const m = v.previousElementSibling; if (!m) return;
   const yc = m.tagName === 'circle' ? +m.getAttribute('cy') : m.getBBox().y + m.getBBox().height / 2;
   const x = m.tagName === 'circle' ? +m.getAttribute('cx') + +m.getAttribute('r') + 5 : m.getBBox().x + m.getBBox().width + 7;
@@ -105,7 +105,7 @@ window.audit = () => {
     const ox = Math.min(a.r, b.r) - Math.max(a.l, b.l), oy = Math.min(a.b, b.b) - Math.max(a.t, b.t);
     if (ox > 1 && oy > 2) bad.push(`overlap: "${a.e.textContent.slice(0, 24)}" / "${b.e.textContent.slice(0, 24)}"`); }
   c.querySelectorAll('#lbsvg, #ecisvg').forEach(svg => {
-    // the row's mark: the mean dot (mean score chart) or the bar (FECI chart)
+    // the row's mark: the mean dot (mean score chart) or the bar (FCI chart)
     const dots = [...svg.querySelectorAll('circle, rect.ebar')].map(d => d.getBoundingClientRect()).filter(r => r.width >= 11);
     svg.querySelectorAll('text.lab').forEach(l => { const r = l.getBoundingClientRect(), cy = (r.top + r.bottom) / 2;
       const near = Math.min(...dots.map(d => Math.abs((d.top + d.bottom) / 2 - cy)));
@@ -213,24 +213,24 @@ OVERVIEW = {
         '');   /* the axis title already says what the score is */
       CHART_H.lbLane = Math.floor((v.clientHeight - 54) / MODELS.length); v.append(document.getElementById('lbplot')); drawLB(); oneLine(document.getElementById('lbsvg')); sideVals(document.getElementById('lbsvg'));
     }""",
-    # FECI: the overview's chart; the headline counts the models whose whole 90% interval is above Human, the line under
+    # FCI: the overview's chart; the headline counts the models whose whole 90% interval is above Human, the line under
     # it names them and any whose whole interval is below
-    '05-feci': """() => {
+    '05-fci': """() => {
       const above = RANKED.filter(m => ECI[m.id][1] > ECI_HUMAN).map(m => m.name), below = RANKED.filter(m => ECI[m.id][2] < ECI_HUMAN).map(m => m.name);
       const NUM = ['No', 'One', 'Two', 'Three', 'Four', 'Five', 'Six'], and = a => a.length < 3 ? a.join(' and ') : a.slice(0, -1).join(', ') + ' and ' + a.at(-1);
-      console.assert(above.length >= 1 && above.length < NUM.length, 'FECI wording', above, below);
-      const v = card('stack', 'FECI (FrontierCS Epoch Capabilities Index)',   // owner, 2026-10-13: the index's name as the headline
+      console.assert(above.length >= 1 && above.length < NUM.length, 'FCI wording', above, below);
+      const v = card('stack', 'FCI (FrontierCS Capabilities Index)',   // owner, 2026-10-13: the index's name as the headline
         `${and(above)} clear${above.length > 1 ? '' : 's'} the human reference.${below.length ? ` ${and(below)} fall${below.length > 1 ? '' : 's'} short.` : ''} The rest are within noise.`,
-        'FECI, fitted with the ECI code of Epoch AI. Human = 25, Kimi K2.7 = 0.');
+        'FCI, fitted with the ECI code of Epoch AI. Human = 25, Kimi K2.7 = 0.');
       CHART_H.eciLane = Math.floor((v.clientHeight - 60) / MODELS.length); v.append(document.getElementById('eciplot')); drawECI(); oneLine(document.getElementById('ecisvg')); sideVals(document.getElementById('ecisvg'));
     }""",
-    # test-time scaling: the overview's chart; budgets where two models come within 1 point of their final FECI
+    # test-time scaling: the overview's chart; budgets where two models come within 1 point of their final FCI
     '06-scaling': """() => {
       const reach = id => { const c = SCALE[id], f = c.at(-1)[1]; return c.find(p => p[1] >= f - 1)[0]; };
       const ds = reach('ds'), astra = reach('astra'); console.assert(ds < 1 && astra > 5, 'scaling wording', ds, astra);
-      const v = card('stack', 'FECI vs. budget per run',
+      const v = card('stack', 'FCI vs. budget per run',
         'Each run counts its latest valid submission at the budget.',
-        'One curve per lab, its model with the highest FECI, as on the site.');
+        'One curve per lab, its model with the highest FCI, as on the site.');
       fit(v, 'tts', 62); v.append(document.getElementById('ttsplot'), document.getElementById('ttslegend')); drawTTS();
       document.querySelectorAll('#ttslegend button[aria-pressed="false"]').forEach(b => b.remove());   // a still card: the hidden models leave the legend
     }""",
