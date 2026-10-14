@@ -153,11 +153,13 @@ function drawECI() {
    A model's 90% band shows only while the pointer is on its curve or its legend entry, or while its legend entry is
    picked; a click picks it, a second click drops it (owner, 2026-10-13: no bands otherwise). */
 let ttsPick = null, ttsHover = null;
+// one curve per lab, its model with the highest FECI (owner, 2026-10-14); a model with no reported spend has no curve
+const TTSM = RANKED.filter(m => SCALE[m.id]).filter((m, i, a) => a.findIndex(o => o.lab === m.lab) === i);
 const ttsBands = () => document.querySelectorAll('#ttssvg .tband').forEach(b => b.setAttribute('opacity', b.dataset.m === (ttsHover || ttsPick) ? .12 : 0));
 function drawTTS() {
   const svg = $('#ttssvg'), W = Math.max(300, $('#ttsplot').clientWidth), narrow = W < 560;
   const L = 34, R = narrow ? 12 : 24, T = 12, B = 46, H = CHART_H.tts || (narrow ? 300 : 380);
-  const all = Object.values(SCALE).flat();
+  const all = TTSM.flatMap(m => SCALE[m.id]);
   // the axis starts half a decade before the first budget at which any model rises above 0
   const x0 = Math.log10(Math.min(...all.filter(p => p[1] >= 0).map(p => p[0]))) - 0.5, x1 = Math.log10(Math.max(...all.map(p => p[0])));
   const ytop = Math.max(...all.map(p => p[3])), ystep = ytop > 60 ? 20 : 10, ymax = Math.ceil(ytop / ystep) * ystep;   // grid every 10 on the Human = 25 scale
@@ -177,7 +179,7 @@ function drawTTS() {
   svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'Cost budget per run in US$, log scale'));
   const g = sv('g', {'clip-path':'url(#ttsclip)'}), gb = sv('g'), gl = sv('g'); g.append(gb, gl); svg.append(g);   // bands under every line
   const pts = [];
-  [...RANKED].reverse().filter(m => SCALE[m.id]).forEach(m => {   // a model with no reported spend has no curve
+  [...TTSM].reverse().forEach(m => {
     const c = SCALE[m.id], path = c.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join('');
     const band = c.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[3]).toFixed(1)}`).join('')
       + [...c].reverse().map(p => `L${X(p[0]).toFixed(1)},${Y(p[2]).toFixed(1)}`).join('') + 'Z';
@@ -197,7 +199,7 @@ function drawTTS() {
   svg.addEventListener('pointerleave', () => { ttsHover = null; ttsBands(); });
   ttsBands();
 }
-$('#ttslegend').innerHTML = RANKED.filter(m => SCALE[m.id]).map(m => `<button type="button" data-m="${m.id}" aria-pressed="false"><i style="background:${MCOL[m.id]}"></i>${esc(m.name)}</button>`).join('');
+$('#ttslegend').innerHTML = TTSM.map(m => `<button type="button" data-m="${m.id}" aria-pressed="false"><i style="background:${MCOL[m.id]}"></i>${esc(m.name)}</button>`).join('');
 $('#ttslegend').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return;
   ttsPick = ttsPick === b.dataset.m ? null : b.dataset.m;
   $('#ttslegend').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x.dataset.m === ttsPick)); ttsBands(); });
