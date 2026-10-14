@@ -294,15 +294,17 @@ function drawLB() {
 }
 
 /* ---------- results by domain ---------- */
+/* Pass rate by domain: one row per model, in leaderboard order, one column per domain after all tasks, each domain headed by
+   its task count (owner, 2026-10-14: models down the side, domains across). Bold marks the best model in each column. */
 function drawTable() {
-  const head = `<tr><th>Domain</th><th class="tk">Tasks</th>${RANKED.map(m => `<th><span class="mn" style="background:${MCOL[m.id]}"></span><span class="full">${m.name}</span><span class="short">${m.short}</span></th>`).join('')}</tr>`;
-  const line = (d, cls) => {
-    const vals = RANKED.map(m => { const s = RUNS.filter(r => r.m === m.id && (d === 'All' || r.d === d)).map(r => r.p * 100); return s.length ? mean(s) : null; });
-    const best = Math.max(...vals.filter(v => v != null));
-    const n = NTASK(RUNS.filter(r => d === 'All' || r.d === d));
-    return `<tr class="${cls || ''}"><td>${d === 'All' ? 'All tasks' : esc(d)}</td><td class="tk">${n}</td>${vals.map(v => v == null ? '<td class="e">–</td>' : `<td class="${v === best && vals.filter(x => x != null).length > 1 ? 'best' : ''}">${Math.round(v)}%</td>`).join('')}</tr>`;
-  };
-  $('#restbl').innerHTML = head + DOMS_WITH_RUNS.map(d => line(d)).join('') + line('All', 'all');
+  const cols = ['All', ...DOMS_WITH_RUNS];
+  const rate = (m, d) => { const s = RUNS.filter(r => r.m === m.id && (d === 'All' || r.d === d)).map(r => r.p * 100); return s.length ? mean(s) : null; };
+  const grid = RANKED.map(m => cols.map(d => rate(m, d)));
+  const best = cols.map((_, j) => { const v = grid.map(row => row[j]).filter(x => x != null); const top = Math.max(...v); return v.length > 1 && top > 0 ? top : null; });   // no bold when every model is at 0%
+  const head = `<tr><th>Model</th>${cols.map(d => `<th class="${d === 'All' ? 'all' : 'dom'}">${d === 'All' ? 'All tasks' : esc(d)}<span class="tk">${NTASK(RUNS.filter(r => d === 'All' || r.d === d))}</span></th>`).join('')}</tr>`;
+  const rows = RANKED.map((m, i) => `<tr><td><span class="sq" style="background:${MCOL[m.id]}"></span><span class="full">${esc(m.name)}</span><span class="short">${esc(m.short)}</span></td>`
+    + grid[i].map((v, j) => v == null ? '<td class="e">–</td>' : `<td class="${[j === 0 ? 'all' : '', v === best[j] ? 'best' : ''].join(' ').trim()}">${Math.round(v)}%</td>`).join('') + '</tr>').join('');
+  $('#restbl').innerHTML = head + rows;
 }
 
 /* ---------- case studies: a placeholder until the preview runs have their own (owner, 2026-10-09) ---------- */

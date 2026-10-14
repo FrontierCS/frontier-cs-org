@@ -144,6 +144,11 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 .res td.e{color:var(--faint)}
 .res td .sq{display:inline-block; width:10px; height:10px; margin-right:9px; vertical-align:0}
 .res tr.all td{font-weight:600; border-bottom:1px solid var(--ink-2)}
+#restbl th.dom{white-space:normal; line-height:1.25}   /* domains across: a long name wraps over its count */
+#restbl th .tk{display:block; font-weight:400; margin-top:2px}
+#restbl{font-size:14px} #restbl th, #restbl td{padding-inline:7px} #restbl th:first-child, #restbl td:first-child{padding-left:0}   /* fourteen columns fit the overview's width */
+#restbl td:first-child{white-space:nowrap}   /* model names on one line; the table scrolls sideways on phones */
+#restbl td.all, #restbl th.all{font-weight:600; border-right:1px solid var(--line)}
 .res .tk{color:var(--muted)}
 .res .best{font-weight:700}
 .res th .mn{display:inline-block; width:9px; height:9px; margin-right:6px}

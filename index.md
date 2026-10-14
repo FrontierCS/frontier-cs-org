@@ -43,7 +43,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
   <details class="tbl-wrap fold" id="domains">
     <summary><h3>Pass rate by domain</h3></summary>
     <div class="res-scroll"><table class="res num" id="restbl"></table></div>
-    <p class="cfoot" style="border-top:0; margin-top:10px; padding-top:0">Bold marks the best in a row.</p>
+    <p class="cfoot" style="border-top:0; margin-top:10px; padding-top:0">Bold marks the best in a column.</p>
   </details>
 
   <div class="tbl-wrap" id="eci">
