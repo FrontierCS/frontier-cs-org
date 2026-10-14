@@ -116,19 +116,21 @@ function drawPassCost() {
 /* On phones the model column is as wide as the longest model name, so every name shows in full (owner: "DeepSeek V4.1 Flash", not cut). */
 const nameCol = svg => { svg.replaceChildren(); const w = Math.max(...MODELS.map(m => { const t = sv('text', {class:'lab', x:-999, y:-999}, m.short); svg.append(t); return t.getComputedTextLength(); })); svg.replaceChildren(); return Math.max(112, Math.ceil(w) + 12); };
 
-/* FECI: one row per model ranked by ECI, a bar from 0 to its FECI and its 90% interval as a whisker. */
+/* FECI: one row per model ranked by ECI, a bar from 0 (Kimi K2.7) to its FECI and its 90% interval as a whisker. */
 function drawECI() {
   const order = [...MODELS].sort((a, b) => ECI[b.id][0] - ECI[a.id][0]);
   const svg = $('#ecisvg'), W = Math.max(300, $('#eciplot').clientWidth), narrow = W < 560;
   const L = narrow ? nameCol(svg) : 190, R = 34, T = 14, B = 46, lane = CHART_H.eciLane || (narrow ? 56 : 64);
-  // grid every 10 on the Human = 25 scale (owner, 2026-10-13); every 20 or 40 if the scale is ever wider
-  const top = Math.max(...MODELS.map(m => ECI[m.id][2])), step = top > 120 ? (narrow ? 40 : 20) : top > 60 ? 20 : 10, xmax = Math.ceil(top / step) * step;
+  // the axis holds 0 and every whisker, on a grid of about six steps (four on phones) whatever the scale's unit
+  const bot = Math.min(0, ...MODELS.map(m => ECI[m.id][1])), top = Math.max(...MODELS.map(m => ECI[m.id][2])), step = eciStep(top - bot, narrow ? 4 : 6);
+  const xmin = Math.floor(bot / step) * step, xmax = Math.ceil(top / step) * step;
   const H = T + order.length * lane + B, an = animates(svg), bh = narrow ? 24 : 28;   // bars near half the lane (owner, 2026-10-14: 18 px read too thin)
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
-  const X = v => L + v / xmax * (W - L - R);
-  for (let v = 0; v <= xmax; v += step) {
-    svg.append(sv('line', {x1:X(v), x2:X(v), y1:T, y2:H - B + 6, stroke:'var(--grid)', 'stroke-width':1}));
-    svg.append(sv('text', {x:X(v), y:H - B + 22, 'text-anchor':'middle'}, v));
+  const X = v => L + (v - xmin) / (xmax - xmin) * (W - L - R);
+  for (let i = 0, v = xmin; v <= xmax + step / 2; v = xmin + ++i * step) {   // the 0 line, Kimi K2.7, is darker when the axis runs below it
+    const zero = xmin < 0 && Math.abs(v) < step / 2;
+    svg.append(sv('line', {x1:X(v), x2:X(v), y1:T, y2:H - B + 6, stroke:zero ? 'var(--ink-2)' : 'var(--grid)', 'stroke-width':zero ? 1.2 : 1}));
+    svg.append(sv('text', {x:X(v), y:H - B + 22, 'text-anchor':'middle'}, tick(v)));
   }
   svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'FECI'));
   const pts = [];
@@ -137,19 +139,21 @@ function drawECI() {
     if (i) svg.append(sv('line', {x1:0, x2:W - R, y1:y0, y2:y0, stroke:'var(--line)', 'stroke-width':1}));
     svg.append(sv('text', {class:'lab', x:0, y:yc + (m.h ? -3 : 4)}, narrow ? m.short : m.name));
     if (m.h) svg.append(sv('text', {x:0, y:yc + 14, 'font-size':12}, m.h));
-    const bar = sv('rect', {class:'ebar', x:X(0), y:yc - bh / 2, width:Math.max(0, X(e) - X(0)), height:bh, fill:MCOL[m.id], 'data-m':m.id});
+    const bar = sv('rect', {class:'ebar', x:Math.min(X(0), X(e)), y:yc - bh / 2, width:Math.abs(X(e) - X(0)), height:bh, fill:MCOL[m.id], 'data-m':m.id});
+    if (e < 0) bar.style.transformOrigin = 'right center';   // a bar below Kimi K2.7 grows leftwards from 0
     const wk = sv('path', {class:'ewhisk', d:`M${X(lo)},${yc}H${X(hi)}M${X(lo)},${yc - 7}v14M${X(hi)},${yc - 7}v14`, fill:'none', stroke:'var(--ink)', 'stroke-width':1.5});
-    const val = sv('text', {class:'val halo', x:X(e), y:yc - bh / 2 - 6, fill:MTXT(m.id), 'text-anchor':'middle'}, f1(e));   // one decimal: on this scale whole numbers tie
+    const val = sv('text', {class:'val halo', x:X(e), y:yc - bh / 2 - 6, fill:MTXT(m.id), 'text-anchor':'middle'}, fe(e));   // as many decimals as keep the models apart
     svg.append(bar, wk, val);
     if (an) { mark(bar, 'a-bar', i * .07); mark(wk, 'a-fade', .55 + i * .07); mark(val, 'a-fade', .55 + i * .07); }
-    pts.push({x:X(e), y:yc, mean:true, html:`<b>${esc(m.name)}</b><br>FECI <b>${f1(e)}</b><br>90% interval ${Math.round(lo)}–${Math.round(hi)}`});
+    pts.push({x:X(e), y:yc, mean:true, html:`<b>${esc(m.name)}</b><br>FECI <b>${fe(e)}</b><br>90% interval ${fe(lo)}–${fe(hi)}`});
   });
   attachTip(svg, W, H, pts, $('#ecitip'));
 }
 
-/* Test-time scaling: FECI when every run stops at a US$ budget (SCALE, from bin/fcs2_runs_from_db.py).
-   Values below 0 leave the plot through its bottom edge. The drawing is that of 2026-10-12: straight segments, one legend
-   (owner, 2026-10-13: back to it). A run stopped at a budget counts its latest valid submission, so a curve can dip.
+/* Test-time scaling: the FECI a model would have if every run stopped at a US$ budget (SCALE, from
+   bin/fcs2_runs_from_db.py); a run counts as passed only once it has ended within the budget with a pass (Qiuyang,
+   2026-10-14). Values below 0 leave the plot through its bottom edge. The drawing is that of 2026-10-12: straight segments, one legend
+   (owner, 2026-10-13: back to it).
    Every model with reported spend is in the legend; at first only each lab's model with the highest FECI is drawn and the
    others are greyed in the legend; a click on an entry shows or hides its curve (owner, 2026-10-14). A model's 90% band
    shows only while the pointer is on its curve or its legend entry (owner, 2026-10-13: no bands otherwise). */
@@ -163,15 +167,15 @@ function drawTTS() {
   const all = TTSM.flatMap(m => SCALE[m.id]);   // the axes hold every model, so showing one moves nothing
   // the axis starts half a decade before the first budget at which any model rises above 0
   const x0 = Math.log10(Math.min(...all.filter(p => p[1] >= 0).map(p => p[0]))) - 0.5, x1 = Math.log10(Math.max(...all.map(p => p[0])));
-  const ytop = Math.max(...all.map(p => p[3])), ystep = ytop > 60 ? 20 : 10, ymax = Math.ceil(ytop / ystep) * ystep;   // grid every 10 on the Human = 25 scale
+  const ytop = Math.max(...all.map(p => p[3])), ystep = eciStep(ytop, narrow ? 4 : 5), ymax = Math.ceil(ytop / ystep) * ystep;   // about five steps from 0, whatever the scale's unit
   const X = v => L + (Math.log10(v) - x0) / (x1 - x0) * (W - L - R), Y = v => T + (1 - v / ymax) * (H - T - B);
   const an = animates(svg);
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
   const clip = sv('clipPath', {id:'ttsclip'}), cr = sv('rect', {x:L, y:T - 4, width:W - L - R + 8, height:H - T - B + 4}); clip.append(cr); svg.append(clip);
   if (an) mark(cr, 'a-wipe');   // the curves and bands are uncovered left to right, along the budget axis
-  for (let v = 0; v <= ymax; v += ystep) {
+  for (let i = 0, v = 0; v <= ymax + ystep / 2; v = ++i * ystep) {
     svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1}));
-    svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, v));
+    svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, tick(v)));
   }
   for (let k = Math.ceil(x0); k <= Math.floor(x1); k++) {
     svg.append(sv('line', {x1:X(10 ** k), x2:X(10 ** k), y1:H - B, y2:H - B + 5, stroke:'var(--ink-2)', 'stroke-width':1}));
@@ -189,8 +193,8 @@ function drawTTS() {
     const e = c[c.length - 1], end = sv('circle', {cx:X(e[0]), cy:Y(e[1]), r:4.5, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':1.5});
     gb.append(bp); gl.append(lp, end);
     if (an) mark(end, 'a-fade', 1.3);
-    c.forEach(p => { if (p[1] >= 0) pts.push({x:X(p[0]), y:Y(p[1]), m:m.id, html:`<b>${esc(m.name)}</b><br>FECI <b>${f1(p[1])}</b> at ${usdfmt(p[0])} per run`
-      + `<br>90% interval ${Math.round(Math.max(p[2], 0))}–${Math.round(p[3])}<br>${Math.round(p[4] * 100)}% of runs still going`}); });
+    c.forEach(p => { if (p[1] >= 0) pts.push({x:X(p[0]), y:Y(p[1]), m:m.id, html:`<b>${esc(m.name)}</b><br>FECI <b>${fe(p[1])}</b> at ${usdfmt(p[0])} per run`
+      + `<br>90% interval ${fe(Math.max(p[2], 0))}–${fe(p[3])}<br>${Math.round(p[4] * 100)}% of runs still going`}); });
   });
   attachTip(svg, W, H, pts, $('#ttstip'));
   // the curve under the pointer: the nearest point within 28 px, as the tooltip picks it; set as properties, so a redraw replaces them
@@ -311,35 +315,37 @@ function drawTable() {
 const redraws = [];
 
 /* ---------- How FECI works: a fold under the FECI chart (owner, 2026-10-11) ----------
-   Three tasks' fitted curves, expected score = 100 / (1 + exp(-k (FECI - FEDI))) from TFIT: an easy one, one at the
-   human reference and a hard one, picked in code as the tasks with a clear S (slope .07 to .3) whose FEDI is nearest
-   -15, 25 and 50, so the picture follows the data (owner, 2026-10-14). Dashed lines mark the two fixed points of the
-   scale, Kimi K2.7 = 0 and Human = 25. */
+   Three tasks' pass curves from TFIT, P(pass) = 1 / (1 + exp(-k (FECI - FEDI))) with the same k on every task: an easy,
+   a middle and a hard one, the tasks a sixth, a half and five sixths of the way up the FEDI order, so the picture
+   follows the data (Qiuyang, 2026-10-14). A dashed line marks the scale's fixed point, Kimi K2.7 = 0. */
 function drawHow() {
   const box = $('#feci-how'); if (!box || !box.open) return;
-  const fits = Object.entries(TFIT), clear = fits.filter(([, [, k]]) => k >= .07 && k <= .3);
-  $('#how-dmax').textContent = Math.round(Math.max(...fits.map(([, [d]]) => d)));
+  $('#how-dmax').textContent = fe(Math.max(...Object.values(FEDI)));
   const INKS = ['#8ab4f8', '#1a73e8', '#174ea6'];   // easy to hard: Google blue 300, 600, 900
   let svg = $('#howasvg'), W = Math.max(300, $('#howaplot').clientWidth), narrow = W < 560;
-  let L = 34, R = narrow ? 12 : 24, T = 26, B = 46, H = narrow ? 254 : 284;
-  const X0 = -40, X1 = 80, X = v => L + (v - X0) / (X1 - X0) * (W - L - R), Y = v => T + (1 - v / 100) * (H - T - B);
+  let L = 44, R = narrow ? 12 : 24, T = 26, B = 46, H = narrow ? 254 : 284;
+  const up = Object.keys(FEDI).filter(s => TFIT[s]).sort((a, b) => FEDI[a] - FEDI[b]);
+  const picks = [1 / 6, 1 / 2, 5 / 6].map(q => up[Math.round(q * (up.length - 1))]).map(s => [s, TFIT[s]]);
+  // the axis runs from 10% on the easy curve to 90% on the hard one, with Kimi K2.7 and every model in view
+  const es = MODELS.map(m => ECI[m.id][0]), lo = Math.min(ECI_LOW_VALUE, picks[0][1][0] - 2.2 / picks[0][1][1], ...es), hi = Math.max(picks[2][1][0] + 2.2 / picks[2][1][1], ...es);
+  const step = eciStep(hi - lo, narrow ? 4 : 6), X0 = Math.floor(lo / step) * step, X1 = Math.ceil(hi / step) * step;
+  const X = v => L + (v - X0) / (X1 - X0) * (W - L - R), Y = v => T + (1 - v / 100) * (H - T - B);
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
-  for (let v = 0; v <= 100; v += 25) { svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1})); svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, v)); }
-  for (let v = X0; v <= X1; v += 20) svg.append(sv('text', {x:X(v), y:H - B + 20, 'text-anchor':'middle'}, v));
+  for (let v = 0; v <= 100; v += 25) { svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1})); svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, v + '%')); }
+  for (let i = 0, v = X0; v <= X1 + step / 2; v = X0 + ++i * step) svg.append(sv('text', {x:X(v), y:H - B + 20, 'text-anchor':'middle'}, tick(v)));
   svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'FECI'));
-  [[0, narrow ? 'K2.7' : 'Kimi K2.7'], [ECI_HUMAN, 'Human']].forEach(([v, name]) => {
-    svg.append(sv('line', {x1:X(v), x2:X(v), y1:T - 4, y2:H - B, stroke:'var(--ink-2)', 'stroke-width':1, 'stroke-dasharray':'3 3', opacity:.6}),
-      sv('text', {x:X(v), y:T - 10, 'text-anchor':'middle'}, `${name} ${v}`)); });
-  const picks = [-15, 25, 50].map(t => clear.slice().sort((a, b) => Math.abs(a[1][0] - t) - Math.abs(b[1][0] - t))[0]);
-  const pts = [];
+  svg.append(sv('line', {x1:X(ECI_LOW_VALUE), x2:X(ECI_LOW_VALUE), y1:T - 4, y2:H - B, stroke:'var(--ink-2)', 'stroke-width':1, 'stroke-dasharray':'3 3', opacity:.6}),
+    sv('text', {x:X(ECI_LOW_VALUE), y:T - 10, 'text-anchor':'middle'}, `${ECI_LOW_NAME} = ${tick(ECI_LOW_VALUE)}`));
+  const pts = [], n = 240;
   picks.forEach(([s, [d, k]], i) => {
     const f = x => 100 / (1 + Math.exp(-k * (x - d)));
-    svg.append(sv('path', {d:Array.from({length:241}, (_, j) => { const x = X0 + j / 2; return `${j ? 'L' : 'M'}${X(x).toFixed(1)},${Y(f(x)).toFixed(1)}`; }).join(''), fill:'none', stroke:INKS[i], 'stroke-width':2.5}));
-    svg.append(sv('circle', {cx:X(d), cy:Y(50), r:5, fill:INKS[i], stroke:'#fff', 'stroke-width':2}));   // the FEDI: expected score 50
-    for (let x = X0; x <= X1; x += 2) pts.push({x:X(x), y:Y(f(x)), html:`<b>${esc(NAME(s))}</b><br>FEDI ${f1(d)}, slope ${k.toFixed(3)}<br>At FECI ${x}: expected score <b>${f1(f(x))}</b>`});
+    svg.append(sv('path', {d:Array.from({length:n + 1}, (_, j) => { const x = X0 + (X1 - X0) * j / n; return `${j ? 'L' : 'M'}${X(x).toFixed(1)},${Y(f(x)).toFixed(1)}`; }).join(''), fill:'none', stroke:INKS[i], 'stroke-width':2.5}));
+    svg.append(sv('circle', {cx:X(d), cy:Y(50), r:5, fill:INKS[i], stroke:'#fff', 'stroke-width':2}));   // the FEDI: passes half the time
+    for (let j = 0; j <= 60; j++) { const x = X0 + (X1 - X0) * j / 60;
+      pts.push({x:X(x), y:Y(f(x)), html:`<b>${esc(NAME(s))}</b><br>FEDI ${fe(d)}<br>At FECI ${fe(x)}: passes <b>${Math.round(f(x))}%</b> of the time`}); }
   });
   attachTip(svg, W, H, pts, $('#howatip'));
-  $('#howalegend').innerHTML = picks.map(([s, [d]], i) => `<span><i style="background:${INKS[i]}"></i>${esc(NAME(s))}, FEDI ${f1(d)}</span>`).join('');
+  $('#howalegend').innerHTML = picks.map(([s, [d]], i) => `<span><i style="background:${INKS[i]}"></i>${esc(NAME(s))}, FEDI ${fe(d)}</span>`).join('');
 }
 $('#feci-how').addEventListener('toggle', drawHow);
 redraws.push(drawHow);

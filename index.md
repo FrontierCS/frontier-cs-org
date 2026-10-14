@@ -51,7 +51,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
     <figure class="chart" style="margin:0">
       <div class="chead"><span>FrontierCS Epoch Capabilities Index (FECI)</span></div>
       <div class="plot" id="eciplot"><svg id="ecisvg" role="img" aria-label="FECI chart"></svg><div class="tip" id="ecitip" hidden></div></div>
-      <div class="cfoot">{% include chart_logo.html %}<span id="ecinote">Human = 25, Kimi K2.7 = 0 · whiskers are 90% intervals</span></div>
+      <div class="cfoot">{% include chart_logo.html %}<span id="ecinote">Kimi K2.7 = 0 · whiskers are 90% intervals</span></div>
     </figure>
     <p class="pcontact">To add your model, email its score on every task to both <a class="mail" href="mailto:qmang@berkeley.edu,wenhao.chai@princeton.edu">qmang@berkeley.edu</a> and <a class="mail" href="mailto:qmang@berkeley.edu,wenhao.chai@princeton.edu">wenhao.chai@princeton.edu</a>.</p>
     <details class="fold how" id="feci-how">
