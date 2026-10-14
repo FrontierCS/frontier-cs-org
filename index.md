@@ -37,7 +37,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
   <figure class="chart" style="margin:0">
     <div class="chead"><span>Pass rate (over human)</span></div>
     <div class="plot" id="pcplot"><svg id="pcsvg" role="img" aria-label="Pass rate (over human) against cost per run"></svg><div class="tip" id="pctip" hidden></div></div>
-    <div class="cfoot">{% include chart_logo.html %}<span>costs of Kimi K3, DeepSeek V4.1 Flash, GLM 5.3, GLM 5.3 Flash and Qwen 3.8 Max are lower bounds</span></div>
+    <div class="cfoot">{% include chart_logo.html %}</div>
   </figure>
 
   <details class="tbl-wrap fold" id="domains">
@@ -87,7 +87,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
       <div class="chead"><span>Test-time scaling: FECI against cost budget per run</span></div>
       <div class="plot" id="ttsplot"><svg id="ttssvg" role="img" aria-label="Test-time scaling chart"></svg><div class="tip" id="ttstip" hidden></div></div>
       <div class="legend" id="ttslegend"></div>
-      <div class="cfoot">{% include chart_logo.html %}<span>at first one model per lab, its highest FECI · click a model below to show or hide it · point at a curve to see its 90% interval</span></div>
+      <div class="cfoot">{% include chart_logo.html %}</div>
     </figure>
   </div>
   <div class="tbl-wrap" id="meanscore">
@@ -100,7 +100,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
       <button class="pill lg custom" id="custom" type="button" aria-expanded="false" aria-controls="settings">
         <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3M5.5 5.5l2.1 2.1M16.4 16.4l2.1 2.1M5.5 18.5l2.1-2.1M16.4 7.6l2.1-2.1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
         Customize graph</button>
-      <div class="cfoot">{% include chart_logo.html %}<span id="lbnote">0 is the human reference · tasks without a human reference score are left out</span></div>
+      <div class="cfoot">{% include chart_logo.html %}</div>
     </figure>
     <aside class="settings" id="settings" aria-label="Graph settings">
       <h3>Settings</h3>
