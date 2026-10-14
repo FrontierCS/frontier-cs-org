@@ -59,9 +59,9 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
       <div class="how-body">
         <div class="how-row">
           <div class="how-txt">
-            <p class="how-step"><span>1</span>One curve per task</p>
-            <p>FCI is fitted on pass verdicts. Each task gets an S-shaped curve: the chance that a model passes it rises from 0 to 100% as the model’s FCI passes the task’s FEDI. Kimi K2.7 is the 0 point. The human reference has no FCI: a pass means beating its code, and its code cannot beat itself.</p>
-            <p><b>FEDI</b>, the FrontierCS Epoch Difficulty Index, is the FCI at which a model passes the task half the time. Each of a task’s metrics has its own difficulty, fitted from which runs beat the human reference on every hidden workload of that metric, and a task passes when every metric does. A run’s final score against the human reference’s only helps place metrics that no model beats. Each FEDI has a 90% interval, shown on its task’s page.</p>
+            <p class="how-step"><span>1</span>Passes, metric by metric</p>
+            <p>FCI comes from pass and fail only. Each model has one FCI, with Kimi K2.7 at 0. The human reference has none, since its code cannot beat itself.</p>
+            <p>Each metric a task checks has its own difficulty, and metrics that every run passes or fails together count once. A task passes when every metric does. Its <b>FEDI</b>, the FrontierCS Epoch Difficulty Index, is the FCI at which a model passes it half the time, with a 90% interval on the task’s page. The final score against the human reference’s only places metrics that no model beats.</p>
           </div>
           <figure class="chart how-fig">
             <div class="chead"><span>Chance of passing on three tasks</span></div>
@@ -72,7 +72,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
         <p class="how-step"><span>2</span>Why FCI</p>
         <ul class="how-why">
           <li><b>It puts models and tasks on one scale.</b> A task’s FEDI is the FCI a model needs to pass it half the time, so a model’s FCI says which tasks it can be expected to pass.</li>
-          <li><b>It has room at the top.</b> The hardest task sits at FEDI <span id="how-dmax">12.80</span>, above every model, so the scale does not saturate the way a pass rate does.</li>
+          <li><b>It has room at the top.</b> The hardest task sits at FEDI <span data-fill="dmax"></span>, above every model, so the scale does not saturate the way a pass rate does.</li>
           <li><b>The method is tested.</b> FCI is item response theory, the model behind standardized tests that compare students who answered different questions. Epoch AI uses it in the <a href="https://epoch.ai/benchmarks/eci" target="_blank" rel="noopener">Epoch Capabilities Index</a> to combine many benchmarks into one scale, and Anthropic tracks how fast its models’ capabilities rise with a fork of Epoch’s index, the Anthropic ECI, in its <a href="https://www.anthropic.com/system-cards" target="_blank" rel="noopener">system cards</a>.</li>
         </ul>
       </div>

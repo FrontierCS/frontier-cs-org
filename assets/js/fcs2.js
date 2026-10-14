@@ -4,7 +4,7 @@
 document.querySelectorAll('[data-fill]').forEach(el => { el.textContent = {updated:`Last updated: ${UPDATED}`, runs:String(RUNS.length),
   runtasks:`on ${NTASK(RUNS)} tasks`, models:`${MODELS.length} models from ${new Set(MODELS.map(m => m.lab)).size} labs have run so far.`,
   summary:`${RUNS.length} runs on ${NTASK(RUNS)} tasks by ${MODELS.length} models`,
-  ntasks:String(TASKS.length), ndomains:String(new Set(TASKS.map(t => t.d)).size)}[el.dataset.fill]; });
+  ntasks:String(TASKS.length), ndomains:String(new Set(TASKS.map(t => t.d)).size), dmax:fe(Math.max(...Object.values(FEDI)))}[el.dataset.fill]; });
 // text in a model's colour, 22% darker: GPT-6.1 Sol, Qwen 3.8 Max and GLM 5.3 Flash are under 3:1 on white at full colour
 const MTXT = id => `color-mix(in srgb, ${MCOL[id]} 78%, #000)`;
 // Bring a tab into view inside its own horizontal strip only. scrollIntoView would also scroll the page,
@@ -320,7 +320,6 @@ const redraws = [];
    follows the data (Qiuyang, 2026-10-14). A dashed line marks the scale's fixed point, Kimi K2.7 = 0. */
 function drawHow() {
   const box = $('#fci-how'); if (!box || !box.open) return;
-  $('#how-dmax').textContent = fe(Math.max(...Object.values(FEDI)));
   const INKS = ['#8ab4f8', '#1a73e8', '#174ea6'];   // easy to hard: Google blue 300, 600, 900
   let svg = $('#howasvg'), W = Math.max(300, $('#howaplot').clientWidth), narrow = W < 560;
   let L = 44, R = narrow ? 12 : 24, T = 26, B = 46, H = narrow ? 254 : 284;
