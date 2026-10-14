@@ -75,7 +75,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
           <li><b>It weighs each score by difficulty.</b> A mean score counts a point on an easy task the same as a point on a hard one. FCI weighs each score by how hard its task is.</li>
           <li><b>It has a human anchor.</b> Every task scores on its own scale. FCI turns them into one number, and 25 always means the human reference.</li>
           <li><b>It has room at the top.</b> The hardest task sits at FEDI <span id="how-dmax">57</span>, far above every model, so the scale does not saturate the way a 0 to 100 average does.</li>
-          <li><b>The method is tested.</b> FCI is item response theory, the model behind standardized tests that compare students who answered different questions. Epoch AI uses it in the <a href="https://epoch.ai/benchmarks/eci" target="_blank" rel="noopener">Epoch Capabilities Index</a> to combine many benchmarks into one scale, and Anthropic tracks how fast its models’ capabilities rise with a fork of Epoch’s index, the Anthropic ECI, in its <a href="https://www.anthropic.com/system-cards" target="_blank" rel="noopener">system cards</a>.</li>
+          <li><b>It builds on an established index.</b> FCI is a fork of Epoch AI’s <a href="https://epoch.ai/benchmarks/eci" target="_blank" rel="noopener">Epoch Capabilities Index</a> (ECI) and runs Epoch’s released code; we thank Epoch AI for both. This kind of fit, item response theory, has become a standard for AI capabilities: Anthropic tracks its models with its own fork, the AECI, in its <a href="https://www.anthropic.com/system-cards" target="_blank" rel="noopener">system cards</a>, and Google tracks its Gemini models with the GCI.</li>
         </ul>
       </div>
     </details>
