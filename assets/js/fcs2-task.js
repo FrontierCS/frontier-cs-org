@@ -1,7 +1,7 @@
 // FrontierCS 2 task page (_pages/fcs2-task.md). /task/#<slug> renders one task from fcs2-data.js, loaded first;
 // /task/ with no slug lists every task by domain. For a task with runs: what the agent must do and what it is scored on,
 // a results table (pass or fail, final score against the Human reference, cost), the solution each shown model handed in,
-// the pass criteria, every run's development score against its spend, and the task's FECI curve. assets/css/fcs2.css holds the styles.
+// the pass criteria, every run's development score against its spend, and the task's FCI curve. assets/css/fcs2.css holds the styles.
 
 const RANK = Object.fromEntries(RANKED.map((m, i) => [m.id, i]));
 const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;   // the patch counts files
@@ -51,7 +51,7 @@ function drawPage() {
     + (CHECKS[t.s] ? `<section class="tcrit"><h2 class="th2">Pass criteria</h2><p>A run passes only if its final submission beats the human reference on every metric, on every hidden workload. Each cell counts the hidden workloads on which it did.</p>`
       + `<div class="res-scroll"><table class="res ctab" id="ctbl"></table></div></section>` : '')   // no general submission note (owner audit, 2026-10-14)
     + figure('dc', 'Development score against spend')
-    + (TFIT[t.s] ? figure('fc', 'Expected score by FECI') : '')
+    + (TFIT[t.s] ? figure('fc', 'Expected score by FCI') : '')
     + solutionHTML(t, runs);   // the solution last (owner, 2026-10-14)
   drawResults(); if (CHECKS[t.s]) drawCriteria(); drawCharts(); loadPatches(t); loadFig(t); drawPager(t);
   scrollTo(0, 0);
@@ -160,8 +160,8 @@ function drawDev() {
   $('#dcnote').textContent = 'Each line is one run: its score on the development workloads after each submission, against its estimated spend so far. A failed build or check scores 0.';
 }
 
-/* The task's curve from the FECI fit: the score a model of a given FECI is expected to reach. Dots: each model's mean final
-   score on this task at the model's FECI, and the Human reference at FECI ECI_HUMAN. */
+/* The task's curve from the FCI fit: the score a model of a given FCI is expected to reach. Dots: each model's mean final
+   score on this task at the model's FCI, and the Human reference at FCI ECI_HUMAN. */
 function drawFit() {
   const {t, runs} = cur, [d, k] = TFIT[t.s], ref = REF[t.s];
   const svg = $('#fcsvg'), W = Math.max(300, $('#fcplot').clientWidth), narrow = W < 560;
@@ -180,7 +180,7 @@ function drawFit() {
     svg.append(sv('line', {x1:X(v), x2:X(v), y1:H - B, y2:H - B + 5, stroke:'var(--ink-2)', 'stroke-width':1}));
     svg.append(sv('text', {x:X(v), y:H - B + 20, 'text-anchor':'middle'}, v));
   }
-  svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'FECI'));
+  svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'FCI'));
   const n = 120, path = Array.from({length:n + 1}, (_, i) => { const x = xmin + (xmax - xmin) * i / n; return `${i ? 'L' : 'M'}${X(x).toFixed(1)},${Y(f(x)).toFixed(1)}`; }).join('');
   svg.append(sv('path', {d:path, fill:'none', stroke:'var(--ink-2)', 'stroke-width':2.5}));
   // the task's FEDI: where the curve crosses an expected score of 50
@@ -193,20 +193,20 @@ function drawFit() {
   RANKED.filter(m => runs.some(r => r[0] === m.id)).forEach(m => {
     const sc = mean(runs.filter(r => r[0] === m.id).map(r => r[2])), x = ECI[m.id][0];
     svg.append(sv('circle', {cx:X(x), cy:Y(sc), r:6, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':1.5}));
-    pts.push({x:X(x), y:Y(sc), html:`<b>${esc(m.name)}</b><br>FECI ${f1(x)}<br>Mean final score here <b>${f1(sc)}</b><br>Expected from the curve ${f1(f(x))}`});
+    pts.push({x:X(x), y:Y(sc), html:`<b>${esc(m.name)}</b><br>FCI ${f1(x)}<br>Mean final score here <b>${f1(sc)}</b><br>Expected from the curve ${f1(f(x))}`});
   });
   if (ref != null) {
     svg.append(sv('rect', {x:X(ECI_HUMAN) - 5.5, y:Y(ref) - 5.5, width:11, height:11, fill:'var(--ink)', stroke:'#fff', 'stroke-width':1.5}));
-    pts.push({x:X(ECI_HUMAN), y:Y(ref), html:`<b>Human reference</b><br>FECI ${ECI_HUMAN} by definition<br>Score <b>${f1(ref)}</b>`});
+    pts.push({x:X(ECI_HUMAN), y:Y(ref), html:`<b>Human reference</b><br>FCI ${ECI_HUMAN} by definition<br>Score <b>${f1(ref)}</b>`});
   }
   attachTip(svg, W, H, pts, $('#fctip'));
   $('#fclegend').innerHTML = RANKED.filter(m => runs.some(r => r[0] === m.id)).map(m => `<span><i style="background:${MCOL[m.id]}; border-radius:50%"></i>${esc(m.name)}</span>`).join('')
     + (ref != null ? '<span><i style="background:var(--ink)"></i>Human reference</span>' : '');
-  $('#fcnote').textContent = `The curve is the score expected at each FECI, from the fit. Dots are the models’ final scores here at their FECI.`;
+  $('#fcnote').textContent = `The curve is the score expected at each FCI, from the fit. Dots are the models’ final scores here at their FCI.`;
 }
 
 /* The solution in words (SOLUTION, assets/js/fcs2-solutions.js; owner, 2026-10-14: no code, the idea): which model,
-   whether it passed and its final score, then its steps, laid out as the reasons under How FECI works on the overview. */
+   whether it passed and its final score, then its steps, laid out as the reasons under How FCI works on the overview. */
 function solutionHTML(t, runs) {
   const so = typeof SOLUTION === 'undefined' ? null : SOLUTION[t.s], r = so && runs.find(x => x[0] === so.m);
   if (!so || !r) return '';

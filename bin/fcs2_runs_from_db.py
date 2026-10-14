@@ -13,11 +13,11 @@ Tasks are matched to the paper's task list by display name (TASK below): the dom
 task's folder under tasks/frontier-cs-2.0-demo/problems/ in FrontierCS-2.0-Preview, and the
 short name is the paper's name for the task, or the database name when the paper list has none.
 
-ECI, the leaderboard's main number, is fitted on pass and fail (Qiuyang, 2026-10-14): Epoch AI's ECI idea, a Rasch model
+FCI, the leaderboard's main number, is fitted on pass and fail (Qiuyang, 2026-10-14): Epoch AI's ECI idea, a Rasch model
 P(model m passes task t) = sigmoid(theta_m - beta_t), with every scored run of every model one observation (hidden models
 too: they are respondents, never shown). Strengths theta and difficulties beta, in logits, are fitted together by
 penalised maximum likelihood with penalty LAM/2 (sum theta^2 + sum beta^2), LAM = 0.35 as in the site's in-browser TDIFF.
-A strength is shown as ECI = PASS_ZERO_VALUE + PASS_UNIT * (theta_m - theta of PASS_ZERO), the constants at the top.
+A strength is shown as FCI = PASS_ZERO_VALUE + PASS_UNIT * (theta_m - theta of PASS_ZERO), the constants at the top.
 The 90% interval resamples task columns with replacement (BOOT draws, seeds 0..BOOT-1), refits, maps each draw the same
 way, and takes the 5th and 95th percentiles.
 
@@ -42,7 +42,7 @@ metric half the time, integral prod_j sigmoid(c D + u - beta_tj) N(u; 0, SIGMA_U
 Its 90% interval comes from IS_DRAWS draws of the task's parameters from the Laplace Gaussian, weighted by the exact
 posterior over the Gaussian's density (the posterior of a metric nobody beats is one-sided): the weighted 5th and 95th
 percentiles of D. TFIT's slope is that of the logistic matched to the pass curve at D, 4 dP(pass)/dtheta there. All are
-divided by c back to the strengths' logits (a metric's difficulty is beta_tj / c) and mapped to ECI points like them.
+divided by c back to the strengths' logits (a metric's difficulty is beta_tj / c) and mapped to FCI points like them.
 
 The raw-score fit that the leaderboard showed before 2026-10-14 runs only with --json (feci_score, task_fit_score). It is
 Epoch AI's own ECI code (bin/eci_fitting.py, vendored from epoch-research/eci-public): every task is one benchmark with
@@ -56,8 +56,8 @@ draws); Epoch's code raises when a draw puts the anchors in the wrong order, and
 
 Test-time scaling (SCALE): at a budget B of US$ (usd() below), a run counts as passed only when it has ended within B
 (its spend at the end is at most B) and its verdict is PASS; otherwise it counts as failed (Qiuyang, 2026-10-14).
-ECI(model, B) holds every task's difficulty beta_t at the leaderboard fit and solves the model's one strength with the
-same penalty, so it equals the leaderboard ECI at full budget; it is mapped with the leaderboard's theta of PASS_ZERO.
+FCI(model, B) holds every task's difficulty beta_t at the leaderboard fit and solves the model's one strength with the
+same penalty, so it equals the leaderboard FCI at full budget; it is mapped with the leaderboard's theta of PASS_ZERO.
 Its 90% interval resamples the model's tasks (SCALE_BOOT draws, difficulties held fixed).
 
 Pass rate is the share of scored runs whose verdict is PASS: the final submission meets the task's
@@ -75,11 +75,11 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from eci_fitting import fit_eci_model
 from datetime import datetime
 
-# The ECI scale (Qiuyang, 2026-10-14): ECI = PASS_ZERO_VALUE + PASS_UNIT * (theta - theta of PASS_ZERO), theta in logits.
-# ECI, SCALE, TFIT, DIFF and DIFF_FIT all follow from these three.
+# The FCI scale (Qiuyang, 2026-10-14): FCI = PASS_ZERO_VALUE + PASS_UNIT * (theta - theta of PASS_ZERO), theta in logits.
+# FCI, SCALE, TFIT, DIFF and DIFF_FIT all follow from these three.
 PASS_ZERO = 'Kimi K2.7 Code'   # the 0 point; it is hidden (HIDDEN below) but stays in every fit
 PASS_ZERO_VALUE = 0
-PASS_UNIT = 1.0                # ECI points per logit
+PASS_UNIT = 1.0                # FCI points per logit
 TIE_EPS = 0                    # a final score within TIE_EPS of the human reference is half a win; 0: only an exact tie
 
 # database display name -> (domain folder, paper short name or None)
@@ -153,7 +153,7 @@ MODEL = {
     'GLM 5.3 Flash (ZCode)': ('glmf', 'GLM 5.3 Flash', 'GLM 5.3 Flash', 'ZCode', 'Z.ai'),
 }
 
-HIDDEN = {'Kimi K2.7 Code'}                    # owner's call, 2026-10-09: off the leaderboard, kept in the fits (it is the ECI's 0 point)
+HIDDEN = {'Kimi K2.7 Code'}                    # owner's call, 2026-10-09: off the leaderboard, kept in the fits (it is the FCI's 0 point)
 for a in sys.argv[2:]:   # optional: --low='Model name=value' to try another 0 point
     if a.startswith('--low='): PASS_ZERO, PASS_ZERO_VALUE = a[6:].rsplit('=', 1)[0], float(a[6:].rsplit('=', 1)[1])
 
@@ -168,7 +168,7 @@ HUMAN_VALUE = 25                # the raw-score fit only (--json): the authors' 
 
 
 def on_scale(theta, theta0):
-    """Logits to ECI points, theta0 being PASS_ZERO's strength in the same fit."""
+    """Logits to FCI points, theta0 being PASS_ZERO's strength in the same fit."""
     return PASS_ZERO_VALUE + PASS_UNIT * (np.asarray(theta) - theta0)
 
 
@@ -207,7 +207,7 @@ def rasch(mi, ti, y, nm, nt):
 
 
 def pass_eci(obs):
-    """The leaderboard fit. Per model: (ECI, 90% low, 90% high, tasks); plus every model's strength and every task's
+    """The leaderboard fit. Per model: (FCI, 90% low, 90% high, tasks); plus every model's strength and every task's
     difficulty in logits, and PASS_ZERO's strength."""
     M, T = list(dict.fromkeys(o[0] for o in obs)), sorted({o[1] for o in obs})
     assert PASS_ZERO in M, f'{PASS_ZERO} has no scored runs'
@@ -378,7 +378,7 @@ def metric_fit(obs, ref, theta, PB, fixed=None):
 
 
 def eci_score(rows):
-    """The raw-score fit (--json only). Per respondent: (ECI, 90% low, 90% high, tasks); plus the number of bootstrap
+    """The raw-score fit (--json only). Per respondent: (FCI, 90% low, 90% high, tasks); plus the number of bootstrap
     draws kept and dropped, the pinned task and the task curves."""
     sc, ref = defaultdict(list), defaultdict(list)
     for cand, task, score, verdict, fj in rows:
@@ -447,7 +447,7 @@ def strength(y, b):
 
 
 def scaling(db, beta, theta0):
-    """{model id: [[US$ budget, ECI, 90% low, 90% high, share of runs still going], ...]}; spend from usd().
+    """{model id: [[US$ budget, FCI, 90% low, 90% high, share of runs still going], ...]}; spend from usd().
     beta: the leaderboard fit's task difficulties (logits, by database task name); theta0: PASS_ZERO's strength there."""
     info = {r: (c, t, v == 'PASS') for r, c, t, s, v in db.execute('''select r.id, cd.name, t.name, r.display_score, r.display_verdict from cells ce
         join runs r on r.id = ce.run_id join candidates cd on cd.id = ce.candidate_id join tasks t on t.id = ce.task_id''') if s is not None and c not in HIDDEN}
@@ -495,7 +495,7 @@ for cand, task, score, state, verdict in rows:
     folder, paper = TASK[task]
     runs.append([MODEL[cand][0], SHOWN.get(folder, folder), paper or task.split(' — ')[0], round(score, 2), int(verdict == 'PASS')])
 dropped = Counter(r[3] for r in rows if r[2] is None and r[0] not in HIDDEN)
-# the hidden models' runs in RUNS's columns, for fits made outside this script: Kimi K2.7 is the FECI 0 point but not on the
+# the hidden models' runs in RUNS's columns, for fits made outside this script: Kimi K2.7 is the FCI 0 point but not on the
 # site (Qiuyang, 2026-10-14). _data/ is never published as a file, and no page reads this one.
 hidden = [[MODEL[c][0], SHOWN.get(TASK[t][0], TASK[t][0]), TASK[t][1] or t.split(' — ')[0], round(s, 2), int(v == 'PASS')]
           for c, t, s, st, v in rows if s is not None and c in HIDDEN]
@@ -532,8 +532,8 @@ def task_reference(db):
 
 
 def task_fits(tasks, fit, theta0):
-    """TFIT, DIFF, the metrics' difficulties and DIFF_FIT from metric_fit()'s output, on the ECI scale.
-    TFIT[task] = [D, slope], the logistic matched to the pass curve at D: P(pass) ~ 1 / (1 + exp(-slope (ECI - D))),
+    """TFIT, DIFF, the metrics' difficulties and DIFF_FIT from metric_fit()'s output, on the FCI scale.
+    TFIT[task] = [D, slope], the logistic matched to the pass curve at D: P(pass) ~ 1 / (1 + exp(-slope (FCI - D))),
     slope = 4 dP/dECI there. DIFF[task] = [D, 90% low, 90% high, passes, wins, runs] and METRIC[task][stem] =
     [difficulty, 90% low, 90% high, runs that beat it], counting the runs the page shows (RUNS); wins null without a reference."""
     s_u, a, d, tau, c = fit
@@ -593,20 +593,20 @@ CHECKS = task_checks(db)
 eci_js = {MODEL[c][0]: list(E[c]) for c in MODEL if c not in HIDDEN}
 zero = MODEL[PASS_ZERO][1]
 block = (f'// One entry per scored run in the preview results database of {when:%Y-%m-%d} (bin/fcs2_runs_from_db.py):\n'
-         f'// model, domain, task, final score (0-100, the task\'s own scale), passed (1 = verdict PASS). Timeouts score 0; {sum(dropped.values())} unscored runs are left out' + ''.join(f'; {MODEL[c][1]} is left out (only the ECI 0 point)' for c in sorted(HIDDEN)) + '.\n'
+         f'// model, domain, task, final score (0-100, the task\'s own scale), passed (1 = verdict PASS). Timeouts score 0; {sum(dropped.values())} unscored runs are left out' + ''.join(f'; {MODEL[c][1]} is left out (only the FCI 0 point)' for c in sorted(HIDDEN)) + '.\n'
          f'const RUNS = {json.dumps(runs, ensure_ascii=False)}.map(([m, d, t, s, p]) => ({{m, d, t, s, p}}));\n'
          'const MODELS = [\n' + ''.join(f"  {{id:'{i}', name:'{n}', short:'{s}', h:'{h}', lab:'{l}'}},\n" for i, n, s, h, l in models) + '];\n'
          f"const UPDATED = '{when:%B} {when.day}, {when.year}';\n"
          f"// Pass rate per model: [percent, runs that pass, runs].\nconst PASS = {json.dumps(pass_rate(runs))};\n"
-         f"// ECI per model: [point, 90% low, 90% high, tasks], fitted on pass and fail: P(model passes task) = 1 / (1 + exp(-(strength - difficulty))), every run of every model one observation ({zero} too), L2 penalty {LAM:g}; ECI = {PASS_ZERO_VALUE:g} + {PASS_UNIT:g} x (strength - {zero}'s strength), strengths in logits (ECI_LOW, ECI_LOW_VALUE, ECI_UNIT); the interval resamples tasks ({BOOT} bootstrap draws).\n"
+         f"// FCI per model: [point, 90% low, 90% high, tasks], fitted on pass and fail: P(model passes task) = 1 / (1 + exp(-(strength - difficulty))), every run of every model one observation ({zero} too), L2 penalty {LAM:g}; FCI = {PASS_ZERO_VALUE:g} + {PASS_UNIT:g} x (strength - {zero}'s strength), strengths in logits (ECI_LOW, ECI_LOW_VALUE, ECI_UNIT); the interval resamples tasks ({BOOT} bootstrap draws).\n"
          f"const ECI = {json.dumps(eci_js)};\nconst ECI_LOW = '{MODEL[PASS_ZERO][0]}', ECI_LOW_NAME = '{zero}', ECI_LOW_VALUE = {PASS_ZERO_VALUE:g}, ECI_UNIT = {PASS_UNIT:g};\n"
-         f"// Test-time scaling per model: [US$ budget per run, ECI, 90% low, 90% high, share of runs still going]; at a budget a run has passed only if it ended within it with verdict PASS, task difficulties held at the ECI fit (see the converter's docstring).\nconst SCALE = {json.dumps(SC, separators=(',', ':'))};\n"
+         f"// Test-time scaling per model: [US$ budget per run, FCI, 90% low, 90% high, share of runs still going]; at a budget a run has passed only if it ended within it with verdict PASS, task difficulties held at the FCI fit (see the converter's docstring).\nconst SCALE = {json.dumps(SC, separators=(',', ':'))};\n"
          f"// Cost per model: [mean US$ per scored run, runs]; output tokens x output price + every token x cache-read price (PRICE above).\nconst COST = {json.dumps(CO)};\nconst PRICE = {json.dumps(PRICE)};\n"
          f"// Every scored run: [model, task, final score, passed, US$ at end, hours, [[US$, dev score] per development submission]].\nconst TRAJ = {json.dumps(trajectories(db), separators=(',', ':'), ensure_ascii=False)};\n"
          f"// Per task: the authors' reference score, the median over the task's runs (tasks without one are left out).\nconst REF = {json.dumps(REF, ensure_ascii=False)};\n"
-         f"// Per task: [D, slope], the logistic matched to its pass curve at D, P(pass) ~ 1 / (1 + exp(-slope (ECI - D))), slope = 4 x the curve's gradient at D (DIFF has D).\nconst TFIT = {json.dumps(TFIT, ensure_ascii=False)};\n"
-         f"// Per task: [D, 90% low, 90% high, passes, wins, runs] in RUNS. D, the difficulty, is the ECI at which a model passes half the time, a pass being every metric beaten at once. It comes from each metric's own difficulty, fitted on which metrics each run beats and whether its final score beats the human reference (a win; a tie is half; wins is null without a reference), with a run effect shared by both (DIFF_FIT).\nconst DIFF = {json.dumps(DIFF, ensure_ascii=False)};\n"
-         f"// The difficulty fit's shared parameters, by Laplace marginal likelihood over all tasks: sigma_u, the sd of a run's effect on its metrics and its win; a, the slope of P(win) over that of a metric; delta and tau, the mean and sd of a metric's difficulty above the task's beat-the-human level (these three in ECI points); c, how much the fit stretches the ECI fit's logits, which have no run effect.\nconst DIFF_FIT = {json.dumps(DIFF_FIT)};\n"
+         f"// Per task: [D, slope], the logistic matched to its pass curve at D, P(pass) ~ 1 / (1 + exp(-slope (FCI - D))), slope = 4 x the curve's gradient at D (DIFF has D).\nconst TFIT = {json.dumps(TFIT, ensure_ascii=False)};\n"
+         f"// Per task: [D, 90% low, 90% high, passes, wins, runs] in RUNS. D, the difficulty, is the FCI at which a model passes half the time, a pass being every metric beaten at once. It comes from each metric's own difficulty, fitted on which metrics each run beats and whether its final score beats the human reference (a win; a tie is half; wins is null without a reference), with a run effect shared by both (DIFF_FIT).\nconst DIFF = {json.dumps(DIFF, ensure_ascii=False)};\n"
+         f"// The difficulty fit's shared parameters, by Laplace marginal likelihood over all tasks: sigma_u, the sd of a run's effect on its metrics and its win; a, the slope of P(win) over that of a metric; delta and tau, the mean and sd of a metric's difficulty above the task's beat-the-human level (these three in FCI points); c, how much the fit stretches the FCI fit's logits, which have no run effect.\nconst DIFF_FIT = {json.dumps(DIFF_FIT)};\n"
          f"// Per task: the metrics its judge checks and the number of hidden final workloads; a run passes only when every check passes on every final workload.\nconst CHECKS = {json.dumps(CHECKS, ensure_ascii=False, separators=(',', ':'))};\n"
          f"// Task descriptions from the paper repo (bin/fcs2_descriptions.tsv).\nconst DESC = {json.dumps(descriptions(), ensure_ascii=False)};\n")
 js = open(js_path, encoding='utf-8').read()   # read late: the fits above take a while
@@ -617,7 +617,7 @@ open(js_path, 'w', encoding='utf-8').write(js)
 hid_path = '_data/fcs2_runs_hidden.json'
 open(hid_path, 'w', encoding='utf-8').write(hidden_json(generated, hidden))
 print('PASS', pass_rate(runs))
-print('ECI', eci_js)
+print('FCI', eci_js)
 print('DIFF_FIT', DIFF_FIT, '(internal axis: sigma_u {:.4f}, a {:.4f}, delta {:.4f}, tau {:.4f}, c {:.4f}; Laplace log marginal likelihood {:.3f})'.format(*dfit, dll))
 print('starts', [(tuple(round(float(v), 4) for v in h), round(float(l), 3)) for h, l in dstarts])
 print('importance sampling: smallest effective sample size', round(min(T['ess'] for T in MT.values())), 'of', IS_DRAWS,
