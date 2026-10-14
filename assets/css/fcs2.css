@@ -467,8 +467,8 @@ a.pbtn:hover{border-color:var(--teal); color:var(--teal-d)}
 .cc{--add:rgb(199,225,203); --add-w:rgb(105,219,124); --add-t:rgb(47,157,68); --del:rgb(253,210,216); --del-w:rgb(255,168,180); --del-t:rgb(209,69,75);
   font:13px/1.6 "Google Sans Code",ui-monospace,Menlo,Consolas,monospace; color:var(--ink)}
 .ccf + .ccf{margin-top:24px}
-.cct{display:flex; align-items:baseline; margin:0; overflow-wrap:anywhere}
-.cct::before{content:""; flex:none; width:8px; height:8px; margin-right:10px; border-radius:50%; background:var(--add-t); transform:translateY(-1px)}
+.cct{position:relative; margin:0; padding-left:18px; overflow-wrap:anywhere}   /* a long path wraps under itself, not under the dot */
+.cct::before{content:""; position:absolute; left:0; top:.55em; width:8px; height:8px; border-radius:50%; background:var(--add-t)}
 .cct b{font-weight:700}
 .ccs{position:relative; margin:2px 0 6px; padding-left:18px; color:var(--muted); overflow-wrap:anywhere}
 .ccs::before{content:""; position:absolute; left:3px; top:0; width:8px; height:.8em; border-left:1.5px solid var(--faint); border-bottom:1.5px solid var(--faint)}
