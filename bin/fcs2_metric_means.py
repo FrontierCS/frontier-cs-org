@@ -42,6 +42,9 @@ r4 = lambda v: None if v is None else float(f'{v:.4g}')
 # checks that must equal an exact answer: the page says so instead of a direction (Qiuyang, 2026-10-15; ParButterfly's
 # judge lists "higher" only as an equivalent under its exactness guard)
 EXACT = {('ParButterfly', 'butterfly_count'), ('SCOPE', 'exact_counts')}
+# a direction the export lacks (its direction file predates this task version), as every workload decision follows it
+BETTER = {('Adaptive attacks', 'attack_bytes'): 'lower', ('Adaptive attacks', 'attack_success_rate'): 'higher',
+          ('Adaptive attacks', 'successful_normalized_diversity'): 'higher'}
 UNIT_NAME = {'milliseconds': 'ms', 'microseconds': 'µs', 'seconds': 's'}   # the export's unit, for keys without a unit suffix
 # metrics whose runs keep a mean over only some workloads: a profiled reference counts only with the same "scope"
 # (Polar Express keeps these two over the original six of its twelve cases; Qiuyang, 2026-10-15)
@@ -78,6 +81,7 @@ for t, metrics in out.items():
         s['ref'] = r4(statistics.median(refs)) if refs else None
         s['by'] = dict(sorted(s['by'].items()))
         if (t, metric) in EXACT: s['exact'] = True
+        if (t, metric) in BETTER: s['better'] = BETTER[t, metric]
 live_ver = {}   # per task, the task versions of the runs counted
 for r in rows:
     if not dbp or r['run_id'] in live: live_ver.setdefault(r['task'], set()).add(r.get('task_version_id'))
