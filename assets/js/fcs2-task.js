@@ -171,12 +171,12 @@ function drawResults() {
       return {k:fam[u0] / fam[u], e:0, u}; }
     const ex = vals.map(v => Math.floor(Math.log10(+v.toPrecision(3)))), lo = Math.min(...ex), hi = Math.max(...ex);
     const e = (lo < -3 || hi >= 6) && hi - lo <= 2 || lo === -3 && hi <= -2 ? lo : 0; return {k:Math.pow(10, -e), e}; };   // 0.001 to 0.01 only when all lie below 0.1
-  // a column whose numbers lie close together shows as many digits as tell them apart, up to 5 (Qiuyang, 2026-10-15:
+  // a column whose numbers lie close together shows as many digits as tell them apart, up to 4 (Qiuyang, 2026-10-15:
   // DeTok's PSNRs all read 24.4)
   const colFmt = (m, s) => { const f = colScale(m, s); if (!s || split) return {...f, p:3};
     const sv = [s.ref, ...Object.values(s.by).map(x => x[0])].filter(v => v != null).map(v => v * f.k);
     const spread = sv.length ? Math.max(...sv) - Math.min(...sv) : 0, mx = Math.max(0, ...sv.map(Math.abs));
-    return {...f, p:spread > 0 ? Math.min(5, Math.max(3, Math.ceil(Math.log10(mx / spread)) + 1)) : 3}; };
+    return {...f, p:spread > 0 ? Math.min(4, Math.max(3, Math.ceil(Math.log10(mx / spread)) + 1)) : 3}; };   // 4: the digits METRIC_STATS keeps
   const sc = (v, m) => v * F[m].k;   // F, each column's scale, follows split below
   const cell = (r, m, i) => { const v = (by[r[0]] || {})[m], [mean, rref] = (st[m] && st[m].by[r[0]]) || [];
     if (!v) return `<td class="${mcls(i)} e">—</td>`;
