@@ -144,23 +144,26 @@ function drawResults() {
   const cell = (r, m, i) => { const v = (by[r[0]] || {})[m], [mean, rref] = (st[m] && st[m].by[r[0]]) || [];
     if (!v) return `<td class="${mcls(i)} e">—</td>`;
     const tip = `Beat the human reference on ${v[0]} of ${v[1]} hidden workloads` + (rref != null ? `; human reference in this run: ${num(rref)}` : '');
-    const all = v[0] === v[1], bar = v[0] ? `<span class="mbar"><i class="${all ? 'y' : 'n'}" style="width:${(100 * v[0] / v[1]).toFixed(0)}%"></i></span>` : '';   // none won: no bar (Qiuyang)
+    const all = v[0] === v[1], bar = `<span class="mbar"><i class="${all ? 'y' : 'n'}" style="width:${(100 * v[0] / v[1]).toFixed(0)}%"></i></span>`;   // none won: the empty track (Qiuyang)
     return `<td class="${mcls(i)} ${all ? 'cy' : 'cn'}" title="${tip}">` + (mean != null ? `<b>${num(mean)}</b>` : `<b>${v[0]}/${v[1]}</b>`) + bar + '</td>'; };
   // a task in WORKLOAD_NAME with numbers for each workload: every metric splits into one column per workload; the human
   // reference's cell adds the margin a run had to beat it by (the median over runs; each run's own in its tooltip), and a
-  // run has a green bar when it cleared that workload's rule, none when not (Qiuyang, 2026-10-15)
+  // run's bar is full green when it cleared that workload's rule, an empty track when not (Qiuyang, 2026-10-15); each
+  // (metric, workload) is a column of its own, "Branches covered, Vim 5.7", with no spanning header (Qiuyang)
   const WN = WORKLOAD_NAME[t.s], split = !!WN && ms.length > 0 && ms.every(m => st[m] && st[m].w), wl = WN ? Object.keys(WN) : [];
   const sign = m => st[m].exact ? '' : st[m].better === 'lower' ? '−' : '+';
   const wcell = (r, m, w) => { const [v, rref, beat, mg] = ((st[m].w[w] || {}).by || {})[r[0]] || [];
     if (v == null) return '<td class="mc e">—</td>';
     const tip = `${beat ? 'Cleared' : 'Did not clear'} the rule on ${WN[w]}` + (rref != null ? `; human reference in this run: ${num(rref)}` : '') + (mg != null ? `; margin needed: ${sign(m)}${num(mg)}` : '');
-    return `<td class="mc ${beat ? 'cy' : 'cn'}" title="${tip}"><b>${num(v)}</b>${beat ? '<span class="mbar"><i class="y" style="width:100%"></i></span>' : ''}</td>`; };
+    return `<td class="mc ${beat ? 'cy' : 'cn'}" title="${tip}"><b>${num(v)}</b><span class="mbar"><i class="y" style="width:${beat ? 100 : 0}%"></i></span></td>`; };
   const wref = (m, w) => { const W = st[m].w[w] || {}; return W.ref == null ? '<td class="mc e">—</td>'
     : `<td class="mc"><b>${num(W.ref)}</b>${W.margin != null ? `<span class="mg">${sign(m)}${num(W.margin)}</span>` : ''}</td>`; };
   // the metrics first, then the final score and the cost (owner, 2026-10-15)
+  const whead = (m, w) => { const h = metricHead(m, st[m]), u = / \([^)]*\)$/.exec(h);   // the workload goes before a unit: "Search overhead, Vim 5.7 (s)"
+    return u ? `${h.slice(0, u.index)}, ${WN[w]}${u[0]}` : `${h}, ${WN[w]}`; };
   const head = split
-    ? '<thead><tr><th rowspan="2">Model</th>' + ms.map(m => `<th class="mc" colspan="${wl.length}" title="${esc(m)}">${esc(metricHead(m, st[m]))}${dir(m)}</th>`).join('')
-      + '<th class="rs" rowspan="2">Final score</th><th class="rc" rowspan="2">Cost</th></tr><tr class="wl">' + ms.map(() => wl.map(w => `<th class="mc">${esc(WN[w])}</th>`).join('')).join('') + '</tr></thead>'
+    ? '<thead><tr><th>Model</th>' + ms.map(m => wl.map(w => `<th class="mc" title="${esc(m)}">${esc(whead(m, w))}${dir(m)}</th>`).join('')).join('')
+      + '<th class="rs">Final score</th><th class="rc">Cost</th></tr></thead>'
     : '<thead><tr><th>Model</th>' + ms.map((m, i) => `<th class="${mcls(i)}" title="${esc(m)}">${esc(metricHead(m, st[m]))}${dir(m)}</th>`).join('') + '<th class="rs">Final score</th><th class="rc">Cost</th></tr></thead>';
   const refRow = split ? ms.map(m => wl.map(w => wref(m, w)).join('')).join('')
     : ms.map((m, i) => st[m] && st[m].ref != null ? `<td class="${mcls(i)}"><b>${num(st[m].ref)}</b></td>` : `<td class="${mcls(i)} e">—</td>`).join('');
