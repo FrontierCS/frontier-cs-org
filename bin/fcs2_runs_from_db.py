@@ -24,30 +24,35 @@ when it beats every workload, and a run without counts (it failed before the hid
 stops unless PASS is exactly "every metric beaten" for every run. Metrics that pass and fail together cannot be told
 apart by the data, and counting each separately makes a task look harder than it is (Qiuyang): metrics whose outcomes
 over the task's runs differ in at most GROUP_TOL runs are linked, a group is a connected set of them (recomputed from
-the data on every run), and the model treats each group as one item that a run beats when it beats every member. A win w
-against the human reference r_t (the median reference_score over the task's runs; 0 or less: REF_DEFAULT's value, else
-the task has none) is 1 for a final score above r_t + TIE_EPS, 0 below r_t - TIE_EPS, otherwise 1/2. The final score
-comes from the same measurements as the metrics, so a run's metric groups and its win share one run effect u ~ N(0,
-SIGMA_U^2). With theta_m the model's strength in logits (prior N(0, 1/LAM), LAM = 0.35 as in the site's in-browser
-TDIFF), a run's likelihood is the integral over u, by Gauss-Hermite quadrature (24 nodes), of prod_j sigmoid(theta_m + u
-- beta_tj)^z (1 - sigmoid(.))^(1 - z), j over the task's metric groups, times sigmoid(a (theta_m + u - h_t))^w (1 -
-sigmoid(.))^(1 - w), with h_t the task's beat-the-human level. Priors: h_t ~ N(0, PRIOR_SD^2) and beta_tj ~ N(h_t +
-DELTA, TAU^2); a task without a reference has no win and no h_t, and beta_tj ~ N(0, PRIOR_SD^2). For given SIGMA_U, a,
-DELTA and TAU, the strengths and every task's parameters are fitted together at their joint posterior mode (Newton's
-method, the strengths' block solved through the Schur complement); SIGMA_U, a, DELTA and TAU maximise the profile log
-marginal likelihood: per task the Laplace approximation over its parameters at that mode, summed, plus the strengths'
-log prior (Nelder-Mead from two starts; all but DELTA on a log scale; SIGMA_U at most 4, where 24 nodes stay accurate).
-A strength is shown as FCI = PASS_ZERO_VALUE + PASS_UNIT * (theta_m - theta of PASS_ZERO), the constants at the top.
-FCI's 90% interval resamples tasks with replacement (BOOT draws, seeds 0..BOOT-1), refits the strengths and every task's
-parameters with the hyperparameters held at the full fit, maps each draw the same way and takes the 5th and 95th
-percentiles. D, a task's difficulty, is the strength at which a run beats every metric half the time, integral prod_j
-sigmoid(D + u - beta_tj) N(u; 0, SIGMA_U^2) du = 1/2, with beta at the mode. Its 90% interval comes from IS_DRAWS draws
-of the task's parameters from the Laplace Gaussian (strengths held), weighted by the exact posterior over the Gaussian's
-density (the posterior of a metric nobody beats is one-sided): the weighted 5th and 95th percentiles of D. TFIT's slope
-(--json only) is that of the logistic matched to the pass curve at D, 4 dP(pass)/dtheta there. All are mapped to FCI
-points like the strengths. GROUPS gives each task's metric-group difficulties at the mode, on the FCI scale, so the task
-chart can draw the model's own pass curve, which crosses 1/2 at the task's FDI (the script checks this on the rounded
-values, to 0.05 points). TFIT (the logistic matched to that curve at FDI) and PROG are written to --json only (task_fit,
+the data on every run), and the model treats each group as one item that a run beats when it beats every member. A run's
+final score counts only when the run passes (Qiuyang, 2026-10-15): then how far above the human reference r_t it is (r_t
+the median reference_score over the task's runs; 0 or less: REF_DEFAULT's value, else the task has none), in units of
+the task's score spread, at least the median spread over tasks: y = (score - r_t) / unit_t, unit_t = max(sd_t, c), sd_t
+the sd of the task's final scores strictly between 0 and 100 (all of them when fewer than 3), c the median sd_t over the
+tasks with a reference. A run that does not pass contributes its metric groups only. The final score comes from the same
+measurements as the metrics, so a run's metric groups and its margin share one run effect u ~ N(0, SIGMA_U^2). With
+theta_m the model's strength in logits (prior N(0, 1/LAM), LAM = 0.35 as in the site's in-browser TDIFF), a run's
+likelihood is the integral over u, by Gauss-Hermite quadrature (64 nodes; 24 stall Newton near SIGMA_U = 3.7), of prod_j
+sigmoid(theta_m + u - beta_tj)^z (1 - sigmoid(.))^(1 - z), j over the task's metric groups, times, for a run that
+passes, the normal density of y with mean a (theta_m + u - h_t) and sd S_E (censored above for a score of 100 or more:
+P(y' >= y)), with h_t the task's beat-the-human level. Priors: h_t ~ N(0, PRIOR_SD^2) and beta_tj ~ N(h_t + DELTA,
+TAU^2); a task without a reference has no margin and no h_t, and beta_tj ~ N(0, PRIOR_SD^2). For given SIGMA_U, a,
+DELTA, TAU and S_E, the strengths and every task's parameters are fitted together at their joint posterior mode
+(Newton's method, the strengths' block solved through the Schur complement); SIGMA_U, a, DELTA, TAU and S_E maximise the
+profile log marginal likelihood: per task the Laplace approximation over its parameters at that mode, summed, plus the
+strengths' log prior (Nelder-Mead from two starts; all but DELTA on a log scale; SIGMA_U at most 7; a cold start eases
+S_E in from 16 times its value). A strength is shown as FCI = PASS_ZERO_VALUE + PASS_UNIT * (theta_m - theta of
+PASS_ZERO), the constants at the top. FCI's 90% interval resamples tasks with replacement (BOOT draws, seeds 0..BOOT-1),
+refits the strengths and every task's parameters with the hyperparameters held at the full fit, maps each draw the same
+way and takes the 5th and 95th percentiles; a draw whose mode is not found is left out and counted. D, a task's
+difficulty, is the strength at which a run beats every metric half the time, integral prod_j sigmoid(D + u - beta_tj)
+N(u; 0, SIGMA_U^2) du = 1/2, with beta at the mode. Its 90% interval comes from IS_DRAWS draws of the task's parameters
+from the Laplace Gaussian (strengths held), weighted by the exact posterior over the Gaussian's density (the posterior
+of a metric nobody beats is one-sided): the weighted 5th and 95th percentiles of D. TFIT's slope (--json only) is that
+of the logistic matched to the pass curve at D, 4 dP(pass)/dtheta there. All are mapped to FCI points like the
+strengths. GROUPS gives each task's metric-group difficulties at the mode, on the FCI scale, so the task chart can draw
+the model's own pass curve, which crosses 1/2 at the task's FDI (the script checks this on the rounded values, to 0.06
+points). TFIT (the logistic matched to that curve at FDI) and PROG are written to --json only (task_fit,
 progress_curve). PROG gives each task a progress curve (Qiuyang): the expected share of the task's hidden checks a model
 beats (summed over its final workloads; a run without counts beats none), E[share | theta] = f_t + (1 - f_t) integral
 sigmoid(kappa_t (theta - g_t) + u) N(u; 0, SIGMA_U^2) du, with a floor f_t in [0, 0.95], a slope kappa_t (log kappa_t ~
@@ -66,10 +71,10 @@ draws); Epoch's code raises when a draw puts the anchors in the wrong order, and
 
 Test-time scaling (SCALE): the same model with every task's parameters held at the leaderboard fit (Qiuyang,
 2026-10-14). At a budget B of US$ (usd() below), a run that has ended within B (its spend at the end is at most B)
-contributes its metric groups and its win; a run still going contributes every group unbeaten and no win. FCI(model, B)
-is the strength that maximises the model's likelihood under the same prior, so it equals the leaderboard FCI at full
-budget; it is mapped with the leaderboard's theta of PASS_ZERO. Its 90% interval resamples the model's tasks (SCALE_BOOT
-draws, task parameters held).
+contributes its metric groups and, if it passed, its margin; a run still going contributes no group beaten and no
+margin. FCI(model, B) is the strength that maximises the model's likelihood under the same prior, so it equals the
+leaderboard FCI at full budget; it is mapped with the leaderboard's theta of PASS_ZERO. Its 90% interval resamples the
+model's tasks (SCALE_BOOT draws, task parameters held).
 
 Pass rate is the share of scored runs whose verdict is PASS: the final submission meets the task's
 beat-the-reference criteria on every workload. It is a plain count, so it has no interval.
@@ -78,7 +83,7 @@ import json, re, sqlite3, sys
 from collections import Counter, defaultdict
 import numpy as np
 from scipy.optimize import minimize
-from scipy.special import expit, log_expit, logsumexp
+from scipy.special import expit, log_expit, logsumexp, log_ndtr
 import pandas as pd
 import os
 os.environ.setdefault('TQDM_DISABLE', '1')   # Epoch's bootstrap bar, once per draw here
@@ -178,7 +183,7 @@ PRIOR_SD = 6                     # logits: prior sd of a task's beat-the-human l
 GROUP_TOL = 0                    # metrics whose outcomes differ in at most GROUP_TOL runs are fitted as one group (below 0: no groups)
 PROG_K_SD = 0.5                  # prior sd of a progress curve's log slope (per logit, centred on 1)
 IS_DRAWS = 2000                  # importance-weighted posterior draws per task for the interval of its difficulty
-GH_U, GH_W = np.polynomial.hermite.hermgauss(24)   # E f(u), u ~ N(0, 1), is the sum over nodes of exp(GH_LW) f(GH_U)
+GH_U, GH_W = np.polynomial.hermite.hermgauss(64)   # E f(u), u ~ N(0, 1), is the sum over nodes of exp(GH_LW) f(GH_U); 24 nodes stall Newton near s_u = 3.7
 GH_U, GH_LW, LOG2PI = np.sqrt(2) * GH_U, np.log(GH_W / np.sqrt(np.pi)), np.log(2 * np.pi)
 HUMAN_VALUE = 25                # the raw-score fit only (--json): the authors' reference is HUMAN_VALUE (owner, 2026-10-13)
 
@@ -218,13 +223,22 @@ def passby():
 def metric_tasks(obs, ref, PB):
     """Per task (database name): its metric stems, their outcomes Z (run x metric), its metric groups, the models of
     its runs and their outcomes O (run x item). The items are the task's metric groups, then, with a reference, the
-    final-score win. A metric is a check key's stem, the text after its last '/' (Yannakakis's keys are per workload;
+    margin of a passing run's final score over the human reference. A metric is a check key's stem, the text after its last '/' (Yannakakis's keys are per workload;
     'dev/' keys are dropped), with its counts summed over its keys; a run beats it (z = 1) when it beats every workload.
     A run without counts failed before the hidden evaluation and beats none. Metrics whose outcomes over the task's runs
     differ in at most GROUP_TOL runs are linked, a group is a connected set of them, and a run beats a group when it
-    beats every member; with every run's PASS equal to all metrics beaten, it is also all groups beaten."""
+    beats every member; with every run's PASS equal to all metrics beaten, it is also all groups beaten. With a reference r_t
+    the outcome row ends [y, cen]: y = (score - r_t) / unit_t for a run that passes, unit_t = max(sd_t, c), sd_t the sd of the
+    task's final scores strictly between 0 and 100 (all of them when fewer than 3), c the median sd_t over the tasks with a
+    reference; cen 0 observed, 1 a score of 100 or more (y a lower bound), -1 a score of 0 or less (y an upper bound), 2 no
+    margin (the run did not pass). Returns the tasks and c."""
     n = Counter((MODEL[o[0]][0], o[1]) for o in obs)
     assert max(n.values()) == 1, 'PASSBY has one entry per task and model: two runs of one model on a task cannot be told apart'
+    spread = {}
+    for t in {o[1] for o in obs}:
+        sc = np.array([o[3] for o in obs if o[1] == t]); mid = sc[(sc > 0) & (sc < 100)]
+        spread[t] = float(np.std(mid if len(mid) >= 3 else sc))
+    unit0 = float(np.median([spread[t] for t in ref]))   # Qiuyang, 2026-10-15: unit_t = max(sd_t, c), c the median sd over tasks
     out = {}
     for t in sorted({o[1] for o in obs}):
         rs, cnt = [o for o in obs if o[1] == t], []
@@ -246,10 +260,15 @@ def metric_tasks(obs, ref, PB):
                 if np.sum(Z[:, i] != Z[:, j]) <= GROUP_TOL: up[root(i)] = root(j)
         groups = [[stems[i] for i in range(len(stems)) if root(i) == r] for r in dict.fromkeys(root(i) for i in range(len(stems)))]
         G = np.array([[min(z[stems.index(m)] for m in g) for g in groups] for z in Z])
-        W = np.array([[win(o[3], ref[t])] for o in rs]) if t in ref else np.zeros((len(rs), 0))
         share = np.array([sum(v[0] for v in a.values()) / max(1, sum(v[1] for v in a.values())) for a in cnt])   # of hidden checks beaten
-        out[t] = {'stems': stems, 'Z': Z, 'groups': groups, 'models': [o[0] for o in rs], 'O': np.hstack([G, W]), 'k': len(groups), 'share': share}
-    return out
+        O, w, unit = G, None, None
+        if t in ref:   # only a run that passes shows how far beyond the human reference it got (Qiuyang, 2026-10-15)
+            sc, unit = np.array([o[3] for o in rs]), max(spread[t], unit0)
+            cen = np.where(G.all(1), np.where(sc <= 0, -1.0, np.where(sc >= 100, 1.0, 0.0)), 2.0)
+            O, w = np.column_stack([G, (sc - ref[t]) / unit, cen]), np.array([win(o[3], ref[t]) for o in rs])
+        out[t] = {'stems': stems, 'Z': Z, 'groups': groups, 'models': [o[0] for o in rs], 'O': O, 'k': len(groups),
+                  'np': len(groups) + (t in ref), 'share': share, 'wins': w, 'unit': unit}
+    return out, unit0
 
 
 def task_prior(x, k, has_ref, hyp):
@@ -267,31 +286,58 @@ def task_prior(x, k, has_ref, hyp):
     return f, g, H
 
 
+def margin_terms(A, y, cen, s_e):
+    """Per entry: the log density of a margin y with mean A, y ~ N(A, s_e^2), and its first and second derivatives in A.
+    cen 0: y observed; 1: y a lower bound (P(y' >= y)); -1: an upper bound; 2: no margin (the run did not pass), 0."""
+    v = (y - A) / s_e
+    lo = -0.5 * v ** 2 - np.log(s_e) - 0.5 * LOG2PI
+    g, h = v / s_e, np.full(np.broadcast(v, cen).shape, -1 / s_e ** 2)
+    w = np.where(cen < 0, v, -v)                          # P = Phi(w) for a censored entry
+    lc = log_ndtr(w)
+    lam = np.exp(-0.5 * w ** 2 - 0.5 * LOG2PI - lc)       # inverse Mills ratio phi(w) / Phi(w)
+    gc, hc = np.where(cen < 0, -lam / s_e, lam / s_e), -lam * (w + lam) / s_e ** 2
+    c, skip = cen != 0, cen == 2
+    lo, g, h = np.where(c, lc, lo), np.where(c, gc, g), np.where(c, hc, h)
+    return np.where(skip, 0.0, lo), np.where(skip, 0.0, g), np.where(skip, 0.0, h)
+
+
 def task_lj(x, th, O, k, hyp):
-    """Log joint of one task's outcomes and parameters at parameter rows x (N x items): its metric-group difficulties
+    """Log joint of one task's outcomes and parameters at parameter rows x (N x params): its metric-group difficulties
     beta, then, with a reference, its beat-the-human level h; th holds its runs' strengths. A run is one integral over
-    its run effect u ~ N(0, s_u^2) (Gauss-Hermite): group j at slope 1, P = sigmoid(theta + u - beta_j), the win at
-    slope a, P = sigmoid(a (theta + u - h))."""
-    s_u, a = hyp[0], hyp[1]
-    s = np.r_[np.ones(k), a][:O.shape[1]]
-    A = s * (th[:, None, None] + s_u * GH_U[:, None] - x[:, None, None, :])            # draw x run x node x item
-    lf = (O[:, None, :] * log_expit(A) + (1 - O[:, None, :]) * log_expit(-A)).sum(3) + GH_LW
-    return logsumexp(lf, axis=2).sum(1) + task_prior(x, k, O.shape[1] > k, hyp)[0]
+    its run effect u ~ N(0, s_u^2) (Gauss-Hermite): group j at slope 1, P = sigmoid(theta + u - beta_j), and for a run
+    that passes, its margin y ~ N(a (theta + u - h), s_e^2) (margin_terms)."""
+    s_u, a, s_e = hyp[0], hyp[1], hyp[4]
+    A = th[:, None, None] + s_u * GH_U[:, None] - x[:, None, None, :k]                  # draw x run x node x group
+    Ok = O[:, None, :k]
+    lf = (Ok * log_expit(A) + (1 - Ok) * log_expit(-A)).sum(3) + GH_LW
+    has = O.shape[1] > k
+    if has:
+        Am = a * (th[:, None] + s_u * GH_U[None, :] - x[:, k][:, None, None])           # draw x run x node
+        lf = lf + margin_terms(Am, O[:, k][:, None], O[:, k + 1][:, None], s_e)[0]
+    return logsumexp(lf, axis=2).sum(1) + task_prior(x, k, has, hyp)[0]
 
 
 def task_derivs(x, tv, O, k, hyp):
     """One task at parameters x, its runs' strengths tv: the log joint, its gradient and Hessian in x, and per run the
     first and second derivative in the run's strength and the cross derivatives with x."""
-    s_u, a = hyp[0], hyp[1]
-    s = np.r_[np.ones(k), a][:O.shape[1]]
-    A = s * (tv[:, None, None] + s_u * GH_U[:, None] - x)                                # run x node x item
-    lf = (O[:, None, :] * log_expit(A) + (1 - O[:, None, :]) * log_expit(-A)).sum(2) + GH_LW
+    s_u, a, s_e = hyp[0], hyp[1], hyp[4]
+    A = tv[:, None, None] + s_u * GH_U[:, None] - x[:k]                                 # run x node x group
+    Ok = O[:, None, :k]
+    lf = (Ok * log_expit(A) + (1 - Ok) * log_expit(-A)).sum(2) + GH_LW
+    p = expit(A)
+    G, W = p - Ok, p * (1 - p)                                                          # d log f / dx; -d2 log f / dx2
+    has = O.shape[1] > k
+    if has:
+        Am = a * (tv[:, None] + s_u * GH_U[None, :] - x[k])                             # run x node
+        lm, gA, hA = margin_terms(Am, O[:, k][:, None], O[:, k + 1][:, None], s_e)
+        lf = lf + lm
+        G = np.concatenate([G, (-a * gA)[:, :, None]], 2)
+        W = np.concatenate([W, (-a * a * hA)[:, :, None]], 2)
     ell = logsumexp(lf, axis=1)
-    q, p = np.exp(lf - ell[:, None]), expit(A)                                          # node weights given the outcomes
-    G, W = s * (p - O[:, None, :]), s * s * p * (1 - p)                                 # d log f / dx; -d2 log f / dx2
+    q = np.exp(lf - ell[:, None])                                                       # node weights given the outcomes
     Gt = -G.sum(2)                                                                      # d log f / dtheta
     gx, gt = np.einsum('ri,rin->rn', q, G), (q * Gt).sum(1)
-    fp, gp, Hp = task_prior(x[None], k, O.shape[1] > k, hyp)
+    fp, gp, Hp = task_prior(x[None], k, has, hyp)
     Hxx = np.einsum('ri,rim,rin->mn', q, G, G) - gx.T @ gx - np.diag(np.einsum('ri,rin->n', q, W)) + Hp
     Htx = np.einsum('ri,rin->rn', q, W + Gt[:, :, None] * G) - gt[:, None] * gx
     Htt = (q * (Gt ** 2 - W.sum(2))).sum(1) - gt ** 2
@@ -340,27 +386,36 @@ def joint_mode(TL, hyp, th):
     return th, ll
 
 
+def joint_cold(TL, hyp, th):
+    """joint_mode from a cold start: the margin's sd s_e eased in from 16 times its value, each solve warm-starting the
+    next (from zeros at the fitted hyperparameters Newton stalls; 2026-10-15)."""
+    for m in (16, 8, 4, 2, 1): th, ll = joint_mode(TL, hyp[:4] + (hyp[4] * m,), th)
+    return th, ll
+
+
 def joint_fit(obs, ref, PB):
     """FCI and FDI from one model (see the docstring). Returns per model (FCI, 90% low, 90% high, tasks), the strengths
     in logits and PASS_ZERO's; per task (database name) metric_tasks()'s fields and its fit, in logits: 'x' (the mode),
     'D', 'lo', 'hi', 'ess', 'slope' (dP(pass)/dtheta at D), 'ci' (per parameter, its 90% interval); the hyperparameters
-    (s_u, a, d, tau), the profile log marginal likelihood and each start's result."""
-    tasks = metric_tasks(obs, ref, PB)
+    (s_u, a, d, tau, s_e), the profile log marginal likelihood, each start's result, the margin unit c (points) and the
+    number of bootstrap draws that did not converge (left out)."""
+    tasks, unit0 = metric_tasks(obs, ref, PB)
     M = list(dict.fromkeys(o[0] for o in obs)); nM = len(M)
     assert PASS_ZERO in M, f'{PASS_ZERO} has no scored runs'
-    for T in tasks.values(): T['mi'], T['x'] = np.array([M.index(m) for m in T['models']]), np.zeros(T['O'].shape[1])
+    for T in tasks.values(): T['mi'], T['x'] = np.array([M.index(m) for m in T['models']]), np.zeros(T['np'])
     TL, state = list(tasks.values()), {'th': np.zeros(nM)}
-    hyp = lambda p: (float(np.exp(p[0])), float(np.exp(p[1])), float(p[2]), float(np.exp(p[3])))
+    hyp = lambda p: (float(np.exp(p[0])), float(np.exp(p[1])), float(p[2]), float(np.exp(p[3])), float(np.exp(p[4])))
 
-    def total(p):   # warm-started at the last mode; -inf where 24 nodes are too coarse for s_u (from about 4 up)
+    def total(p):   # warm-started at the last mode; -inf where the mode is not found
         try: state['th'], ll = joint_mode(TL, hyp(p), state['th'])
-        except ArithmeticError: return -np.inf
+        except (ArithmeticError, np.linalg.LinAlgError): return -np.inf
         return ll
 
-    starts = [(2.2, .8, 1.9, 3.9), (1.0, .5, 1.0, 2.0)]   # (s_u, a, d, tau)
-    bounds = [(np.log(1e-3), np.log(4)), (np.log(1e-2), np.log(20)), (-20, 30), (np.log(.05), np.log(20))]
-    fits = [minimize(lambda p: -total(p), [np.log(s[0]), np.log(s[1]), s[2], np.log(s[3])], method='Nelder-Mead',
-                     bounds=bounds, options={'xatol': 1e-3, 'fatol': 1e-6, 'maxiter': 3000}) for s in starts]
+    starts = [(1.85, 1.0, 1.4, 3.3, 1.0), (1.0, 0.5, 1.0, 2.0, 0.5)]   # (s_u, a, d, tau, s_e)
+    bounds = [(np.log(1e-3), np.log(7)), (np.log(1e-2), np.log(20)), (-20, 30), (np.log(.05), np.log(20)), (np.log(.02), np.log(20))]
+    state['th'], _ = joint_cold(TL, hyp([np.log(v) if i != 2 else v for i, v in enumerate(starts[0])]), state['th'])
+    fits = [minimize(lambda p: -total(p), [np.log(s[0]), np.log(s[1]), s[2], np.log(s[3]), np.log(s[4])], method='Nelder-Mead',
+                     bounds=bounds, options={'xatol': 1e-3, 'fatol': 1e-6, 'maxiter': 4000}) for s in starts]
     hb = hyp(min(fits, key=lambda r: r.fun).x)
     th, ll = joint_mode(TL, hb, state['th'])
     s_u, z = hb[0], M.index(PASS_ZERO)
@@ -377,27 +432,29 @@ def joint_fit(obs, ref, PB):
                  ci=[tuple(wpct(X[:, j], w, [.05, .95])) for j in range(n)])
         T['lo'], T['hi'] = wpct(fdi(X[:, :k], s_u), w, [.05, .95])
     # the FCI interval: resample tasks, refit the strengths and every task's parameters, hyperparameters held
-    full, draws = [T['x'].copy() for T in TL], []
+    full, draws, skipped = [T['x'].copy() for T in TL], [], 0
     for seed in range(BOOT):
         pick = np.random.default_rng(seed).integers(0, len(TL), len(TL))
-        d, _ = joint_mode([dict(TL[j], x=full[j].copy()) for j in pick], hb, th.copy())
+        try: d, _ = joint_mode([dict(TL[j], x=full[j].copy()) for j in pick], hb, th.copy())
+        except (ArithmeticError, np.linalg.LinAlgError): skipped += 1; continue   # left out and counted (should be none)
         draws.append(on_scale(d, d[z]))
     point, (lo, hi) = on_scale(th, th[z]), np.percentile(draws, [5, 95], axis=0)
     out = {m: (round(float(point[i]), DEC), round(float(lo[i]), DEC), round(float(hi[i]), DEC), len({o[1] for o in obs if o[0] == m}))
            for i, m in enumerate(M)}
-    return out, dict(zip(M, th)), th[z], tasks, hb, ll, [(hyp(r.x), -r.fun) for r in fits]
+    return out, dict(zip(M, th)), th[z], tasks, hb, ll, [(hyp(r.x), -r.fun) for r in fits], unit0, skipped
 
 
-def p_pass(D, B, s_u):
+def p_pass(D, B, s_u, gh=None):
     """P(pass) at strength D with metric difficulties B (both logits, one per row): E_u prod_j sigmoid(D + u - beta_j)."""
-    return np.exp(logsumexp(log_expit(D[:, None, None] + s_u * GH_U[:, None] - B[:, None, :]).sum(2) + GH_LW, axis=1))
+    gu, glw = gh or (GH_U, GH_LW)
+    return np.exp(logsumexp(log_expit(D[:, None, None] + s_u * gu[:, None] - B[:, None, :]).sum(2) + glw, axis=1))
 
 
-def fdi(B, s_u):
+def fdi(B, s_u, gh=None):
     """Per row of metric difficulties B: the strength D at which P(pass) = 1/2, by bisection (P rises with D)."""
     lo, hi = B.min(1) - 40 - 8 * s_u, B.max(1) + 40 + 8 * s_u
     for _ in range(64):
-        mid = (lo + hi) / 2; up = p_pass(mid, B, s_u) > .5
+        mid = (lo + hi) / 2; up = p_pass(mid, B, s_u, gh) > .5
         lo, hi = np.where(up, lo, mid), np.where(up, mid, hi)
     return (lo + hi) / 2
 
@@ -492,18 +549,21 @@ def cost(db):
 
 def theta_at(items, counts, hyp):
     """Per row of counts (row x task): the strength that maximises sum_t counts * log l_t(theta) - LAM theta^2 / 2, each
-    task's parameters x and the run's outcomes o held (items: (x, o, k) per task); Newton's method, steps clipped to 2
-    logits (the objective is concave)."""
-    s_u, a = hyp[0], hyp[1]
+    task's parameters x and the run's outcomes o held (items: (x, o, k) per task: its metric groups, then with a reference
+    the margin and its code, as in metric_tasks); Newton's method, steps clipped to 2 logits (the objective is concave)."""
+    s_u, a, s_e = hyp[0], hyp[1], hyp[4]
     th = np.zeros(len(counts))
     for _ in range(200):
         G, H = -LAM * th, np.full(len(th), -LAM)
         for j, (x, o, k) in enumerate(items):
-            s = np.r_[np.ones(k), a][:len(o)]
-            A = s * (th[:, None, None] + s_u * GH_U[:, None] - x)                      # row x node x item
-            lf = (o * log_expit(A) + (1 - o) * log_expit(-A)).sum(2) + GH_LW
-            q, p = np.exp(lf - logsumexp(lf, axis=1)[:, None]), expit(A)
-            gi, hi = (s * (o - p)).sum(2), -(s * s * p * (1 - p)).sum(2)
+            A = th[:, None, None] + s_u * GH_U[:, None] - x[:k]                        # row x node x group
+            lf = (o[:k] * log_expit(A) + (1 - o[:k]) * log_expit(-A)).sum(2) + GH_LW
+            p = expit(A)
+            gi, hi = (o[:k] - p).sum(2), -(p * (1 - p)).sum(2)
+            if len(o) > k:   # the margin of a run that passed, in theta: slope a
+                lm, gA, hA = margin_terms(a * (th[:, None] + s_u * GH_U[None, :] - x[k]), o[k], o[k + 1], s_e)
+                lf, gi, hi = lf + lm, gi + a * gA, hi + a * a * hA
+            q = np.exp(lf - logsumexp(lf, axis=1)[:, None])
             g = (q * gi).sum(1)
             G += counts[:, j] * g; H += counts[:, j] * ((q * (hi + gi ** 2)).sum(1) - g ** 2)
         step = np.clip(G / -H, -2, 2); th = th + step
@@ -511,10 +571,13 @@ def theta_at(items, counts, hyp):
     raise ArithmeticError('theta_at did not converge')
 
 
+notyet = lambda o, k: np.r_[np.zeros(k), [0.0, 2.0]] if len(o) > k else np.zeros(k)   # no group beaten, no margin
+
+
 def scaling(db, tasks, hyp, theta0):
     """{model id: [[US$ budget, FCI, 90% low, 90% high, share of runs still going], ...]}; spend from usd(). The joint
     model with every task's parameters held at the leaderboard fit: at budget B a run that has ended contributes its
-    metric groups and its win, a run still going contributes none beaten and no win."""
+    metric groups and, if it passed, its margin; a run still going contributes no group beaten and no margin."""
     info = {r: (c, t) for r, c, t, s in db.execute('''select r.id, cd.name, t.name, r.display_score from cells ce
         join runs r on r.id = ce.run_id join candidates cd on cd.id = ce.candidate_id join tasks t on t.id = ce.task_id''') if s is not None and c not in HIDDEN}
     pts = {(r, sid): (tt, ot) for r, sid, tt, ot in db.execute('select run_id, submission_id, total_tokens, output_tokens from score_points')}
@@ -530,7 +593,7 @@ def scaling(db, tasks, hyp, theta0):
         rng, curve = np.random.default_rng(3), []
         # budgets are rounded up to the stored precision before use, so each point is exact at its stored budget
         for B in np.ceil(np.geomspace(1e-3, max(ends), SCALE_POINTS) * 1e5) / 1e5:
-            items = [(tasks[t]['x'], O[t] if end.get(runs[t], 0) <= B else 0 * O[t], tasks[t]['k']) for t in tl]
+            items = [(tasks[t]['x'], O[t] if end.get(runs[t], 0) <= B else notyet(O[t], tasks[t]['k']), tasks[t]['k']) for t in tl]
             counts = np.array([np.ones(len(tl))] + [np.bincount([tl.index(t) for t in rng.choice(tl, len(tl))], minlength=len(tl)) for _ in range(SCALE_BOOT)])
             v = on_scale(theta_at(items, counts, hyp), theta0)
             lo, hi = np.percentile(v[1:], [5, 95])
@@ -602,25 +665,26 @@ def task_reference(db):
     return dict(sorted({**{t: float(v) for t, v in REF_DEFAULT.items() if t in tasks}, **out}.items()))
 
 
-def task_fits(tasks, fit, theta0):
+def task_fits(tasks, fit, theta0, unit0):
     """TFIT, DIFF, the metrics' difficulties, the metric groups and DIFF_FIT from joint_fit()'s output, on the FCI scale.
     TFIT[task] = [D, slope], the logistic matched to the pass curve at D: P(pass) ~ 1 / (1 + exp(-slope (FCI - D))),
     slope = 4 dP/dFCI there. DIFF[task] = [D, 90% low, 90% high, passes, wins, runs] and METRIC[task][stem] =
     [its group's difficulty, 90% low, 90% high, runs that beat the metric, group], counting the runs the page shows
     (RUNS); wins null without a reference. GROUPS[task] lists the groups' metrics, group 1 first."""
-    s_u, a, d, tau = fit
+    s_u, a, d, tau, s_e = fit
     TFIT, DIFF, METRIC, GROUPS = {}, {}, {}, {}
     for t, T in tasks.items():
         shown = [m not in HIDDEN for m in T['models']]
         O, Z, k = T['O'][shown], T['Z'][shown], T['k']
+        wins = None if T['wins'] is None else T['wins'][shown]
         e = [round(float(v), DEC) for v in on_scale([T['D'], T['lo'], T['hi']], theta0)]
         TFIT[short(t)] = [e[0], round(4 * T['slope'] / PASS_UNIT, 4)]
-        DIFF[short(t)] = e + [int(O[:, :k].all(1).sum()), round(float(O[:, k].sum()), 1) if O.shape[1] > k else None, len(O)]
+        DIFF[short(t)] = e + [int(O[:, :k].all(1).sum()), None if wins is None else round(float(wins.sum()), 1), len(O)]
         METRIC[short(t)] = {m: [round(float(v), DEC) for v in on_scale([T['x'][g], *T['ci'][g]], theta0)] + [int(Z[:, T['stems'].index(m)].sum()), g + 1]
                             for g, ms in enumerate(T['groups']) for m in ms}
         GROUPS[short(t)] = T['groups']
     return (dict(sorted(TFIT.items())), dict(sorted(DIFF.items())), dict(sorted(METRIC.items())), dict(sorted(GROUPS.items())),
-            {'a': round(a, 3), 'delta': round(PASS_UNIT * d, 2), 'tau': round(PASS_UNIT * tau, 2), 'sigma_u': round(PASS_UNIT * s_u, 2)})
+            {'a': round(a, 3), 'delta': round(PASS_UNIT * d, 2), 'tau': round(PASS_UNIT * tau, 2), 'sigma_u': round(PASS_UNIT * s_u, 2), 's_e': round(s_e, 3), 'c': round(unit0, 2)})
 
 
 def task_checks(db):
@@ -658,10 +722,10 @@ models = [MODEL[c] for c in MODEL if c not in HIDDEN]
 fit_rows = db.execute('''select c.name, t.name, r.display_score, r.display_verdict, r.feedback_json from cells ce
   join runs r on r.id = ce.run_id join candidates c on c.id = ce.candidate_id join tasks t on t.id = ce.task_id''').fetchall()
 obs, task_ref = fit_data(fit_rows)
-E, THETA, theta0, MT, dfit, dll, dstarts = joint_fit(obs, task_ref, passby())
-TFIT, DIFF, METRIC, MGROUPS, DIFF_FIT = task_fits(MT, dfit, theta0)
+E, THETA, theta0, MT, dfit, dll, dstarts, UNIT0, nskip = joint_fit(obs, task_ref, passby())
+TFIT, DIFF, METRIC, MGROUPS, DIFF_FIT = task_fits(MT, dfit, theta0, UNIT0)
 # each task's metric-group difficulties at the mode, on the FCI scale: the task chart draws the exact pass curve from them (Qiuyang);
-# one decimal more than FDI, so the curve from these rounded values still crosses 1/2 within 0.05 points of the rounded FDI
+# one decimal more than FDI, so the curve from these rounded values crosses 1/2 within 0.06 points of the rounded FDI
 GROUPS = {short(t): sorted((round(float(v), DEC + 1) for v in on_scale(T['x'][:T['k']], theta0)), reverse=True) for t, T in sorted(MT.items(), key=lambda kv: short(kv[0]))}
 PROG = {short(t): [round(float(on_scale(g, theta0)), DEC), round(k / PASS_UNIT, 4), round(f, 3)] for t, (g, k, f) in sorted(progress(MT, THETA, dfit).items(), key=lambda kv: short(kv[0]))}
 SC, CO = scaling(db, MT, dfit, theta0), cost(db)
@@ -674,7 +738,12 @@ lost = {k: sorted({r[2] for r in runs} - set(v)) for k, v in (('DIFF', DIFF), ('
 assert not any(lost.values()), f'tasks in RUNS without a difficulty: {lost}'
 half = {t: float(fdi(np.array([b]) / PASS_UNIT, DIFF_FIT['sigma_u'] / PASS_UNIT)[0]) * PASS_UNIT for t, b in GROUPS.items()}
 gap = max(abs(half[t] - DIFF[t][0]) for t in GROUPS)
-assert gap <= 0.05 + 1e-9, f'the pass curve from GROUPS misses FDI by {gap:.3f} points'
+# FDI is shown to 0.1, so its rounding alone moves it up to 0.05 from the crossing; the rounding of GROUPS and sigma_u adds a hair
+assert gap <= 0.06, f'the pass curve from GROUPS misses FDI by {gap:.3f} points'
+u24, w24 = np.polynomial.hermite.hermgauss(24)   # the pages integrate with 24 nodes: their curve may differ by a hair more
+half24 = {t: float(fdi(np.array([b]) / PASS_UNIT, DIFF_FIT['sigma_u'] / PASS_UNIT, (np.sqrt(2) * u24, np.log(w24 / np.sqrt(np.pi))))[0]) * PASS_UNIT for t, b in GROUPS.items()}
+gap24 = max(abs(half24[t] - DIFF[t][0]) for t in GROUPS)
+assert gap24 <= 0.06, f'the pages\' 24-node pass curve misses FDI by {gap24:.3f} points'
 assert {m[0] for m in models} <= set(eci_js), f'models without an FCI: {sorted({m[0] for m in models} - set(eci_js))}'
 block = (f'// One entry per scored run in the preview results database of {when:%Y-%m-%d} (bin/fcs2_runs_from_db.py):\n'
          f'// model, domain, task, final score (0-100, the task\'s own scale), passed (1 = verdict PASS). Timeouts score 0; {sum(dropped.values())} unscored runs are left out' + ''.join(f'; {MODEL[c][1]} is left out (only the FCI 0 point)' for c in sorted(HIDDEN)) + '.\n'
@@ -682,15 +751,15 @@ block = (f'// One entry per scored run in the preview results database of {when:
          'const MODELS = [\n' + ''.join(f"  {{id:'{i}', name:'{n}', short:'{s}', h:'{h}', lab:'{l}'}},\n" for i, n, s, h, l in models) + '];\n'
          f"const UPDATED = '{when:%B} {when.day}, {when.year}';\n"
          f"// Pass rate per model: [percent, runs that pass, runs].\nconst PASS = {json.dumps(pass_rate(runs))};\n"
-         f"// FCI per model: [point, 90% low, 90% high, tasks], from the model that also gives FDI: every run's metric groups and its win against the human reference, with a run effect shared by both and a strength prior N(0, 1/{LAM:g}), every model a respondent ({zero} too); FCI = {PASS_ZERO_VALUE:g} + {PASS_UNIT:g} x (strength - {zero}'s strength), strengths in logits (ECI_LOW, ECI_LOW_VALUE, ECI_UNIT); the interval resamples tasks and refits ({BOOT} bootstrap draws).\n"
+         f"// FCI per model: [point, 90% low, 90% high, tasks], from the model that also gives FDI: every run's metric groups and, for a run that passes, how far its final score is above the human reference, in units of the task's score spread (at least the median spread over tasks), with a run effect shared by both and a strength prior N(0, 1/{LAM:g}), every model a respondent ({zero} too); FCI = {PASS_ZERO_VALUE:g} + {PASS_UNIT:g} x (strength - {zero}'s strength), strengths in logits (ECI_LOW, ECI_LOW_VALUE, ECI_UNIT); the interval resamples tasks and refits ({BOOT} bootstrap draws).\n"
          f"const ECI = {json.dumps(eci_js)};\nconst ECI_LOW = '{MODEL[PASS_ZERO][0]}', ECI_LOW_NAME = '{zero}', ECI_LOW_VALUE = {PASS_ZERO_VALUE:g}, ECI_UNIT = {PASS_UNIT:g};\n"
-         f"// Test-time scaling per model: [US$ budget per run, FCI, 90% low, 90% high, share of runs still going]; at a budget a run that has ended counts its metric groups and win, a run still going counts none, task parameters held at the FCI fit (see the converter's docstring).\nconst SCALE = {json.dumps(SC, separators=(',', ':'))};\n"
+         f"// Test-time scaling per model: [US$ budget per run, FCI, 90% low, 90% high, share of runs still going]; at a budget a run that has ended counts its metric groups and, if it passed, its margin; a run still going counts no group and no margin; task parameters held at the FCI fit (see the converter's docstring).\nconst SCALE = {json.dumps(SC, separators=(',', ':'))};\n"
          f"// Cost per model: [mean US$ per scored run, runs]; output tokens x output price + every token x cache-read price (PRICE above).\nconst COST = {json.dumps(CO)};\nconst PRICE = {json.dumps(PRICE)};\n"
          f"// Every scored run: [model, task, final score, passed, US$ at end, hours, [[US$, dev score] per development submission]].\nconst TRAJ = {json.dumps(trajectories(db), separators=(',', ':'), ensure_ascii=False)};\n"
          f"// Per task: the authors' reference score, the median over the task's runs; where the database has none, the converter's REF_DEFAULT (" + ', '.join(f'{k}: {v:g}' for k, v in REF_DEFAULT.items()) + f"), else the task is left out.\nconst REF = {json.dumps(REF, ensure_ascii=False)};\n"
          f"// Per task: its metric groups' difficulties [beta_g, ...], highest first, on the FCI scale. A run passes when it beats every group, so the pass curve is P(pass | FCI) = integral of prod_g 1 / (1 + exp(-((FCI - beta_g) / ECI_UNIT + u))) N(u; 0, (sigma_u / ECI_UNIT)^2) du, sigma_u from DIFF_FIT (24-node Gauss-Hermite); it is 1/2 at the task's FDI.\nconst GROUPS = {json.dumps(GROUPS, ensure_ascii=False)};\n"
-         f"// Per task: [D, 90% low, 90% high, passes, wins, runs] in RUNS. D, the difficulty, is the FCI at which a model passes half the time, a pass being every metric beaten at once. It comes from each metric's own difficulty (metrics that pass and fail together share one), fitted on which metrics each run beats and whether its final score beats the human reference (a win; a tie is half; wins is null without a reference), with a run effect shared by both (DIFF_FIT).\nconst DIFF = {json.dumps(DIFF, ensure_ascii=False)};\n"
-         f"// The FCI and FDI model's shared parameters, by Laplace marginal likelihood over all tasks: sigma_u, the sd of a run's effect on its metrics and its win; a, the slope of P(win) over that of a metric; delta and tau, the mean and sd of a metric's difficulty above the task's beat-the-human level (these three in FCI points).\nconst DIFF_FIT = {json.dumps(DIFF_FIT)};\n"
+         f"// Per task: [D, 90% low, 90% high, passes, wins, runs] in RUNS. D, the difficulty, is the FCI at which a model passes half the time, a pass being every metric beaten at once. It comes from each metric's own difficulty (metrics that pass and fail together share one), fitted on which metrics each run beats and, for a run that passes, how far its final score is above the human reference, in units of the task's score spread (at least the median spread over tasks), with a run effect shared by both (DIFF_FIT). wins counts the runs whose final score beats the reference (a tie is half; null without a reference).\nconst DIFF = {json.dumps(DIFF, ensure_ascii=False)};\n"
+         f"// The FCI and FDI model's shared parameters, by Laplace marginal likelihood over all tasks: sigma_u, the sd of a run's effect on its metrics and its margin; a, the margin's slope per logit of strength; delta and tau, the mean and sd of a metric's difficulty above the task's beat-the-human level (sigma_u, delta and tau in FCI points); s_e, the margin's sd in units of the score spread; c, the smallest spread unit, in score points.\nconst DIFF_FIT = {json.dumps(DIFF_FIT)};\n"
          f"// Per task: the metrics its judge checks and the number of hidden final workloads; a run passes only when every check passes on every final workload.\nconst CHECKS = {json.dumps(CHECKS, ensure_ascii=False, separators=(',', ':'))};\n"
          f"// Task descriptions from the paper repo (bin/fcs2_descriptions.tsv).\nconst DESC = {json.dumps(descriptions(), ensure_ascii=False)};\n")
 js = open(js_path, encoding='utf-8').read()   # read late: the fits above take a while
@@ -702,8 +771,9 @@ hid_path = '_data/fcs2_runs_hidden.json'
 open(hid_path, 'w', encoding='utf-8').write(hidden_json(generated, hidden))
 print('PASS', pass_rate(runs))
 print('FCI', eci_js)
-print('DIFF_FIT', DIFF_FIT, '(logits: sigma_u {:.4f}, a {:.4f}, delta {:.4f}, tau {:.4f}; profile log marginal likelihood {:.3f})'.format(*dfit, dll))
-print(f'pass curves from GROUPS reach 1/2 within {gap:.3f} points of FDI')
+print('DIFF_FIT', DIFF_FIT, '(logits: sigma_u {:.4f}, a {:.4f}, delta {:.4f}, tau {:.4f}, s_e {:.4f}; profile log marginal likelihood {:.3f})'.format(*dfit, dll))
+print(f'FCI bootstrap: {BOOT - nskip} draws, {nskip} skipped (no convergence)')
+print(f'pass curves from GROUPS reach 1/2 within {gap:.3f} points of FDI ({gap24:.3f} with the pages\' 24 nodes)')
 print('starts', [(tuple(round(float(v), 4) for v in h), round(float(l), 3)) for h, l in dstarts])
 print('importance sampling: smallest effective sample size', round(min(T['ess'] for T in MT.values())), 'of', IS_DRAWS,
       '; below 200:', [short(t) for t, T in MT.items() if T['ess'] < 200])
@@ -715,7 +785,7 @@ for a in sys.argv[2:]:
         out = {'source': sys.argv[1], 'generated_at': generated, 'runs_columns': ['model', 'domain', 'task', 'score', 'passed'], 'runs': runs,
                'models': [dict(zip(['id', 'name', 'short', 'harness', 'lab'], m)) for m in models], 'dropped': dict(dropped),
                'pass': pass_rate(runs), 'cost_usd': CO, 'price_per_mtok': PRICE, 'eci': eci_js, 'eci_unit': PASS_UNIT,
-               'eci_low': [PASS_ZERO, PASS_ZERO_VALUE], 'eci_penalty': LAM, 'eci_boot': BOOT,
+               'eci_low': [PASS_ZERO, PASS_ZERO_VALUE], 'eci_penalty': LAM, 'eci_boot': BOOT, 'eci_boot_skipped': nskip,
                'scaling_columns': ['usd', 'eci', 'lo90', 'hi90', 'share_running'], 'scaling': SC,
                'task_reference': REF, 'task_fit_columns': ['difficulty', 'slope'], 'task_fit': TFIT,
                'task_difficulty_columns': ['difficulty', 'lo90', 'hi90', 'passes', 'wins', 'runs'], 'task_difficulty': DIFF,
