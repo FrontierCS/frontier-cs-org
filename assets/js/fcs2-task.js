@@ -133,7 +133,9 @@ function drawResults() {
   const cell = (r, m, i) => { const v = (by[r[0]] || {})[m], [mean, rref] = (st[m] && st[m].by[r[0]]) || [];
     if (!v) return `<td class="${mcls(i)} e">—</td>`;
     const tip = `Beat the human reference on ${v[0]} of ${v[1]} hidden workloads` + (rref != null ? `; human reference in this run: ${num(rref)}` : '');
-    return `<td class="${mcls(i)} ${v[0] === v[1] ? 'cy' : 'cn'}" title="${tip}">` + (mean != null ? `<b>${num(mean)}</b>` : (v[0] === v[1] ? TICK : CROSS)) + '</td>'; };
+    // green: every workload beaten; light red: some; dark red: none (owner, 2026-10-15: why a better mean can be red, without counts)
+    const k = v[0] === v[1] ? 'cy' : v[0] > 0 ? 'cp' : 'cn';
+    return `<td class="${mcls(i)} ${k}" title="${tip}">` + (mean != null ? `<b>${num(mean)}</b>` : (v[0] === v[1] ? TICK : CROSS)) + '</td>'; };
   // the metrics first, then the final score and the cost (owner, 2026-10-15)
   $('#rtbl').innerHTML = '<thead><tr><th>Model</th>'
     + ms.map((m, i) => `<th class="${mcls(i)}" title="${esc(m)}">${esc(metricHead(m, st[m]))}${dir(m)}</th>`).join('') + '<th class="rs">Final score</th><th class="rc">Cost</th></tr></thead><tbody>'
