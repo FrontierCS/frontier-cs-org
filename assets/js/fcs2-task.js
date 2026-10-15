@@ -52,13 +52,13 @@ function drawPage() {
     .concat(dw != null ? [`<b>${+dw.toFixed(1)} of ${dn}</b> score above the human reference`] : [])
     .concat([`best final score <b>${f1(best[2])}</b>, by ${esc(MNAME[best[0]])}`], ref != null ? [`human reference <b>${f1(ref)}</b>`] : []);
   $('#tbody').innerHTML = lead
-    + `<section class="tres"><h2 class="th2">Results</h2><p class="tsum">${sum.join(' · ')}</p><div class="res-scroll"><table class="res rtab" id="rtbl"></table></div></section>`
-    + (CHECKS[t.s] ? `<section class="tcrit"><h2 class="th2">Pass criteria</h2><p>A run passes only if its final submission beats the human reference on every metric, on every hidden workload. Each cell counts the hidden workloads on which it did.</p>`
-      + `<div class="res-scroll"><table class="res ctab" id="ctbl"></table></div></section>` : '')   // no general submission note (owner audit, 2026-10-14)
+    + `<section class="tres"><h2 class="th2">Results</h2><p class="tsum">${sum.join(' · ')}</p>`
+      + (CHECKS[t.s] ? '<p class="tnote">A run passes only if its final submission beats the human reference on every metric, on every hidden workload. Each metric column gives the run’s mean over its hidden workloads, in green when it beat the human reference on every one and in red otherwise.</p>' : '')
+      + `<div class="res-scroll"><table class="res rtab${CHECKS[t.s] ? ' wm' : ''}" id="rtbl"></table></div></section>`   // results and pass criteria in one table (owner, 2026-10-15)
     + figure('sc', 'Final score against cost')
     + (DIFF[t.s] && passChance(t.s, 0) != null ? figure('fc', 'Chance of passing by FCI') : '')
     + solutionHTML(t, runs);   // the solution last (owner, 2026-10-14)
-  drawResults(); if (CHECKS[t.s]) drawCriteria(); drawCharts(); loadPatches(t); loadFig(t); drawPager(t);
+  drawResults(); drawCharts(); loadPatches(t); loadFig(t); drawPager(t);
   scrollTo(0, 0);
 }
 const NEWDESC = s => (DESC[s] || '').includes('¶');
@@ -97,32 +97,55 @@ addEventListener('keydown', e => {
 const METRIC = {"accuracy_qualified":"Estimate accuracy", "action_rate":"Action smoothness", "adaptive_probe_redirection_rate":"Redirection rate, adaptive probes", "adjusted_rand_index":"Adjusted Rand index", "auxiliary_bytes":"Extra memory", "average_episodic_reward":"Average episode reward", "average_jct_seconds":"Average job completion time", "avg_log2_prec_l2_abs_discrepancy_bits":"Mean precision error (bits)", "batch_latency_seconds":"Batch latency", "br_mis_pki":"Mispredictions per 1K instructions", "branch_accuracy":"Branch prediction accuracy", "build_ns":"Build time", "butterfly_count":"Exact butterfly count", "canary_integrity_accuracy":"Canary integrity accuracy", "candidates_verified":"Candidates verified", "case_throughput_ktps":"Throughput", "checkpoint_create_ns":"Checkpoint creation time", "checkpoint_restore_ns":"Checkpoint restore time", "client_storage_bytes":"Client storage", "clip_fdr":"Fréchet distance, CLIP", "committed_tps":"Committed transactions per second", "complete_workload_wall_seconds":"Wall time, whole workload", "compression_ratio":"Compression ratio", "congruence_seconds":"Congruence-closure time", "convnext_fdr":"Fréchet distance, ConvNeXt", "core_peak_live_bytes":"Peak memory", "correctness":"Correctness", "cost":"Cost", "counting_seconds":"Counting time", "cpu_time_seconds":"CPU time", "cyc_wp_pki":"Wrong-path cycles per 1K instructions", "dbscan_latency_ms":"Latency", "delta":"δ", "dinov2_fdr":"Fréchet distance, DINOv2", "distance_consistency":"Distance consistency", "duration_seconds":"Duration", "e2e_latency_seconds":"End-to-end latency", "effective_fpr":"False-positive rate", "egraph_node_growth":"E-graph growth", "elapsed_seconds":"Run time", "ema_quantized_png_psnr_db":"PSNR, EMA weights", "end_to_end_online_time_ms":"Online time, end to end", "energy":"Energy", "enforcement_seconds":"Enforcement time", "episode_reward":"Episode reward", "episode_success_rate":"Success rate", "epsilon":"ε", "estimator_seconds":"Estimator time", "evaluation_honesty_gap":"Evaluation honesty gap", "exact_counts":"Exact counts", "exact_result":"Exact result", "execution_time_ms":"Execution time", "gap":"Gap found", "historical_query_us":"Historical query latency", "im2col_discovery":"Finds im2col", "inception_fdr":"Fréchet distance, Inception", "inference_latency_ms":"Inference latency", "iso_recall":"Recall at matched cost", "label_mismatch_fraction":"Label mismatch", "labeled_inertia":"Inertia", "last_result_inner_product_ratio":"Inner-product ratio, last result", "latency_ms":"Latency", "latency_seconds":"Latency", "lloyd_loop_latency_ms":"Lloyd-iteration latency", "logical_storage_bits":"Predictor storage", "lookup_ns":"Lookup time", "lpips":"LPIPS", "mae_fdr":"Fréchet distance, MAE", "makespan_seconds":"Makespan", "mean_episode_max_reward":"Mean best reward per episode", "mean_predict_action_seconds":"Action prediction time", "mean_query_time":"Mean query time", "median_latency":"Median latency", "method_process_wall_seconds":"Wall time", "nn_recall":"Nearest-neighbor recall", "noise_mismatch_fraction":"Noise-point mismatch", "ocr_reward":"OCR reward", "online_communication_bytes":"Online communication", "oram_blocks_per_access":"ORAM blocks per access", "ordinary_quantized_png_psnr_db":"PSNR", "orth_err_normalized":"Orthogonality error", "overall_ratio":"Overall ratio", "peak_memory_mib":"Peak memory", "permitted_call_utility":"Utility on permitted calls", "polar_cosine_similarity":"Cosine similarity to the polar factor", "policy_enforcement_precision":"Enforcement precision", "policy_enforcement_recall":"Enforcement recall", "preprocessing_client_time_minutes":"Client preprocessing time", "procrustes_mse":"Procrustes error", "psnr":"PSNR", "psnr_db":"PSNR", "pssu_strength":"PSSU strength", "query_time_ms":"Query time", "r2_hz":"R², h from z", "r2_zh":"R², z from h", "recall":"Recall", "recall_at_50":"Recall@50", "refuted_pair":"Pairs refuted", "region_graph_ns":"Region-graph time", "relative_polar_factor_error":"Relative polar-factor error", "report_coverage":"Report coverage", "resident_bytes":"Memory", "residual_update_seconds":"Residual update time", "retained_bytes_per_checkpoint":"Memory per checkpoint", "retrieval_hit":"Retrieval hits", "rewrite_time_seconds":"Rewrite time", "rmse_error":"RMSE", "runtime_seconds":"Run time", "search_latency_ms":"Search latency", "selected_runtime_seconds":"Run time", "sequential_runtime_seconds":"Sequential run time", "server_compute_time_ns":"Server compute time", "siglip_fdr":"Fréchet distance, SigLIP", "sort_time_ns":"Sort time", "space_overhead_pct":"Space overhead", "spectral_polar_error":"Spectral polar error", "ssim":"SSIM", "static_probe_redirection_rate":"Redirection rate, static probes", "std_log2_prec_l2_abs_discrepancy_bits":"Spread of precision error (bits)", "success_rate":"Success rate", "tflops":"TFLOPS", "throughput_mflops":"Throughput", "throughput_ops_per_second":"Throughput", "top1_accuracy_pct":"Top-1 accuracy", "top_subspace_polar_error":"Top-subspace polar error", "trace_shape_match":"Trace-shape match", "tracking_ang_vel":"Angular-velocity tracking", "tracking_lin_vel":"Linear-velocity tracking", "training_latency_ms":"Training latency"};
 const metric = m => METRIC[m] || m.replace(/_/g, ' ').replace(/^./, c => c.toUpperCase());
 
-/* Per model (rows, leaderboard order, with its verdict) and metric (columns): on how many hidden workloads its final
-   submission beat the Human reference (PASSBY, bin/fcs2_checks_from_platform.py, the same runs as the scores). A full count
-   is green, a short one red; a run with no hidden evaluation has a dash. */
-function drawCriteria() {
-  const {t, runs} = cur, ms = CHECKS[t.s].metrics, by = (typeof PASSBY === 'undefined' ? {} : PASSBY)[t.s] || {};
-  const short = Object.fromEntries(RANKED.map(m => [m.id, m.short]));
-  $('#ctbl').innerHTML = `<thead><tr><th>Model</th>${ms.map(m => `<th title="${esc(m)}">${esc(metric(m))}</th>`).join('')}</tr></thead><tbody>`
-    + runs.map(r => { const c = by[r[0]] || {};
-      return `<tr><td>${r[3] ? TICK : CROSS}<span class="full">${esc(MNAME[r[0]])}</span><span class="short">${esc(short[r[0]])}</span></td>`
-        + ms.map(m => { const v = c[m]; return v ? `<td class="${v[0] === v[1] ? 'cy' : 'cn'}">${v[0]}/${v[1]}</td>` : '<td class="e">—</td>'; }).join('') + '</tr>'; }).join('')
-    + '</tbody>';
-}
+/* Results and pass criteria in one table (owner, 2026-10-15). Rows: the Human reference, then every run by final score, each
+   with its verdict (tick or cross); one column per metric, then its final score as a bar and its cost. Each metric: on how many hidden
+   workloads the final submission beat the Human reference (PASSBY, bin/fcs2_checks_from_platform.py, the same runs as the
+   scores) sets the colour of the run's mean (green on every workload, red otherwise), a dash for a run with no hidden evaluation. */
+/* Each metric's mean (Qiuyang, 2026-10-15): METRIC_STATS (assets/js/fcs2-metrics.js, bin/fcs2_metric_means.py) gives
+   per metric whether higher or lower is better, the human reference's mean (the median over the task's runs, as it is
+   measured again in every run) and per model [the run's mean over its hidden workloads, the reference's mean in that
+   run]. The header names the metric with its unit and says which way is better; a first row gives the human
+   reference; each model cell is the run's mean, coloured by its count, with the count and the reference's mean in that
+   run as its tooltip. */
+const UNIT = {ms:'ms', seconds:'s', ns:'ns', us:'µs', minutes:'min', bytes:'bytes', mib:'MiB', pct:'%', db:'dB'};
+const metricHead = m => { const label = metric(m), u = UNIT[(/_([a-z]+)$/.exec(m) || [])[1]];
+  return u && !/\(.*\)\s*$/.test(label) ? `${label} (${u})` : label; };   // a label that already names its unit keeps it
+// a mean: 3 significant digits with thousands separators; under 0.001 or from a million up, ×10 to a power in
+// superscript digits, which also reads in a tooltip; a true minus sign throughout
+const SUPD = {'-':'⁻', 0:'⁰', 1:'¹', 2:'²', 3:'³', 4:'⁴', 5:'⁵', 6:'⁶', 7:'⁷', 8:'⁸', 9:'⁹'};
+const num = v => { const r = +v.toPrecision(3), a = Math.abs(r);   // judged after rounding, so 999,999 is 1×10⁶
+  if (a && (a < 1e-3 || a >= 1e6)) { const [mt, ex] = r.toExponential(2).split('e'); return `${String(+mt).replace('-', '−')}×10${String(+ex).replace(/[-\d]/g, c => SUPD[c])}`; }
+  return r.toLocaleString('en-US', {maximumSignificantDigits:3}).replace('-', '−'); };
 
 // pass and fail as a green tick and a red cross (Qiuyang, 2026-10-14), with the word for screen readers
 const TICK = '<svg class="ri y" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.2 8.6l3.1 3.1 6.5-7.4"/></svg><span class="vh">Pass</span>';
 const CROSS = '<svg class="ri n" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.3 4.3l7.4 7.4M11.7 4.3l-7.4 7.4"/></svg><span class="vh">Fail</span>';
 function drawResults() {
   const {t, runs} = cur, ref = REF[t.s], xmax = Math.max(100, ref ?? 0, ...runs.map(r => r[2]));
+  const ms = CHECKS[t.s] ? CHECKS[t.s].metrics : [], by = (typeof PASSBY === 'undefined' ? {} : PASSBY)[t.s] || {};
+  const st = (typeof METRIC_STATS === 'undefined' ? {} : METRIC_STATS)[t.s] || {};
   // the score sits at the end of its bar (owner, 2026-10-14: beside the bar, not at the right edge of the column)
   const bar = (v, style) => { const w = (Math.max(0, v) / xmax * 100).toFixed(1);
     return `<span class="rb"><i style="width:${w}%;${style}"></i><span class="rn" style="left:${w}%">${f1(v)}</span></span>`; };
   const short = Object.fromEntries(RANKED.map(m => [m.id, m.short]));
-  $('#rtbl').innerHTML = '<thead><tr><th>Model</th><th class="rv">Pass</th><th class="rs">Final score</th><th>Cost</th></tr></thead><tbody>'
-    + (ref != null ? `<tr class="rref"><td><span class="sq"></span>Human reference</td><td class="rv"></td><td class="rs">${bar(ref, '')}</td><td></td></tr>` : '')
-    + [...runs].sort((p, q) => q[2] - p[2]).map(r => `<tr><td><span class="sq" style="background:${MCOL[r[0]]}"></span><span class="full">${esc(MNAME[r[0]])}</span><span class="short">${esc(short[r[0]])}</span></td>`
-      + `<td class="rv">${r[3] ? TICK : CROSS}</td><td class="rs">${bar(r[2], `background:${MCOL[r[0]]}`)}</td><td>$${r[4].toFixed(2)}</td></tr>`).join('')
+  const dir = m => st[m] ? `<span class="dir">${st[m].better === 'lower' ? 'Lower' : 'Higher'} is better</span>` : '';
+  const mcls = () => 'mc';
+  // a metric's cell is the run's mean, green when the run beat the human reference on every hidden workload, red otherwise
+  // (owner, 2026-10-15: values, not counts); the count and the reference's mean in that run go to the tooltip; without a
+  // mean, a tick or a cross
+  const cell = (r, m, i) => { const v = (by[r[0]] || {})[m], [mean, rref] = (st[m] && st[m].by[r[0]]) || [];
+    if (!v) return `<td class="${mcls(i)} e">—</td>`;
+    const tip = `Beat the human reference on ${v[0]} of ${v[1]} hidden workloads` + (rref != null ? `; human reference in this run: ${num(rref)}` : '');
+    return `<td class="${mcls(i)} ${v[0] === v[1] ? 'cy' : 'cn'}" title="${tip}">` + (mean != null ? `<b>${num(mean)}</b>` : (v[0] === v[1] ? TICK : CROSS)) + '</td>'; };
+  // the metrics first, then the final score and the cost (owner, 2026-10-15)
+  $('#rtbl').innerHTML = '<thead><tr><th>Model</th>'
+    + ms.map((m, i) => `<th class="${mcls(i)}" title="${esc(m)}">${esc(metricHead(m))}${dir(m)}</th>`).join('') + '<th class="rs">Final score</th><th class="rc">Cost</th></tr></thead><tbody>'
+    + (ref != null || ms.some(m => st[m] && st[m].ref != null)
+      ? '<tr class="rref"><td><span class="sq"></span>Human reference</td>'
+        + ms.map((m, i) => st[m] && st[m].ref != null ? `<td class="${mcls(i)}"><b>${num(st[m].ref)}</b></td>` : `<td class="${mcls(i)} e">—</td>`).join('')
+        + `<td class="rs">${ref != null ? bar(ref, '') : ''}</td><td class="rc"></td></tr>` : '')
+    + [...runs].sort((p, q) => q[2] - p[2]).map(r => `<tr><td>${r[3] ? TICK : CROSS}<span class="full">${esc(MNAME[r[0]])}</span><span class="short">${esc(short[r[0]])}</span></td>`
+      + ms.map((m, i) => cell(r, m, i)).join('') + `<td class="rs">${bar(r[2], `background:${MCOL[r[0]]}`)}</td><td class="rc">$${r[4].toFixed(2)}</td></tr>`).join('')
     + '</tbody>';
 }
 
