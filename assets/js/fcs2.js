@@ -548,7 +548,7 @@ function startPlay(tile) {
 // all tasks (owner, 2026-10-13: the run curves said too little for the room they took).
 // Icons for the kinds of metric a task is scored on (KEYM), each a path in a 14 px box centred on (x, y).
 const KEY_KIND = {Latency:'time', Throughput:'speed', Accuracy:'quality', Quality:'quality', 'Success rate':'quality', Reward:'quality',
-  Memory:'size', Size:'size', Compression:'size', Communication:'size', Fairness:'balance'};
+  Memory:'size', Size:'size', Compression:'size', Communication:'size', Fairness:'balance', Coverage:'count'};
 const KEY_ICON = {
   time:(x, y) => `M${x - 6.5},${y}a6.5,6.5 0 1,0 13,0a6.5,6.5 0 1,0 -13,0M${x},${y - 3.6}V${y}l2.6,1.8`,                    // a clock
   speed:(x, y) => `M${x + 1.5},${y - 7}l-5.5,8h4l-1.5,6l5.5,-8h-4z`,                                                        // a bolt

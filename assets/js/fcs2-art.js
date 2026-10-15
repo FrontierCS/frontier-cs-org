@@ -114,6 +114,18 @@ Object.assign(ART, {
     return plane(36, s1, 4) + plane(84, s1, 4) + plane(132, s1, 4) + Pa('M112,84l52,0l-20,20l-52,0Z', {fill:WHITE, stroke:WHITE, 'stroke-width':5, 'stroke-linejoin':'round'})
       + Pa('M138,60V80M138,108V128', {stroke:WHITE, 'stroke-width':4, 'stroke-dasharray':'2 7'});
   },
+  // CREST: a program's tree of branches; the white path is the concrete run, and the dashed branch it negates next leads
+  // to code not yet covered (the white ring)
+  CREST(R, [bg, s1, s2]) {
+    const L = [26, 74, 122, 170], P = (d, i) => [150 + (i - (2 ** d - 1) / 2) * 240 / 2 ** d, L[d]];
+    let g = '';
+    for (let d = 0; d < 3; d++) for (let i = 0; i < 2 ** d; i++) { const [x, y] = P(d, i);
+      for (const c of [2 * i, 2 * i + 1]) { const [cx, cy] = P(d + 1, c); g += Pa(`M${x},${y}L${cx},${cy}`, {stroke:s1, 'stroke-width':6}); } }
+    for (let d = 0; d < 4; d++) for (let i = 0; i < 2 ** d; i++) { const [x, y] = P(d, i); g += C(x, y, 7, {fill:s2}); }
+    const run = [P(0, 0), P(1, 0), P(2, 1), P(3, 2)], [fx, fy] = P(2, 1), [tx, ty] = P(3, 3);
+    return g + Pa('M' + run.map(p => p.join(',')).join('L'), {stroke:WHITE, 'stroke-width':8}) + run.map(p => C(p[0], p[1], 8, {fill:WHITE})).join('')
+      + Pa(`M${fx},${fy}L${tx},${ty}`, {stroke:WHITE, 'stroke-width':5, 'stroke-dasharray':'2 9'}) + C(tx, ty, 10, {fill:'none', stroke:WHITE, 'stroke-width':4});
+  },
   // TenSat: a tensor graph of operator boxes; a rewritten subgraph is white
   TenSat(R, [bg, s1, s2]) {
     const N = [[150, 24], [80, 74], [220, 74], [44, 128], [128, 128], [194, 128], [256, 128], [100, 180], [210, 180]], E = [[0, 1], [0, 2], [1, 3], [1, 4], [2, 5], [2, 6], [4, 7], [3, 7], [5, 8], [6, 8]], w = [4, 5];
