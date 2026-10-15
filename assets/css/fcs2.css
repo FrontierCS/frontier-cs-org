@@ -433,8 +433,11 @@ a.pbtn:hover{border-color:var(--teal); color:var(--teal-d)}
 .ctab td:first-child{white-space:nowrap; font-weight:400}
 .ctab td .ri{margin-right:8px}
 .ctab td.cy{color:#137333} .ctab td.cn{color:#c5221f}
-.ctab .ri{display:inline-block; width:17px; height:17px; vertical-align:-4px; fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round}
+.ctab .ri{display:inline-block; width:17px; height:17px; max-width:none; vertical-align:-4px; fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round}   /* max-width:none: with the site's percentage max-width an icon counts as 0 wide in the column's minimum, and a long name runs into the next cell */
 .ctab .ri.y{color:#137333} .ctab .ri.n{color:#c5221f}
+.ctab th .dir{display:block; margin-top:2px; font-size:12px; font-weight:400; color:var(--muted)}   /* which way the metric is better */
+.ctab td{white-space:nowrap} .ctab td .mv{font-weight:400; color:var(--ink-2)}   /* the run's mean, in brackets after its count */
+.ctab .rref td{color:var(--ink-2); font-weight:400} .ctab .rref .sq{display:inline-block; width:10px; height:10px; margin-right:9px; vertical-align:0; background:repeating-linear-gradient(135deg, #9aa0a6 0 1.5px, transparent 1.5px 3.5px)}
 .crit{display:flex; flex-wrap:wrap; gap:8px; margin:0 0 16px; padding:0; list-style:none}
 .crit li{border-radius:4px; padding:3px 8px; background:var(--soft); color:var(--ink-2)}
 .crit code{font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
