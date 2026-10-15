@@ -53,7 +53,7 @@ function drawPage() {
     .concat([`best final score <b>${f1(best[2])}</b>, by ${esc(MNAME[best[0]])}`], ref != null ? [`human reference <b>${f1(ref)}</b>`] : []);
   $('#tbody').innerHTML = lead
     + `<section class="tres"><h2 class="th2">Results</h2><p class="tsum">${sum.join(' · ')}</p>`
-      + (CHECKS[t.s] ? '<p class="tnote">A run passes only if its final submission beats the human reference on every metric, on every hidden workload. Each metric column gives the run’s mean over its hidden workloads, in green when it beat the human reference on every one and in red otherwise.</p>' : '')
+      + (CHECKS[t.s] ? '<p class="tnote">A run passes only if its final submission beats the human reference on every metric, on every hidden workload. Each metric column gives the run’s mean over its hidden workloads: green when it beat the human reference on every one, light red on some, dark red on none. A mean better than the reference’s can still be red: the run missed a workload, the rule asks for a margin (for example 5% faster), or the reference, measured again in every run, did better in this run than the median shown above.</p>' : '')
       + `<div class="res-scroll"><table class="res rtab${CHECKS[t.s] ? ' wm' : ''}" id="rtbl"></table></div></section>`   // results and pass criteria in one table (owner, 2026-10-15)
     + figure('sc', 'Final score against cost')
     + (DIFF[t.s] && passChance(t.s, 0) != null ? figure('fc', 'Chance of passing by FCI') : '')
@@ -132,12 +132,14 @@ function drawResults() {
   const dir = m => st[m] ? `<span class="dir">${st[m].exact ? 'Must be exact' : st[m].better === 'lower' ? 'Lower is better' : 'Higher is better'}</span>` : '';
   const mcls = () => 'mc';
   // a metric's cell is the run's mean, green when the run beat the human reference on every hidden workload, red otherwise
-  // (owner, 2026-10-15: values, not counts); the count and the reference's mean in that run go to the tooltip; without a
-  // mean, a tick or a cross
+  // (owner, 2026-10-15: values, not counts or bars); the count and the reference's mean in that run go to the tooltip;
+  // without a mean, a tick or a cross
   const cell = (r, m, i) => { const v = (by[r[0]] || {})[m], [mean, rref] = (st[m] && st[m].by[r[0]]) || [];
     if (!v) return `<td class="${mcls(i)} e">—</td>`;
     const tip = `Beat the human reference on ${v[0]} of ${v[1]} hidden workloads` + (rref != null ? `; human reference in this run: ${num(rref)}` : '');
-    return `<td class="${mcls(i)} ${v[0] === v[1] ? 'cy' : 'cn'}" title="${tip}">` + (mean != null ? `<b>${num(mean)}</b>` : (v[0] === v[1] ? TICK : CROSS)) + '</td>'; };
+    // green: every workload beaten; light red: some; dark red: none (owner, 2026-10-15: why a better mean can be red, without counts)
+    const k = v[0] === v[1] ? 'cy' : v[0] > 0 ? 'cp' : 'cn';
+    return `<td class="${mcls(i)} ${k}" title="${tip}">` + (mean != null ? `<b>${num(mean)}</b>` : (v[0] === v[1] ? TICK : CROSS)) + '</td>'; };
   // the metrics first, then the final score and the cost (owner, 2026-10-15)
   $('#rtbl').innerHTML = '<thead><tr><th>Model</th>'
     + ms.map((m, i) => `<th class="${mcls(i)}" title="${esc(m)}">${esc(metricHead(m, st[m]))}${dir(m)}</th>`).join('') + '<th class="rs">Final score</th><th class="rc">Cost</th></tr></thead><tbody>'
