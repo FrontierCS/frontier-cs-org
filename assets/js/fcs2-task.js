@@ -113,10 +113,10 @@ const WORKLOAD_NAME = {'CREST':{w0:'Vim 5.7', w1:'sed 3.02'}};
    reference; each model cell is the run's mean, coloured by its count, with the count and the reference's mean in that
    run as its tooltip. */
 const UNIT = {ms:'ms', seconds:'s', ns:'ns', us:'µs', minutes:'min', bytes:'bytes', mib:'MiB', pct:'%', db:'dB'};
-const metricHead = (m, s, e = 0) => { const label = metric(m), u = UNIT[(/_([a-z]+)$/.exec(m) || [])[1]] || (s && s.unit);   // the key's suffix, else the export's unit
-  const x = e ? `×10${String(e).replace(/[-\d]/g, c => SUPD[c])}` : '', named = /\(([^)]*)\)\s*$/.exec(label);   // a column's power of ten goes before its unit
-  if (named) return x ? label.slice(0, named.index) + `(${x} ${named[1]})` : label;   // a label that already names its unit keeps it
-  const tail = [x, u].filter(Boolean).join(' '); return tail ? `${label} (${tail})` : label; };
+const metricHead = (m, s, e = 0, uo) => { const label = metric(m), named = /\(([^)]*)\)\s*$/.exec(label);   // a label that already names its unit keeps it
+  const base = named ? label.slice(0, named.index).trimEnd() : label, x = e ? `×10${String(e).replace(/[-\d]/g, c => SUPD[c])}` : '';
+  const u = uo || (named ? named[1] : UNIT[(/_([a-z]+)$/.exec(m) || [])[1]] || (s && s.unit));   // else the key's suffix, else the export's unit
+  const tail = [x, u].filter(Boolean).join(' '); return tail ? `${base} (${tail})` : base; };   // a column's power of ten goes before its unit
 // a header's text with its arrow: the last word and the arrow never part (Qiuyang, 2026-10-15); math in a label is TeX,
 // \( \) inline and without spaces, set by MathJax once the table is drawn
 const headText = (h, d) => { const e = esc(h), i = e.lastIndexOf(' ');
@@ -150,16 +150,22 @@ function drawResults() {
   // a metric's cell is the run's mean in black, with a bar under it for the share of hidden workloads on which it beat
   // the human reference, green when every one, red otherwise (Qiuyang, 2026-10-15, after the owner's values-first table);
   // the count and the reference's mean in that run go to the tooltip; without a mean, the count itself over the bar (Qiuyang)
-  // a column whose numbers would show ×10 to a power, all within a factor of 1,000, takes that power into its header and
-  // shows 3.73 under "Latency (×10⁻⁸ s)" (Qiuyang, 2026-10-15)
-  const colExp = s => { if (!s || split) return 0;
-    const ex = [s.ref, ...Object.values(s.by).map(x => x[0])].filter(v => v != null && v !== 0).map(v => Math.floor(Math.log10(Math.abs(+v.toPrecision(3)))));
-    if (!ex.length) return 0; const lo = Math.min(...ex), hi = Math.max(...ex);
-    return (lo < -3 || hi >= 6) && hi - lo <= 2 ? lo : 0; };
-  const sc = (v, m) => v / Math.pow(10, E[m]);   // E, each column's power, follows split below
+  // a time column takes the unit that puts its median between 1 and 1,000 (s, ms, µs or ns), so 3.73×10⁻⁸ s reads 37.3 ns;
+  // any other column whose numbers would show ×10 to a power, all within a factor of 1,000, takes that power into its
+  // header, "Count (×10⁹)" over 2.73 (Qiuyang, 2026-10-15)
+  const TIME = {ns:1e-9, 'µs':1e-6, ms:1e-3, s:1};
+  const colFmt = (m, s) => { if (!s || split) return {k:1, e:0};
+    const named = /\(([^)]*)\)\s*$/.exec(metric(m)), u0 = named ? named[1] : UNIT[(/_([a-z]+)$/.exec(m) || [])[1]] || s.unit;
+    const vals = [s.ref, ...Object.values(s.by).map(x => x[0])].filter(v => v != null && v !== 0).map(Math.abs);
+    if (!vals.length) return {k:1, e:0};
+    if (TIME[u0]) { const med = vals.map(v => v * TIME[u0]).sort((a, b) => a - b)[vals.length >> 1];
+      const u = med >= 1 ? 's' : med >= 1e-3 ? 'ms' : med >= 1e-6 ? 'µs' : 'ns'; return {k:TIME[u0] / TIME[u], e:0, u}; }
+    const ex = vals.map(v => Math.floor(Math.log10(+v.toPrecision(3)))), lo = Math.min(...ex), hi = Math.max(...ex);
+    const e = (lo < -3 || hi >= 6) && hi - lo <= 2 ? lo : 0; return {k:Math.pow(10, -e), e}; };
+  const sc = (v, m) => v * F[m].k;   // F, each column's scale, follows split below
   const cell = (r, m, i) => { const v = (by[r[0]] || {})[m], [mean, rref] = (st[m] && st[m].by[r[0]]) || [];
     if (!v) return `<td class="${mcls(i)} e">—</td>`;
-    const tip = `Beat the human reference on ${v[0]} of ${v[1]} hidden workloads` + (rref != null ? `; human reference in this run: ${num(rref)}` : '');
+    const tip = `Beat the human reference on ${v[0]} of ${v[1]} hidden workloads` + (rref != null ? `; human reference in this run: ${num(sc(rref, m))}` : '');
     const all = v[0] === v[1], bar = `<span class="mbar"><i class="${all ? 'y' : 'n'}" style="width:${(100 * v[0] / v[1]).toFixed(0)}%"></i></span>`;   // none won: the empty track (Qiuyang)
     return `<td class="${mcls(i)} ${all ? 'cy' : 'cn'}" title="${tip}">` + (mean != null ? `<b>${num(sc(mean, m))}</b>` : `<b>${v[0]}/${v[1]}</b>`) + bar + '</td>'; };
   // a task in WORKLOAD_NAME with numbers for each workload: every metric splits into one column per workload; the human
@@ -167,7 +173,7 @@ function drawResults() {
   // run's bar is full green when it cleared that workload's rule, an empty track when not (Qiuyang, 2026-10-15); each
   // (metric, workload) is a column of its own, "Branches covered, Vim 5.7", with no spanning header (Qiuyang)
   const WN = WORKLOAD_NAME[t.s], split = !!WN && ms.length > 0 && ms.every(m => st[m] && st[m].w), wl = WN ? Object.keys(WN) : [];
-  const E = Object.fromEntries(ms.map(m => [m, colExp(st[m])]));
+  const F = Object.fromEntries(ms.map(m => [m, colFmt(m, st[m])]));
   const sign = m => st[m].exact ? '' : st[m].better === 'lower' ? '−' : '+';
   const wcell = (r, m, w) => { const [v, rref, beat, mg] = ((st[m].w[w] || {}).by || {})[r[0]] || [];
     if (v == null) return '<td class="mc e">—</td>';
@@ -181,7 +187,7 @@ function drawResults() {
   const head = split
     ? '<thead><tr><th>Model</th>' + ms.map(m => wl.map(w => `<th class="mc" title="${esc(m)}">${whead(m, w)}${dir(m)}</span></th>`).join('')).join('')
       + '<th class="rs">Final score</th><th class="rc">Cost</th></tr></thead>'
-    : '<thead><tr><th>Model</th>' + ms.map((m, i) => `<th class="${mcls(i)}" title="${esc(m)}">${headText(metricHead(m, st[m], E[m]), dir(m))}</th>`).join('') + '<th class="rs">Final score</th><th class="rc">Cost</th></tr></thead>';
+    : '<thead><tr><th>Model</th>' + ms.map((m, i) => `<th class="${mcls(i)}" title="${esc(m)}">${headText(metricHead(m, st[m], F[m].e, F[m].u), dir(m))}</th>`).join('') + '<th class="rs">Final score</th><th class="rc">Cost</th></tr></thead>';
   const refRow = split ? ms.map(m => wl.map(w => wref(m, w)).join('')).join('')
     : ms.map((m, i) => st[m] && st[m].ref != null ? `<td class="${mcls(i)}"${st[m].profiled ? ' title="From a separate measurement of the human reference"' : ''}><b>${num(sc(st[m].ref, m))}</b></td>` : `<td class="${mcls(i)} e">—</td>`).join('');
   $('#rtbl').innerHTML = head + '<tbody>'
