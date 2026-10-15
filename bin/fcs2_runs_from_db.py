@@ -25,11 +25,11 @@ stops unless PASS is exactly "every metric beaten" for every run. Metrics that p
 apart by the data, and counting each separately makes a task look harder than it is (Qiuyang): metrics whose outcomes
 over the task's runs differ in at most GROUP_TOL runs are linked, a group is a connected set of them (recomputed from
 the data on every run), and the model treats each group as one item that a run beats when it beats every member. A run's
-final score counts only when the run passes (Qiuyang, 2026-10-15): then how far above the human reference r_t it is (r_t
+final score counts by how far above the human reference r_t it is when the run passes, and by how far below it when it does not, a non-passing run above r_t counting as at least level (Qiuyang, 2026-10-15): for a passing run, how far above the human reference r_t it is (r_t
 the median reference_score over the task's runs; 0 or less: REF_DEFAULT's value, else the task has none), in units of
 the task's score spread, at least the median spread over tasks: y = (score - r_t) / unit_t, unit_t = max(sd_t, c), sd_t
 the sd of the task's final scores strictly between 0 and 100 (all of them when fewer than 3), c the median sd_t over the
-tasks with a reference. A run that does not pass contributes its metric groups only. The final score comes from the same
+tasks with a reference. A run that does not pass contributes its metric groups and its margin censored at 0 from above: how far below r_t, or at least level. The final score comes from the same
 measurements as the metrics, so a run's metric groups and its margin share one run effect u ~ N(0, SIGMA_U^2). With
 theta_m the model's strength in logits (prior N(0, 1/LAM), LAM = 0.35 as in the site's in-browser TDIFF), a run's
 likelihood is the integral over u, by Gauss-Hermite quadrature (64 nodes; 24 stall Newton near SIGMA_U = 3.7), of prod_j
@@ -230,8 +230,9 @@ def metric_tasks(obs, ref, PB):
     beats every member; with every run's PASS equal to all metrics beaten, it is also all groups beaten. With a reference r_t
     the outcome row ends [y, cen]: y = (score - r_t) / unit_t for a run that passes, unit_t = max(sd_t, c), sd_t the sd of the
     task's final scores strictly between 0 and 100 (all of them when fewer than 3), c the median sd_t over the tasks with a
-    reference; cen 0 observed, 1 a score of 100 or more (y a lower bound), -1 a score of 0 or less (y an upper bound), 2 no
-    margin (the run did not pass). Returns the tasks and c."""
+    reference; cen 0 observed, 1 a score of 100 or more (y a lower bound), -1 a score of 0 or less (y an upper bound). A run
+    that does not pass keeps y when its final score is below r_t; above r_t it has y = 0, cen 1 (at least level); a tie has
+    cen 2 (no margin). Returns the tasks and c."""
     n = Counter((MODEL[o[0]][0], o[1]) for o in obs)
     assert max(n.values()) == 1, 'PASSBY has one entry per task and model: two runs of one model on a task cannot be told apart'
     spread = {}
@@ -262,10 +263,14 @@ def metric_tasks(obs, ref, PB):
         G = np.array([[min(z[stems.index(m)] for m in g) for g in groups] for z in Z])
         share = np.array([sum(v[0] for v in a.values()) / max(1, sum(v[1] for v in a.values())) for a in cnt])   # of hidden checks beaten
         O, w, unit = G, None, None
-        if t in ref:   # only a run that passes shows how far beyond the human reference it got (Qiuyang, 2026-10-15)
-            sc, unit = np.array([o[3] for o in rs]), max(spread[t], unit0)
-            cen = np.where(G.all(1), np.where(sc <= 0, -1.0, np.where(sc >= 100, 1.0, 0.0)), 2.0)
-            O, w = np.column_stack([G, (sc - ref[t]) / unit, cen]), np.array([win(o[3], ref[t]) for o in rs])
+        if t in ref:   # a run that passes shows how far beyond the human reference it got (Qiuyang, 2026-10-15); a run that
+            # does not pass shows how far short of it it fell, and beyond it only that it got there: its margin is censored
+            # at 0 from above (Qiuyang: otherwise tasks nobody passes tie)
+            sc, unit, ok = np.array([o[3] for o in rs]), max(spread[t], unit0), G.all(1)
+            y, above = (sc - ref[t]) / unit, sc > ref[t] + TIE_EPS
+            short_ = np.where(above, 1.0, np.where(sc <= 0, -1.0, np.where(sc < ref[t] - TIE_EPS, 0.0, 2.0)))   # a tie shows nothing
+            cen = np.where(ok, np.where(sc <= 0, -1.0, np.where(sc >= 100, 1.0, 0.0)), short_)
+            O, w = np.column_stack([G, np.where(ok | ~above, y, 0.0), cen]), np.array([win(o[3], ref[t]) for o in rs])
         out[t] = {'stems': stems, 'Z': Z, 'groups': groups, 'models': [o[0] for o in rs], 'O': O, 'k': len(groups),
                   'np': len(groups) + (t in ref), 'share': share, 'wins': w, 'unit': unit}
     return out, unit0
@@ -751,14 +756,14 @@ block = (f'// One entry per scored run in the preview results database of {when:
          'const MODELS = [\n' + ''.join(f"  {{id:'{i}', name:'{n}', short:'{s}', h:'{h}', lab:'{l}'}},\n" for i, n, s, h, l in models) + '];\n'
          f"const UPDATED = '{when:%B} {when.day}, {when.year}';\n"
          f"// Pass rate per model: [percent, runs that pass, runs].\nconst PASS = {json.dumps(pass_rate(runs))};\n"
-         f"// FCI per model: [point, 90% low, 90% high, tasks], from the model that also gives FDI: every run's metric groups and, for a run that passes, how far its final score is above the human reference, in units of the task's score spread (at least the median spread over tasks), with a run effect shared by both and a strength prior N(0, 1/{LAM:g}), every model a respondent ({zero} too); FCI = {PASS_ZERO_VALUE:g} + {PASS_UNIT:g} x (strength - {zero}'s strength), strengths in logits (ECI_LOW, ECI_LOW_VALUE, ECI_UNIT); the interval resamples tasks and refits ({BOOT} bootstrap draws).\n"
+         f"// FCI per model: [point, 90% low, 90% high, tasks], from the model that also gives FDI: every run's metric groups and how far its final score is from the human reference (a run that does not pass counts at most as level), in units of the task's score spread (at least the median spread over tasks), with a run effect shared by both and a strength prior N(0, 1/{LAM:g}), every model a respondent ({zero} too); FCI = {PASS_ZERO_VALUE:g} + {PASS_UNIT:g} x (strength - {zero}'s strength), strengths in logits (ECI_LOW, ECI_LOW_VALUE, ECI_UNIT); the interval resamples tasks and refits ({BOOT} bootstrap draws).\n"
          f"const ECI = {json.dumps(eci_js)};\nconst ECI_LOW = '{MODEL[PASS_ZERO][0]}', ECI_LOW_NAME = '{zero}', ECI_LOW_VALUE = {PASS_ZERO_VALUE:g}, ECI_UNIT = {PASS_UNIT:g};\n"
-         f"// Test-time scaling per model: [US$ budget per run, FCI, 90% low, 90% high, share of runs still going]; at a budget a run that has ended counts its metric groups and, if it passed, its margin; a run still going counts no group and no margin; task parameters held at the FCI fit (see the converter's docstring).\nconst SCALE = {json.dumps(SC, separators=(',', ':'))};\n"
+         f"// Test-time scaling per model: [US$ budget per run, FCI, 90% low, 90% high, share of runs still going]; at a budget a run that has ended counts its metric groups and its margin (at most level if it did not pass); a run still going counts no group and no margin; task parameters held at the FCI fit (see the converter's docstring).\nconst SCALE = {json.dumps(SC, separators=(',', ':'))};\n"
          f"// Cost per model: [mean US$ per scored run, runs]; output tokens x output price + every token x cache-read price (PRICE above).\nconst COST = {json.dumps(CO)};\nconst PRICE = {json.dumps(PRICE)};\n"
          f"// Every scored run: [model, task, final score, passed, US$ at end, hours, [[US$, dev score] per development submission]].\nconst TRAJ = {json.dumps(trajectories(db), separators=(',', ':'), ensure_ascii=False)};\n"
          f"// Per task: the authors' reference score, the median over the task's runs; where the database has none, the converter's REF_DEFAULT (" + ', '.join(f'{k}: {v:g}' for k, v in REF_DEFAULT.items()) + f"), else the task is left out.\nconst REF = {json.dumps(REF, ensure_ascii=False)};\n"
          f"// Per task: its metric groups' difficulties [beta_g, ...], highest first, on the FCI scale. A run passes when it beats every group, so the pass curve is P(pass | FCI) = integral of prod_g 1 / (1 + exp(-((FCI - beta_g) / ECI_UNIT + u))) N(u; 0, (sigma_u / ECI_UNIT)^2) du, sigma_u from DIFF_FIT (24-node Gauss-Hermite); it is 1/2 at the task's FDI.\nconst GROUPS = {json.dumps(GROUPS, ensure_ascii=False)};\n"
-         f"// Per task: [D, 90% low, 90% high, passes, wins, runs] in RUNS. D, the difficulty, is the FCI at which a model passes half the time, a pass being every metric beaten at once. It comes from each metric's own difficulty (metrics that pass and fail together share one), fitted on which metrics each run beats and, for a run that passes, how far its final score is above the human reference, in units of the task's score spread (at least the median spread over tasks), with a run effect shared by both (DIFF_FIT). wins counts the runs whose final score beats the reference (a tie is half; null without a reference).\nconst DIFF = {json.dumps(DIFF, ensure_ascii=False)};\n"
+         f"// Per task: [D, 90% low, 90% high, passes, wins, runs] in RUNS. D, the difficulty, is the FCI at which a model passes half the time, a pass being every metric beaten at once. It comes from each metric's own difficulty (metrics that pass and fail together share one), fitted on which metrics each run beats and how far its final score is from the human reference (a run that does not pass counts at most as level), in units of the task's score spread (at least the median spread over tasks), with a run effect shared by both (DIFF_FIT). wins counts the runs whose final score beats the reference (a tie is half; null without a reference).\nconst DIFF = {json.dumps(DIFF, ensure_ascii=False)};\n"
          f"// The FCI and FDI model's shared parameters, by Laplace marginal likelihood over all tasks: sigma_u, the sd of a run's effect on its metrics and its margin; a, the margin's slope per logit of strength; delta and tau, the mean and sd of a metric's difficulty above the task's beat-the-human level (sigma_u, delta and tau in FCI points); s_e, the margin's sd in units of the score spread; c, the smallest spread unit, in score points.\nconst DIFF_FIT = {json.dumps(DIFF_FIT)};\n"
          f"// Per task: the metrics its judge checks and the number of hidden final workloads; a run passes only when every check passes on every final workload.\nconst CHECKS = {json.dumps(CHECKS, ensure_ascii=False, separators=(',', ':'))};\n"
          f"// Task descriptions from the paper repo (bin/fcs2_descriptions.tsv).\nconst DESC = {json.dumps(descriptions(), ensure_ascii=False)};\n")
