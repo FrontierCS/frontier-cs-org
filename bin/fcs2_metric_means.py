@@ -47,6 +47,9 @@ UNIT_NAME = {'milliseconds': 'ms', 'microseconds': 'µs', 'seconds': 's'}   # th
 # (Polar Express keeps these two over the original six of its twelve cases; Qiuyang, 2026-10-15)
 SIX = {'square_0', 'square_1', 'tall_0', 'tall_1', 'wide_0', 'wide_1'}
 REF_SCOPE = {('Polar Express', 'relative_polar_factor_error'): SIX, ('Polar Express', 'worst_case_scalar_error'): SIX}
+# the human reference's value by decision where no human implementation exists (Qiuyang, 2026-10-15: Structured LWE
+# counts as solving every instance, as its final score is 100); "fixed" marks it
+REF_FIXED = {('Structured LWE', 'valid_witness'): 1}
 WORKLOADS = {'CREST'}   # tasks whose page shows each hidden workload apart (their names are in assets/js/fcs2-task.js)
 rows = [json.loads(line) for line in open(sys.argv[1]) if line.strip()]
 dbp = next((a[5:] for a in sys.argv[2:] if a.startswith('--db=')), None)
@@ -87,6 +90,9 @@ for p in (json.loads(l) for f in refpaths for l in open(f) if l.strip()):
     if (t, p['metric']) in REF_SCOPE and set(p.get('scope') or ()) != REF_SCOPE[t, p['metric']]: continue
     if s is not None and (s['ref'] is None or s.get('profiled')):   # a later file's row replaces an earlier one's
         s['ref'], s['profiled'] = r4(p['reference_mean']), True; profiled += 1
+for (t, metric), v in REF_FIXED.items():
+    s = out.get(t, {}).get(metric)
+    if s is not None and s['ref'] is None: s['ref'], s['fixed'] = v, True
 for r in wrows:   # each workload apart, for the tasks in WORKLOADS
     task, cand = r['task'], r['candidate']
     if task not in TASK or (TASK[task][1] or task) not in WORKLOADS or cand in HIDDEN or cand not in MODEL: continue
