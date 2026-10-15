@@ -48,7 +48,7 @@ function drawPage() {
     .concat(ref != null ? [`human reference <b>${f1(ref)}</b>`] : [], []);
   $('#tbody').innerHTML = lead
     + `<section class="tres"><h2 class="th2">Results</h2><p class="tsum">${sum.join(' · ')}</p><div class="res-scroll"><table class="res rtab" id="rtbl"></table></div></section>`
-    + (CHECKS[t.s] ? `<section class="tcrit"><h2 class="th2">Pass criteria</h2><p>A run passes only if its final submission beats the human reference on every metric, on every hidden workload. Each cell counts the hidden workloads on which it did.</p>`
+    + (CHECKS[t.s] ? `<section class="tcrit"><h2 class="th2">Pass criteria</h2><p>A run passes only if its final submission beats the human reference on every metric, on every hidden workload. Each cell counts the hidden workloads on which it did. In brackets, the run’s mean over its hidden workloads.</p>`
       + `<div class="res-scroll"><table class="res ctab" id="ctbl"></table></div></section>` : '')   // no general submission note (owner audit, 2026-10-14)
     + figure('sc', 'Final score against cost')
     + (TFIT[t.s] ? figure('fc', 'Expected score by FCI') : '')
@@ -96,13 +96,34 @@ const metric = m => METRIC[m] || m.replace(/_/g, ' ').replace(/^./, c => c.toUpp
 /* Per model (rows, leaderboard order, with its verdict) and metric (columns): on how many hidden workloads its final
    submission beat the Human reference (PASSBY, bin/fcs2_checks_from_platform.py, the same runs as the scores). A full count
    is green, a short one red; a run with no hidden evaluation has a dash. */
+/* Each metric's mean (Qiuyang, 2026-10-15): METRIC_STATS (assets/js/fcs2-metrics.js, bin/fcs2_metric_means.py) gives
+   per metric whether higher or lower is better, the human reference's mean (the median over the task's runs, as it is
+   measured again in every run) and per model [the run's mean over its hidden workloads, the reference's mean in that
+   run]. The header names the metric with its unit and says which way is better; a first row gives the human
+   reference; each model cell keeps its count, coloured, and adds the run's mean in brackets, with the reference's mean
+   in that run as its tooltip. */
+const UNIT = {ms:'ms', seconds:'s', ns:'ns', us:'µs', minutes:'min', bytes:'bytes', mib:'MiB', pct:'%', db:'dB'};
+const metricHead = m => { const label = metric(m), u = UNIT[(/_([a-z]+)$/.exec(m) || [])[1]];
+  return u && !/\(.*\)\s*$/.test(label) ? `${label} (${u})` : label; };   // a label that already names its unit keeps it
+// a mean: 3 significant digits with thousands separators; under 0.001 or from a million up, ×10 to a power in
+// superscript digits, which also reads in a tooltip; a true minus sign throughout
+const SUPD = {'-':'⁻', 0:'⁰', 1:'¹', 2:'²', 3:'³', 4:'⁴', 5:'⁵', 6:'⁶', 7:'⁷', 8:'⁸', 9:'⁹'};
+const num = v => { const r = +v.toPrecision(3), a = Math.abs(r);   // judged after rounding, so 999,999 is 1×10⁶
+  if (a && (a < 1e-3 || a >= 1e6)) { const [mt, ex] = r.toExponential(2).split('e'); return `${String(+mt).replace('-', '−')}×10${String(+ex).replace(/[-\d]/g, c => SUPD[c])}`; }
+  return r.toLocaleString('en-US', {maximumSignificantDigits:3}).replace('-', '−'); };
 function drawCriteria() {
   const {t, runs} = cur, ms = CHECKS[t.s].metrics, by = (typeof PASSBY === 'undefined' ? {} : PASSBY)[t.s] || {};
+  const st = (typeof METRIC_STATS === 'undefined' ? {} : METRIC_STATS)[t.s] || {};
   const short = Object.fromEntries(RANKED.map(m => [m.id, m.short]));
-  $('#ctbl').innerHTML = `<thead><tr><th>Model</th>${ms.map(m => `<th title="${esc(m)}">${esc(metric(m))}</th>`).join('')}</tr></thead><tbody>`
+  const dir = m => st[m] ? `<span class="dir">${st[m].better === 'lower' ? 'Lower' : 'Higher'} is better</span>` : '';
+  $('#ctbl').innerHTML = `<thead><tr><th>Model</th>${ms.map(m => `<th title="${esc(m)}">${esc(metricHead(m))}${dir(m)}</th>`).join('')}</tr></thead><tbody>`
+    + `<tr class="rref"><td><span class="sq"></span>Human reference</td>${ms.map(m => st[m] && st[m].ref != null ? `<td>${num(st[m].ref)}</td>` : '<td class="e">—</td>').join('')}</tr>`
     + runs.map(r => { const c = by[r[0]] || {};
       return `<tr><td>${r[3] ? TICK : CROSS}<span class="full">${esc(MNAME[r[0]])}</span><span class="short">${esc(short[r[0]])}</span></td>`
-        + ms.map(m => { const v = c[m]; return v ? `<td class="${v[0] === v[1] ? 'cy' : 'cn'}">${v[0]}/${v[1]}</td>` : '<td class="e">—</td>'; }).join('') + '</tr>'; }).join('')
+        + ms.map(m => { const v = c[m], [mean, ref] = (st[m] && st[m].by[r[0]]) || [];
+          if (!v) return '<td class="e">—</td>';
+          return `<td class="${v[0] === v[1] ? 'cy' : 'cn'}"${ref != null ? ` title="Human reference in this run: ${num(ref)}"` : ''}>${v[0]}/${v[1]}`
+            + (mean != null ? ` <span class="mv">(${num(mean)})</span>` : '') + '</td>'; }).join('') + '</tr>'; }).join('')
     + '</tbody>';
 }
 
