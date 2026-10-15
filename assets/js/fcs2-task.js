@@ -127,9 +127,9 @@ const typeset = el => { const M = window.MathJax; if (M && M.typesetPromise) M.t
 // a mean: 3 significant digits with thousands separators; under 0.001 or from a million up, ×10 to a power in
 // superscript digits, which also reads in a tooltip; a true minus sign throughout
 const SUPD = {'-':'⁻', 0:'⁰', 1:'¹', 2:'²', 3:'³', 4:'⁴', 5:'⁵', 6:'⁶', 7:'⁷', 8:'⁸', 9:'⁹'};
-const num = v => { const r = +v.toPrecision(3), a = Math.abs(r);   // judged after rounding, so 999,999 is 1×10⁶
-  if (a && (a < 1e-3 || a >= 1e6)) { const [mt, ex] = r.toExponential(2).split('e'); return `${String(+mt).replace('-', '−')}×10${String(+ex).replace(/[-\d]/g, c => SUPD[c])}`; }
-  return r.toLocaleString('en-US', {maximumSignificantDigits:3}).replace('-', '−'); };
+const num = (v, p = 3) => { const r = +v.toPrecision(p), a = Math.abs(r);   // judged after rounding, so 999,999 is 1×10⁶; p significant digits
+  if (a && (a < 1e-3 || a >= 1e6)) { const [mt, ex] = r.toExponential(p - 1).split('e'); return `${String(+mt).replace('-', '−')}×10${String(+ex).replace(/[-\d]/g, c => SUPD[c])}`; }
+  return r.toLocaleString('en-US', {maximumSignificantDigits:p, minimumSignificantDigits:p > 3 ? p : 1}).replace('-', '−'); };   // a column with more digits keeps them, 24.50 beside 24.47
 
 // pass and fail as a green tick and a red cross (Qiuyang, 2026-10-14), with the word for screen readers
 const TICK = '<svg class="ri y" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.2 8.6l3.1 3.1 6.5-7.4"/></svg><span class="vh">Pass</span>';
@@ -161,7 +161,7 @@ function drawResults() {
   // or lie between 0.001 and 0.1 with some below 0.01, takes that power into its header, "Count (×10⁹)" over 2.73
   // (Qiuyang, 2026-10-15)
   const FAM = [{s:1, ms:1e-3, 'µs':1e-6, ns:1e-9}, {GiB:2 ** 30, MiB:2 ** 20, KiB:1024, bytes:1, bits:1 / 8}];
-  const colFmt = (m, s) => { if (!s || split) return {k:1, e:0};
+  const colScale = (m, s) => { if (!s || split) return {k:1, e:0};
     const named = NAMED.exec(metric(m)), u0 = named ? named[1] : UNIT[(/_([a-z]+)$/.exec(m) || [])[1]] || s.unit;
     const vals = [s.ref, ...Object.values(s.by).map(x => x[0])].filter(v => v != null && v !== 0).map(Math.abs);
     if (!vals.length) return {k:1, e:0};
@@ -171,12 +171,18 @@ function drawResults() {
       return {k:fam[u0] / fam[u], e:0, u}; }
     const ex = vals.map(v => Math.floor(Math.log10(+v.toPrecision(3)))), lo = Math.min(...ex), hi = Math.max(...ex);
     const e = (lo < -3 || hi >= 6) && hi - lo <= 2 || lo === -3 && hi <= -2 ? lo : 0; return {k:Math.pow(10, -e), e}; };   // 0.001 to 0.01 only when all lie below 0.1
+  // a column whose numbers lie close together shows as many digits as tell them apart, up to 4 (Qiuyang, 2026-10-15:
+  // DeTok's PSNRs all read 24.4)
+  const colFmt = (m, s) => { const f = colScale(m, s); if (!s || split) return {...f, p:3};
+    const sv = [s.ref, ...Object.values(s.by).map(x => x[0])].filter(v => v != null).map(v => v * f.k);
+    const spread = sv.length ? Math.max(...sv) - Math.min(...sv) : 0, mx = Math.max(0, ...sv.map(Math.abs));
+    return {...f, p:spread > 0 ? Math.min(4, Math.max(3, Math.ceil(Math.log10(mx / spread)) + 1)) : 3}; };   // 4: the digits METRIC_STATS keeps
   const sc = (v, m) => v * F[m].k;   // F, each column's scale, follows split below
   const cell = (r, m, i) => { const v = (by[r[0]] || {})[m], [mean, rref] = (st[m] && st[m].by[r[0]]) || [];
     if (!v) return `<td class="${mcls(i)} e">—</td>`;
-    const tip = `Beat the human reference on ${v[0]} of ${v[1]} hidden workloads` + (rref != null ? `; human reference in this run: ${num(sc(rref, m))}` : '');
+    const tip = `Beat the human reference on ${v[0]} of ${v[1]} hidden workloads` + (rref != null ? `; human reference in this run: ${num(sc(rref, m), F[m].p)}` : '');
     const all = v[0] === v[1], bar = `<span class="mbar"><i class="${all ? 'y' : 'n'}" style="width:${(100 * v[0] / v[1]).toFixed(0)}%"></i></span>`;   // none won: the empty track (Qiuyang)
-    return `<td class="${mcls(i)} ${all ? 'cy' : 'cn'}" title="${tip}">` + (mean != null ? `<b>${num(sc(mean, m))}</b>` : `<b>${v[0]}/${v[1]}</b>`) + bar + '</td>'; };
+    return `<td class="${mcls(i)} ${all ? 'cy' : 'cn'}" title="${tip}">` + (mean != null ? `<b>${num(sc(mean, m), F[m].p)}</b>` : `<b>${v[0]}/${v[1]}</b>`) + bar + '</td>'; };
   // a task in WORKLOAD_NAME with numbers for each workload: every metric splits into one column per workload; the human
   // reference's cell adds the margin a run had to beat it by (the median over runs; each run's own in its tooltip), and a
   // run's bar is full green when it cleared that workload's rule, an empty track when not (Qiuyang, 2026-10-15); each
@@ -198,7 +204,7 @@ function drawResults() {
       + '<th class="rs">Final score</th><th class="rc">Cost</th></tr></thead>'
     : '<thead><tr><th>Model</th>' + ms.map((m, i) => `<th class="${mcls(i)}" title="${esc(m)}">${headText(metricHead(m, st[m], F[m].e, F[m].u), dir(m))}</th>`).join('') + '<th class="rs">Final score</th><th class="rc">Cost</th></tr></thead>';
   const refRow = split ? ms.map(m => wl.map(w => wref(m, w)).join('')).join('')
-    : ms.map((m, i) => st[m] && st[m].ref != null ? `<td class="${mcls(i)}"${st[m].profiled ? ' title="From a separate measurement of the human reference"' : ''}><b>${num(sc(st[m].ref, m))}</b></td>` : `<td class="${mcls(i)} e">—</td>`).join('');
+    : ms.map((m, i) => st[m] && st[m].ref != null ? `<td class="${mcls(i)}"${st[m].profiled ? ' title="From a separate measurement of the human reference"' : ''}><b>${num(sc(st[m].ref, m), F[m].p)}</b></td>` : `<td class="${mcls(i)} e">—</td>`).join('');
   $('#rtbl').innerHTML = head + '<tbody>'
     + (ref != null || ms.some(m => st[m] && st[m].ref != null)
       ? '<tr class="rref"><td><span class="sq"></span>Human reference</td>' + refRow
