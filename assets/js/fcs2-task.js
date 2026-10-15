@@ -52,7 +52,7 @@ function drawPage() {
     .concat(dw != null ? [`<b>${+dw.toFixed(1)} of ${dn}</b> score above the human reference`] : [])
     .concat([`best final score <b>${f1(best[2])}</b>, by ${esc(MNAME[best[0]])}`], ref != null ? [`human reference <b>${f1(ref)}</b>`] : []);
   // the note names the human reference's median only where its row has one; a task whose evidence holds only pass/fail has none (owner)
-  const mst = (typeof METRIC_STATS === 'undefined' ? {} : METRIC_STATS)[t.s] || {}, refMean = (CHECKS[t.s] ? CHECKS[t.s].metrics : []).some(m => mst[m] && mst[m].ref != null);
+  const mst = (typeof METRIC_STATS === 'undefined' ? {} : METRIC_STATS)[t.s] || {}, refMean = (CHECKS[t.s] ? CHECKS[t.s].metrics : []).some(m => mst[m] && mst[m].ref != null && !mst[m].profiled);   // a profiled value is no median (Qiuyang)
   $('#tbody').innerHTML = lead
     + `<section class="tres"><h2 class="th2">Results</h2><p class="tsum">${sum.join(' · ')}</p>`
       + (CHECKS[t.s] ? '<p class="tnote">A run passes only if its final submission beats the human reference on every metric, on every hidden workload. Each metric column gives the run’s mean over its hidden workloads, or, where the evidence has no values, the number of workloads won; the bar under it is the share of workloads on which the run beat the human reference, green when all of them. ' + (refMean ? 'The human reference is measured again in every run, so its row shows the median, and some rules' : 'Some rules') + ' ask for a margin (for example 5% faster).</p>' : '')
@@ -168,7 +168,7 @@ function drawResults() {
       + '<th class="rs">Final score</th><th class="rc">Cost</th></tr></thead>'
     : '<thead><tr><th>Model</th>' + ms.map((m, i) => `<th class="${mcls(i)}" title="${esc(m)}">${esc(metricHead(m, st[m]))}${dir(m)}</th>`).join('') + '<th class="rs">Final score</th><th class="rc">Cost</th></tr></thead>';
   const refRow = split ? ms.map(m => wl.map(w => wref(m, w)).join('')).join('')
-    : ms.map((m, i) => st[m] && st[m].ref != null ? `<td class="${mcls(i)}"><b>${num(st[m].ref)}</b></td>` : `<td class="${mcls(i)} e">—</td>`).join('');
+    : ms.map((m, i) => st[m] && st[m].ref != null ? `<td class="${mcls(i)}"${st[m].profiled ? ' title="From a separate measurement of the human reference"' : ''}><b>${num(st[m].ref)}</b></td>` : `<td class="${mcls(i)} e">—</td>`).join('');
   $('#rtbl').innerHTML = head + '<tbody>'
     + (ref != null || ms.some(m => st[m] && st[m].ref != null)
       ? '<tr class="rref"><td><span class="sq"></span>Human reference</td>' + refRow

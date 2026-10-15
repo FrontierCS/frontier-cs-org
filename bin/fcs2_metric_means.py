@@ -2,7 +2,7 @@
 """Per task, metric and model, the run's mean on the hidden final workloads and the human reference's: assets/js/fcs2-metrics.js.
 
 usage: python3 bin/fcs2_metric_means.py path/to/metric_aggregates.jsonl [--db=platform.db] [--values=metric_values.jsonl]
-       [--margins=workload_margins.jsonl]
+       [--margins=workload_margins.jsonl] [--reference=reference_profile.jsonl]
 
 With --db, only rows of the runs the database holds count (by run id), so a task rerun since the export shows no
 mean rather than the old run's (Qiuyang, 2026-10-15).
@@ -11,6 +11,11 @@ With --values (the export's per-workload rows: run, metric, workload, value, ref
 also gets each workload's numbers (Qiuyang, 2026-10-15: CREST's two programs differ tenfold, so a mean over them says
 little): per metric, "w" = {workload: {"ref": the reference's median, "margin": the median margin a run had to beat it
 by (from --margins, where the evidence states one), "by": {model id: [value, reference value, beat, margin]}}}.
+
+With --reference (one row per task and metric: task, metric, reference_mean, task_version_id, source), a metric whose
+runs give no reference value takes the profiled one (Qiuyang, 2026-10-15: measured in a run of the human reference alone,
+or read from existing evidence), where the row names no task version or one that the task's runs used; "profiled"
+marks it, as it is no median over runs.
 
 The input is an export of the platform's final evidence (GET /api/v1/runs/<id>/submission/evidence?submission_id=final),
 one JSON row per run and metric: task and candidate (database names), metric (the key PASSBY and CHECKS use), better
@@ -37,6 +42,9 @@ r4 = lambda v: None if v is None else float(f'{v:.4g}')
 # judge lists "higher" only as an equivalent under its exactness guard)
 EXACT = {('ParButterfly', 'butterfly_count'), ('SCOPE', 'exact_counts')}
 UNIT_NAME = {'milliseconds': 'ms', 'microseconds': 'µs', 'seconds': 's'}   # the export's unit, for keys without a unit suffix
+# profiled reference means that cover other workloads than the runs' retained means: Polar Express's runs keep these two
+# over the original six of its twelve cases, the profile over all twelve
+REF_OTHER_SCOPE = {('Polar Express', 'relative_polar_factor_error'), ('Polar Express', 'worst_case_scalar_error')}
 WORKLOADS = {'CREST'}   # tasks whose page shows each hidden workload apart (their names are in assets/js/fcs2-task.js)
 rows = [json.loads(line) for line in open(sys.argv[1]) if line.strip()]
 dbp = next((a[5:] for a in sys.argv[2:] if a.startswith('--db=')), None)
@@ -65,6 +73,16 @@ for t, metrics in out.items():
         s['ref'] = r4(statistics.median(refs)) if refs else None
         s['by'] = dict(sorted(s['by'].items()))
         if (t, metric) in EXACT: s['exact'] = True
+live_ver = {}   # per task, the task versions of the runs counted
+for r in rows:
+    if not dbp or r['run_id'] in live: live_ver.setdefault(r['task'], set()).add(r.get('task_version_id'))
+profiled = 0
+for p in (map(json.loads, open(arg('reference'))) if arg('reference') else []):
+    if p['task'] not in TASK or p['reference_mean'] is None or p.get('task_version_id') not in live_ver.get(p['task'], set()) | {None}: continue
+    t = TASK[p['task']][1] or p['task']
+    s = out.get(t, {}).get(p['metric'])
+    if s is not None and s['ref'] is None and (t, p['metric']) not in REF_OTHER_SCOPE:
+        s['ref'], s['profiled'] = r4(p['reference_mean']), True; profiled += 1
 for r in wrows:   # each workload apart, for the tasks in WORKLOADS
     task, cand = r['task'], r['candidate']
     if task not in TASK or (TASK[task][1] or task) not in WORKLOADS or cand in HIDDEN or cand not in MODEL: continue
@@ -91,4 +109,5 @@ path.write_text('// Written by bin/fcs2_metric_means.py from an export of the pl
                 '// every run), and per model [the run\'s mean over its hidden final workloads, the human reference\'s mean in that run].\n'
                 'const METRIC_STATS = ' + json.dumps(out, separators=(',', ':'), ensure_ascii=False) + ';\n')
 print(f'{len(rows)} rows, {sum(len(m) for m in out.values())} metrics on {len(out)} tasks -> {path}; left out: {skipped}'
-      + (f'; numbers of {stale} rows dropped, their runs not in {dbp}' if dbp else ''))
+      + (f'; numbers of {stale} rows dropped, their runs not in {dbp}' if dbp else '')
+      + (f'; {profiled} reference means from {arg("reference")}' if arg('reference') else ''))
