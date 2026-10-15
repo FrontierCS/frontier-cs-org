@@ -45,11 +45,11 @@ function drawPage() {
   if (!runs.length) { $('#tbody').innerHTML = lead + '<p class="tbd">No runs on this task yet.</p>'; loadFig(t); drawPager(t); scrollTo(0, 0); return; }
   const ref = REF[t.s], ms = new Set(runs.map(r => r[0])), np = new Set(runs.filter(r => r[3]).map(r => r[0])).size;
   const best = runs.reduce((a, r) => r[2] > a[2] ? r : a);
-  // beside who passes, the wins the FDI fit counts (DIFF): runs whose final score is above the human reference's, a tie
-  // counting half; none without a reference (Qiuyang, 2026-10-14)
-  const [, , , , dw, dn] = DIFF[t.s] || [];
+  // beside who passes, the runs whose final score is above the human reference's, and those level with it apart (Qiuyang,
+  // 2026-10-15: a tie counted as half read "5 of 10" where all ten were level); none without a reference
+  const above = ref != null ? runs.filter(r => r[2] > ref).length : null, level = ref != null ? runs.filter(r => r[2] === ref).length : 0;
   const sum = [`<b>${np} of ${ms.size}</b> models pass`]
-    .concat(dw != null ? [`<b>${+dw.toFixed(1)} of ${dn}</b> score above the human reference`] : [])
+    .concat(above != null ? [`<b>${above} of ${runs.length}</b> score above the human reference` + (level ? `, <b>${level}</b> level with it` : '')] : [])
     .concat([`best final score <b>${f1(best[2])}</b>, by ${esc(MNAME[best[0]])}`], ref != null ? [`human reference <b>${f1(ref)}</b>`] : []);
   // the note names the human reference's median only where its row has one; a task whose evidence holds only pass/fail has none (owner)
   const mst = (typeof METRIC_STATS === 'undefined' ? {} : METRIC_STATS)[t.s] || {}, refMean = (CHECKS[t.s] ? CHECKS[t.s].metrics : []).some(m => mst[m] && mst[m].ref != null && !mst[m].profiled && !mst[m].fixed);   // a profiled or fixed value is no median (Qiuyang)
@@ -136,7 +136,11 @@ const TICK = '<svg class="ri y" viewBox="0 0 16 16" aria-hidden="true"><path d="
 const CROSS = '<svg class="ri n" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.3 4.3l7.4 7.4M11.7 4.3l-7.4 7.4"/></svg><span class="vh">Fail</span>';
 function drawResults() {
   const {t, runs} = cur, ref = REF[t.s], xmax = Math.max(100, ref ?? 0, ...runs.map(r => r[2]));
-  const ms = CHECKS[t.s] ? CHECKS[t.s].metrics : [], by = (typeof PASSBY === 'undefined' ? {} : PASSBY)[t.s] || {};
+  // per model and metric, the counts summed over the metric's keys, development workloads left out, as the converter
+  // reads them (Qiuyang, 2026-10-15: Yannakakis keeps one key per workload, "final/3/exact_result")
+  const ms = CHECKS[t.s] ? CHECKS[t.s].metrics : [], by = Object.fromEntries(Object.entries((typeof PASSBY === 'undefined' ? {} : PASSBY)[t.s] || {})
+    .map(([mid, kv]) => [mid, Object.entries(kv).reduce((o, [k, [a, n]]) => { if (k.startsWith('dev/')) return o;
+      const s = k.slice(k.lastIndexOf('/') + 1); o[s] = o[s] ? [o[s][0] + a, o[s][1] + n] : [a, n]; return o; }, {})]));
   const st = (typeof METRIC_STATS === 'undefined' ? {} : METRIC_STATS)[t.s] || {};
   // the score sits at the end of its bar (owner, 2026-10-14: beside the bar, not at the right edge of the column)
   const bar = (v, style) => { const w = (Math.max(0, v) / xmax * 100).toFixed(1);
