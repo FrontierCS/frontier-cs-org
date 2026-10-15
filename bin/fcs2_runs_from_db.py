@@ -174,6 +174,7 @@ MODEL = {
     'Codex · Qwen 3.8 Max': ('qwen', 'Qwen 3.8 Max', 'Qwen 3.8 Max', 'Codex CLI', 'Qwen'),
     'Qwen Code CLI · Qwen 3.8 Max': ('qwen', 'Qwen 3.8 Max', 'Qwen 3.8 Max', 'Qwen Code', 'Qwen'),   # re-run on Qwen Code (Qiuyang, 2026-10-14)
     'GLM 5.3 Flash (ZCode)': ('glmf', 'GLM 5.3 Flash', 'GLM 5.3 Flash', 'ZCode', 'Z.ai'),
+    'pi · Gemini 4': ('gemini', 'Gemini 4', 'Gemini 4', 'pi', 'Google'),   # on the pi agent harness (Qiuyang, 2026-10-16)
 }
 
 HIDDEN = {'Kimi K2.7 Code'}                    # owner's call, 2026-10-09: off the leaderboard, kept in the fits (it is the FCI's 0 point)
