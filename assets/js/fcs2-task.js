@@ -112,7 +112,7 @@ const WORKLOAD_NAME = {'CREST':{w0:'Vim 5.7', w1:'sed 3.02'}};
    run]. The header names the metric with its unit and says which way is better; a first row gives the human
    reference; each model cell is the run's mean, coloured by its count, with the count and the reference's mean in that
    run as its tooltip. */
-const UNIT = {ms:'ms', seconds:'s', ns:'ns', us:'µs', minutes:'min', bytes:'bytes', bits:'bits', mib:'MiB', pct:'%', db:'dB'};
+const UNIT = {ms:'ms', seconds:'s', ns:'ns', us:'µs', minutes:'min', bytes:'bytes', bits:'bits', mflops:'MFLOP/s', mib:'MiB', pct:'%', db:'dB'};
 const NAMED = /(?<!\\)\(([^()]*)\)\s*$/;   // a unit in the label's closing parentheses, not TeX's \( \)
 const metricHead = (m, s, e = 0, uo) => { const label = metric(m), named = NAMED.exec(label);   // a label that already names its unit keeps it
   const base = named ? label.slice(0, named.index).trimEnd() : label, x = e ? `×10${String(e).replace(/[-\d]/g, c => SUPD[c])}` : '';
@@ -160,7 +160,7 @@ function drawResults() {
     const named = NAMED.exec(metric(m)), u0 = named ? named[1] : UNIT[(/_([a-z]+)$/.exec(m) || [])[1]] || s.unit;
     const vals = [s.ref, ...Object.values(s.by).map(x => x[0])].filter(v => v != null && v !== 0).map(Math.abs);
     if (!vals.length) return {k:1, e:0};
-    const fam = FAM.find(f => f[u0]);
+    const fam = named && u0 === 'bits' ? null : FAM.find(f => f[u0]);   // bits of precision are no size; storage bits come from the key
     if (fam) { const med = vals.map(v => v * fam[u0]).sort((a, b) => a - b)[vals.length >> 1];
       const us = Object.keys(fam).filter(u => u !== 'bits'), u = us.find(u => med >= fam[u]) || us[us.length - 1];
       return {k:fam[u0] / fam[u], e:0, u}; }
