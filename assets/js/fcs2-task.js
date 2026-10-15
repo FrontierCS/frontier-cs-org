@@ -48,7 +48,7 @@ function drawPage() {
     .concat(ref != null ? [`human reference <b>${f1(ref)}</b>`] : [], []);
   $('#tbody').innerHTML = lead
     + `<section class="tres"><h2 class="th2">Results</h2><p class="tsum">${sum.join(' · ')}</p>`
-      + (CHECKS[t.s] ? '<p class="tnote">A run passes only if its final submission beats the human reference on every metric, on every hidden workload. Each metric column gives the run’s mean over its hidden workloads, in green when it beat the human reference on every one and in red otherwise.</p>' : '')
+      + (CHECKS[t.s] ? '<p class="tnote">A run passes only if its final submission beats the human reference on every metric, on every hidden workload. Each metric column gives the run’s mean over its hidden workloads: green when it beat the human reference on every one, light red on some, dark red on none. A mean better than the reference’s can still be red: the run missed a workload, the rule asks for a margin (for example 5% faster), or the reference, measured again in every run, did better in this run than the median shown above.</p>' : '')
       + `<div class="res-scroll"><table class="res rtab${CHECKS[t.s] ? ' wm' : ''}" id="rtbl"></table></div></section>`   // results and pass criteria in one table (owner, 2026-10-15)
     + figure('sc', 'Final score against cost')
     + (TFIT[t.s] ? figure('fc', 'Expected score by FCI') : '')
