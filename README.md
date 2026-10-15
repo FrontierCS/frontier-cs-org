@@ -41,7 +41,8 @@ The FrontierCS 2 pages read static files; nothing on the site calls the evaluati
 1. `bin/fcs2_db_from_platform.py out.db` collects the formal evaluations into a SQLite database.
 2. `bin/fcs2_runs_from_db.py out.db` rewrites the block between the converter markers in `assets/js/fcs2-data.js`: runs, costs, FCI, test-time scaling, per-task fits and descriptions. It also writes `_data/fcs2_runs_hidden.json`, the runs of models kept off the leaderboard (Kimi K2.7, the 0 point of FCI). Files in `_data/` are not published.
 3. `bin/fcs2_checks_from_platform.py out.db` writes `assets/js/fcs2-checks.js`: for each run and metric, on how many hidden workloads the final submission beat the human reference.
-4. `bin/fcs2_patches_from_platform.py` writes `assets/patches/<slug>.json`, the final patch of each run. The site does not show patches; they are the source for the solutions below.
+4. `bin/fcs2_metric_means.py metric_aggregates.jsonl` writes `assets/js/fcs2-metrics.js`: for each task and metric, whether higher or lower is better and, per run, its mean over the hidden final workloads and the human reference's mean in the same evaluation. The input is an export of each run's final evidence from the platform (`GET /api/v1/runs/<id>/submission/evidence?submission_id=final`, one row per run and metric). The human reference is measured again in every run, so its mean varies from run to run; the task page shows the median over the task's runs.
+5. `bin/fcs2_patches_from_platform.py` writes `assets/patches/<slug>.json`, the final patch of each run. The site does not show patches; they are the source for the solutions below.
 
 These files are written by hand:
 
