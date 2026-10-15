@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """Per task, metric and model, the run's mean on the hidden final workloads and the human reference's: assets/js/fcs2-metrics.js.
 
-usage: python3 bin/fcs2_metric_means.py path/to/metric_aggregates.jsonl
+usage: python3 bin/fcs2_metric_means.py path/to/metric_aggregates.jsonl [--db=platform.db]
+
+With --db, only rows of the runs the database holds count (by run id), so a task rerun since the export shows no
+mean rather than the old run's (Qiuyang, 2026-10-15).
 
 The input is an export of the platform's final evidence (GET /api/v1/runs/<id>/submission/evidence?submission_id=final),
 one JSON row per run and metric: task and candidate (database names), metric (the key PASSBY and CHECKS use), better
@@ -29,6 +32,13 @@ r4 = lambda v: None if v is None else float(f'{v:.4g}')
 EXACT = {('ParButterfly', 'butterfly_count'), ('SCOPE', 'exact_counts')}
 UNIT_NAME = {'milliseconds': 'ms', 'microseconds': 'µs', 'seconds': 's'}   # the export's unit, for keys without a unit suffix
 rows = [json.loads(line) for line in open(sys.argv[1]) if line.strip()]
+dbp = next((a[5:] for a in sys.argv[2:] if a.startswith('--db=')), None)
+if dbp:
+    import sqlite3
+    live = {r for r, in sqlite3.connect(dbp).execute('select run_id from cells')}
+    stale = sum(r['run_id'] not in live for r in rows)
+    for r in rows:   # a rerun's row from the old run: keep its direction, drop its numbers
+        if r['run_id'] not in live: r['value'] = r['reference_value'] = None
 out, skipped = {}, {}
 for r in rows:
     task, cand, metric = r['task'], r['candidate'], r['metric']
@@ -52,4 +62,5 @@ path.write_text('// Written by bin/fcs2_metric_means.py from an export of the pl
                 '// higher or lower is better, the human reference\'s mean (the median over the task\'s runs, as it is measured again in\n'
                 '// every run), and per model [the run\'s mean over its hidden final workloads, the human reference\'s mean in that run].\n'
                 'const METRIC_STATS = ' + json.dumps(out, separators=(',', ':'), ensure_ascii=False) + ';\n')
-print(f'{len(rows)} rows, {sum(len(m) for m in out.values())} metrics on {len(out)} tasks -> {path}; left out: {skipped}')
+print(f'{len(rows)} rows, {sum(len(m) for m in out.values())} metrics on {len(out)} tasks -> {path}; left out: {skipped}'
+      + (f'; numbers of {stale} rows dropped, their runs not in {dbp}' if dbp else ''))
