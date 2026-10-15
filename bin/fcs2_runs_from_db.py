@@ -29,7 +29,7 @@ final score counts by how far above the human reference r_t it is when the run p
 the median reference_score over the task's runs; 0 or less: REF_DEFAULT's value, else the task has none), in units of
 the task's score spread, at least the median spread over tasks: y = (score - r_t) / unit_t, unit_t = max(sd_t, c), sd_t
 the sd of the task's final scores strictly between 0 and 100 (all of them when fewer than 3), c the median sd_t over the
-tasks with a reference. A run that does not pass contributes its metric groups and its margin censored at 0 from above: how far below r_t, or at least level. The final score comes from the same
+tasks with a reference. A run that does not pass contributes its metric groups and its margin censored at 0 from above: how far below r_t, or at least level. A run the model's provider refused (feedback_json.refusal: no final submission came) is left out of every fit, FCI, FDI and test-time scaling alike; the page still lists it (Qiuyang, 2026-10-16). The final score comes from the same
 measurements as the metrics, so a run's metric groups and its margin share one run effect u ~ N(0, SIGMA_U^2). With
 theta_m the model's strength in logits (prior N(0, 1/LAM), LAM = 0.35 as in the site's in-browser TDIFF), a run's
 likelihood is the integral over u, by Gauss-Hermite quadrature (64 nodes; 24 stall Newton near SIGMA_U = 3.7), of prod_j
@@ -584,12 +584,15 @@ def theta_at(items, counts, hyp):
 notyet = lambda o, k: np.r_[np.zeros(k), [0.0, 2.0]] if len(o) > k else np.zeros(k)   # no group beaten, no margin
 
 
+refused = lambda fj: bool(fj) and bool(json.loads(fj).get('refusal'))   # bin/fcs2_db_from_platform.py marks a provider refusal
+
+
 def scaling(db, tasks, hyp, theta0):
     """{model id: [[US$ budget, FCI, 90% low, 90% high, share of runs still going], ...]}; spend from usd(). The joint
     model with every task's parameters held at the leaderboard fit: at budget B a run that has ended contributes its
     metric groups and, if it passed, its margin; a run still going contributes no group beaten and no margin."""
-    info = {r: (c, t) for r, c, t, s in db.execute('''select r.id, cd.name, t.name, r.display_score from cells ce
-        join runs r on r.id = ce.run_id join candidates cd on cd.id = ce.candidate_id join tasks t on t.id = ce.task_id''') if s is not None and c not in HIDDEN}
+    info = {r: (c, t) for r, c, t, s, fj in db.execute('''select r.id, cd.name, t.name, r.display_score, r.feedback_json from cells ce
+        join runs r on r.id = ce.run_id join candidates cd on cd.id = ce.candidate_id join tasks t on t.id = ce.task_id''') if s is not None and c not in HIDDEN and not refused(fj)}
     pts = {(r, sid): (tt, ot) for r, sid, tt, ot in db.execute('select run_id, submission_id, total_tokens, output_tokens from score_points')}
     end = {}   # a run's spend at its end: usd() at its last submission with a score point, 0 if none
     for r, sid in db.execute('select run_id, id from submissions order by run_id, ordinal'):
@@ -731,6 +734,9 @@ when = datetime.fromisoformat(generated[:19])
 models = [MODEL[c] for c in MODEL if c not in HIDDEN]
 fit_rows = db.execute('''select c.name, t.name, r.display_score, r.display_verdict, r.feedback_json from cells ce
   join runs r on r.id = ce.run_id join candidates c on c.id = ce.candidate_id join tasks t on t.id = ce.task_id''').fetchall()
+# a run the model's provider refused (no final submission) says nothing about the model's ability on the task: it is left
+# out of FCI and FDI, though the page still lists it (Qiuyang, 2026-10-16)
+fit_rows = [x for x in fit_rows if not refused(x[4])]
 obs, task_ref = fit_data(fit_rows)
 E, THETA, theta0, MT, dfit, dll, dstarts, UNIT0, nskip = joint_fit(obs, task_ref, passby())
 TFIT, DIFF, METRIC, MGROUPS, DIFF_FIT = task_fits(MT, dfit, theta0, UNIT0)

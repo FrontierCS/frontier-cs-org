@@ -17,6 +17,8 @@ What the API does not give, and what stands in for it:
 - The patch behind the final submission. Development payload ids do not match the final checkpoint's, so no
   development score is paired with the hidden score and the converter applies no dev-to-hidden calibration.
 - Check labels. feedback_json.checks lists the metric names of metrics.private.beat_spec_progress.
+- Refusals. feedback_json.refusal is true for a run whose adjudication cause is provider_refusal_no_final: the model's
+  provider refused, so no final submission came. The converter leaves such runs out of FCI and FDI (Qiuyang, 2026-10-16).
 """
 import json, sqlite3, sys, urllib.request, os
 from concurrent.futures import ThreadPoolExecutor
@@ -112,6 +114,7 @@ for c, r, events in pulled:
     units = lambda x: x * 1e6
     priv = (r.get('metrics') or {}).get('private') or {}
     fb = {'reference_score': priv.get('reference_score'), 'checks': [{'label': k} for k in (priv.get('beat_spec_progress') or {})]}
+    if (r.get('adjudication') or {}).get('cause') == 'provider_refusal_no_final': fb['refusal'] = True   # the model's provider refused and no final came
     db.execute('insert into runs values (?,?,?,?,?,?)', (r['id'], 0.0 if r['score'] is None and r['state'] == 'TIMED_OUT' else r['score'], r['state'], r['verdict'], end - start if start and end else None, json.dumps(fb)))
     db.execute('insert into cells values (?,?,?)', (r['id'], c, r['task_id']))
     n = 0
