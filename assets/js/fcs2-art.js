@@ -114,17 +114,15 @@ Object.assign(ART, {
     return plane(36, s1, 4) + plane(84, s1, 4) + plane(132, s1, 4) + Pa('M112,84l52,0l-20,20l-52,0Z', {fill:WHITE, stroke:WHITE, 'stroke-width':5, 'stroke-linejoin':'round'})
       + Pa('M138,60V80M138,108V128', {stroke:WHITE, 'stroke-width':4, 'stroke-dasharray':'2 7'});
   },
-  // CREST: a program's tree of branches; the white path is the concrete run, and the dashed branch it negates next leads
-  // to code not yet covered (the white ring)
+  // CREST: a program as lines of code in a coverage view; the branch body the search reaches next is white, marked in the
+  // gutter; lines no run has reached stay faint
   CREST(R, [bg, s1, s2]) {
-    const L = [26, 74, 122, 170], P = (d, i) => [150 + (i - (2 ** d - 1) / 2) * 240 / 2 ** d, L[d]];
+    const ind = [0, 1, 1, 1, 2, 2, 2, 1, 2, 1, 0], st = [1, 1, 1, 1, 2, 2, 2, 1, 0, 1, 1];   // 1 covered, 2 reached next, 0 not reached
     let g = '';
-    for (let d = 0; d < 3; d++) for (let i = 0; i < 2 ** d; i++) { const [x, y] = P(d, i);
-      for (const c of [2 * i, 2 * i + 1]) { const [cx, cy] = P(d + 1, c); g += Pa(`M${x},${y}L${cx},${cy}`, {stroke:s1, 'stroke-width':6}); } }
-    for (let d = 0; d < 4; d++) for (let i = 0; i < 2 ** d; i++) { const [x, y] = P(d, i); g += C(x, y, 7, {fill:s2}); }
-    const run = [P(0, 0), P(1, 0), P(2, 1), P(3, 2)], [fx, fy] = P(2, 1), [tx, ty] = P(3, 3);
-    return g + Pa('M' + run.map(p => p.join(',')).join('L'), {stroke:WHITE, 'stroke-width':8}) + run.map(p => C(p[0], p[1], 8, {fill:WHITE})).join('')
-      + Pa(`M${fx},${fy}L${tx},${ty}`, {stroke:WHITE, 'stroke-width':5, 'stroke-dasharray':'2 9'}) + C(tx, ty, 10, {fill:'none', stroke:WHITE, 'stroke-width':4});
+    ind.forEach((d, i) => { const y = 20 + i * 16, x = 66 + d * 24, len = 50 + R() * (150 - d * 24);
+      g += Pa(`M${x},${y}h${len}`, st[i] === 2 ? {stroke:WHITE, 'stroke-width':9} : st[i] === 1 ? {stroke:s1, 'stroke-width':9} : {stroke:s2, 'stroke-width':9, 'stroke-opacity':.45});
+      g += st[i] ? C(44, y, 4, {fill:st[i] === 2 ? WHITE : s2}) : C(44, y, 3.6, {fill:'none', stroke:s2, 'stroke-width':1.8, 'stroke-opacity':.6}); });
+    return g + Pa(`M28,${20 + 4 * 16}V${20 + 6 * 16}`, {stroke:WHITE, 'stroke-width':6});
   },
   // TenSat: a tensor graph of operator boxes; a rewritten subgraph is white
   TenSat(R, [bg, s1, s2]) {
