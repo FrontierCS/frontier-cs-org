@@ -94,7 +94,7 @@ const METRIC = {"accuracy_qualified":"Estimate accuracy", "action_rate":"Action 
 const metric = m => METRIC[m] || m.replace(/_/g, ' ').replace(/^./, c => c.toUpperCase());
 
 /* Results and pass criteria in one table (owner, 2026-10-15). Rows: the Human reference, then every run by final score, each
-   with its verdict (tick or cross), its final score as a bar and its cost. Then one column per metric: on how many hidden
+   with its verdict (tick or cross); one column per metric, then its final score as a bar and its cost. Each metric: on how many hidden
    workloads the final submission beat the Human reference (PASSBY, bin/fcs2_checks_from_platform.py, the same runs as the
    scores), green when every workload, red otherwise, a dash for a run with no hidden evaluation. */
 /* Each metric's mean (Qiuyang, 2026-10-15): METRIC_STATS (assets/js/fcs2-metrics.js, bin/fcs2_metric_means.py) gives
@@ -125,18 +125,20 @@ function drawResults() {
     return `<span class="rb"><i style="width:${w}%;${style}"></i><span class="rn" style="left:${w}%">${f1(v)}</span></span>`; };
   const short = Object.fromEntries(RANKED.map(m => [m.id, m.short]));
   const dir = m => st[m] ? `<span class="dir">${st[m].better === 'lower' ? 'Lower' : 'Higher'} is better</span>` : '';
-  const mcls = i => `mc${i ? '' : ' m1'}`;   // the first metric column opens with a rule
+  const mcls = () => 'mc';
   const cell = (r, m, i) => { const v = (by[r[0]] || {})[m], [mean, rref] = (st[m] && st[m].by[r[0]]) || [];
     if (!v) return `<td class="${mcls(i)} e">—</td>`;
     return `<td class="${mcls(i)} ${v[0] === v[1] ? 'cy' : 'cn'}"${rref != null ? ` title="Human reference in this run: ${num(rref)}"` : ''}><b>${v[0]}/${v[1]}</b>`
       + (mean != null ? `<span class="mv">${num(mean)}</span>` : '') + '</td>'; };
-  $('#rtbl').innerHTML = `<thead><tr><th>Model</th><th class="rs">Final score</th><th class="rc">Cost</th>`
-    + ms.map((m, i) => `<th class="${mcls(i)}" title="${esc(m)}">${esc(metricHead(m))}${dir(m)}</th>`).join('') + '</tr></thead><tbody>'
+  // the metrics first, then the final score and the cost (owner, 2026-10-15)
+  $('#rtbl').innerHTML = '<thead><tr><th>Model</th>'
+    + ms.map((m, i) => `<th class="${mcls(i)}" title="${esc(m)}">${esc(metricHead(m))}${dir(m)}</th>`).join('') + '<th class="rs">Final score</th><th class="rc">Cost</th></tr></thead><tbody>'
     + (ref != null || ms.some(m => st[m] && st[m].ref != null)
-      ? `<tr class="rref"><td><span class="sq"></span>Human reference</td><td class="rs">${ref != null ? bar(ref, '') : ''}</td><td class="rc"></td>`
-        + ms.map((m, i) => st[m] && st[m].ref != null ? `<td class="${mcls(i)}"><b>${num(st[m].ref)}</b></td>` : `<td class="${mcls(i)} e">—</td>`).join('') + '</tr>' : '')
+      ? '<tr class="rref"><td><span class="sq"></span>Human reference</td>'
+        + ms.map((m, i) => st[m] && st[m].ref != null ? `<td class="${mcls(i)}"><b>${num(st[m].ref)}</b></td>` : `<td class="${mcls(i)} e">—</td>`).join('')
+        + `<td class="rs">${ref != null ? bar(ref, '') : ''}</td><td class="rc"></td></tr>` : '')
     + [...runs].sort((p, q) => q[2] - p[2]).map(r => `<tr><td>${r[3] ? TICK : CROSS}<span class="full">${esc(MNAME[r[0]])}</span><span class="short">${esc(short[r[0]])}</span></td>`
-      + `<td class="rs">${bar(r[2], `background:${MCOL[r[0]]}`)}</td><td class="rc">$${r[4].toFixed(2)}</td>` + ms.map((m, i) => cell(r, m, i)).join('') + '</tr>').join('')
+      + ms.map((m, i) => cell(r, m, i)).join('') + `<td class="rs">${bar(r[2], `background:${MCOL[r[0]]}`)}</td><td class="rc">$${r[4].toFixed(2)}</td></tr>`).join('')
     + '</tbody>';
 }
 
