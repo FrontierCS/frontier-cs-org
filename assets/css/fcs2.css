@@ -134,7 +134,7 @@ h2{font-weight:600; font-size:clamp(25px,2.4vw,30px); line-height:1.2; margin:0}
 .how-why li{margin:0}
 .how-why b{display:block; margin-bottom:4px; color:var(--ink); font-weight:600}
 @media (max-width:900px){ .how-why{grid-template-columns:1fr} }
-.res-scroll{overflow-x:auto; -webkit-overflow-scrolling:touch}
+.res-scroll{position:relative; overflow-x:auto; -webkit-overflow-scrolling:touch}   /* positioned, so the hidden Pass/Fail words inside clip with the table */
 .res th{white-space:nowrap}
 .plot .halo{paint-order:stroke; stroke:#fff; stroke-width:4px; stroke-linejoin:round}
 table.res{width:100%; border-collapse:collapse; font-size:15px}
@@ -432,7 +432,7 @@ a.pbtn:hover{border-color:var(--teal); color:var(--teal-d)}
 .rtab td.mc{text-align:center; white-space:nowrap; line-height:1.25}
 .rtab td.mc b{font-weight:500}
 .rtab td.cy b{color:#137333} .rtab td.cn b{color:#c5221f}
-.rtab td.mc .mv{display:block; margin-top:3px; font-size:12.5px; color:var(--muted)}   /* the run's mean, under its count */
+.rtab td.mc .ri{margin:0}   /* a tick or a cross where the run has no mean */
 .rtab .rref td.mc b{font-weight:400; color:var(--ink-2)}
 .rtab .ri{display:inline-block; max-width:none}   /* the site's percentage max-width would shrink an icon in a narrow cell */
 @media (max-width:640px){

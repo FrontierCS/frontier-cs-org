@@ -48,7 +48,7 @@ function drawPage() {
     .concat(ref != null ? [`human reference <b>${f1(ref)}</b>`] : [], []);
   $('#tbody').innerHTML = lead
     + `<section class="tres"><h2 class="th2">Results</h2><p class="tsum">${sum.join(' · ')}</p>`
-      + (CHECKS[t.s] ? '<p class="tnote">A run passes only if its final submission beats the human reference on every metric, on every hidden workload. Each metric column counts the hidden workloads on which it did, with the run’s mean over them below.</p>' : '')
+      + (CHECKS[t.s] ? '<p class="tnote">A run passes only if its final submission beats the human reference on every metric, on every hidden workload. Each metric column gives the run’s mean over its hidden workloads, in green when it beat the human reference on every one and in red otherwise.</p>' : '')
       + `<div class="res-scroll"><table class="res rtab${CHECKS[t.s] ? ' wm' : ''}" id="rtbl"></table></div></section>`   // results and pass criteria in one table (owner, 2026-10-15)
     + figure('sc', 'Final score against cost')
     + (TFIT[t.s] ? figure('fc', 'Expected score by FCI') : '')
@@ -96,13 +96,13 @@ const metric = m => METRIC[m] || m.replace(/_/g, ' ').replace(/^./, c => c.toUpp
 /* Results and pass criteria in one table (owner, 2026-10-15). Rows: the Human reference, then every run by final score, each
    with its verdict (tick or cross); one column per metric, then its final score as a bar and its cost. Each metric: on how many hidden
    workloads the final submission beat the Human reference (PASSBY, bin/fcs2_checks_from_platform.py, the same runs as the
-   scores), green when every workload, red otherwise, a dash for a run with no hidden evaluation. */
+   scores) sets the colour of the run's mean (green on every workload, red otherwise), a dash for a run with no hidden evaluation. */
 /* Each metric's mean (Qiuyang, 2026-10-15): METRIC_STATS (assets/js/fcs2-metrics.js, bin/fcs2_metric_means.py) gives
    per metric whether higher or lower is better, the human reference's mean (the median over the task's runs, as it is
    measured again in every run) and per model [the run's mean over its hidden workloads, the reference's mean in that
    run]. The header names the metric with its unit and says which way is better; a first row gives the human
-   reference; each model cell keeps its count, coloured, with the run's mean on a muted line below it and the reference's
-   mean in that run as its tooltip. */
+   reference; each model cell is the run's mean, coloured by its count, with the count and the reference's mean in that
+   run as its tooltip. */
 const UNIT = {ms:'ms', seconds:'s', ns:'ns', us:'µs', minutes:'min', bytes:'bytes', mib:'MiB', pct:'%', db:'dB'};
 const metricHead = m => { const label = metric(m), u = UNIT[(/_([a-z]+)$/.exec(m) || [])[1]];
   return u && !/\(.*\)\s*$/.test(label) ? `${label} (${u})` : label; };   // a label that already names its unit keeps it
@@ -126,10 +126,13 @@ function drawResults() {
   const short = Object.fromEntries(RANKED.map(m => [m.id, m.short]));
   const dir = m => st[m] ? `<span class="dir">${st[m].better === 'lower' ? 'Lower' : 'Higher'} is better</span>` : '';
   const mcls = () => 'mc';
+  // a metric's cell is the run's mean, green when the run beat the human reference on every hidden workload, red otherwise
+  // (owner, 2026-10-15: values, not counts); the count and the reference's mean in that run go to the tooltip; without a
+  // mean, a tick or a cross
   const cell = (r, m, i) => { const v = (by[r[0]] || {})[m], [mean, rref] = (st[m] && st[m].by[r[0]]) || [];
     if (!v) return `<td class="${mcls(i)} e">—</td>`;
-    return `<td class="${mcls(i)} ${v[0] === v[1] ? 'cy' : 'cn'}"${rref != null ? ` title="Human reference in this run: ${num(rref)}"` : ''}><b>${v[0]}/${v[1]}</b>`
-      + (mean != null ? `<span class="mv">${num(mean)}</span>` : '') + '</td>'; };
+    const tip = `Beat the human reference on ${v[0]} of ${v[1]} hidden workloads` + (rref != null ? `; human reference in this run: ${num(rref)}` : '');
+    return `<td class="${mcls(i)} ${v[0] === v[1] ? 'cy' : 'cn'}" title="${tip}">` + (mean != null ? `<b>${num(mean)}</b>` : (v[0] === v[1] ? TICK : CROSS)) + '</td>'; };
   // the metrics first, then the final score and the cost (owner, 2026-10-15)
   $('#rtbl').innerHTML = '<thead><tr><th>Model</th>'
     + ms.map((m, i) => `<th class="${mcls(i)}" title="${esc(m)}">${esc(metricHead(m))}${dir(m)}</th>`).join('') + '<th class="rs">Final score</th><th class="rc">Cost</th></tr></thead><tbody>'
