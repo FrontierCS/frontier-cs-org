@@ -129,7 +129,7 @@ const typeset = el => { const M = window.MathJax; if (M && M.typesetPromise) M.t
 const SUPD = {'-':'⁻', 0:'⁰', 1:'¹', 2:'²', 3:'³', 4:'⁴', 5:'⁵', 6:'⁶', 7:'⁷', 8:'⁸', 9:'⁹'};
 const num = (v, p = 3) => { const r = +v.toPrecision(p), a = Math.abs(r);   // judged after rounding, so 999,999 is 1×10⁶; p significant digits
   if (a && (a < 1e-3 || a >= 1e6)) { const [mt, ex] = r.toExponential(p - 1).split('e'); return `${String(+mt).replace('-', '−')}×10${String(+ex).replace(/[-\d]/g, c => SUPD[c])}`; }
-  return r.toLocaleString('en-US', {maximumSignificantDigits:p}).replace('-', '−'); };
+  return r.toLocaleString('en-US', {maximumSignificantDigits:p, minimumSignificantDigits:p > 3 ? p : 1}).replace('-', '−'); };   // a column with more digits keeps them, 24.50 beside 24.47
 
 // pass and fail as a green tick and a red cross (Qiuyang, 2026-10-14), with the word for screen readers
 const TICK = '<svg class="ri y" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.2 8.6l3.1 3.1 6.5-7.4"/></svg><span class="vh">Pass</span>';
