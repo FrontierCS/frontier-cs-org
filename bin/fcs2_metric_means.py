@@ -24,6 +24,10 @@ for n in src.body:   # the first, literal assignment of each (MODEL is narrowed 
 TASK, MODEL, HIDDEN = lit['TASK'], lit['MODEL'], lit['HIDDEN']
 
 r4 = lambda v: None if v is None else float(f'{v:.4g}')
+# checks that must equal an exact answer: the page says so instead of a direction (Qiuyang, 2026-10-15; ParButterfly's
+# judge lists "higher" only as an equivalent under its exactness guard)
+EXACT = {('ParButterfly', 'butterfly_count'), ('SCOPE', 'exact_counts')}
+UNIT_NAME = {'milliseconds': 'ms', 'microseconds': 'µs', 'seconds': 's'}   # the export's unit, for keys without a unit suffix
 rows = [json.loads(line) for line in open(sys.argv[1]) if line.strip()]
 out, skipped = {}, {}
 for r in rows:
@@ -31,14 +35,16 @@ for r in rows:
     if task not in TASK: skipped[task] = skipped.get(task, 0) + 1; continue
     s = out.setdefault(TASK[task][1] or task.split(' — ')[0], {}).setdefault(metric, {'better': r['better'], 'ref': None, 'by': {}, 'refs': []})
     if s['better'] != r['better']: sys.exit(f'{task} {metric}: "better" differs between runs')
+    if r.get('unit') in UNIT_NAME: s['unit'] = UNIT_NAME[r['unit']]
     if cand in HIDDEN or cand not in MODEL: skipped[cand] = skipped.get(cand, 0) + 1; continue
     s['by'][MODEL[cand][0]] = [r4(r['value']), r4(r['reference_value'])]
     if r['reference_value'] is not None: s['refs'].append(r['reference_value'])
-for metrics in out.values():
-    for s in metrics.values():
+for t, metrics in out.items():
+    for metric, s in metrics.items():
         refs = s.pop('refs')
         s['ref'] = r4(statistics.median(refs)) if refs else None
         s['by'] = dict(sorted(s['by'].items()))
+        if (t, metric) in EXACT: s['exact'] = True
 out = {t: dict(sorted(m.items())) for t, m in sorted(out.items())}
 
 path = ROOT / 'assets' / 'js' / 'fcs2-metrics.js'
