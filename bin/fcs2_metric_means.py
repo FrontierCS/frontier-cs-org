@@ -2,7 +2,7 @@
 """Per task, metric and model, the run's mean on the hidden final workloads and the human reference's: assets/js/fcs2-metrics.js.
 
 usage: python3 bin/fcs2_metric_means.py path/to/metric_aggregates.jsonl [--db=platform.db] [--values=metric_values.jsonl]
-       [--margins=workload_margins.jsonl] [--reference=reference_profile.jsonl]
+       [--margins=workload_margins.jsonl] [--reference=reference_profile.jsonl ...]
 
 With --db, only rows of the runs the database holds count (by run id), so a task rerun since the export shows no
 mean rather than the old run's (Qiuyang, 2026-10-15).
@@ -15,7 +15,8 @@ by (from --margins, where the evidence states one), "by": {model id: [value, ref
 With --reference (one row per task and metric: task, metric, reference_mean, task_version_id, source), a metric whose
 runs give no reference value takes the profiled one (Qiuyang, 2026-10-15: measured in a run of the human reference alone,
 or read from existing evidence), where the row names no task version or one that the task's runs used; "profiled"
-marks it, as it is no median over runs.
+marks it, as it is no median over runs. --reference may repeat; a later file's row replaces an earlier one's. A metric in
+REF_SCOPE takes only a row whose "scope" lists the workloads its runs' means cover.
 
 The input is an export of the platform's final evidence (GET /api/v1/runs/<id>/submission/evidence?submission_id=final),
 one JSON row per run and metric: task and candidate (database names), metric (the key PASSBY and CHECKS use), better
@@ -42,9 +43,10 @@ r4 = lambda v: None if v is None else float(f'{v:.4g}')
 # judge lists "higher" only as an equivalent under its exactness guard)
 EXACT = {('ParButterfly', 'butterfly_count'), ('SCOPE', 'exact_counts')}
 UNIT_NAME = {'milliseconds': 'ms', 'microseconds': 'µs', 'seconds': 's'}   # the export's unit, for keys without a unit suffix
-# profiled reference means that cover other workloads than the runs' retained means: Polar Express's runs keep these two
-# over the original six of its twelve cases, the profile over all twelve
-REF_OTHER_SCOPE = {('Polar Express', 'relative_polar_factor_error'), ('Polar Express', 'worst_case_scalar_error')}
+# metrics whose runs keep a mean over only some workloads: a profiled reference counts only with the same "scope"
+# (Polar Express keeps these two over the original six of its twelve cases; Qiuyang, 2026-10-15)
+SIX = {'square_0', 'square_1', 'tall_0', 'tall_1', 'wide_0', 'wide_1'}
+REF_SCOPE = {('Polar Express', 'relative_polar_factor_error'): SIX, ('Polar Express', 'worst_case_scalar_error'): SIX}
 WORKLOADS = {'CREST'}   # tasks whose page shows each hidden workload apart (their names are in assets/js/fcs2-task.js)
 rows = [json.loads(line) for line in open(sys.argv[1]) if line.strip()]
 dbp = next((a[5:] for a in sys.argv[2:] if a.startswith('--db=')), None)
@@ -77,11 +79,13 @@ live_ver = {}   # per task, the task versions of the runs counted
 for r in rows:
     if not dbp or r['run_id'] in live: live_ver.setdefault(r['task'], set()).add(r.get('task_version_id'))
 profiled = 0
-for p in (map(json.loads, open(arg('reference'))) if arg('reference') else []):
+refpaths = [a[12:] for a in sys.argv[2:] if a.startswith('--reference=')]
+for p in (json.loads(l) for f in refpaths for l in open(f) if l.strip()):
     if p['task'] not in TASK or p['reference_mean'] is None or p.get('task_version_id') not in live_ver.get(p['task'], set()) | {None}: continue
     t = TASK[p['task']][1] or p['task']
     s = out.get(t, {}).get(p['metric'])
-    if s is not None and s['ref'] is None and (t, p['metric']) not in REF_OTHER_SCOPE:
+    if (t, p['metric']) in REF_SCOPE and set(p.get('scope') or ()) != REF_SCOPE[t, p['metric']]: continue
+    if s is not None and (s['ref'] is None or s.get('profiled')):   # a later file's row replaces an earlier one's
         s['ref'], s['profiled'] = r4(p['reference_mean']), True; profiled += 1
 for r in wrows:   # each workload apart, for the tasks in WORKLOADS
     task, cand = r['task'], r['candidate']
@@ -110,4 +114,4 @@ path.write_text('// Written by bin/fcs2_metric_means.py from an export of the pl
                 'const METRIC_STATS = ' + json.dumps(out, separators=(',', ':'), ensure_ascii=False) + ';\n')
 print(f'{len(rows)} rows, {sum(len(m) for m in out.values())} metrics on {len(out)} tasks -> {path}; left out: {skipped}'
       + (f'; numbers of {stale} rows dropped, their runs not in {dbp}' if dbp else '')
-      + (f'; {profiled} reference means from {arg("reference")}' if arg('reference') else ''))
+      + (f'; {profiled} reference means from {", ".join(refpaths)}' if refpaths else ''))
