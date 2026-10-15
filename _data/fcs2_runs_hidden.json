@@ -1,6 +1,6 @@
 {
  "note": "Runs of models kept off the site (HIDDEN in bin/fcs2_runs_from_db.py), in the columns of RUNS in assets/js/fcs2-data.js. Timeouts score 0; unscored runs are left out. Not shown on any page.",
- "generated_at": "2026-10-13T20:36:41.755646+00:00",
+ "generated_at": "2026-10-15T06:22:34.630514+00:00",
  "models": {
   "k27": "Kimi K2.7"
  },
@@ -13,10 +13,9 @@
  ],
  "runs": [
   ["k27", "Programming Languages", "Glenside", 0.0, 0],
-  ["k27", "Security", "Adaptive attacks", 73.73, 0],
+  ["k27", "Security", "Adaptive attacks", 74.34, 0],
   ["k27", "Database", "Approximate-MIPS Query Stopping", 80.55, 0],
-  ["k27", "Security", "Progent", 0.0, 0],
-  ["k27", "Network", "BBQ", 0.0, 0],
+  ["k27", "Security", "Progent", 91.76, 0],
   ["k27", "Security", "Hacking Blind", 100.0, 1],
   ["k27", "Database", "SCOPE", 14.47, 0],
   ["k27", "Theory", "Binary Fuse Filter Construction and Lookup", 49.73, 0],
@@ -27,7 +26,7 @@
   ["k27", "Network", "Shockwave", 44.05, 0],
   ["k27", "Programming Languages", "egg", 58.23, 0],
   ["k27", "Database", "Spectrum", 23.17, 0],
-  ["k27", "Security", "Opal", 75.0, 0],
+  ["k27", "Security", "Opal", 100.0, 1],
   ["k27", "HPC", "Parallel DBSCAN", 69.26, 0],
   ["k27", "Bioinformatics", "Exact Sequence Alignment", 37.6, 0],
   ["k27", "Database", "FARGO paper-aligned query core", 51.71, 1],
@@ -35,7 +34,6 @@
   ["k27", "Machine Learning", "Nano World Model", 79.12, 0],
   ["k27", "MLSys", "knn kernel", 13.52, 0],
   ["k27", "MLSys", "dbscan kernel", 0.0, 0],
-  ["k27", "MLSys", "ivf_pq kernel", 0.0, 0],
   ["k27", "MLSys", "kmeans kernel", 43.48, 0],
   ["k27", "Robotics", "MuJoCo Playground", 47.94, 0],
   ["k27", "Database", "ScaleGPM", 84.74, 0],
@@ -52,7 +50,6 @@
   ["k27", "Database", "Persistent Treap Update Engine", 9.3, 0],
   ["k27", "Machine Learning", "Polar Express", 0.0, 0],
   ["k27", "Cryptography", "QuarterPIR", 35.08, 0],
-  ["k27", "Architecture", "RUNLTS", 0.0, 0],
   ["k27", "Database", "Residual State Advancement", 3.12, 1],
   ["k27", "Programming Languages", "BABBLE", 16.99, 0],
   ["k27", "Machine Learning", "Robust Image Tokenizer", 72.28, 0],

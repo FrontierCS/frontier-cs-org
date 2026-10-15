@@ -15,7 +15,7 @@ page_css: fcs2
       <p class="tgoal" id="tgoal" hidden></p>
       <p class="ptitle" id="tpaper"></p>
       <div class="tkeys" id="tkeys"></div>
-      <p class="tfedi" id="tfedi"></p>
+      <p class="tfdi" id="tfdi"></p>
       <a id="howlink" href="{{ '/#fci-how' | relative_url }}" hidden></a>
       <div class="links" id="tlinks"></div>
     </header>

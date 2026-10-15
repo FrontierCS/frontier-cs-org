@@ -30,6 +30,7 @@ for a in sys.argv[2:]:
 CACHE = {'GPT-6 Astra': 1.00, 'GPT-6.1 Sol': 0.10, 'Kimi K3 (Modal)': 0.30, 'DeepSeek V4.1 Flash (DSH)': 0.003, 'Muse Code - Muse Spark 1.3': 0.15, 'GLM 5.3 (ZCode)': 0.26,
          'Claude Code · Opus 5.5 (Subscription, max effort)': None, 'Kimi K2.7 Code': None, 'Muse Code · Muse Wonder 1.0': None,
          'Codex · Qwen 3.8 Max': 0.25,           # as 'qwen' in the converter's PRICE
+         'Qwen Code CLI · Qwen 3.8 Max': 0.25,   # the same model on Qwen Code (Qiuyang, 2026-10-14)
          'GLM 5.3 Flash (ZCode)': 0.03}          # list cached-input rate, eesel.ai's GLM-5.3-Flash pricing write-up, found 2026-10-13   # None: run on a subscription, the platform reports no usage
 
 

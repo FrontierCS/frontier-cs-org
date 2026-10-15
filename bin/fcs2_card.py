@@ -77,7 +77,7 @@ function draw() {{
       const ink = AINK[a.k], meas = (str, fs) => {{ const t = sv('text', {{x:-999, y:-999, 'font-size':fs, 'font-weight':600}}, str); svg.append(t); const w = t.getComputedTextLength(); t.remove(); return w; }};
       // as drawMap(): the large sizes in all four forms before the small one, then the short name (CHIP_SHORT in fcs2.js)
       let labeled = false;
-      const SHORTN = {{'Programming Languages':'Languages', 'Machine Learning':'ML', 'Bioinformatics':'Bio', 'Cryptography':'Crypto', 'Architecture':'Arch'}};
+      const SHORTN = {{'Programming Languages':'Languages', 'Machine Learning':'ML', 'Bioinformatics':'Bio', 'Cryptography':'Crypto', 'Architecture':'Arch', 'Software Engineering':'SE'}};
       const forms = [];
       for (const [sizes, name] of [[[15, 13], d], [[11], d], [[11], SHORTN[d]]]) if (name)
         for (const rot of [false, true]) for (const cnt of [true, false]) for (const fs of sizes) forms.push({{name, rot, cnt, fs}});

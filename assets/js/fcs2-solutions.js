@@ -87,7 +87,7 @@ const SOLUTION = {
     ["Strips traced right to left", "Starting from the end cell, it resolves the strips between checkpoints from right to left. A narrow strip is recomputed from its checkpoint with full storage, within a small memory budget, and traced back directly, skipping runs of matches along the diagonal."],
     ["Splitting wide strips", "For a wide strip, a short backward pass from the exit cell meets the checkpoint column. The row where the forward and backward costs add up to the known cost is where an optimal path enters, and the part in between is solved recursively, as in Hirschberg’s method."],
     ["A shortcut for similar pairs", "When the cost is small compared with the length, it uses a diagonal-transition search instead: for each cost, it tracks how far each diagonal can run along matches, then traces back from the end cell."],
-    ["Columns in parallel", "The bit-parallel kernel runs as a skewed wavefront over several neighbouring columns at once, so that their carry chains run side by side in AVX-512 or AVX2 vector registers when the processor has them."],
+    ["Columns in parallel", "The bit-parallel kernel runs as a skewed wavefront over several neighboring columns at once, so that their carry chains run side by side in AVX-512 or AVX2 vector registers when the processor has them."],
   ]},
   "FARGO paper-aligned query core": {m:'opus', steps:[
     ["Distances from flip costs", "In each table, flipping a bit costs the squared projection of the query on that bit. A bucket’s distance is the sum of the costs of the bits where it differs from the query’s own key, so the query’s own bucket in every table comes first, at 0."],

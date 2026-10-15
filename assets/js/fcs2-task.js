@@ -1,7 +1,7 @@
 // FrontierCS 2 task page (_pages/fcs2-task.md). /task/#<slug> renders one task from fcs2-data.js, loaded first;
 // /task/ with no slug lists every task by domain. For a task with runs: what the agent must do and what it is scored on,
-// a results table (pass or fail, final score against the Human reference, cost), the solution each shown model handed in,
-// the pass criteria, every run's final score against its cost, and the task's FCI curve. assets/css/fcs2.css holds the styles.
+// a results table (pass or fail, final score against the human reference, cost), the solution each shown model handed in,
+// the pass criteria, every run's final score against its cost, and the task's pass curve on the FCI scale. assets/css/fcs2.css holds the styles.
 
 const RANK = Object.fromEntries(RANKED.map((m, i) => [m.id, i]));
 const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;   // the patch counts files
@@ -30,10 +30,11 @@ function drawPage() {
   // assets/img/fcs2-tasks/<slug>.svg and set inline so it takes the page's type (Qiuyang, 2026-10-14)
   const goal = GOAL[t.s], key = KEYM[t.s];
   $('#tgoal').textContent = goal || ''; $('#tgoal').hidden = !goal;
-  // the task's FEDI and its rank, with a link to what FEDI is (owner, 2026-10-14); the address comes from a real link in the
-  // markup, so it follows the site's base URL and the preview's relative links alike
-  const fr = FRANK[t.s], fe = $('#tfedi');
-  fe.innerHTML = fr ? `<span>FEDI</span><b>${f1(FEDI[t.s])}</b><span>the ${fr === Object.keys(FRANK).length ? 'easiest' : (fr === 1 ? '' : ordinal(fr) + ' ') + 'hardest'} of ${Object.keys(FRANK).length} tasks</span><a href="${esc($('#howlink').getAttribute('href'))}">What is FEDI?</a>` : '';
+  // the task's FDI, its 90% interval and its rank, with a link to what FDI is (owner, 2026-10-14; the interval: Qiuyang,
+  // 2026-10-14); the address comes from a real link in the markup, so it follows the site's base URL and the preview's relative links alike
+  const fr = FRANK[t.s], N = Object.keys(FRANK).length;
+  $('#tfdi').innerHTML = fr ? `<span>FDI</span><b>${fe(FDI[t.s])}</b><span>the ${fr === FLAST ? 'easiest' : (fr === 1 ? '' : ordinal(fr) + ' ') + 'hardest'} of ${N} tasks,</span>`
+    + `<span>90% interval ${fe(DIFF[t.s][1])}–${fe(DIFF[t.s][2])}</span><a href="${esc($('#howlink').getAttribute('href'))}">What is FDI?</a>` : '';
   $('#tkeys').innerHTML = key ? `<span class="lab">Scored on</span>${key.map(k => `<span class="k">${esc(k)}</span>`).join('')}` : '';
   $('#tfig').hidden = true; $('#tfig').innerHTML = ''; $('#thero').classList.add('nofig');
   // a rewritten description (three paragraphs split by ¶) sits under the top block, one column each: the idea, what the
@@ -44,16 +45,20 @@ function drawPage() {
   if (!runs.length) { $('#tbody').innerHTML = lead + '<p class="tbd">No runs on this task yet.</p>'; loadFig(t); drawPager(t); scrollTo(0, 0); return; }
   const ref = REF[t.s], ms = new Set(runs.map(r => r[0])), np = new Set(runs.filter(r => r[3]).map(r => r[0])).size;
   const best = runs.reduce((a, r) => r[2] > a[2] ? r : a);
-  const sum = [`<b>${np} of ${ms.size}</b> models pass`, `best final score <b>${f1(best[2])}</b>, by ${esc(MNAME[best[0]])}`]
-    .concat(ref != null ? [`human reference <b>${f1(ref)}</b>`] : [], []);
+  // beside who passes, the runs whose final score is above the human reference's, and those level with it apart (Qiuyang,
+  // 2026-10-15: a tie counted as half read "5 of 10" where all ten were level); none without a reference
+  const above = ref != null ? runs.filter(r => r[2] > ref).length : null, level = ref != null ? runs.filter(r => r[2] === ref).length : 0;
+  const sum = [`<b>${np} of ${ms.size}</b> models pass`]
+    .concat(above != null ? [`<b>${above} of ${runs.length}</b> score above the human reference` + (level ? `, <b>${level}</b> level with it` : '')] : [])
+    .concat([`best final score <b>${f1(best[2])}</b>, by ${esc(MNAME[best[0]])}`], ref != null ? [`human reference <b>${f1(ref)}</b>`] : []);
   // the note names the human reference's median only where its row has one; a task whose evidence holds only pass/fail has none (owner)
-  const mst = (typeof METRIC_STATS === 'undefined' ? {} : METRIC_STATS)[t.s] || {}, refMean = (CHECKS[t.s] ? CHECKS[t.s].metrics : []).some(m => mst[m] && mst[m].ref != null);
+  const mst = (typeof METRIC_STATS === 'undefined' ? {} : METRIC_STATS)[t.s] || {}, refMean = (CHECKS[t.s] ? CHECKS[t.s].metrics : []).some(m => mst[m] && mst[m].ref != null && !mst[m].profiled && !mst[m].fixed);   // a profiled or fixed value is no median (Qiuyang)
   $('#tbody').innerHTML = lead
     + `<section class="tres"><h2 class="th2">Results</h2><p class="tsum">${sum.join(' · ')}</p>`
       + (CHECKS[t.s] ? '<p class="tnote">A run passes only if its final submission beats the human reference on every metric, on every hidden workload. Each metric column gives the run’s mean over its hidden workloads, or, where the evidence has no values, the number of workloads won; the bar under it is the share of workloads on which the run beat the human reference, green when all of them. ' + (refMean ? 'The human reference is measured again in every run, so its row shows the median, and some rules' : 'Some rules') + ' ask for a margin (for example 5% faster).</p>' : '')
       + `<div class="res-scroll"><table class="res rtab${CHECKS[t.s] ? ' wm' : ''}" id="rtbl"></table></div></section>`   // results and pass criteria in one table (owner, 2026-10-15)
     + figure('sc', 'Final score against cost')
-    + (TFIT[t.s] ? figure('fc', 'Expected score by FCI') : '')
+    + (DIFF[t.s] && passChance(t.s, 0) != null ? figure('fc', 'Chance of passing by FCI') : '')
     + solutionHTML(t, runs);   // the solution last (owner, 2026-10-14)
   drawResults(); drawCharts(); loadPatches(t); loadFig(t); drawPager(t);
   scrollTo(0, 0);
@@ -66,7 +71,7 @@ function loadFig(t) {
       // the agent's part takes the task's domain colours, as the domain square beside its name does
       const k = AREA_OF[t.d].k; box.style.setProperty('--a', AINK[k]); box.style.setProperty('--af', AFILL[k]); } }).catch(() => {});
 }
-/* Previous and next task, in the task list's first order: hardest first (FEDI), then by domain and name
+/* Previous and next task, in the task list's first order: hardest first (FDI), then by domain and name
    (Qiuyang, 2026-10-14). A pager beside the breadcrumb, and the arrow keys. */
 const ORDER = [...TASKS].sort((a, b) => (FRANK[a.s] ?? 1e9) - (FRANK[b.s] ?? 1e9)
   || DOMAINS.indexOf(a.d) - DOMAINS.indexOf(b.d) || a.name.localeCompare(b.name));
@@ -84,7 +89,6 @@ addEventListener('keydown', e => {
   const i = ORDER.indexOf(cur.t), to = e.key === 'ArrowLeft' ? ORDER[i - 1] : e.key === 'ArrowRight' ? ORDER[i + 1] : null;
   if (to) location.hash = slug(to.s);
 });
-const ordinal = n => n + ((n % 100 >= 11 && n % 100 <= 13) ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th');
 
 /* One row per run, highest final score first (owner, 2026-10-14; ties keep leaderboard order), under the Human reference: pass or fail, the final score as a bar on the task's own scale, and the run's
    estimated cost; the Human reference (the authors' code; owner, 2026-10-14: that name everywhere) is a bar of its own on top, hatched grey (owners, 2026-10-11: bars, no vertical line;
@@ -92,8 +96,11 @@ const ordinal = n => n + ((n % 100 >= 11 && n % 100 <= 13) ? 'th' : ['th', 'st',
    This replaces the final-score chart and the runs table (Qiuyang, 2026-10-14: per model, readers want cost, score and
    pass or fail). */
 // the verifier's metric identifiers in words (Qiuyang, 2026-10-14: identifiers are not for readers); an unknown one is spelled out
-const METRIC = {"accuracy_qualified":"Estimate accuracy", "action_rate":"Action smoothness", "adaptive_probe_redirection_rate":"Redirection rate, adaptive probes", "adjusted_rand_index":"Adjusted Rand index", "auxiliary_bytes":"Extra memory", "average_episodic_reward":"Average episode reward", "average_jct_seconds":"Average job completion time", "avg_log2_prec_l2_abs_discrepancy_bits":"Mean precision error (bits)", "batch_latency_seconds":"Batch latency", "br_mis_pki":"Mispredictions per 1K instructions", "branch_accuracy":"Branch prediction accuracy", "build_ns":"Build time", "butterfly_count":"Exact butterfly count", "canary_integrity_accuracy":"Canary integrity accuracy", "candidates_verified":"Candidates verified", "case_throughput_ktps":"Throughput", "checkpoint_create_ns":"Checkpoint creation time", "checkpoint_restore_ns":"Checkpoint restore time", "client_storage_bytes":"Client storage", "clip_fdr":"Fréchet distance, CLIP", "committed_tps":"Committed transactions per second", "complete_workload_wall_seconds":"Wall time, whole workload", "compression_ratio":"Compression ratio", "congruence_seconds":"Congruence-closure time", "convnext_fdr":"Fréchet distance, ConvNeXt", "core_peak_live_bytes":"Peak memory", "correctness":"Correctness", "cost":"Cost", "counting_seconds":"Counting time", "cpu_time_seconds":"CPU time", "cyc_wp_pki":"Wrong-path cycles per 1K instructions", "dbscan_latency_ms":"Latency", "delta":"δ", "dinov2_fdr":"Fréchet distance, DINOv2", "distance_consistency":"Distance consistency", "duration_seconds":"Duration", "e2e_latency_seconds":"End-to-end latency", "effective_fpr":"False-positive rate", "egraph_node_growth":"E-graph growth", "elapsed_seconds":"Run time", "ema_quantized_png_psnr_db":"PSNR, EMA weights", "end_to_end_online_time_ms":"Online time, end to end", "energy":"Energy", "enforcement_seconds":"Enforcement time", "episode_reward":"Episode reward", "episode_success_rate":"Success rate", "epsilon":"ε", "estimator_seconds":"Estimator time", "evaluation_honesty_gap":"Evaluation honesty gap", "exact_counts":"Exact counts", "exact_result":"Exact result", "execution_time_ms":"Execution time", "gap":"Gap found", "historical_query_us":"Historical query latency", "im2col_discovery":"Finds im2col", "inception_fdr":"Fréchet distance, Inception", "inference_latency_ms":"Inference latency", "iso_recall":"Recall at matched cost", "label_mismatch_fraction":"Label mismatch", "labeled_inertia":"Inertia", "last_result_inner_product_ratio":"Inner-product ratio, last result", "latency_ms":"Latency", "latency_seconds":"Latency", "lloyd_loop_latency_ms":"Lloyd-iteration latency", "logical_storage_bits":"Predictor storage", "lookup_ns":"Lookup time", "lpips":"LPIPS", "mae_fdr":"Fréchet distance, MAE", "makespan_seconds":"Makespan", "mean_episode_max_reward":"Mean best reward per episode", "mean_predict_action_seconds":"Action prediction time", "mean_query_time":"Mean query time", "median_latency":"Median latency", "method_process_wall_seconds":"Wall time", "nn_recall":"Nearest-neighbour recall", "noise_mismatch_fraction":"Noise-point mismatch", "ocr_reward":"OCR reward", "online_communication_bytes":"Online communication", "oram_blocks_per_access":"ORAM blocks per access", "ordinary_quantized_png_psnr_db":"PSNR", "orth_err_normalized":"Orthogonality error", "overall_ratio":"Overall ratio", "peak_memory_mib":"Peak memory", "permitted_call_utility":"Utility on permitted calls", "polar_cosine_similarity":"Cosine similarity to the polar factor", "policy_enforcement_precision":"Enforcement precision", "policy_enforcement_recall":"Enforcement recall", "preprocessing_client_time_minutes":"Client preprocessing time", "procrustes_mse":"Procrustes error", "psnr":"PSNR", "psnr_db":"PSNR", "pssu_strength":"PSSU strength", "query_time_ms":"Query time", "r2_hz":"R², h from z", "r2_zh":"R², z from h", "recall":"Recall", "recall_at_50":"Recall@50", "refuted_pair":"Pairs refuted", "region_graph_ns":"Region-graph time", "relative_polar_factor_error":"Relative polar-factor error", "report_coverage":"Report coverage", "resident_bytes":"Memory", "residual_update_seconds":"Residual update time", "retained_bytes_per_checkpoint":"Memory per checkpoint", "retrieval_hit":"Retrieval hits", "rewrite_time_seconds":"Rewrite time", "rmse_error":"RMSE", "runtime_seconds":"Run time", "search_latency_ms":"Search latency", "selected_runtime_seconds":"Run time", "sequential_runtime_seconds":"Sequential run time", "server_compute_time_ns":"Server compute time", "siglip_fdr":"Fréchet distance, SigLIP", "sort_time_ns":"Sort time", "space_overhead_pct":"Space overhead", "spectral_polar_error":"Spectral polar error", "ssim":"SSIM", "static_probe_redirection_rate":"Redirection rate, static probes", "std_log2_prec_l2_abs_discrepancy_bits":"Spread of precision error (bits)", "success_rate":"Success rate", "tflops":"TFLOPS", "throughput_mflops":"Throughput", "throughput_ops_per_second":"Throughput", "top1_accuracy_pct":"Top-1 accuracy", "top_subspace_polar_error":"Top-subspace polar error", "trace_shape_match":"Trace-shape match", "tracking_ang_vel":"Angular-velocity tracking", "tracking_lin_vel":"Linear-velocity tracking", "training_latency_ms":"Training latency"};
+const METRIC = {"accuracy_qualified":"Estimate accuracy", "action_rate":"Action smoothness", "adaptive_probe_redirection_rate":"Redirection rate, adaptive probes", "adjusted_rand_index":"Adjusted Rand index", "auxiliary_bytes":"Extra memory", "average_episodic_reward":"Average episode reward", "average_jct_seconds":"Average job completion time", "avg_log2_prec_l2_abs_discrepancy_bits":"Mean precision error (bits)", "batch_latency_seconds":"Batch latency", "br_mis_pki":"Mispredictions per 1K instructions", "branch_accuracy":"Branch prediction accuracy", "branches_covered":"Branches covered", "build_ns":"Build time", "butterfly_count":"Exact butterfly count", "canary_integrity_accuracy":"Canary integrity accuracy", "candidates_verified":"Candidates verified", "case_throughput_ktps":"Throughput", "checkpoint_create_ns":"Checkpoint creation time", "checkpoint_restore_ns":"Checkpoint restore time", "client_storage_bytes":"Client storage", "clip_fdr":"Fréchet distance, CLIP", "committed_tps":"Committed transactions per second", "complete_workload_wall_seconds":"Wall time, whole workload", "compression_ratio":"Compression ratio", "congruence_seconds":"Congruence-closure time", "convnext_fdr":"Fréchet distance, ConvNeXt", "core_peak_live_bytes":"Peak memory", "correctness":"Correctness", "cost":"Cost", "counting_seconds":"Counting time", "cpu_time_seconds":"CPU time", "cyc_wp_pki":"Wrong-path cycles per 1K instructions", "dbscan_latency_ms":"Latency", "delta":"\\(\\delta\\)", "dinov2_fdr":"Fréchet distance, DINOv2", "distance_consistency":"Distance consistency", "duration_seconds":"Duration", "e2e_latency_seconds":"End-to-end latency", "effective_fpr":"False-positive rate", "egraph_node_growth":"E-graph growth", "elapsed_seconds":"Run time", "ema_quantized_png_psnr_db":"PSNR, EMA weights", "end_to_end_online_time_ms":"Online time, end to end", "energy":"Energy", "enforcement_seconds":"Enforcement time", "episode_reward":"Episode reward", "episode_success_rate":"Success rate", "epsilon":"\\(\\varepsilon\\)", "estimator_seconds":"Estimator time", "evaluation_honesty_gap":"Evaluation honesty gap", "exact_counts":"Exact counts", "exact_result":"Exact result", "execution_time_ms":"Execution time", "gap":"Gap found", "historical_query_us":"Historical query latency", "im2col_discovery":"Finds im2col", "inception_fdr":"Fréchet distance, Inception", "inference_latency_ms":"Inference latency", "iso_recall":"Recall at matched cost", "label_mismatch_fraction":"Label mismatch", "labeled_inertia":"Inertia", "last_result_inner_product_ratio":"Inner-product ratio, last result", "latency_ms":"Latency", "latency_seconds":"Latency", "lloyd_loop_latency_ms":"Lloyd-iteration latency", "logical_storage_bits":"Predictor storage", "lookup_ns":"Lookup time", "lpips":"LPIPS", "mae_fdr":"Fréchet distance, MAE", "makespan_seconds":"Makespan", "mean_episode_max_reward":"Mean best reward per episode", "mean_predict_action_seconds":"Action prediction time", "mean_query_time":"Mean query time", "median_latency":"Median latency", "method_process_wall_seconds":"Wall time", "nn_recall":"Nearest-neighbor recall", "noise_mismatch_fraction":"Noise-point mismatch", "ocr_reward":"OCR reward", "online_communication_bytes":"Online communication", "oram_blocks_per_access":"ORAM blocks per access", "ordinary_quantized_png_psnr_db":"PSNR", "orth_err_normalized":"Orthogonality error", "overall_ratio":"Overall ratio", "peak_memory_mib":"Peak memory", "permitted_call_utility":"Utility on permitted calls", "polar_cosine_similarity":"Cosine similarity to the polar factor", "policy_enforcement_precision":"Enforcement precision", "policy_enforcement_recall":"Enforcement recall", "preprocessing_client_time_minutes":"Client preprocessing time", "procrustes_mse":"Procrustes error", "psnr":"PSNR", "psnr_db":"PSNR", "pssu_strength":"PSSU strength", "query_time_ms":"Query time", "r2_hz":"\\(R^2\\) of \\(h\\) from \\(z\\)", "r2_zh":"\\(R^2\\) of \\(z\\) from \\(h\\)", "recall":"Recall", "recall_at_50":"Recall@50", "refuted_pair":"Pairs refuted", "region_graph_ns":"Region-graph time", "relative_polar_factor_error":"Relative polar-factor error", "report_coverage":"Report coverage", "resident_bytes":"Memory", "residual_update_seconds":"Residual update time", "retained_bytes_per_checkpoint":"Memory per checkpoint", "retrieval_hit":"Retrieval hits", "rewrite_time_seconds":"Rewrite time", "rmse_error":"RMSE", "runtime_seconds":"Run time", "search_latency_ms":"Search latency", "search_overhead_seconds":"Search overhead", "selected_runtime_seconds":"Run time", "sequential_runtime_seconds":"Sequential run time", "server_compute_time_ns":"Server compute time", "siglip_fdr":"Fréchet distance, SigLIP", "sort_time_ns":"Sort time", "space_overhead_pct":"Space overhead", "spectral_polar_error":"Spectral polar error", "ssim":"SSIM", "static_probe_redirection_rate":"Redirection rate, static probes", "std_log2_prec_l2_abs_discrepancy_bits":"Spread of precision error (bits)", "success_rate":"Success rate", "tflops":"TFLOPS", "throughput_mflops":"Throughput", "throughput_ops_per_second":"Throughput", "top1_accuracy_pct":"Top-1 accuracy", "top_subspace_polar_error":"Top-subspace polar error", "trace_shape_match":"Trace-shape match", "tracking_ang_vel":"Angular-velocity tracking", "tracking_lin_vel":"Linear-velocity tracking", "training_latency_ms":"Training latency", "unfair_job_fraction_percent":"Unfair jobs (%)", "wall_clock_seconds":"Wall-clock time", "wall_time_seconds":"Wall time", "worst_case_scalar_error":"Worst-case scalar error", "worst_finish_time_fairness_rho":"Worst finish-time fairness \\(\\rho\\)"};
 const metric = m => METRIC[m] || m.replace(/_/g, ' ').replace(/^./, c => c.toUpperCase());
+// tasks whose few hidden workloads differ too much for one mean: the results table shows each apart, by these names
+// (Qiuyang, 2026-10-15; CREST's two programs differ tenfold in branches)
+const WORKLOAD_NAME = {'CREST':{w0:'Vim 5.7', w1:'sed 3.02'}};
 
 /* Results and pass criteria in one table (owner, 2026-10-15). Rows: the Human reference, then every run by final score, each
    with its verdict (tick or cross); one column per metric, then its final score as a bar and its cost. Each metric: on how many hidden
@@ -105,9 +112,18 @@ const metric = m => METRIC[m] || m.replace(/_/g, ' ').replace(/^./, c => c.toUpp
    run]. The header names the metric with its unit and says which way is better; a first row gives the human
    reference; each model cell is the run's mean, coloured by its count, with the count and the reference's mean in that
    run as its tooltip. */
-const UNIT = {ms:'ms', seconds:'s', ns:'ns', us:'µs', minutes:'min', bytes:'bytes', mib:'MiB', pct:'%', db:'dB'};
-const metricHead = (m, s) => { const label = metric(m), u = UNIT[(/_([a-z]+)$/.exec(m) || [])[1]] || (s && s.unit);   // the key's suffix, else the export's unit
-  return u && !/\(.*\)\s*$/.test(label) ? `${label} (${u})` : label; };   // a label that already names its unit keeps it
+const UNIT = {ms:'ms', seconds:'s', ns:'ns', us:'µs', minutes:'min', bytes:'bytes', bits:'bits', mflops:'MFLOP/s', mib:'MiB', pct:'%', db:'dB'};
+const NAMED = /(?<!\\)\(([^()]*)\)\s*$/;   // a unit in the label's closing parentheses, not TeX's \( \)
+const metricHead = (m, s, e = 0, uo) => { const label = metric(m), named = NAMED.exec(label);   // a label that already names its unit keeps it
+  const base = named ? label.slice(0, named.index).trimEnd() : label, x = e ? `×10${String(e).replace(/[-\d]/g, c => SUPD[c])}` : '';
+  let u = uo || (named ? named[1] : UNIT[(/_([a-z]+)$/.exec(m) || [])[1]] || (s && s.unit));   // else the key's suffix, else the export's unit
+  if (u && !named && new RegExp(`\\b${u}\\b`, 'i').test(base)) u = '';   // "Attack bytes", not "Attack bytes (bytes)"
+  const tail = [x, u].filter(Boolean).join(' '); return tail ? `${base} (${tail})` : base; };   // a column's power of ten goes before its unit
+// a header's text with its arrow: the last word and the arrow never part (Qiuyang, 2026-10-15); math in a label is TeX,
+// \( \) inline and without spaces, set by MathJax once the table is drawn
+const headText = (h, d) => { const e = esc(h), i = e.lastIndexOf(' ');
+  return `${e.slice(0, i + 1)}<span class="nw">${e.slice(i + 1)}${d}</span>`; };
+const typeset = el => { const M = window.MathJax; if (M && M.typesetPromise) M.typesetPromise([el]).catch(() => {}); };   // before MathJax is ready, its own first pass sets the page
 // a mean: 3 significant digits with thousands separators; under 0.001 or from a million up, ×10 to a power in
 // superscript digits, which also reads in a tooltip; a true minus sign throughout
 const SUPD = {'-':'⁻', 0:'⁰', 1:'¹', 2:'²', 3:'³', 4:'⁴', 5:'⁵', 6:'⁶', 7:'⁷', 8:'⁸', 9:'⁹'};
@@ -120,7 +136,11 @@ const TICK = '<svg class="ri y" viewBox="0 0 16 16" aria-hidden="true"><path d="
 const CROSS = '<svg class="ri n" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.3 4.3l7.4 7.4M11.7 4.3l-7.4 7.4"/></svg><span class="vh">Fail</span>';
 function drawResults() {
   const {t, runs} = cur, ref = REF[t.s], xmax = Math.max(100, ref ?? 0, ...runs.map(r => r[2]));
-  const ms = CHECKS[t.s] ? CHECKS[t.s].metrics : [], by = (typeof PASSBY === 'undefined' ? {} : PASSBY)[t.s] || {};
+  // per model and metric, the counts summed over the metric's keys, development workloads left out, as the converter
+  // reads them (Qiuyang, 2026-10-15: Yannakakis keeps one key per workload, "final/3/exact_result")
+  const ms = CHECKS[t.s] ? CHECKS[t.s].metrics : [], by = Object.fromEntries(Object.entries((typeof PASSBY === 'undefined' ? {} : PASSBY)[t.s] || {})
+    .map(([mid, kv]) => [mid, Object.entries(kv).reduce((o, [k, [a, n]]) => { if (k.startsWith('dev/')) return o;
+      const s = k.slice(k.lastIndexOf('/') + 1); o[s] = o[s] ? [o[s][0] + a, o[s][1] + n] : [a, n]; return o; }, {})]));
   const st = (typeof METRIC_STATS === 'undefined' ? {} : METRIC_STATS)[t.s] || {};
   // the score sits at the end of its bar (owner, 2026-10-14: beside the bar, not at the right edge of the column)
   const bar = (v, style) => { const w = (Math.max(0, v) / xmax * 100).toFixed(1);
@@ -136,26 +156,62 @@ function drawResults() {
   // a metric's cell is the run's mean in black, with a bar under it for the share of hidden workloads on which it beat
   // the human reference, green when every one, red otherwise (Qiuyang, 2026-10-15, after the owner's values-first table);
   // the count and the reference's mean in that run go to the tooltip; without a mean, the count itself over the bar (Qiuyang)
+  // a time or size column takes the unit that puts its median in range (s, ms, µs, ns; GiB, MiB, KiB, bytes), so
+  // 3.73×10⁻⁸ s reads 37.3 ns; any other column whose numbers would show ×10 to a power, all within a factor of 1,000,
+  // takes that power into its header, "Count (×10⁹)" over 2.73 (Qiuyang, 2026-10-15)
+  const FAM = [{s:1, ms:1e-3, 'µs':1e-6, ns:1e-9}, {GiB:2 ** 30, MiB:2 ** 20, KiB:1024, bytes:1, bits:1 / 8}];
+  const colFmt = (m, s) => { if (!s || split) return {k:1, e:0};
+    const named = NAMED.exec(metric(m)), u0 = named ? named[1] : UNIT[(/_([a-z]+)$/.exec(m) || [])[1]] || s.unit;
+    const vals = [s.ref, ...Object.values(s.by).map(x => x[0])].filter(v => v != null && v !== 0).map(Math.abs);
+    if (!vals.length) return {k:1, e:0};
+    const fam = named && u0 === 'bits' ? null : FAM.find(f => f[u0]);   // bits of precision are no size; storage bits come from the key
+    if (fam) { const med = vals.map(v => v * fam[u0]).sort((a, b) => a - b)[vals.length >> 1];
+      const us = Object.keys(fam).filter(u => u !== 'bits'), u = us.find(u => med >= fam[u]) || us[us.length - 1];
+      return {k:fam[u0] / fam[u], e:0, u}; }
+    const ex = vals.map(v => Math.floor(Math.log10(+v.toPrecision(3)))), lo = Math.min(...ex), hi = Math.max(...ex);
+    const e = (lo < -3 || hi >= 6) && hi - lo <= 2 ? lo : 0; return {k:Math.pow(10, -e), e}; };
+  const sc = (v, m) => v * F[m].k;   // F, each column's scale, follows split below
   const cell = (r, m, i) => { const v = (by[r[0]] || {})[m], [mean, rref] = (st[m] && st[m].by[r[0]]) || [];
     if (!v) return `<td class="${mcls(i)} e">—</td>`;
-    const tip = `Beat the human reference on ${v[0]} of ${v[1]} hidden workloads` + (rref != null ? `; human reference in this run: ${num(rref)}` : '');
-    const all = v[0] === v[1], bar = `<span class="mbar"><i class="${all ? 'y' : 'n'}" style="width:${(100 * v[0] / v[1]).toFixed(0)}%"></i></span>`;
-    return `<td class="${mcls(i)} ${all ? 'cy' : 'cn'}" title="${tip}">` + (mean != null ? `<b>${num(mean)}</b>` : `<b>${v[0]}/${v[1]}</b>`) + bar + '</td>'; };
+    const tip = `Beat the human reference on ${v[0]} of ${v[1]} hidden workloads` + (rref != null ? `; human reference in this run: ${num(sc(rref, m))}` : '');
+    const all = v[0] === v[1], bar = `<span class="mbar"><i class="${all ? 'y' : 'n'}" style="width:${(100 * v[0] / v[1]).toFixed(0)}%"></i></span>`;   // none won: the empty track (Qiuyang)
+    return `<td class="${mcls(i)} ${all ? 'cy' : 'cn'}" title="${tip}">` + (mean != null ? `<b>${num(sc(mean, m))}</b>` : `<b>${v[0]}/${v[1]}</b>`) + bar + '</td>'; };
+  // a task in WORKLOAD_NAME with numbers for each workload: every metric splits into one column per workload; the human
+  // reference's cell adds the margin a run had to beat it by (the median over runs; each run's own in its tooltip), and a
+  // run's bar is full green when it cleared that workload's rule, an empty track when not (Qiuyang, 2026-10-15); each
+  // (metric, workload) is a column of its own, "Branches covered, Vim 5.7", with no spanning header (Qiuyang)
+  const WN = WORKLOAD_NAME[t.s], split = !!WN && ms.length > 0 && ms.every(m => st[m] && st[m].w), wl = WN ? Object.keys(WN) : [];
+  const F = Object.fromEntries(ms.map(m => [m, colFmt(m, st[m])]));
+  const sign = m => st[m].exact ? '' : st[m].better === 'lower' ? '−' : '+';
+  const wcell = (r, m, w) => { const [v, rref, beat, mg] = ((st[m].w[w] || {}).by || {})[r[0]] || [];
+    if (v == null) return '<td class="mc e">—</td>';
+    const tip = `${beat ? 'Cleared' : 'Did not clear'} the rule on ${WN[w]}` + (rref != null ? `; human reference in this run: ${num(rref)}` : '') + (mg != null ? `; margin needed: ${sign(m)}${num(mg)}` : '');
+    return `<td class="mc ${beat ? 'cy' : 'cn'}" title="${tip}"><b>${num(v)}</b><span class="mbar"><i class="y" style="width:${beat ? 100 : 0}%"></i></span></td>`; };
+  const wref = (m, w) => { const W = st[m].w[w] || {}; return W.ref == null ? '<td class="mc e">—</td>'
+    : `<td class="mc"><b>${num(W.ref)}</b>${W.margin != null ? `<span class="mg">${sign(m)}${num(W.margin)}</span>` : ''}</td>`; };
   // the metrics first, then the final score and the cost (owner, 2026-10-15)
-  $('#rtbl').innerHTML = '<thead><tr><th>Model</th>'
-    + ms.map((m, i) => `<th class="${mcls(i)}" title="${esc(m)}">${esc(metricHead(m, st[m]))}${dir(m)}</th>`).join('') + '<th class="rs">Final score</th><th class="rc">Cost</th></tr></thead><tbody>'
+  const whead = (m, w) => { const h = metricHead(m, st[m]), u = / \([^)]*\)$/.exec(h);   // the metric, then on its own line the workload and unit
+    return `${esc(u ? h.slice(0, u.index) : h)}<br><span class="nw">${esc(WN[w])}${u ? esc(u[0]) : ''}`; };
+  const head = split
+    ? '<thead><tr><th>Model</th>' + ms.map(m => wl.map(w => `<th class="mc" title="${esc(m)}">${whead(m, w)}${dir(m)}</span></th>`).join('')).join('')
+      + '<th class="rs">Final score</th><th class="rc">Cost</th></tr></thead>'
+    : '<thead><tr><th>Model</th>' + ms.map((m, i) => `<th class="${mcls(i)}" title="${esc(m)}">${headText(metricHead(m, st[m], F[m].e, F[m].u), dir(m))}</th>`).join('') + '<th class="rs">Final score</th><th class="rc">Cost</th></tr></thead>';
+  const refRow = split ? ms.map(m => wl.map(w => wref(m, w)).join('')).join('')
+    : ms.map((m, i) => st[m] && st[m].ref != null ? `<td class="${mcls(i)}"${st[m].profiled ? ' title="From a separate measurement of the human reference"' : ''}><b>${num(sc(st[m].ref, m))}</b></td>` : `<td class="${mcls(i)} e">—</td>`).join('');
+  $('#rtbl').innerHTML = head + '<tbody>'
     + (ref != null || ms.some(m => st[m] && st[m].ref != null)
-      ? '<tr class="rref"><td><span class="sq"></span>Human reference</td>'
-        + ms.map((m, i) => st[m] && st[m].ref != null ? `<td class="${mcls(i)}"><b>${num(st[m].ref)}</b></td>` : `<td class="${mcls(i)} e">—</td>`).join('')
+      ? '<tr class="rref"><td><span class="sq"></span>Human reference</td>' + refRow
         + `<td class="rs">${ref != null ? bar(ref, '') : ''}</td><td class="rc"></td></tr>` : '')
     + [...runs].sort((p, q) => q[2] - p[2]).map(r => `<tr><td>${r[3] ? TICK : CROSS}<span class="full">${esc(MNAME[r[0]])}</span><span class="short">${esc(short[r[0]])}</span></td>`
-      + ms.map((m, i) => cell(r, m, i)).join('') + `<td class="rs">${bar(r[2], `background:${MCOL[r[0]]}`)}</td><td class="rc">$${r[4].toFixed(2)}</td></tr>`).join('')
+      + (split ? ms.map(m => wl.map(w => wcell(r, m, w)).join('')).join('') : ms.map((m, i) => cell(r, m, i)).join(''))
+      + `<td class="rs">${bar(r[2], `background:${MCOL[r[0]]}`)}</td><td class="rc">$${r[4].toFixed(2)}</td></tr>`).join('')
     + '</tbody>';
+  typeset($('#rtbl'));
 }
 
 function drawCharts() {
   if (!cur || !cur.runs.length) return;
-  drawScore(); if (TFIT[cur.t.s]) drawFit();
+  drawScore(); if (DIFF[cur.t.s] && passChance(cur.t.s, 0) != null) drawFit();
 }
 
 /* Final score against cost (Qiuyang, 2026-10-14: in place of the development score against spend, drawn as the overview's
@@ -204,49 +260,74 @@ function drawScore() {
   attachTip(svg, W, H, pts, $('#sctip'));
 }
 
-/* The task's curve from the FCI fit: the score a model of a given FCI is expected to reach. Dots: each model's mean final
-   score on this task at the model's FCI, and the Human reference at FCI ECI_HUMAN. */
+/* The task's pass curve, the joint model's own (passChance, fcs2-data.js): the chance that a model of a given FCI passes it, 50% at the task's FDI (Qiuyang,
+   2026-10-14). No interval is drawn: the FDI's 90% interval is given in words in the head line only (Qiuyang,
+   2026-10-14). Dots: each model at its FCI, at the share of its runs here that
+   pass, so at 100% or 0% for a model with one run. The human reference has no FCI and no dot. */
 function drawFit() {
-  const {t, runs} = cur, [d, k] = TFIT[t.s], ref = REF[t.s];
+  const {t, runs} = cur, d = FDI[t.s];
   const svg = $('#fcsvg'), W = Math.max(300, $('#fcplot').clientWidth), narrow = W < 560;
-  const L = 34, R = narrow ? 12 : 24, T = 12, B = 46, H = narrow ? 280 : 320;
-  // the axis holds 0 to 50, every model, and the task's FEDI with 10 to spare on each side (owner, 2026-10-14: a FEDI
-  // of 57 or of -49 fell off the old 0 to 50 axis); grid every 10, every 20 past a span of 80
-  const es = RANKED.map(m => ECI[m.id][0]), lo = Math.min(0, d - 10, ...es), hi = Math.max(50, d + 10, ...es), step = hi - lo > 80 ? 20 : 10;
-  const xmin = Math.floor(lo / step) * step, xmax = Math.ceil(hi / step) * step;
-  const X = v => L + (v - xmin) / (xmax - xmin) * (W - L - R), Y = v => T + (1 - v / 100) * (H - T - B), f = x => 100 / (1 + Math.exp(-k * (x - d)));
+  const L = 44, R = narrow ? 12 : 24, T = 12, B = 46, H = narrow ? 280 : 320;
+  // the axis holds 0 (Kimi K2.7), every model and the FDI, nothing more, so a hard task does not stretch it
+  const es = RANKED.map(m => ECI[m.id][0]), lo = Math.min(ECI_LOW_VALUE, d, ...es), hi = Math.max(d, ...es), step = eciStep(hi - lo, narrow ? 4 : 7);
+  const xmin = Math.floor(lo / step) * step, xmax = Math.ceil(hi / step) * step, top = Math.max(ECI_LOW_VALUE, ...es), PW = W - L - R;
+  const Y = v => T + (1 - v / 100) * (H - T - B), f = x => 100 * passChance(t.s, x);
+  /* A broken axis (Qiuyang, 2026-10-14): on a phone, when reaching the FDI would leave the models less than 60% of the
+     plot, the axis runs to a little past the strongest model, breaks, and shows a short stretch around the FDI at the
+     same scale, with a tick of its own at the FDI. The gap is marked by two slanted strokes on the axis line and on the
+     curve, and nothing is drawn inside it. */
+  let X = v => L + (v - xmin) / (xmax - xmin) * PW, segs = [[xmin, xmax]], gap = null, ticks = [];
+  for (let i = 0, v = xmin; v <= xmax + step / 2; v = xmin + ++i * step) ticks.push([v, tick(v)]);
+  if (narrow && d > top && (top - xmin) / (xmax - xmin) < .6) {
+    const s1 = eciStep(top - xmin, 3), xa = Math.ceil(top / s1) * s1 + (Math.ceil(top / s1) * s1 === top ? s1 : 0);
+    const G = 14, lp = Math.round(PW * .7), ppu = lp / (xa - xmin), half = (PW - lp - G) / ppu / 2, r0 = d - half;
+    if (r0 > xa) {
+      X = v => v <= xa + 1e-9 ? L + (v - xmin) * ppu : L + lp + G + (v - r0) * ppu;
+      segs = [[xmin, xa], [r0, d + half]]; gap = [L + lp, L + lp + G]; ticks = [];
+      for (let i = 0, v = xmin; v <= xa + s1 / 2; v = xmin + ++i * s1) ticks.push([v, tick(v)]);
+      ticks.push([d, fe(d)]);
+    }
+  }
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
-  for (let v = 0; v <= 100; v += 20) {
-    svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1}));
-    svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, v));
+  for (let v = 0; v <= 100; v += 25) {
+    for (const [x1, x2] of gap ? [[L, gap[0]], [gap[1], W - R]] : [[L, W - R]]) svg.append(sv('line', {x1, x2, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1}));
+    svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, v + '%'));
   }
-  for (let v = xmin; v <= xmax; v += step) {
+  ticks.forEach(([v, label]) => {
     svg.append(sv('line', {x1:X(v), x2:X(v), y1:H - B, y2:H - B + 5, stroke:'var(--ink-2)', 'stroke-width':1}));
-    svg.append(sv('text', {x:X(v), y:H - B + 20, 'text-anchor':'middle'}, v));
+    svg.append(sv('text', {x:X(v), y:H - B + 20, 'text-anchor':'middle'}, label));
+  });
+  svg.append(sv('text', {class:'ax', x:L + PW / 2, y:H - 6, 'text-anchor':'middle'}, 'FCI'));
+  const n = 120;
+  segs.forEach(([a, b]) => svg.append(sv('path', {d:Array.from({length:n + 1}, (_, i) => { const x = a + (b - a) * i / n; return `${i ? 'L' : 'M'}${X(x).toFixed(1)},${Y(f(x)).toFixed(1)}`; }).join(''),
+    fill:'none', stroke:'var(--ink-2)', 'stroke-width':2.5})));
+  if (gap) {   // the break: a pair of slanted strokes where the axis line and the curve leave off and start again
+    const ys = [[H - B, H - B], [Y(f(segs[0][1])), Y(f(segs[1][0]))]];
+    ys.forEach(([ya, yb]) => [[gap[0], ya], [gap[1], yb]].forEach(([x, y]) =>
+      svg.append(sv('line', {x1:x - 3, y1:y + 6, x2:x + 3, y2:y - 6, stroke:'var(--ink-2)', 'stroke-width':1.5}))));
   }
-  svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'FCI'));
-  const n = 120, path = Array.from({length:n + 1}, (_, i) => { const x = xmin + (xmax - xmin) * i / n; return `${i ? 'L' : 'M'}${X(x).toFixed(1)},${Y(f(x)).toFixed(1)}`; }).join('');
-  svg.append(sv('path', {d:path, fill:'none', stroke:'var(--ink-2)', 'stroke-width':2.5}));
-  // the task's FEDI: where the curve crosses an expected score of 50
-  // a dashed drop to the axis marks it there; the label sits above and left of the point, which is off a rising curve
+  // the task's FDI: where the curve crosses 50%, an open circle; a dashed drop
+  // to the axis marks it there; the label sits above and left of the point, which is off a rising curve
   svg.append(sv('line', {x1:X(d), x2:X(d), y1:Y(50), y2:H - B, stroke:'var(--ink-2)', 'stroke-width':1, 'stroke-dasharray':'3 3', opacity:.7}));
   svg.append(sv('circle', {cx:X(d), cy:Y(50), r:4.5, fill:'#fff', stroke:'var(--ink-2)', 'stroke-width':2}));
   const left = X(d) - L > 90;   // near the left edge the label goes right of the point
-  svg.append(sv('text', {class:'val halo', x:X(d) + (left ? -10 : 10), y:Y(50) - 12, 'text-anchor':left ? 'end' : 'start', fill:'var(--ink-2)'}, `FEDI ${f1(d)}`));
-  const pts = [];
+  svg.append(sv('text', {class:'val halo', x:X(d) + (left ? -10 : 10), y:Y(50) - 14, 'text-anchor':left ? 'end' : 'start', fill:'var(--ink-2)'}, `FDI ${fe(d)}`));
+  const pts = [{x:X(d), y:Y(50), html:`<b>FDI ${fe(d)}</b><br>The FCI at which a model passes half the time`}];
+  const placed = [];
   RANKED.filter(m => runs.some(r => r[0] === m.id)).forEach(m => {
-    const sc = mean(runs.filter(r => r[0] === m.id).map(r => r[2])), x = ECI[m.id][0];
-    svg.append(sv('circle', {cx:X(x), cy:Y(sc), r:6, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':1.5}));
-    pts.push({x:X(x), y:Y(sc), html:`<b>${esc(m.name)}</b><br>FCI ${f1(x)}<br>Mean final score here <b>${f1(sc)}</b><br>Expected from the curve ${f1(f(x))}`});
+    const rs = runs.filter(r => r[0] === m.id), np = rs.filter(r => r[3]).length, y = np / rs.length * 100, x = ECI[m.id][0];
+    // models with the same passes have the same FCI: a dot that would hide another steps half a dot in from the 0% or
+    // 100% line, twice at most, so the dots stay on their line and partial overlaps remain
+    let cy = Y(y); const dir = y > 50 ? 1 : -1, r = narrow ? 5 : 6;
+    for (let k = 0; k < 2 && placed.some(p => Math.hypot(p[0] - X(x), p[1] - cy) < r); k++) cy += dir * (r + 1);
+    placed.push([X(x), cy]);
+    svg.append(sv('circle', {cx:X(x), cy, r, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':1.5}));
+    pts.push({x:X(x), y:cy, html:`<b>${esc(m.name)}</b><br>FCI ${fe(x)}<br>${rs.length === 1 ? (np ? 'Passes' : 'Does not pass') : `Passes <b>${np} of ${rs.length}</b> runs`} here`
+      + `<br>Chance from the curve ${Math.round(f(x))}%`});
   });
-  if (ref != null) {
-    svg.append(sv('rect', {x:X(ECI_HUMAN) - 5.5, y:Y(ref) - 5.5, width:11, height:11, fill:'var(--ink)', stroke:'#fff', 'stroke-width':1.5}));
-    pts.push({x:X(ECI_HUMAN), y:Y(ref), html:`<b>Human reference</b><br>FCI ${ECI_HUMAN} by definition<br>Score <b>${f1(ref)}</b>`});
-  }
   attachTip(svg, W, H, pts, $('#fctip'));
-  $('#fclegend').innerHTML = RANKED.filter(m => runs.some(r => r[0] === m.id)).map(m => `<span><i style="background:${MCOL[m.id]}; border-radius:50%"></i>${esc(m.name)}</span>`).join('')
-    + (ref != null ? '<span><i style="background:var(--ink)"></i>Human reference</span>' : '');
-  $('#fcnote').textContent = `The curve is the score expected at each FCI, from the fit. Dots are the models’ final scores here at their FCI.`;
+  $('#fclegend').innerHTML = RANKED.filter(m => runs.some(r => r[0] === m.id)).map(m => `<span><i style="background:${MCOL[m.id]}; border-radius:50%"></i>${esc(m.name)}</span>`).join('');
+  $('#fcnote').textContent = 'The curve is the chance of passing at each FCI, from the fit. Dots are the models at their FCI: at 100% if they pass here, at 0% if not.';
 }
 
 /* The solution in words (SOLUTION, assets/js/fcs2-solutions.js; owner, 2026-10-14: no code, the idea): which model,

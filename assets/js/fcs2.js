@@ -4,7 +4,7 @@
 document.querySelectorAll('[data-fill]').forEach(el => { el.textContent = {updated:`Last updated: ${UPDATED}`, runs:String(RUNS.length),
   runtasks:`on ${NTASK(RUNS)} tasks`, models:`${MODELS.length} models from ${new Set(MODELS.map(m => m.lab)).size} labs have run so far.`,
   summary:`${RUNS.length} runs on ${NTASK(RUNS)} tasks by ${MODELS.length} models`,
-  ntasks:String(TASKS.length), ndomains:String(new Set(TASKS.map(t => t.d)).size)}[el.dataset.fill]; });
+  ntasks:String(TASKS.length), ndomains:String(new Set(TASKS.map(t => t.d)).size), dmax:fe(Math.max(...Object.values(FDI))), zero:tick(ECI_LOW_VALUE)}[el.dataset.fill]; });
 // Bring a tab into view inside its own horizontal strip only. scrollIntoView would also scroll the page,
 // which fought the reader's scrolling whenever the section spy fired.
 const reveal = el => { const p = el.parentElement, pr = p.getBoundingClientRect(), er = el.getBoundingClientRect();
@@ -96,19 +96,21 @@ function drawPassCost() {
 /* On phones the model column is as wide as the longest model name, so every name shows in full (owner: "DeepSeek V4.1 Flash", not cut). */
 const nameCol = svg => { svg.replaceChildren(); const w = Math.max(...MODELS.map(m => { const t = sv('text', {class:'lab', x:-999, y:-999}, m.short); svg.append(t); return t.getComputedTextLength(); })); svg.replaceChildren(); return Math.max(112, Math.ceil(w) + 12); };
 
-/* FCI: one row per model ranked by ECI, a bar from 0 to its FCI and its 90% interval as a whisker. */
+/* FCI: one row per model ranked by ECI, a bar from 0 (Kimi K2.7) to its FCI and its 90% interval as a whisker. */
 function drawECI() {
   const order = [...MODELS].sort((a, b) => ECI[b.id][0] - ECI[a.id][0]);
   const svg = $('#ecisvg'), W = Math.max(300, $('#eciplot').clientWidth), narrow = W < 560;
   const L = narrow ? nameCol(svg) : 190, R = 34, T = 14, B = 46, lane = CHART_H.eciLane || (narrow ? 56 : 64);
-  // grid every 10 on the Human = 25 scale (owner, 2026-10-13); every 20 or 40 if the scale is ever wider
-  const top = Math.max(...MODELS.map(m => ECI[m.id][2])), step = top > 120 ? (narrow ? 40 : 20) : top > 60 ? 20 : 10, xmax = Math.ceil(top / step) * step;
+  // the axis holds 0 and every whisker, on a grid of about six steps (four on phones) whatever the scale's unit
+  const bot = Math.min(0, ...MODELS.map(m => ECI[m.id][1])), top = Math.max(...MODELS.map(m => ECI[m.id][2])), step = eciStep(top - bot, narrow ? 4 : 6);
+  const xmin = Math.floor(bot / step) * step, xmax = Math.ceil(top / step) * step;
   const H = T + order.length * lane + B, an = animates(svg), bh = narrow ? 24 : 28;   // bars near half the lane (owner, 2026-10-14: 18 px read too thin)
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
-  const X = v => L + v / xmax * (W - L - R);
-  for (let v = 0; v <= xmax; v += step) {
-    svg.append(sv('line', {x1:X(v), x2:X(v), y1:T, y2:H - B + 6, stroke:'var(--grid)', 'stroke-width':1}));
-    svg.append(sv('text', {x:X(v), y:H - B + 22, 'text-anchor':'middle'}, v));
+  const X = v => L + (v - xmin) / (xmax - xmin) * (W - L - R);
+  for (let i = 0, v = xmin; v <= xmax + step / 2; v = xmin + ++i * step) {   // the 0 line, Kimi K2.7, is darker when the axis runs below it
+    const zero = xmin < 0 && Math.abs(v) < step / 2;
+    svg.append(sv('line', {x1:X(v), x2:X(v), y1:T, y2:H - B + 6, stroke:zero ? 'var(--ink-2)' : 'var(--grid)', 'stroke-width':zero ? 1.2 : 1}));
+    svg.append(sv('text', {x:X(v), y:H - B + 22, 'text-anchor':'middle'}, tick(v)));
   }
   svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'FCI'));
   const pts = [];
@@ -117,18 +119,20 @@ function drawECI() {
     if (i) svg.append(sv('line', {x1:0, x2:W - R, y1:y0, y2:y0, stroke:'var(--line)', 'stroke-width':1}));
     svg.append(sv('text', {class:'lab', x:0, y:yc + (m.h ? -3 : 4)}, narrow ? m.short : m.name));
     if (m.h) svg.append(sv('text', {x:0, y:yc + 14, 'font-size':12}, m.h));
-    const bar = sv('rect', {class:'ebar', x:X(0), y:yc - bh / 2, width:Math.max(0, X(e) - X(0)), height:bh, fill:MCOL[m.id], 'data-m':m.id});
+    const bar = sv('rect', {class:'ebar', x:Math.min(X(0), X(e)), y:yc - bh / 2, width:Math.abs(X(e) - X(0)), height:bh, fill:MCOL[m.id], 'data-m':m.id});
+    if (e < 0) bar.style.transformOrigin = 'right center';   // a bar below Kimi K2.7 grows leftwards from 0
     const wk = sv('path', {class:'ewhisk', d:`M${X(lo)},${yc}H${X(hi)}M${X(lo)},${yc - 7}v14M${X(hi)},${yc - 7}v14`, fill:'none', stroke:'var(--ink)', 'stroke-width':1.5});
-    const val = sv('text', {class:'val halo', x:X(e), y:yc - bh / 2 - 6, fill:MTXT(m.id), 'text-anchor':'middle'}, f1(e));   // one decimal: on this scale whole numbers tie
+    const val = sv('text', {class:'val halo', x:X(e), y:yc - bh / 2 - 6, fill:MTXT(m.id), 'text-anchor':'middle'}, fe(e));   // as many decimals as keep the models apart
     svg.append(bar, wk, val);
     if (an) { mark(bar, 'a-bar', i * .07); mark(wk, 'a-fade', .55 + i * .07); mark(val, 'a-fade', .55 + i * .07); }
-    pts.push({x:X(e), y:yc, mean:true, html:`<b>${esc(m.name)}</b><br>FCI <b>${f1(e)}</b><br>90% interval ${Math.round(lo)}–${Math.round(hi)}`});
+    pts.push({x:X(e), y:yc, mean:true, html:`<b>${esc(m.name)}</b><br>FCI <b>${fe(e)}</b><br>90% interval ${fe(lo)}–${fe(hi)}`});
   });
   attachTip(svg, W, H, pts, $('#ecitip'));
 }
 
-/* Test-time scaling: FCI when every run stops at a US$ budget (SCALE, from bin/fcs2_runs_from_db.py). Straight segments
-   and one legend (owner, 2026-10-13). A run stopped at a budget counts its latest valid submission, so a curve can dip.
+/* Test-time scaling: the FCI a model would have if every run stopped at a US$ budget (SCALE, from
+   bin/fcs2_runs_from_db.py); a run that has ended within the budget counts what it beat, and a run still going counts
+   as beating nothing (Qiuyang, 2026-10-14). Straight segments and one legend (owner, 2026-10-13).
    Every model with reported spend is in the legend; at first only each lab's model with the highest FCI is drawn and the
    others are greyed in the legend; a click on an entry shows or hides its curve (owner, 2026-10-14). A model's 90% band
    shows only while the pointer is on its curve or its legend entry (owner, 2026-10-13: no bands otherwise).
@@ -154,6 +158,8 @@ function ttsUpTo(c, lx) {
   }
   return out;
 }
+// the focus's pacing was tuned on the old Human = 25 scale, about 7 of its points to a logit of the pass-based one
+const TTS_PT = 7 / ECI_UNIT;
 const ttsEase = t => t < .5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
 // the cursor's log budget at time t: a stretch takes time in proportion to how much happens in it (curves starting, FCI
 // gained), with a floor, so the sweep slows through the busy stretches and hurries across the empty ones
@@ -163,7 +169,7 @@ function ttsSweep(cs, x0, x1, t) {
     const a = x0 + (x1 - x0) * (k - 1) / n, b = x0 + (x1 - x0) * k / n;
     let act = .6;
     cs.forEach(c => { const s0 = Math.log10(c[0][0]); if (s0 > a && s0 <= b) act += 30;
-      const ya = at(c, a), yb = at(c, b); if (ya != null && yb != null) act += Math.abs(yb - ya) * 6; });
+      const ya = at(c, a), yb = at(c, b); if (ya != null && yb != null) act += Math.abs(yb - ya) * 6 * TTS_PT; });
     w.push(w[k - 1] + act);
   }
   const target = w[n] * t; let k = 1; while (k < n && w[k] < target) k++;
@@ -181,16 +187,16 @@ function drawTTS(t) {
   const L = 34, R = narrow ? 12 : 24, T = 12, B = 46, H = CHART_H.tts || (narrow ? 300 : 380);
   const all = TTSM.flatMap(m => ttsCurve(m.id));   // the axes hold every model, so showing one moves nothing
   const x0 = Math.log10(Math.min(...all.map(p => p[0]))) - .15, x1 = Math.log10(Math.max(...all.map(p => p[0])));
-  const ytop = Math.max(...all.map(p => p[3])), ystep = ytop > 60 ? 20 : 10, ymax = Math.ceil(ytop / ystep) * ystep;   // grid every 10 on the Human = 25 scale
+  const ytop = Math.max(...all.map(p => p[3])), ystep = eciStep(ytop, narrow ? 4 : 5), ymax = Math.ceil(ytop / ystep) * ystep;   // about five steps from 0, whatever the scale's unit
   const ms = [...TTSM].reverse().filter(m => ttsOn.has(m.id)), cs = ms.map(m => ttsCurve(m.id));
   const play = t < 1, sweep = play ? ttsSweep(cs, x0, x1, ttsEase(t)) : x1;
   const vx1 = play ? Math.min(x1, Math.max(x0 + 1.1, sweep + .45)) : x1;   // the view: at least a decade wide, just past the cursor
   const X = v => L + (Math.log10(v) - x0) / (vx1 - x0) * (W - L - R), Y = v => T + (1 - v / ymax) * (H - T - B);
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
   const clip = sv('clipPath', {id:'ttsclip'}); clip.append(sv('rect', {x:L, y:T - 6, width:W - L - R + 10, height:H - T - B + 6})); svg.append(clip);
-  for (let v = 0; v <= ymax; v += ystep) {
+  for (let i = 0, v = 0; v <= ymax + ystep / 2; v = ++i * ystep) {
     svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1}));
-    svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, v));
+    svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, tick(v)));
   }
   for (let k = Math.ceil(x0); k <= Math.floor(vx1); k++) {
     svg.append(sv('line', {x1:X(10 ** k), x2:X(10 ** k), y1:H - B, y2:H - B + 5, stroke:'var(--ink-2)', 'stroke-width':1}));
@@ -198,9 +204,9 @@ function drawTTS(t) {
   }
   svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'Cost budget per run in US$, log scale'));
   const g = sv('g', {'clip-path':'url(#ttsclip)'}), gb = sv('g'), gl = sv('g'); g.append(gb, gl); svg.append(g);   // bands under every line
-  // rising at the cursor: started within the last 0.35 decade, or 2 FCI gained over it; nothing steps back while nothing rises
+  // rising at the cursor: started within the last 0.35 decade, or 2 old points (2 / TTS_PT FCI) gained over it; nothing steps back while nothing rises
   const rising = c => { const s0 = Math.log10(c[0][0]); if (s0 > sweep) return false; const e = ttsUpTo(c, sweep), b = ttsUpTo(c, sweep - .35);
-    return s0 > sweep - .35 || e[e.length - 1][1] - b[b.length - 1][1] >= 2; };
+    return s0 > sweep - .35 || e[e.length - 1][1] - b[b.length - 1][1] >= 2 / TTS_PT; };
   const anyRising = play && cs.some(rising), pts = [], tips = [];
   ms.forEach((m, k) => {
     const c = cs[k], vis = play ? ttsUpTo(c, sweep) : c;
@@ -213,8 +219,8 @@ function drawTTS(t) {
     gl.append(sv('path', {d:path, fill:'none', stroke:MCOL[m.id], 'stroke-width':2.2, 'stroke-linejoin':'round', opacity:op}),
       sv('circle', {cx:X(e[0]), cy:Y(e[1]), r:4.5, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':1.5, opacity:op}));
     if (play && anyRising && lit) tips.push({m, e});
-    if (!play) c.forEach(p => pts.push({x:X(p[0]), y:Y(p[1]), m:m.id, html:`<b>${esc(m.name)}</b><br>FCI <b>${f1(p[1])}</b> at ${usdfmt(p[0])} per run`
-      + `<br>90% interval ${Math.round(Math.max(p[2], 0))}–${Math.round(p[3])}<br>${Math.round(p[4] * 100)}% of runs still going`}));
+    if (!play) c.forEach(p => pts.push({x:X(p[0]), y:Y(p[1]), m:m.id, html:`<b>${esc(m.name)}</b><br>FCI <b>${fe(p[1])}</b> at ${usdfmt(p[0])} per run`
+      + `<br>90% interval ${fe(Math.max(p[2], 0))}–${fe(p[3])}<br>${Math.round(p[4] * 100)}% of runs still going`}));
   });
   // while the focus moves, the rising curves are named at their tips, off every line where there is room
   if (tips.length) {
@@ -344,35 +350,36 @@ function drawTable() {
 const redraws = [];
 
 /* ---------- How FCI works: a fold under the FCI chart (owner, 2026-10-11) ----------
-   Three tasks' fitted curves, expected score = 100 / (1 + exp(-k (FCI - FEDI))) from TFIT: an easy one, one at the
-   human reference and a hard one, picked in code as the tasks with a clear S (slope .07 to .3) whose FEDI is nearest
-   -15, 25 and 50, so the picture follows the data (owner, 2026-10-14). Dashed lines mark the two fixed points of the
-   scale, Kimi K2.7 = 0 and Human = 25. */
+   Three tasks' pass curves, the joint model's own (passChance, fcs2-data.js): an easy, a middle and a hard one, the tasks a sixth, a half and five sixths of the way up the FDI order, so the picture
+   follows the data (Qiuyang, 2026-10-14). A dashed line marks the scale's fixed point, Kimi K2.7 = 0. */
 function drawHow() {
   const box = $('#fci-how'); if (!box || !box.open) return;
-  const fits = Object.entries(TFIT), clear = fits.filter(([, [, k]]) => k >= .07 && k <= .3);
-  $('#how-dmax').textContent = Math.round(Math.max(...fits.map(([, [d]]) => d)));
   const INKS = ['#8ab4f8', '#1a73e8', '#174ea6'];   // easy to hard: Google blue 300, 600, 900
   let svg = $('#howasvg'), W = Math.max(300, $('#howaplot').clientWidth), narrow = W < 560;
-  let L = 34, R = narrow ? 12 : 24, T = 26, B = 46, H = narrow ? 254 : 284;
-  const X0 = -40, X1 = 80, X = v => L + (v - X0) / (X1 - X0) * (W - L - R), Y = v => T + (1 - v / 100) * (H - T - B);
+  let L = 44, R = narrow ? 12 : 24, T = 26, B = 46, H = narrow ? 254 : 284;
+  const up = Object.keys(FDI).filter(s => passChance(s, FDI[s]) != null).sort((a, b) => FDI[a] - FDI[b]);
+  if (up.length < 3) return;   // no pass curves in the data
+  const picks = [1 / 6, 1 / 2, 5 / 6].map(q => up[Math.round(q * (up.length - 1))]);
+  // the axis runs from 10% on the easy curve to 90% on the hard one, with Kimi K2.7 and every model in view
+  const es = MODELS.map(m => ECI[m.id][0]), lo = Math.min(ECI_LOW_VALUE, passAt(picks[0], .1), ...es), hi = Math.max(passAt(picks[2], .9), ...es);
+  const step = eciStep(hi - lo, narrow ? 4 : 6), X0 = Math.floor(lo / step) * step, X1 = Math.ceil(hi / step) * step;
+  const X = v => L + (v - X0) / (X1 - X0) * (W - L - R), Y = v => T + (1 - v / 100) * (H - T - B);
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
-  for (let v = 0; v <= 100; v += 25) { svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1})); svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, v)); }
-  for (let v = X0; v <= X1; v += 20) svg.append(sv('text', {x:X(v), y:H - B + 20, 'text-anchor':'middle'}, v));
+  for (let v = 0; v <= 100; v += 25) { svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1})); svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, v + '%')); }
+  for (let i = 0, v = X0; v <= X1 + step / 2; v = X0 + ++i * step) svg.append(sv('text', {x:X(v), y:H - B + 20, 'text-anchor':'middle'}, tick(v)));
   svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'FCI'));
-  [[0, narrow ? 'K2.7' : 'Kimi K2.7'], [ECI_HUMAN, 'Human']].forEach(([v, name]) => {
-    svg.append(sv('line', {x1:X(v), x2:X(v), y1:T - 4, y2:H - B, stroke:'var(--ink-2)', 'stroke-width':1, 'stroke-dasharray':'3 3', opacity:.6}),
-      sv('text', {x:X(v), y:T - 10, 'text-anchor':'middle'}, `${name} ${v}`)); });
-  const picks = [-15, 25, 50].map(t => clear.slice().sort((a, b) => Math.abs(a[1][0] - t) - Math.abs(b[1][0] - t))[0]);
-  const pts = [];
-  picks.forEach(([s, [d, k]], i) => {
-    const f = x => 100 / (1 + Math.exp(-k * (x - d)));
-    svg.append(sv('path', {d:Array.from({length:241}, (_, j) => { const x = X0 + j / 2; return `${j ? 'L' : 'M'}${X(x).toFixed(1)},${Y(f(x)).toFixed(1)}`; }).join(''), fill:'none', stroke:INKS[i], 'stroke-width':2.5}));
-    svg.append(sv('circle', {cx:X(d), cy:Y(50), r:5, fill:INKS[i], stroke:'#fff', 'stroke-width':2}));   // the FEDI: expected score 50
-    for (let x = X0; x <= X1; x += 2) pts.push({x:X(x), y:Y(f(x)), html:`<b>${esc(NAME(s))}</b><br>FEDI ${f1(d)}, slope ${k.toFixed(3)}<br>At FCI ${x}: expected score <b>${f1(f(x))}</b>`});
+  svg.append(sv('line', {x1:X(ECI_LOW_VALUE), x2:X(ECI_LOW_VALUE), y1:T - 4, y2:H - B, stroke:'var(--ink-2)', 'stroke-width':1, 'stroke-dasharray':'3 3', opacity:.6}),
+    sv('text', {x:X(ECI_LOW_VALUE), y:T - 10, 'text-anchor':'middle'}, `${ECI_LOW_NAME} = ${tick(ECI_LOW_VALUE)}`));
+  const pts = [], n = 240;
+  picks.forEach((s, i) => {
+    const d = FDI[s], f = x => 100 * passChance(s, x);
+    svg.append(sv('path', {d:Array.from({length:n + 1}, (_, j) => { const x = X0 + (X1 - X0) * j / n; return `${j ? 'L' : 'M'}${X(x).toFixed(1)},${Y(f(x)).toFixed(1)}`; }).join(''), fill:'none', stroke:INKS[i], 'stroke-width':2.5}));
+    svg.append(sv('circle', {cx:X(d), cy:Y(50), r:5, fill:INKS[i], stroke:'#fff', 'stroke-width':2}));   // the FDI: passes half the time
+    for (let j = 0; j <= 60; j++) { const x = X0 + (X1 - X0) * j / 60;
+      pts.push({x:X(x), y:Y(f(x)), html:`<b>${esc(NAME(s))}</b><br>FDI ${fe(d)}<br>At FCI ${fe(x)}: passes <b>${Math.round(f(x))}%</b> of the time`}); }
   });
   attachTip(svg, W, H, pts, $('#howatip'));
-  $('#howalegend').innerHTML = picks.map(([s, [d]], i) => `<span><i style="background:${INKS[i]}"></i>${esc(NAME(s))}, FEDI ${f1(d)}</span>`).join('');
+  $('#howalegend').innerHTML = picks.map((s, i) => `<span><i style="background:${INKS[i]}"></i>${esc(NAME(s))}, FDI ${fe(FDI[s])}</span>`).join('');
 }
 $('#fci-how').addEventListener('toggle', drawHow);
 redraws.push(drawHow);
@@ -383,7 +390,7 @@ addEventListener('hashchange', fqHash); fqHash();
 
 /* ---------- task index ----------
    One compact row per task: its name over its domain, what the agent must do (GOAL) over the paper it comes from, its
-   FEDI, and the links. The filter is by domain; the search also
+   FDI, and the links. The filter is by domain; the search also
    reads goals and venues; the order is the reader's choice, hardest first to begin with. */
 let picked = new Set(), q = '', order = 'hard';
 // the domain filter: checkboxes drawn as Material 3 ones, any number checked (owner, design audit: chips did not look good, 4B)
@@ -432,7 +439,7 @@ function hits() {
   const w = q.toLowerCase().split(/\s+/).filter(Boolean);
   const hay = t => [t.s, t.name, t.t, t.n, t.d, GOAL[t.s] || '', VENUE[t.s] || ''].join(' ').toLowerCase();
   const h = TASKS.filter(t => (!picked.size || picked.has(t.d)) && w.every(x => hay(t).includes(x)));
-  // difficulty is the FEDI rank (FRANK, 1 = hardest); a task without a FEDI has none and comes last either way
+  // difficulty is the FDI rank (FRANK, 1 = hardest); a task without a FDI has none and comes last either way
   const rank = t => FRANK[t.s] ?? null, dom = (a, b) => DOMAINS.indexOf(a.d) - DOMAINS.indexOf(b.d), nm = (a, b) => a.name.localeCompare(b.name);
   const hard = (a, b) => (rank(a) ?? 1e9) - (rank(b) ?? 1e9) || dom(a, b) || nm(a, b), easy = (a, b) => (rank(b) ?? -1) - (rank(a) ?? -1) || dom(a, b) || nm(a, b);
   return [...h].sort({hard, easy, domain:(a, b) => dom(a, b) || hard(a, b), name:nm}[order]);
@@ -451,10 +458,11 @@ function squarify(vals, x, y, w, h) {
   }
   return out;
 }
-const CHIP_SHORT = {'Programming Languages':'Languages', 'Machine Learning':'ML', 'Bioinformatics':'Bio', 'Cryptography':'Crypto', 'Architecture':'Arch'};   // map chips only, where the full name does not fit
+const CHIP_SHORT = {'Programming Languages':'Languages', 'Machine Learning':'ML', 'Bioinformatics':'Bio', 'Cryptography':'Crypto', 'Architecture':'Arch', 'Software Engineering':'SE'};   // map chips only, where the full name does not fit
 function drawMap() {
   stopPlay(false);
   const svg = $('#mapsvg'), W = $('#map').clientWidth, narrow = W < 640, H = narrow ? Math.round(W * 1.15) : Math.round(W * 0.36);
+  svg.setAttribute('aria-label', `The ${TASKS.length} tasks by domain`);   // the count from the data, not the markup
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
   const byArea = AREAS.map(a => ({a, n:a.d.reduce((s, d) => s + N_IN(d), 0)})).sort((p, q) => q.n - p.n), G = narrow ? 4 : 6, tol = .5;
   squarify(byArea.map(x => x.n), 0, 0, W, H).forEach((ar, k) => {
@@ -540,7 +548,7 @@ function startPlay(tile) {
 // all tasks (owner, 2026-10-13: the run curves said too little for the room they took).
 // Icons for the kinds of metric a task is scored on (KEYM), each a path in a 14 px box centred on (x, y).
 const KEY_KIND = {Latency:'time', Throughput:'speed', Accuracy:'quality', Quality:'quality', 'Success rate':'quality', Reward:'quality',
-  Memory:'size', Size:'size', Compression:'size', Communication:'size', Fairness:'balance'};
+  Memory:'size', Size:'size', Compression:'size', Communication:'size', Fairness:'balance', Coverage:'count'};
 const KEY_ICON = {
   time:(x, y) => `M${x - 6.5},${y}a6.5,6.5 0 1,0 13,0a6.5,6.5 0 1,0 -13,0M${x},${y - 3.6}V${y}l2.6,1.8`,                    // a clock
   speed:(x, y) => `M${x + 1.5},${y - 7}l-5.5,8h4l-1.5,6l5.5,-8h-4z`,                                                        // a bolt
@@ -587,16 +595,17 @@ function showRun() {
         sv('path', {d:r.p ? `M${cx - R * .46},${cy + R * .04}l${R * .32},${R * .34}l${R * .6},${-R * .7}` : `M${cx - R * .36},${cy - R * .36}l${R * .72},${R * .72}M${cx + R * .36},${cy - R * .36}l${-R * .72},${R * .72}`,
           fill:'none', stroke:r.p ? field : '#fff', 'stroke-width':2, 'stroke-linecap':'round', 'stroke-linejoin':'round', 'stroke-opacity':r.p ? 1 : .85}),
         sv('text', {x:cx + 17, y:cy + 4.5, 'font-size':13.5, 'font-weight':r.p ? 600 : 400, fill:'#fff', 'fill-opacity':r.p ? 1 : .85}, narrow ? m.short : m.name)); });
-  } else {   // difficulty: the FEDI rank (FRANK), and a strip with every task in rank order and this one as a disc; TDIFF gives who passes
-    const D = TDIFF[s] && FRANK[s] ? {...TDIFF[s], rank:FRANK[s]} : null, N = Object.keys(FRANK).length;
+  } else {   // difficulty: the FDI rank (FRANK), and a strip with every task in rank order and this one as a disc; DIFF gives who passes
+    const D = FRANK[s] ? {rank:FRANK[s], pass:DIFF[s][3], n:DIFF[s][5]} : null, N = Object.keys(FRANK).length;
     panel.append(sv('text', {x:p.x + PX, y:top + 4, 'font-size':13, 'font-weight':500, fill:'#fff', 'fill-opacity':.85}, 'Difficulty'));
     if (!D) panel.append(sv('text', {x:p.x + PX, y:top + 52, 'font-size':16, fill:'#fff'}, 'No runs yet'));
     else { const rank = D.rank, X = r => p.x + PX + (N - r) / (N - 1 || 1) * inner, sy = p.y + p.h - 74;
-      const ord = `${rank}${[, 'st', 'nd', 'rd'][rank % 100 > 10 && rank % 100 < 14 ? 0 : rank % 10] || 'th'}`;
-      panel.append(sv('text', {x:p.x + PX, y:top + 62, 'font-size':52, 'font-weight':600, fill:'#fff'}, rank === 1 ? 'Hardest' : ord),
-        sv('text', {x:p.x + PX, y:top + 90, 'font-size':14, fill:'#fff', 'fill-opacity':.92}, `${rank === 1 ? '' : 'hardest '}of ${N} tasks · ${D.pass} of ${D.n} models pass`),
+      // the hardest and the easiest are named as the task page names them; tasks of the same shown FDI share a rank
+      const end = rank === 1 ? 'Hardest' : rank === FLAST ? 'Easiest' : null;
+      panel.append(sv('text', {x:p.x + PX, y:top + 62, 'font-size':52, 'font-weight':600, fill:'#fff'}, end || ordinal(rank)),
+        sv('text', {x:p.x + PX, y:top + 90, 'font-size':14, fill:'#fff', 'fill-opacity':.92}, `${end ? '' : 'hardest '}of ${N} tasks · ${D.pass} of ${D.n} models pass`),
         sv('line', {x1:p.x + PX, x2:p.x + PX + inner, y1:sy, y2:sy, stroke:'#fff', 'stroke-opacity':.45, 'stroke-width':1.5}));
-      for (let r = 1; r <= N; r++) panel.append(sv('line', {x1:X(r), x2:X(r), y1:sy - 5, y2:sy + 5, stroke:'#fff', 'stroke-opacity':.5, 'stroke-width':1.5}));
+      Object.values(FRANK).forEach(r => panel.append(sv('line', {x1:X(r), x2:X(r), y1:sy - 5, y2:sy + 5, stroke:'#fff', 'stroke-opacity':.5, 'stroke-width':1.5})));   // a tick per task
       panel.append(sv('circle', {cx:X(rank), cy:sy, r:8, fill:'#fff'}),
         sv('text', {x:p.x + PX, y:sy + 26, 'font-size':12, fill:'#fff', 'fill-opacity':.85}, 'easier'), sv('text', {x:p.x + PX + inner, y:sy + 26, 'text-anchor':'end', 'font-size':12, fill:'#fff', 'fill-opacity':.85}, 'harder')); }
   }
@@ -637,12 +646,12 @@ document.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse' &&
 function drawRows() {
   const h = hits(); $('#fcount').textContent = picked.size ? `(${picked.size})` : '';
   $('#lhead').innerHTML = `<span>${h.length === TASKS.length ? `${TASKS.length} tasks` : `${h.length} of ${TASKS.length} tasks`}</span><span></span>`
-    + `<span title="FEDI, the FrontierCS Epoch Difficulty Index: the FCI at which a model is expected to score 50 on the task">FEDI</span><span></span>`;
+    + `<span title="FDI, the FrontierCS Difficulty Index: the FCI at which a model passes the task half the time">FDI</span><span></span>`;
   $('#rows').innerHTML = h.map(t => { const s = t.s, v = VENUE[s], goal = GOAL[s], ttl = t.t || (v ? t.name : '');
     // with a goal, the source is the small line under it (venue in bold, then the title); without one (Security), the title is the main line
     const main = goal || ttl, small = goal ? (v && ttl ? `<b>${esc(v)}</b> · ${esc(ttl)}` : esc(v || ttl)) : v ? `<b>${esc(v)}</b>` : '';
-    // the task's FEDI in place of the pass rate (owner, 2026-10-14)
-    const pass = FEDI[s] != null ? `<a class="tp" href="${esc(taskHref(s))}" tabindex="-1"><span class="pr">${f1(FEDI[s])}</span></a>` : '<span></span>';
+    // the task's FDI in place of the pass rate (owner, 2026-10-14)
+    const pass = FDI[s] != null ? `<a class="tp" href="${esc(taskHref(s))}" tabindex="-1"><span class="pr">${fe(FDI[s])}</span></a>` : '<span></span>';
     return `<article class="trow" data-s="${esc(s)}"><div class="tn"><h3><a class="stretch" href="${esc(taskHref(s))}">${esc(t.name)}</a></h3><span class="td" style="--a:${AINK[AREA_OF[t.d].k]}">${esc(t.d)}</span></div>
     <div class="tx">${main ? `<p>${esc(main)}</p>` : ''}${small ? `<p class="src">${small}</p>` : ''}</div>${pass}
     <div class="lk">${t.p ? `<a href="${esc(t.p)}" target="_blank" rel="noopener">${t.t ? t.src : 'Project'}</a>` : ''}${t.r ? `<a href="${esc(t.r)}" target="_blank" rel="noopener">Code</a>` : ''}</div></article>`; }).join('')
