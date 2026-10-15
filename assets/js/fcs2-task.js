@@ -157,9 +157,9 @@ function drawResults() {
   // the human reference, green when every one, red otherwise (Qiuyang, 2026-10-15, after the owner's values-first table);
   // the count and the reference's mean in that run go to the tooltip; without a mean, the count itself over the bar (Qiuyang)
   // a time or size column takes the unit that puts its median in range (s, ms, µs, ns; GiB, MiB, KiB, bytes), so
-  // 3.73×10⁻⁸ s reads 37.3 ns; any other column whose numbers would show ×10 to a power, all within a factor of 1,000, or lie between 0.001
-  // and 0.1 with some below 0.01,
-  // takes that power into its header, "Count (×10⁹)" over 2.73 (Qiuyang, 2026-10-15)
+  // 3.73×10⁻⁸ s reads 37.3 ns; any other column whose numbers would show ×10 to a power, all within a factor of 1,000,
+  // or lie between 0.001 and 0.1 with some below 0.01, takes that power into its header, "Count (×10⁹)" over 2.73
+  // (Qiuyang, 2026-10-15)
   const FAM = [{s:1, ms:1e-3, 'µs':1e-6, ns:1e-9}, {GiB:2 ** 30, MiB:2 ** 20, KiB:1024, bytes:1, bits:1 / 8}];
   const colFmt = (m, s) => { if (!s || split) return {k:1, e:0};
     const named = NAMED.exec(metric(m)), u0 = named ? named[1] : UNIT[(/_([a-z]+)$/.exec(m) || [])[1]] || s.unit;
