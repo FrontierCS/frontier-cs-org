@@ -432,7 +432,8 @@ a.pbtn:hover{border-color:var(--teal); color:var(--teal-d)}
 .rtab td.mc{text-align:center; white-space:nowrap; line-height:1.25}
 .rtab td.mc b{font-weight:500}
 .rtab td.cy b{color:#137333} .rtab td.cn b{color:#c5221f}
-.rtab td.mc .mk{font-size:12px}   /* a red cell's count beside its mean */
+.rtab td.mc .mbar{display:block; width:44px; height:3px; margin:3px auto 0; border-radius:2px; background:var(--grid)}   /* under a red cell: the share of workloads won */
+.rtab td.mc .mbar i{display:block; height:3px; border-radius:2px; background:currentColor}
 .rtab .rref td.mc b{font-weight:400; color:var(--ink-2)}
 .rtab .ri{display:inline-block; max-width:none}   /* the site's percentage max-width would shrink an icon in a narrow cell */
 @media (max-width:640px){
