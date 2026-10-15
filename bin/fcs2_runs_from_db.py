@@ -103,6 +103,7 @@ REF_DEFAULT = {'Structured LWE': 100}   # Qiuyang, 2026-10-14: the human referen
 # database display name -> (domain folder, paper short name or None)
 TASK = {
     'Access-Pattern Rewriting': ('Programming Language', 'Glenside'),
+    'Search Strategy for Concolic Testing': ('SE', 'CREST'),   # scored from 2026-10-15: Burnim and Sen, ASE 2008; Software Engineering (Qiuyang)
     'Binary Fuse Filter Construction and Lookup': ('Theory', None),
     'CKKS Precision Propagation at 2,048 Slots': ('Crypto', 'CKKS noise'),
     'Exact Sequence Alignment': ('Bioinformatics', None),
@@ -152,7 +153,7 @@ TASK = {
     'Sparse Video Attention Policy': ('MLSys', 'SVG-EAR'),
     'Structured-LWE Public Witness Recovery': ('Crypto', 'Structured LWE'),
 }
-SHOWN = {'Arch': 'Architecture', 'Crypto': 'Cryptography', 'Programming Language': 'Programming Languages'}
+SHOWN = {'Arch': 'Architecture', 'Crypto': 'Cryptography', 'Programming Language': 'Programming Languages', 'SE': 'Software Engineering'}
 short = lambda t: TASK[t][1] or t.split(' — ')[0]   # database task name -> the name RUNS and the page use
 
 # database candidate name -> (id, shown name, short name for phones, harness, lab); order = legend order within a lab
