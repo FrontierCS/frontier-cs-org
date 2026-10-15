@@ -98,7 +98,10 @@ PASS_ZERO_VALUE = 0
 PASS_UNIT = 10                 # FCI points per logit (Qiuyang, 2026-10-14; was 1)
 DEC = max(0, int(np.ceil(2 - np.log10(PASS_UNIT) - 1e-9)))   # decimals of FCI points: a hundredth of a logit or finer, 1 at 10 per logit
 TIE_EPS = 0                    # a final score within TIE_EPS of the human reference is half a win; 0: only an exact tie
-REF_DEFAULT = {'Structured LWE': 100}   # Qiuyang, 2026-10-14: the human reference (by short name) where the database has none
+# the human reference (by short name) where the database has none: Structured LWE by Qiuyang's decision (2026-10-14);
+# ParButterfly and RegionsSort as measured in runs of the human reference alone on the runs' task version
+# (run_01M4RVT5V4D3SR83YXW0B4EYP6, run_01M4HGFJEHVPJN04RVH9WEPYV1; Qiuyang, 2026-10-15)
+REF_DEFAULT = {'Structured LWE': 100, 'ParButterfly': 30.51, 'RegionsSort': 50.26}
 
 # database display name -> (domain folder, paper short name or None)
 TASK = {
