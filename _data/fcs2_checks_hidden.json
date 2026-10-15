@@ -28,38 +28,6 @@
     ]
    }
   },
-  "Adaptive attacks": {
-   "k27": {
-    "adaptive_probe_redirection_rate": [
-     9,
-     9
-    ],
-    "canary_integrity_accuracy": [
-     9,
-     9
-    ],
-    "evaluation_honesty_gap": [
-     9,
-     9
-    ],
-    "policy_enforcement_precision": [
-     9,
-     9
-    ],
-    "policy_enforcement_recall": [
-     9,
-     9
-    ],
-    "pssu_strength": [
-     0,
-     9
-    ],
-    "static_probe_redirection_rate": [
-     9,
-     9
-    ]
-   }
-  },
   "BABBLE": {
    "k27": {
     "compression_ratio": [
@@ -164,22 +132,6 @@
     ]
    }
   },
-  "Opal": {
-   "k27": {
-    "oram_blocks_per_access": [
-     120,
-     120
-    ],
-    "retrieval_hit": [
-     90,
-     120
-    ],
-    "trace_shape_match": [
-     120,
-     120
-    ]
-   }
-  },
   "Polygon": {
    "k27": {
     "refuted_pair": [
@@ -257,6 +209,26 @@
     "transaction_path_accuracy": [
      4,
      6
+    ]
+   }
+  },
+  "Progent": {
+   "k27": {
+    "duration_seconds": [
+     44,
+     48
+    ],
+    "enforcement_seconds": [
+     44,
+     48
+    ],
+    "permitted_call_utility": [
+     48,
+     48
+    ],
+    "unauthorized_call_success_rate": [
+     48,
+     48
     ]
    }
   },
@@ -856,6 +828,30 @@
     ]
    }
   },
+  "Opal": {
+   "k27": {
+    "admissible_chunks": [
+     120,
+     120
+    ],
+    "admissible_recall": [
+     120,
+     120
+    ],
+    "oram_blocks_per_access": [
+     120,
+     120
+    ],
+    "retrieval_hit": [
+     120,
+     120
+    ],
+    "trace_shape_match": [
+     120,
+     120
+    ]
+   }
+  },
   "Diffusion Policy": {
    "k27": {
     "complete_workload_wall_seconds": [
@@ -873,6 +869,22 @@
     "mean_predict_action_seconds": [
      4,
      4
+    ]
+   }
+  },
+  "Adaptive attacks": {
+   "k27": {
+    "attack_bytes": [
+     3,
+     3
+    ],
+    "attack_success_rate": [
+     2,
+     3
+    ],
+    "successful_normalized_diversity": [
+     2,
+     3
     ]
    }
   },
