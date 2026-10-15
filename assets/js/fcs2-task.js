@@ -108,7 +108,7 @@ const metric = m => METRIC[m] || m.replace(/_/g, ' ').replace(/^./, c => c.toUpp
    reference; each model cell is the run's mean, coloured by its count, with the count and the reference's mean in that
    run as its tooltip. */
 const UNIT = {ms:'ms', seconds:'s', ns:'ns', us:'µs', minutes:'min', bytes:'bytes', mib:'MiB', pct:'%', db:'dB'};
-const metricHead = m => { const label = metric(m), u = UNIT[(/_([a-z]+)$/.exec(m) || [])[1]];
+const metricHead = (m, s) => { const label = metric(m), u = UNIT[(/_([a-z]+)$/.exec(m) || [])[1]] || (s && s.unit);   // the key's suffix, else the export's unit
   return u && !/\(.*\)\s*$/.test(label) ? `${label} (${u})` : label; };   // a label that already names its unit keeps it
 // a mean: 3 significant digits with thousands separators; under 0.001 or from a million up, ×10 to a power in
 // superscript digits, which also reads in a tooltip; a true minus sign throughout
@@ -128,7 +128,8 @@ function drawResults() {
   const bar = (v, style) => { const w = (Math.max(0, v) / xmax * 100).toFixed(1);
     return `<span class="rb"><i style="width:${w}%;${style}"></i><span class="rn" style="left:${w}%">${f1(v)}</span></span>`; };
   const short = Object.fromEntries(RANKED.map(m => [m.id, m.short]));
-  const dir = m => st[m] ? `<span class="dir">${st[m].better === 'lower' ? 'Lower' : 'Higher'} is better</span>` : '';
+  // an exactness check (it must equal the exact answer) has no better direction (Qiuyang, 2026-10-15)
+  const dir = m => st[m] ? `<span class="dir">${st[m].exact ? 'Must be exact' : st[m].better === 'lower' ? 'Lower is better' : 'Higher is better'}</span>` : '';
   const mcls = () => 'mc';
   // a metric's cell is the run's mean, green when the run beat the human reference on every hidden workload, red otherwise
   // (owner, 2026-10-15: values, not counts); the count and the reference's mean in that run go to the tooltip; without a
@@ -139,7 +140,7 @@ function drawResults() {
     return `<td class="${mcls(i)} ${v[0] === v[1] ? 'cy' : 'cn'}" title="${tip}">` + (mean != null ? `<b>${num(mean)}</b>` : (v[0] === v[1] ? TICK : CROSS)) + '</td>'; };
   // the metrics first, then the final score and the cost (owner, 2026-10-15)
   $('#rtbl').innerHTML = '<thead><tr><th>Model</th>'
-    + ms.map((m, i) => `<th class="${mcls(i)}" title="${esc(m)}">${esc(metricHead(m))}${dir(m)}</th>`).join('') + '<th class="rs">Final score</th><th class="rc">Cost</th></tr></thead><tbody>'
+    + ms.map((m, i) => `<th class="${mcls(i)}" title="${esc(m)}">${esc(metricHead(m, st[m]))}${dir(m)}</th>`).join('') + '<th class="rs">Final score</th><th class="rc">Cost</th></tr></thead><tbody>'
     + (ref != null || ms.some(m => st[m] && st[m].ref != null)
       ? '<tr class="rref"><td><span class="sq"></span>Human reference</td>'
         + ms.map((m, i) => st[m] && st[m].ref != null ? `<td class="${mcls(i)}"><b>${num(st[m].ref)}</b></td>` : `<td class="${mcls(i)} e">—</td>`).join('')
