@@ -159,10 +159,10 @@ function drawResults() {
   const wref = (m, w) => { const W = st[m].w[w] || {}; return W.ref == null ? '<td class="mc e">—</td>'
     : `<td class="mc"><b>${num(W.ref)}</b>${W.margin != null ? `<span class="mg">${sign(m)}${num(W.margin)}</span>` : ''}</td>`; };
   // the metrics first, then the final score and the cost (owner, 2026-10-15)
-  const whead = (m, w) => { const h = metricHead(m, st[m]), u = / \([^)]*\)$/.exec(h);   // the workload goes before a unit: "Search overhead, Vim 5.7 (s)"
-    return u ? `${h.slice(0, u.index)}, ${WN[w]}${u[0]}` : `${h}, ${WN[w]}`; };
+  const whead = (m, w) => { const h = metricHead(m, st[m]), u = / \([^)]*\)$/.exec(h);   // the metric, then on its own line the workload and unit
+    return `${esc(u ? h.slice(0, u.index) : h)}<br><span class="nw">${esc(WN[w])}${u ? esc(u[0]) : ''}`; };
   const head = split
-    ? '<thead><tr><th>Model</th>' + ms.map(m => wl.map(w => `<th class="mc" title="${esc(m)}">${esc(whead(m, w))}${dir(m)}</th>`).join('')).join('')
+    ? '<thead><tr><th>Model</th>' + ms.map(m => wl.map(w => `<th class="mc" title="${esc(m)}">${whead(m, w)}${dir(m)}</span></th>`).join('')).join('')
       + '<th class="rs">Final score</th><th class="rc">Cost</th></tr></thead>'
     : '<thead><tr><th>Model</th>' + ms.map((m, i) => `<th class="${mcls(i)}" title="${esc(m)}">${esc(metricHead(m, st[m]))}${dir(m)}</th>`).join('') + '<th class="rs">Final score</th><th class="rc">Cost</th></tr></thead>';
   const refRow = split ? ms.map(m => wl.map(w => wref(m, w)).join('')).join('')
