@@ -458,7 +458,7 @@ function squarify(vals, x, y, w, h) {
   }
   return out;
 }
-const CHIP_SHORT = {'Programming Languages':'Languages', 'Machine Learning':'ML', 'Bioinformatics':'Bio', 'Cryptography':'Crypto', 'Architecture':'Arch'};   // map chips only, where the full name does not fit
+const CHIP_SHORT = {'Programming Languages':'Languages', 'Machine Learning':'ML', 'Bioinformatics':'Bio', 'Cryptography':'Crypto', 'Architecture':'Arch', 'Software Engineering':'SE'};   // map chips only, where the full name does not fit
 function drawMap() {
   stopPlay(false);
   const svg = $('#mapsvg'), W = $('#map').clientWidth, narrow = W < 640, H = narrow ? Math.round(W * 1.15) : Math.round(W * 0.36);
