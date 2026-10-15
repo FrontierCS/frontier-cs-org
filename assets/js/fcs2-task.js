@@ -127,15 +127,13 @@ function drawResults() {
   // an exactness check (it must equal the exact answer) has no better direction (Qiuyang, 2026-10-15)
   const dir = m => st[m] ? `<span class="dir">${st[m].exact ? 'Must be exact' : st[m].better === 'lower' ? 'Lower is better' : 'Higher is better'}</span>` : '';
   const mcls = () => 'mc';
-  // a metric's cell: the run's mean, green when it beat the human reference on every hidden workload, red otherwise
-  // (owner, 2026-10-15: values); under a red cell a thin bar gives the share of workloads it won, since a better mean can
-  // still miss one (Qiuyang); a run without a mean shows its count; the count and the reference's mean in that run go to
-  // the tooltip
+  // a metric's cell is the run's mean, green when the run beat the human reference on every hidden workload, red otherwise
+  // (owner, 2026-10-15: values, not counts or bars); the count and the reference's mean in that run go to the tooltip;
+  // without a mean, a tick or a cross
   const cell = (r, m, i) => { const v = (by[r[0]] || {})[m], [mean, rref] = (st[m] && st[m].by[r[0]]) || [];
     if (!v) return `<td class="${mcls(i)} e">—</td>`;
     const tip = `Beat the human reference on ${v[0]} of ${v[1]} hidden workloads` + (rref != null ? `; human reference in this run: ${num(rref)}` : '');
-    const all = v[0] === v[1], bar = all ? '' : `<span class="mbar"><i style="width:${(100 * v[0] / v[1]).toFixed(0)}%"></i></span>`;
-    return `<td class="${mcls(i)} ${all ? 'cy' : 'cn'}" title="${tip}">` + (mean != null ? `<b>${num(mean)}</b>${bar}` : `<b>${v[0]}/${v[1]}</b>`) + '</td>'; };
+    return `<td class="${mcls(i)} ${v[0] === v[1] ? 'cy' : 'cn'}" title="${tip}">` + (mean != null ? `<b>${num(mean)}</b>` : (v[0] === v[1] ? TICK : CROSS)) + '</td>'; };
   // the metrics first, then the final score and the cost (owner, 2026-10-15)
   $('#rtbl').innerHTML = '<thead><tr><th>Model</th>'
     + ms.map((m, i) => `<th class="${mcls(i)}" title="${esc(m)}">${esc(metricHead(m, st[m]))}${dir(m)}</th>`).join('') + '<th class="rs">Final score</th><th class="rc">Cost</th></tr></thead><tbody>'
