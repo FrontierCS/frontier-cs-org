@@ -426,14 +426,15 @@ a.pbtn:hover{border-color:var(--teal); color:var(--teal-d)}
 .rtab th.rc, .rtab td.rc{text-align:right}
 .rtab td:first-child{white-space:nowrap} .rtab td:first-child .ri{margin-right:8px}
 .rtab th.mc{white-space:normal; min-width:5.5em; max-width:9em; text-align:center; line-height:1.3}
-.rtab th .dir{display:block; margin-top:2px; font-size:12px; font-weight:400; color:var(--muted)}   /* which way the metric is better */
+.rtab th .dir{display:inline-block; margin-left:3px; vertical-align:-2px; color:var(--muted)}   /* which way the metric is better: a drawn arrow */
+.rtab th .dir svg{width:13px; height:13px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round}
 .rtab td.mc{text-align:center; white-space:nowrap; line-height:1.25}
 .rtab td.mc b{font-weight:500}
-.rtab td.cy b, .rtab td.cy .ri{color:#137333}   /* every hidden workload beaten */
-.rtab td.cp b, .rtab td.cp .ri{color:#ee675c}   /* some beaten: GM2 red 400 */
-.rtab td.cn b, .rtab td.cn .ri{color:#a50e0e}   /* none beaten: GM2 red 900 */
+.rtab td.cy .ri{color:#137333} .rtab td.cn .ri{color:#c5221f}   /* a tick or a cross where the run has no mean */
+.rtab td.mc .mbar{display:block; width:44px; height:3px; margin:4px auto 0; border-radius:2px; background:var(--grid, #e8eaed)}   /* share of hidden workloads beaten */
+.rtab td.mc .mbar i{display:block; height:3px; border-radius:2px} .rtab td.mc .mbar i.y{background:#1e8e3e} .rtab td.mc .mbar i.n{background:#d93025}
 .rtab td.mc .ri{margin:0}   /* a tick or a cross where the run has no mean */
-.rtab .rref td.mc b{font-weight:400; color:var(--ink-2)}
+.rtab .rref td.mc b{font-weight:700; color:inherit}   /* the human reference: the bar every run is held to (Qiuyang) */
 .rtab .ri{display:inline-block; max-width:none}   /* the site's percentage max-width would shrink an icon in a narrow cell */
 @media (max-width:640px){
   .rtab.wm td:first-child, .rtab.wm th:first-child{position:sticky; left:0; z-index:1; background:var(--bg); padding-right:10px}   /* the model stays in view while the metrics scroll */
