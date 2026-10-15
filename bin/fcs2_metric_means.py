@@ -45,6 +45,9 @@ EXACT = {('ParButterfly', 'butterfly_count'), ('SCOPE', 'exact_counts')}
 # a direction the export lacks (its direction file predates this task version), as every workload decision follows it
 BETTER = {('Adaptive attacks', 'attack_bytes'): 'lower', ('Adaptive attacks', 'attack_success_rate'): 'higher',
           ('Adaptive attacks', 'successful_normalized_diversity'): 'higher'}
+# penalty terms the evidence keeps as negative rewards (higher is better): the page shows their size as a cost, lower is
+# better (Qiuyang, 2026-10-15: "-0.00497, higher is better" reads backwards)
+NEGATE = {('MuJoCo Playground', 'action_rate'), ('MuJoCo Playground', 'energy')}
 UNIT_NAME = {'milliseconds': 'ms', 'microseconds': 'µs', 'seconds': 's'}   # the export's unit, for keys without a unit suffix
 # metrics whose runs keep a mean over only some workloads: a profiled reference counts only with the same "scope"
 # (Polar Express keeps these two over the original six of its twelve cases; Qiuyang, 2026-10-15)
@@ -82,6 +85,9 @@ for t, metrics in out.items():
         s['by'] = dict(sorted(s['by'].items()))
         if (t, metric) in EXACT: s['exact'] = True
         if (t, metric) in BETTER: s['better'] = BETTER[t, metric]
+        if (t, metric) in NEGATE and s['better'] == 'higher':
+            neg = lambda v: None if v is None else -v
+            s['ref'], s['by'], s['better'] = neg(s['ref']), {k: [neg(a), neg(b)] for k, (a, b) in s['by'].items()}, 'lower'
 live_ver = {}   # per task, the task versions of the runs counted
 for r in rows:
     if not dbp or r['run_id'] in live: live_ver.setdefault(r['task'], set()).add(r.get('task_version_id'))
