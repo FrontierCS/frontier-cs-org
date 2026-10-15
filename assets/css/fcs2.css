@@ -428,7 +428,8 @@ a.pbtn:hover{border-color:var(--teal); color:var(--teal-d)}
 .rtab th.rc, .rtab td.rc{text-align:right}
 .rtab td:first-child{white-space:nowrap} .rtab td:first-child .ri{margin-right:8px}
 .rtab th.mc{white-space:normal; min-width:5.5em; max-width:9em; text-align:center; line-height:1.3}
-.rtab th .dir{display:block; margin-top:2px; font-size:12px; font-weight:400; color:var(--muted)}   /* which way the metric is better */
+.rtab th .dir{display:inline-block; margin-left:3px; vertical-align:-2px; color:var(--muted)}   /* which way the metric is better: a drawn arrow */
+.rtab th .dir svg{width:13px; height:13px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round}
 .rtab td.mc{text-align:center; white-space:nowrap; line-height:1.25}
 .rtab td.mc b{font-weight:500}
 .rtab td.cy .ri{color:#137333} .rtab td.cn .ri{color:#c5221f}   /* a tick or a cross where the run has no mean */

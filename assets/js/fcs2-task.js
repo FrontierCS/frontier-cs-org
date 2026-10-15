@@ -125,7 +125,11 @@ function drawResults() {
     return `<span class="rb"><i style="width:${w}%;${style}"></i><span class="rn" style="left:${w}%">${f1(v)}</span></span>`; };
   const short = Object.fromEntries(RANKED.map(m => [m.id, m.short]));
   // an exactness check (it must equal the exact answer) has no better direction (Qiuyang, 2026-10-15)
-  const dir = m => st[m] ? `<span class="dir">${st[m].exact ? 'Must be exact' : st[m].better === 'lower' ? 'Lower is better' : 'Higher is better'}</span>` : '';
+  // which way the metric is better, as a drawn arrow after its name (Qiuyang, 2026-10-15); an exactness check shows "="
+  const DIRP = {up:'M8 13V3.5M4.2 7.3 8 3.5l3.8 3.8', down:'M8 3v9.5M4.2 8.7 8 12.5l3.8-3.8', exact:'M3.5 6h9M3.5 10h9'};
+  const dir = m => { if (!st[m]) return '';
+    const [d, w] = st[m].exact ? ['exact', 'Must be exact'] : st[m].better === 'lower' ? ['down', 'Lower is better'] : ['up', 'Higher is better'];
+    return `<span class="dir" title="${w}"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="${DIRP[d]}"/></svg><span class="vh">${w}</span></span>`; };
   const mcls = () => 'mc';
   // a metric's cell is the run's mean in black, with a bar under it for the share of hidden workloads on which it beat
   // the human reference, green when every one, red otherwise (Qiuyang, 2026-10-15, after the owner's values-first table);
