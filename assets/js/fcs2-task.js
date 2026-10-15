@@ -157,7 +157,8 @@ function drawResults() {
   // the human reference, green when every one, red otherwise (Qiuyang, 2026-10-15, after the owner's values-first table);
   // the count and the reference's mean in that run go to the tooltip; without a mean, the count itself over the bar (Qiuyang)
   // a time or size column takes the unit that puts its median in range (s, ms, µs, ns; GiB, MiB, KiB, bytes), so
-  // 3.73×10⁻⁸ s reads 37.3 ns; any other column whose numbers lie below 0.01 or from a million up, all within a factor of 1,000,
+  // 3.73×10⁻⁸ s reads 37.3 ns; any other column whose numbers would show ×10 to a power, all within a factor of 1,000, or lie between 0.001
+  // and 0.1 with some below 0.01,
   // takes that power into its header, "Count (×10⁹)" over 2.73 (Qiuyang, 2026-10-15)
   const FAM = [{s:1, ms:1e-3, 'µs':1e-6, ns:1e-9}, {GiB:2 ** 30, MiB:2 ** 20, KiB:1024, bytes:1, bits:1 / 8}];
   const colFmt = (m, s) => { if (!s || split) return {k:1, e:0};
@@ -169,7 +170,7 @@ function drawResults() {
       const us = Object.keys(fam).filter(u => u !== 'bits'), u = us.find(u => med >= fam[u]) || us[us.length - 1];
       return {k:fam[u0] / fam[u], e:0, u}; }
     const ex = vals.map(v => Math.floor(Math.log10(+v.toPrecision(3)))), lo = Math.min(...ex), hi = Math.max(...ex);
-    const e = (lo <= -3 || hi >= 6) && hi - lo <= 2 ? lo : 0; return {k:Math.pow(10, -e), e}; };   // from 0.00999 down, or a million up
+    const e = (lo < -3 || hi >= 6) && hi - lo <= 2 || lo === -3 && hi <= -2 ? lo : 0; return {k:Math.pow(10, -e), e}; };   // 0.001 to 0.01 only when all lie below 0.1
   const sc = (v, m) => v * F[m].k;   // F, each column's scale, follows split below
   const cell = (r, m, i) => { const v = (by[r[0]] || {})[m], [mean, rref] = (st[m] && st[m].by[r[0]]) || [];
     if (!v) return `<td class="${mcls(i)} e">—</td>`;
