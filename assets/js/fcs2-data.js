@@ -118,7 +118,7 @@ const MODELS = [
   {id:'wonder', name:'Muse Wonder 1.0', short:'Muse Wonder 1.0', h:'Muse Code', lab:'Meta'},
   {id:'qwen', name:'Qwen 3.8 Max', short:'Qwen 3.8 Max', h:'Qwen Code', lab:'Qwen'},
   {id:'glmf', name:'GLM 5.3 Flash', short:'GLM 5.3 Flash', h:'ZCode', lab:'Z.ai'},
-  {id:'gemini', name:'Gemini 4', short:'Gemini 4', h:'Pi', lab:'Google'},
+  {id:'gemini', name:'Gemini 4 Argon', short:'Gemini 4 Argon', h:'Pi', lab:'Google'},
 ];
 const UPDATED = 'October 15, 2026';
 // Pass rate per model: [percent, runs that pass, runs].
