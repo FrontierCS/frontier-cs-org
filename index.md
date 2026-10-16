@@ -71,10 +71,10 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
           </div>
           <div>
             <p class="how-step"><span>2</span>Beating a metric</p>
-            <div class="how-eq">\[ P(\text{run } r \text{ beats metric } g) = \frac{1}{1 + e^{-(\theta_m + u_r - \beta_g)}} \]</div>
             <p>\(\theta_m\) is the strength of model \(m\), \(\beta_g\) the difficulty of metric \(g\), and \(u_r\) how well this one run went; it is shared by all of the run’s metrics, which come from the same submission. When strength equals difficulty, the chance is one half, and every unit of strength above it multiplies the odds by \(e\). Metrics that every run beats or misses together count once. A run passes when it beats every metric, and a task’s <b>FDI</b>, the FrontierCS Difficulty Index, is the strength at which a model passes it half the time.</p>
           </div>
         </div>
+        <div class="how-eq">\[ P(\text{run } r \text{ beats metric } g) = \frac{1}{1 + e^{-(\theta_m + u_r - \beta_g)}} \]</div>
         <figure class="chart how-fig">
           <div class="chead"><span>Chance of passing on three tasks</span></div>
           <div class="plot" id="howaplot"><svg id="howasvg" role="img" aria-label="Chance of passing against FCI on three tasks"></svg><div class="tip" id="howatip" hidden></div></div>
