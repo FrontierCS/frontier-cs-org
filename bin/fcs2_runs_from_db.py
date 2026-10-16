@@ -29,7 +29,7 @@ final score counts by how far above the human reference r_t it is when the run p
 the median reference_score over the task's runs; 0 or less: REF_DEFAULT's value, else the task has none), in units of
 the task's score spread, at least the median spread over tasks: y = (score - r_t) / unit_t, unit_t = max(sd_t, c), sd_t
 the sd of the task's final scores strictly between 0 and 100 (all of them when fewer than 3), c the median sd_t over the
-tasks with a reference. A run that does not pass contributes its metric groups and its margin censored at 0 from above: how far below r_t, or at least level. A run the model's provider refused (feedback_json.refusal: no final submission came) is left out of every fit, FCI, FDI and test-time scaling alike; the page still lists it (Qiuyang, 2026-10-16). The final score comes from the same
+tasks with a reference. A run that does not pass contributes its metric groups and its margin censored at 0 from above: how far below r_t, or at least level. Tasks in OFF_FIT_DOMAINS (Security, until its tasks are fixed) are left out of every fit too. A run the model's provider refused (feedback_json.refusal: no final submission came) is left out of every fit, FCI, FDI and test-time scaling alike; the page still lists it (Qiuyang, 2026-10-16). The final score comes from the same
 measurements as the metrics, so a run's metric groups and its margin share one run effect u ~ N(0, SIGMA_U^2). With
 theta_m the model's strength in logits (prior N(0, 1/LAM), LAM = 0.35 as in the site's in-browser TDIFF), a run's
 likelihood is the integral over u, by Gauss-Hermite quadrature (64 nodes; 24 stall Newton near SIGMA_U = 3.7), of prod_j
@@ -101,6 +101,7 @@ TIE_EPS = 0                    # a final score within TIE_EPS of the human refer
 # the human reference (by short name) where the database has none: Structured LWE by Qiuyang's decision (2026-10-14);
 # ParButterfly and RegionsSort as measured in runs of the human reference alone on the runs' task version
 # (run_01M4RVT5V4D3SR83YXW0B4EYP6, run_01M4HGFJEHVPJN04RVH9WEPYV1; Qiuyang, 2026-10-15)
+OFF_FIT_DOMAINS = {'Security'}   # Qiuyang, 2026-10-16: off FCI, FDI and test-time scaling until their tasks are fixed; the pages still list their runs
 REF_DEFAULT = {'Structured LWE': 100, 'ParButterfly': 30.51, 'RegionsSort': 50.26}
 
 # database display name -> (domain folder, paper short name or None)
@@ -592,7 +593,7 @@ def scaling(db, tasks, hyp, theta0):
     model with every task's parameters held at the leaderboard fit: at budget B a run that has ended contributes its
     metric groups and, if it passed, its margin; a run still going contributes no group beaten and no margin."""
     info = {r: (c, t) for r, c, t, s, fj in db.execute('''select r.id, cd.name, t.name, r.display_score, r.feedback_json from cells ce
-        join runs r on r.id = ce.run_id join candidates cd on cd.id = ce.candidate_id join tasks t on t.id = ce.task_id''') if s is not None and c not in HIDDEN and not refused(fj)}
+        join runs r on r.id = ce.run_id join candidates cd on cd.id = ce.candidate_id join tasks t on t.id = ce.task_id''') if s is not None and c not in HIDDEN and not refused(fj) and TASK[t][0] not in OFF_FIT_DOMAINS}
     pts = {(r, sid): (tt, ot) for r, sid, tt, ot in db.execute('select run_id, submission_id, total_tokens, output_tokens from score_points')}
     end = {}   # a run's spend at its end: usd() at its last submission with a score point, 0 if none
     for r, sid in db.execute('select run_id, id from submissions order by run_id, ordinal'):
@@ -736,7 +737,7 @@ fit_rows = db.execute('''select c.name, t.name, r.display_score, r.display_verdi
   join runs r on r.id = ce.run_id join candidates c on c.id = ce.candidate_id join tasks t on t.id = ce.task_id''').fetchall()
 # a run the model's provider refused (no final submission) says nothing about the model's ability on the task: it is left
 # out of FCI and FDI, though the page still lists it (Qiuyang, 2026-10-16)
-fit_rows = [x for x in fit_rows if not refused(x[4])]
+fit_rows = [x for x in fit_rows if not refused(x[4]) and TASK[x[1]][0] not in OFF_FIT_DOMAINS]
 obs, task_ref = fit_data(fit_rows)
 E, THETA, theta0, MT, dfit, dll, dstarts, UNIT0, nskip = joint_fit(obs, task_ref, passby())
 TFIT, DIFF, METRIC, MGROUPS, DIFF_FIT = task_fits(MT, dfit, theta0, UNIT0)
@@ -749,8 +750,8 @@ REF = task_reference(db)
 CHECKS = task_checks(db)
 eci_js = {MODEL[c][0]: list(E[c]) for c in MODEL if c not in HIDDEN}
 zero = MODEL[PASS_ZERO][1]
-# no task or model may drop out of the fits in an update, Security tasks included (Qiuyang, 2026-10-14)
-lost = {k: sorted({r[2] for r in runs} - set(v)) for k, v in (('DIFF', DIFF), ('GROUPS', GROUPS))}
+# no task or model may drop out of the fits in an update, but for the domains held off them (OFF_FIT_DOMAINS)
+lost = {k: sorted({r[2] for r in runs if r[1] not in OFF_FIT_DOMAINS} - set(v)) for k, v in (('DIFF', DIFF), ('GROUPS', GROUPS))}
 assert not any(lost.values()), f'tasks in RUNS without a difficulty: {lost}'
 half = {t: float(fdi(np.array([b]) / PASS_UNIT, DIFF_FIT['sigma_u'] / PASS_UNIT)[0]) * PASS_UNIT for t, b in GROUPS.items()}
 gap = max(abs(half[t] - DIFF[t][0]) for t in GROUPS)
