@@ -104,7 +104,7 @@ const LOGO = {OpenAI:'openai', Anthropic:'anthropic', Google:'google', Meta:'met
 const LOGO_DIR = (document.querySelector('script[src*="fcs2.js"]') || {src:''}).src.replace(/js\/fcs2\.js.*$/, 'img/models/');
 const lightCol = id => { const h = getComputedStyle(document.documentElement).getPropertyValue(`--m-${id}`).trim().replace('#', '');
   if (h.length !== 6) return false; const [r, g, b] = [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16) / 255);
-  return .2126 * r + .7152 * g + .0722 * b > .6; };   // white as Artificial Analysis has it, dark ink only on a colour lighter than .6 (none since the model colours of 2026-10-16)
+  return .2126 * r + .7152 * g + .0722 * b > .6; };   // white as Artificial Analysis has it, dark ink only on the lightest (Sol's grey, GLM Flash's pink)
 function drawPassBars() {
   const val = passPct, order = [...MODELS].sort((a, b) => val(b) - val(a));
   const svg = $('#fcibsvg'), W = Math.max(300, $('#fcibplot').clientWidth), an = animates(svg);
