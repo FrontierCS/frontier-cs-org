@@ -202,11 +202,17 @@ function drawECI() {
    into view a moving focus plays (Melissa's and Qiuyang's idea, 2026-10-14): a budget cursor sweeps right, slow where
    curves start or rise and quick across empty stretches; the view follows it, zoomed in on cheap budgets first and
    widening to the whole range; curves rising at the cursor are drawn in full and named at their tip while the others
-   step back. At rest nothing is named in the plot: the legend names the curves. */
+   step back. At rest nothing is named in the plot: the legend names the curves.
+   At rest only the Pareto frontier of the shown curves is drawn in full (Qiuyang, 2026-10-16): at each budget, the best
+   FCI any shown model reaches at that budget or less. A curve holds its last value past its end, so the frontier stays at
+   a model's final FCI until another model passes it; the rest of every curve is faint (TTS_FADE), in full again while the
+   pointer is on it or its legend entry. */
 let ttsHover = null, ttsRun = 0;
+const TTS_FADE = .25;
 const TTSM = RANKED.filter(m => SCALE[m.id]);   // a model with no reported spend has no curve
 const ttsOn = new Set(TTSM.filter((m, i, a) => a.findIndex(o => o.lab === m.lab) === i).map(m => m.id));
-const ttsBands = () => document.querySelectorAll('#ttssvg .tband').forEach(b => b.setAttribute('opacity', b.dataset.m === ttsHover ? .12 : 0));
+const ttsBands = () => { document.querySelectorAll('#ttssvg .tband').forEach(b => b.setAttribute('opacity', b.dataset.m === ttsHover ? .12 : 0));
+  document.querySelectorAll('#ttssvg .tfade').forEach(e => e.setAttribute('opacity', e.dataset.m === ttsHover ? 1 : e.dataset.op)); };
 const ttsCurve = id => SCALE[id].filter(p => p[1] >= 0);   // [US$, FCI, 90% low, 90% high, share still going], from FCI 0 up
 // a curve up to log budget lx, ending on the point interpolated there
 function ttsUpTo(c, lx) {
@@ -218,6 +224,22 @@ function ttsUpTo(c, lx) {
     break;
   }
   return out;
+}
+/* The frontier of curves cs over log budgets x0 to x1: runs of [model index, [[US$, FCI], ...]], each run starting where
+   the one before ends, so the drawn frontier has no breaks; it runs on across the axis gap (Qiuyang: DeepSeek V4.1 Flash's
+   stretch is one line). A sample every 0.002 decade, under a pixel. */
+function ttsFrontier(cs, x0, x1) {
+  const val = (c, lx) => { if (lx < Math.log10(c[0][0])) return null; const v = ttsUpTo(c, lx); return v[v.length - 1][1]; };
+  const runs = []; let rec = -Infinity, who = -1, cur = null;
+  for (let k = 0, n = Math.ceil((x1 - x0) / .002); k <= n; k++) {
+    const lx = x0 + (x1 - x0) * k / n;
+    cs.forEach((c, i) => { const y = val(c, lx); if (y != null && y > rec) { rec = y; who = i; } });
+    if (who < 0) continue;
+    const p = [10 ** lx, rec];
+    if (!cur || cur[0] !== who) { const last = cur && cur[1][cur[1].length - 1]; cur = [who, last ? [last] : []]; runs.push(cur); }
+    cur[1].push(p);
+  }
+  return runs;
 }
 // the focus's pacing was tuned on the old Human = 25 scale, about 7 of its points to a logit of the pass-based one
 const TTS_PT = 7 / ECI_UNIT;
@@ -280,25 +302,32 @@ function drawTTS(t) {
   if (gapPx) [gapPx[0], vx1 >= brk[1] ? gapPx[1] : null].forEach(x => x != null &&
     svg.append(sv('line', {x1:x - 3, y1:H - B + 6, x2:x + 3, y2:H - B - 6, stroke:'var(--ink-2)', 'stroke-width':1.5})));
   svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'Cost budget per run in US$, log scale'));
-  const g = sv('g', {'clip-path':'url(#ttsclip)'}), gb = sv('g'), gl = sv('g'); g.append(gb, gl); svg.append(g);   // bands under every line
+  const g = sv('g', {'clip-path':'url(#ttsclip)'}), gb = sv('g'), gl = sv('g'), gd = sv('g'); g.append(gb, gl, gd); svg.append(g);   // bands under every line, end dots over
   // rising at the cursor: started within the last 0.35 decade, or 2 old points (2 / TTS_PT FCI) gained over it; nothing steps back while nothing rises
   const rising = c => { const s0 = Math.log10(c[0][0]); if (s0 > sweep) return false; const e = ttsUpTo(c, sweep), b = ttsUpTo(c, sweep - .35);
     return s0 > sweep - .35 || e[e.length - 1][1] - b[b.length - 1][1] >= 2 / TTS_PT; };
   const anyRising = play && cs.some(rising), pts = [], tips = [];
+  // at rest, the Pareto frontier; a curve whose end lies on it keeps its end dot in full
+  const front = play ? [] : ttsFrontier(cs, x0, x1), fpts = front.flatMap(([k, ps]) => ps.map(p => [p[0], k]));
+  const onFront = k => { const e = cs[k][cs[k].length - 1][0], at = fpts.filter(p => p[0] <= e * 1.0001).pop(); return !!at && at[1] === k; };
   ms.forEach((m, k) => {
     const c = cs[k], vis = play ? ttsUpTo(c, sweep) : c;
     if (!vis.length) return;
-    const lit = !anyRising || rising(c), op = lit ? null : .28;
+    const lit = !anyRising || rising(c), op = play ? (lit ? null : .28) : TTS_FADE;   // at rest the frontier, drawn below, is the full line
     const path = vis.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join('');
     if (!play) gb.append(sv('path', {class:'tband', 'data-m':m.id, opacity:0, fill:MCOL[m.id],
       d:c.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[3]).toFixed(1)}`).join('') + [...c].reverse().map(p => `L${X(p[0]).toFixed(1)},${Y(p[2]).toFixed(1)}`).join('') + 'Z'}));
     const e = vis[vis.length - 1];
-    gl.append(sv('path', {d:path, fill:'none', stroke:MCOL[m.id], 'stroke-width':2.2, 'stroke-linejoin':'round', opacity:op}),
-      sv('circle', {cx:X(e[0]), cy:Y(e[1]), r:4.5, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':1.5, opacity:op}));
+    const fade = play ? {} : {class:'tfade', 'data-m':m.id, 'data-op':op};
+    gl.append(sv('path', {d:path, fill:'none', stroke:MCOL[m.id], 'stroke-width':2.2, 'stroke-linejoin':'round', opacity:op, ...fade}));
+    gd.append(sv('circle', {cx:X(e[0]), cy:Y(e[1]), r:4.5, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':1.5, ...(!play && onFront(k) ? {} : {opacity:op, ...fade})}));
     if (play && anyRising && lit) tips.push({m, e});
     if (!play) c.forEach(p => pts.push({x:X(p[0]), y:Y(p[1]), m:m.id, html:`<b>${esc(m.name)}</b><br>FCI <b>${fe(p[1])}</b> at ${usdfmt(p[0])} per run`
       + `<br>90% interval ${fe(Math.max(p[2], 0))}–${fe(p[3])}<br>${Math.round(p[4] * 100)}% of runs still going`}));
   });
+  // at rest, the Pareto frontier in full over the faint curves, each stretch in the colour of the model that holds it
+  front.forEach(([k, ps]) => gl.append(sv('path', {d:ps.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join(''),
+    fill:'none', stroke:MCOL[ms[k].id], 'stroke-width':2.6, 'stroke-linejoin':'round', 'stroke-linecap':'round'})));
   // while the focus moves, the rising curves are named at their tips, off every line where there is room
   if (tips.length) {
     const fr = {l:L, r:W, t:T, b:H - B}, boxes = tips.map(({e}) => ({x:X(e[0]) - 7, y:Y(e[1]) - 7, w:14, h:14})), near = [];
