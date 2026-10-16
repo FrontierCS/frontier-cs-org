@@ -41,22 +41,17 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
     <div class="plot" id="fcibplot"><svg id="fcibsvg" role="img" aria-label="Pass rate (beat reference) by model"></svg><div class="tip" id="fcibtip" hidden></div></div>
     <div class="cfoot">{% include chart_logo.html %}</div>   <!-- the bars keep their FrontierCS row (owner, 2026-10-16, on #89) -->
   </figure>
-  <figure class="chart" style="margin:56px 0 0">   <!-- the gap of the blocks around it, so it does not run into the bars' footer (owner, 2026-10-16) -->
-    <div class="chead"><span>Pass rate (beat reference)</span></div>
-    <div class="plot" id="pcplot"><svg id="pcsvg" role="img" aria-label="Pass rate (beat reference) against cost per run"></svg><div class="tip" id="pctip" hidden></div></div>
+  <figure class="chart" style="margin:56px 0 0" id="domains">   <!-- the gap of the blocks around it, so it does not run into the bars' footer (owner, 2026-10-16) -->
+    <!-- two views of the pass rate, chips as the mean score's Group by (Qiuyang, 2026-10-16): against cost, or by domain -->
+    <div class="chead"><span>Pass rate (beat reference)</span><div class="chips" id="pview"><button class="chip" type="button" data-v="cost" aria-pressed="true">Against cost</button><button class="chip" type="button" data-v="domain" aria-pressed="false">By domain</button></div></div>
+    <div id="pv-cost"><div class="plot" id="pcplot"><svg id="pcsvg" role="img" aria-label="Pass rate (beat reference) against cost per run"></svg><div class="tip" id="pctip" hidden></div></div></div>
+    <div id="pv-domain" hidden>
+      <div class="legend" id="domlegend"></div>
+      <div class="plot" id="domplot"><svg id="domsvg" role="img" aria-label="Pass rate (beat reference) by domain, lowest first, one dot per model"></svg><div class="tip" id="domtip" hidden></div></div>
+    </div>
     <div class="cfoot">{% include chart_logo.html %}</div>
   </figure>
   <p class="pcontact">To add your model, email its score on every task to both <a class="mail" href="mailto:qmang@berkeley.edu,wenhao.chai@princeton.edu">qmang@berkeley.edu</a> and <a class="mail" href="mailto:qmang@berkeley.edu,wenhao.chai@princeton.edu">wenhao.chai@princeton.edu</a>.</p>
-
-  <details class="tbl-wrap fold" id="domains">
-    <summary><h3>Pass rate by domain</h3></summary>
-    <figure class="chart" style="margin:0">
-      <div class="chead"><span>Pass rate (beat reference) by domain, lowest first</span></div>
-      <div class="legend" id="domlegend"></div>
-      <div class="plot" id="domplot"><svg id="domsvg" role="img" aria-label="Pass rate by domain, one dot per model"></svg><div class="tip" id="domtip" hidden></div></div>
-      <div class="cfoot">{% include chart_logo.html %}</div>
-    </figure>
-  </details>
 
   <div class="tbl-wrap" id="eci">
     <h3>FCI</h3>

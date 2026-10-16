@@ -411,7 +411,8 @@ function drawLB() {
 }
 
 /* ---------- results by domain ---------- */
-/* Pass rate by domain as a dot plot (Qiuyang, 2026-10-16; it was a table of models by domains): one row per domain, the
+/* Pass rate by domain as a dot plot, the pass rate chart's second view (Qiuyang, 2026-10-16; it was a table of models by
+   domains in a fold under the chart): one row per domain, the
    lowest pass rate first (the mean over the models of the share of the domain's tasks each passes; a tie puts the domain
    with more tasks first), headed by its name and task count. One dot per model at the share of the domain's tasks it
    passes, in its colour, a lab's second model hollow; models at the same share sit in a block of at most four columns,
@@ -422,7 +423,7 @@ const DOM_2ND = new Set(RANKED.filter((m, i, a) => a.findIndex(o => o.lab === m.
 let domPin = null;
 const domFocus = id => { const svg = $('#domsvg'); svg.classList.toggle('focus', !!id); svg.querySelectorAll('circle').forEach(c => c.classList.toggle('on', c.dataset.m === id)); };
 function drawDomains() {
-  const svg = $('#domsvg'), W = $('#domplot').clientWidth; if (!W) return;   // inside the closed fold: drawn when it opens
+  const svg = $('#domsvg'), W = $('#domplot').clientWidth; if (!W) return;   // in the hidden view: drawn when it is shown
   const narrow = W < 640, x0 = narrow ? 14 : 244, x1 = W - 14, X = v => x0 + (x1 - x0) * v;
   const R = 5.5, STEP = 12.5, PER = 4, AX = 24;
   const kn = (m, d) => { const rs = RUNS.filter(r => r.m === m && r.d === d); return [rs.filter(r => r.p).length, rs.length]; };
@@ -458,7 +459,11 @@ $('#domlegend').addEventListener('pointerover', e => { const b = e.target.closes
 $('#domlegend').addEventListener('pointerleave', () => { if (!domPin) domFocus(null); });
 $('#domlegend').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return;
   domPin = domPin === b.dataset.m ? null : b.dataset.m; $('#domlegend').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.m === domPin))); domFocus(domPin); });
-$('#domains').addEventListener('toggle', drawDomains);
+// the pass rate chart's two views (Qiuyang, 2026-10-16): against cost, or by domain; #domains opens the second
+const pView = v => { $('#pview').querySelectorAll('.chip').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === v)));
+  $('#pv-cost').hidden = v !== 'cost'; $('#pv-domain').hidden = v !== 'domain'; v === 'cost' ? drawPassCost() : drawDomains(); };
+$('#pview').addEventListener('click', e => { const b = e.target.closest('.chip'); if (b) pView(b.dataset.v); });
+if (location.hash === '#domains') pView('domain');
 
 /* ---------- case studies: a placeholder until the preview runs have their own (owner, 2026-10-09) ---------- */
 const redraws = [];
