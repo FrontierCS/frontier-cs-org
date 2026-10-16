@@ -42,7 +42,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
     <div class="cfoot">{% include chart_logo.html %}</div>   <!-- the bars keep their FrontierCS row (owner, 2026-10-16, on #89) -->
   </figure>
   <!-- the cost scatter and the kebab, one square per metric of every run, share one figure under two tabs (Qiuyang, 2026-10-16) -->
-  <figure class="chart" style="margin:0" id="pcfig">
+  <figure class="chart" style="margin:56px 0 0" id="pcfig">   <!-- the gap of the blocks around it, so it does not run into the bars' footer (owner, 2026-10-16) -->
     <div class="chead"><span id="pctitle">Pass rate (beat reference)</span><div class="chips" id="pcview" role="tablist" aria-label="View"><button class="chip" type="button" role="tab" data-v="scatter" aria-pressed="true">Scatter</button><button class="chip" type="button" role="tab" data-v="kebab" aria-pressed="false">Kebab</button></div></div>
     <div class="plot" id="pcplot"><svg id="pcsvg" role="img" aria-label="Pass rate (beat reference) against cost per run"></svg><div class="tip" id="pctip" hidden></div></div>
     <div id="kebab" hidden>
