@@ -34,9 +34,17 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
 
 <section class="sec" id="leaderboard">
   <h2>Leaderboard</h2>
+  <!-- First in the leaderboard (owner, 2026-10-16): one bar per model, Artificial Analysis style, the pass rate as a whole
+       number in the bar, the exact value in the tooltip; no FCI switch (owner, 2026-10-16) -->
   <figure class="chart" style="margin:0">
-    <div class="chead"><span>Pass rate (over human)</span></div>
-    <div class="plot" id="pcplot"><svg id="pcsvg" role="img" aria-label="Pass rate (over human) against cost per run"></svg><div class="tip" id="pctip" hidden></div></div>
+    <div class="chead"><span>Pass rate (beat reference)</span></div>
+    <div class="plot" id="fcibplot"><svg id="fcibsvg" role="img" aria-label="Pass rate (beat reference) by model"></svg><div class="tip" id="fcibtip" hidden></div></div>
+    <div class="cfoot">{% include chart_logo.html %}</div>
+  </figure>
+  <p class="pcontact">To add your model, email its score on every task to both <a class="mail" href="mailto:qmang@berkeley.edu,wenhao.chai@princeton.edu">qmang@berkeley.edu</a> and <a class="mail" href="mailto:qmang@berkeley.edu,wenhao.chai@princeton.edu">wenhao.chai@princeton.edu</a>.</p>
+  <figure class="chart" style="margin:0">
+    <div class="chead"><span>Pass rate (beat reference)</span></div>
+    <div class="plot" id="pcplot"><svg id="pcsvg" role="img" aria-label="Pass rate (beat reference) against cost per run"></svg><div class="tip" id="pctip" hidden></div></div>
     <div class="cfoot">{% include chart_logo.html %}</div>
   </figure>
 
@@ -53,7 +61,6 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
       <div class="plot" id="eciplot"><svg id="ecisvg" role="img" aria-label="FCI chart"></svg><div class="tip" id="ecitip" hidden></div></div>
       <div class="cfoot">{% include chart_logo.html %}<span id="ecinote">Kimi K2.7 = <span data-fill="zero"></span> · whiskers are 90% intervals</span></div>
     </figure>
-    <p class="pcontact">To add your model, email its score on every task to both <a class="mail" href="mailto:qmang@berkeley.edu,wenhao.chai@princeton.edu">qmang@berkeley.edu</a> and <a class="mail" href="mailto:qmang@berkeley.edu,wenhao.chai@princeton.edu">wenhao.chai@princeton.edu</a>.</p>
     <details class="fold how" id="fci-how">
       <summary><h3>How FCI works</h3></summary>
       <div class="how-body">
@@ -166,7 +173,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
       <details id="q-bar"><summary>What counts as a pass?</summary><div class="ans"><p>A run passes only when its final submission beats the human reference on every metric the task checks and on every hidden workload. A higher total score is not enough: a run that is faster on average but worse on one metric or one workload does not pass. The criteria are set from the reference’s own measurements. For SVG-EAR, its latency must be at most 0.96 of the reference’s, with PSNR, SSIM and LPIPS within fixed bands. Each task’s page lists the metrics its judge checks.</p></div></details>
       <details id="q-score"><summary>How are scores computed?</summary><div class="ans"><p>The leaderboard’s main number is pass rate, the share of runs that pass by the criteria above. Each task’s evaluator also scores the final submission on the hidden suite, from 0 to 100, and a run that times out scores 0. The mean score chart averages each run’s score minus the human reference’s score on the same task, so 0 means level with the human reference. FCI, the FrontierCS Capabilities Index, applies the idea of Epoch AI’s ECI to what decides a pass. One fit, over each run’s beat or miss on every metric the task checks and how far its final score is above or below the human reference’s (a run that does not pass counts only how far it falls short), gives every model an FCI and every task an FDI. Kimi K2.7 is the <span data-fill="zero"></span> point; its runs take part in the fit, but it is not on the leaderboard. The human reference has no FCI, since its code cannot pass against itself. FCI’s whiskers are 90% intervals from a bootstrap that resamples the tasks. Costs are estimates; “How is cost estimated?” below gives the method. The results cover <span data-fill="summary"></span>.</p></div></details>
       <details id="q-scaling"><summary>How is test-time scaling computed?</summary><div class="ans"><p>Each curve is the FCI a model would have if every run were stopped at a cost budget. A run that has ended within the budget counts what it beat; a run still going at the budget counts as beating nothing. Every task’s difficulty stays as in the leaderboard fit, so once the budget covers all of a model’s runs, its curve ends at its leaderboard value. The budget is the estimated cost, as the next answer explains.</p></div></details>
-      <details id="q-cost"><summary>How is cost estimated?</summary><div class="ans"><p>Cost per run comes from three sources. For GPT-6 Astra, GPT-6.1 Sol, Gemini 4, Muse Spark 1.3 and Muse Wonder 1.0 it is the cost their model gateway estimated. For Claude Opus 5.5 it is the cost Claude Code reports for itself; where a run’s saved trace stops before the run ends, its tokens are priced at the rates Claude Code’s complete reports follow and scaled to the whole run. Kimi K3, DeepSeek V4.1 Flash, GLM 5.3, GLM 5.3 Flash and Qwen 3.8 Max report tokens but no cost, so we price every token at the model’s cache-read list price, in US$ per million tokens: Kimi K3 0.30, DeepSeek V4.1 Flash 0.003 (off-peak), GLM 5.3 0.26, GLM 5.3 Flash 0.03 and Qwen 3.8 Max 0.25, found on October 9, 2026, and for GLM 5.3 Flash on October 13. Their output tokens are not counted apart, so their costs are lower bounds. Costs compare orders of magnitude better than small gaps.</p></div></details>
+      <details id="q-cost"><summary>How is cost estimated?</summary><div class="ans"><p>Cost per run comes from three sources. For GPT-6 Astra, GPT-6.1 Sol, Gemini 4 Argon, Muse Spark 1.3 and Muse Wonder 1.0 it is the cost their model gateway estimated. For Claude Opus 5.5 it is the cost Claude Code reports for itself; where a run’s saved trace stops before the run ends, its tokens are priced at the rates Claude Code’s complete reports follow and scaled to the whole run. Kimi K3, DeepSeek V4.1 Flash, GLM 5.3, GLM 5.3 Flash and Qwen 3.8 Max report tokens but no cost, so we price every token at the model’s cache-read list price, in US$ per million tokens: Kimi K3 0.30, DeepSeek V4.1 Flash 0.003 (off-peak), GLM 5.3 0.26, GLM 5.3 Flash 0.03 and Qwen 3.8 Max 0.25, found on October 9, 2026, and for GLM 5.3 Flash on October 13. Their output tokens are not counted apart, so their costs are lower bounds. Costs compare orders of magnitude better than small gaps.</p></div></details>
       <details id="q-run"><summary>Can I run it?</summary><div class="ans"><p>We will release the tasks, evaluators and judge as one evaluation environment.</p></div></details>
     </div>
   </div>

@@ -118,7 +118,7 @@ const MODELS = [
   {id:'wonder', name:'Muse Wonder 1.0', short:'Muse Wonder 1.0', h:'Muse Code', lab:'Meta'},
   {id:'qwen', name:'Qwen 3.8 Max', short:'Qwen 3.8 Max', h:'Qwen Code', lab:'Qwen'},
   {id:'glmf', name:'GLM 5.3 Flash', short:'GLM 5.3 Flash', h:'ZCode', lab:'Z.ai'},
-  {id:'gemini', name:'Gemini 4', short:'Gemini 4', h:'Pi', lab:'Google'},
+  {id:'gemini', name:'Gemini 4 Argon', short:'Gemini 4 Argon', h:'Pi', lab:'Google'},
 ];
 const UPDATED = 'October 15, 2026';
 // Pass rate per model: [percent, runs that pass, runs].
@@ -216,7 +216,9 @@ const isTouch = matchMedia('(hover: none)').matches;
 
 function attachTip(svg, W, H, pts, tip = $('#lbtip')) {
   const near = ev => { const rc = svg.getBoundingClientRect(), px = (ev.clientX - rc.left) * W / rc.width, py = (ev.clientY - rc.top) * H / rc.height;
-    let best = null, bd = 1e9; pts.forEach(p => { const d = Math.hypot(p.x - px, p.y - py) - (p.mean ? 4 : 0); if (d < bd) { bd = d; best = p; } });
+    // a point with a box (a bar's whole column) answers anywhere inside it; others answer within 28 px
+    const inBox = pts.find(p => p.box && px >= p.box[0] && px <= p.box[1] && py >= p.box[2] && py <= p.box[3]); if (inBox) return {p:inBox, rc};
+    let best = null, bd = 1e9; pts.forEach(p => { if (p.box) return; const d = Math.hypot(p.x - px, p.y - py) - (p.mean ? 4 : 0); if (d < bd) { bd = d; best = p; } });
     return bd < 28 ? {p:best, rc} : null; };
   svg.onpointermove = ev => { const n = near(ev); if (!n) { tip.hidden = true; return; }
     tip.innerHTML = n.p.html; tip.hidden = false; tip.style.left = (n.p.x / W * n.rc.width) + 'px'; tip.style.top = (n.p.y / H * n.rc.height) + 'px'; };

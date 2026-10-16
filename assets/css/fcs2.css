@@ -308,7 +308,7 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
   .faq details[open]::details-content{block-size:auto}
 }
 .tbd{color:var(--ink-2); font-size:16px; margin:0}
-.pcontact{color:var(--ink-2); font-size:16px; margin:20px 0 0}
+.pcontact{color:var(--ink-2); font-size:16px; margin:20px 0 40px}   /* under the leaderboard bars, room before the next chart */
 /* the two addresses, marked; either link writes to both (Qiuyang, 2026-10-14) */
 .pcontact .mail{white-space:nowrap; color:#0b57d0; font-weight:600; text-decoration:underline; text-decoration-color:#a8c7fa; text-underline-offset:3px}   /* blue text, no ground (Qiuyang, 2026-10-14) */
 .pcontact .mail:hover{text-decoration-color:currentColor}
@@ -514,6 +514,8 @@ a.pbtn:hover{border-color:var(--teal); color:var(--teal-d)}
 /* scroll-in animation of the mean-score, FCI and test-time scaling charts (fcs2.js: animates, mark); .pre is the state before the chart comes into view */
 .anim .a-bar{transform-box:fill-box; transform-origin:left center; transition:transform .8s cubic-bezier(.2,.7,.2,1) var(--d,0s)}
 .anim.pre .a-bar{transform:scaleX(0)}
+.anim .a-rise{transform-box:fill-box; transform-origin:center bottom; transition:transform .8s cubic-bezier(.2,.7,.2,1) var(--d,0s)}
+.anim.pre .a-rise{transform:scaleY(0)}
 .anim .a-fade{transition:opacity .45s ease var(--d,0s)}
 .anim.pre .a-fade{opacity:0}
 .anim .a-pop{transform-box:fill-box; transform-origin:center; transition:transform .35s cubic-bezier(.3,1.5,.5,1) var(--d,0s), opacity .2s ease var(--d,0s)}

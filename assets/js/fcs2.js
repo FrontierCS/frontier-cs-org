@@ -54,6 +54,7 @@ $('#lblegend').innerHTML = RANKED.map(m => `<span><i style="background:${MCOL[m.
 /* Main chart: pass rate against mean cost per run in US$, one dot per model (PASS, COST); the dots on the Pareto frontier are emphasised. Each label takes the first
    spot right, left, above or below its dot that clears every dot, every placed label and the edges; a dot with no free
    spot keeps no label (the tooltip still names it). No legend: the labels name the dots. */
+const passPct = m => PASS[m.id][0];   // pass rate in %; both leaderboard charts show it alone (owner, 2026-10-16: no FCI switch)
 function drawPassCost() {
   const svg = $('#pcsvg'), W = Math.max(300, $('#pcplot').clientWidth), narrow = W < 560;
   const L = 44, R = narrow ? 12 : 24, T = 14, B = 46, H = CHART_H.pc || (narrow ? 320 : 400);
@@ -62,39 +63,99 @@ function drawPassCost() {
   // the range loose); an edge dot whose label has no room on its outer side takes another spot
   // (on phones the right side keeps more, so the labels of the dots near the right edge fit on their right)
   const x0 = Math.log10(Math.min(...tx)) - .15, x1 = Math.log10(Math.max(...tx)) + (narrow ? .74 : .15);
-  const ymax = Math.min(100, Math.ceil((Math.max(...ms.map(m => PASS[m.id][0])) + 5) / 20) * 20);
+  const val = passPct, ystep = 20, ymax = Math.min(100, Math.ceil((Math.max(...ms.map(val)) + 5) / 20) * 20);
   const X = v => L + (Math.log10(v) - x0) / (x1 - x0) * (W - L - R), Y = v => T + (1 - v / ymax) * (H - T - B);
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
-  for (let v = 0; v <= ymax; v += 20) {
+  for (let v = 0; v <= ymax + ystep / 2; v += ystep) {
     svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1}));
     svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, v + '%'));
   }
   // ticks at 1, 2 and 5 times each power of ten; a range under one decade still gets several
   for (let k = Math.floor(x0); k <= Math.ceil(x1); k++) [1, 2, 5].forEach(f => { const v = f * 10 ** k, lv = Math.log10(v);
-    if (lv < x0 - 1e-9 || lv > x1 + 1e-9 || (narrow && f === 2 && x1 - x0 > 1.5)) return;
+    if (lv < x0 - 1e-9 || lv > x1 + 1e-9 || (narrow && f !== 1 && x1 - x0 > 2.5) || (narrow && f === 2 && x1 - x0 > 1.5)) return;   // phones: over 2.5 decades, powers of ten only, so labels do not crowd
     svg.append(sv('line', {x1:X(v), x2:X(v), y1:T, y2:H - B, stroke:'var(--grid)', 'stroke-width':1}));
     svg.append(sv('text', {x:X(v), y:H - B + 20, 'text-anchor':'middle'}, usdfmt(v))); });
   svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'Cost per run in US$, mean, log scale'));
-  const pts = [], order = [...ms].sort((a, b) => PASS[b.id][0] - PASS[a.id][0]);
-  const at = m => [X(COST[m.id][0]), Y(PASS[m.id][0])];
+  const pts = [], order = [...ms].sort((a, b) => val(b) - val(a));
+  const at = m => [X(COST[m.id][0]), Y(Math.max(0, val(m)))];
   const boxes = order.map(m => { const [cx, cy] = at(m); return {x:cx - 9, y:cy - 9, w:18, h:18}; });
   // the Pareto frontier: the models no cheaper model matches or beats on pass rate
-  const front = [...ms].sort((p, q) => COST[p.id][0] - COST[q.id][0] || PASS[q.id][0] - PASS[p.id][0]).filter((m, i, a) => a.slice(0, i).every(o => PASS[o.id][0] < PASS[m.id][0]));
+  const front = [...ms].sort((p, q) => COST[p.id][0] - COST[q.id][0] || val(q) - val(p)).filter((m, i, a) => a.slice(0, i).every(o => val(o) < val(m)));
   order.forEach(m => {
     const [cx, cy] = at(m), name = narrow ? m.short : m.name;
-    // the frontier reads from the dots themselves, with no line: a model on it has a larger dot and a bold name, a model
-    // under it a smaller dot and a regular name, both at full colour (owner, 2026-10-13: keep the chart clean)
+    // the frontier reads from the names, with no line: a model on it has a bold name, a model under it a regular name;
+    // every dot is the same size, at full colour (owner, 2026-10-13: keep the chart clean; 2026-10-16: one dot size)
     const lead = front.includes(m);
-    svg.append(sv('circle', {cx, cy, r:lead ? 7.5 : 5, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':2, 'data-m':m.id}));
+    svg.append(sv('circle', {cx, cy, r:6.5, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':2, 'data-m':m.id}));   // one dot size for every model (owner, 2026-10-16); the frontier keeps its bold names
     labelDot(svg, boxes, cx, cy, name, {l:L, r:W, t:T, b:H - B}, MTXT(m.id), lead);   // fcs2-data.js
-    const pct = PASS[m.id][0];
-    pts.push({x:cx, y:cy, mean:true, html:`<b>${esc(m.name)}</b><br>Pass rate <b>${f1(pct)}%</b><br>${usdfmt(COST[m.id][0])} per run, mean`});
+    pts.push({x:cx, y:cy, mean:true, html:`<b>${esc(m.name)}</b><br>Pass rate <b>${f1(val(m))}%</b><br>${usdfmt(COST[m.id][0])} per run, mean`});
   });
   attachTip(svg, W, H, pts, $('#pctip'));
 }
 
 /* On phones the model column is as wide as the longest model name, so every name shows in full (owner: "DeepSeek V4.1 Flash", not cut). */
 const nameCol = svg => { svg.replaceChildren(); const w = Math.max(...MODELS.map(m => { const t = sv('text', {class:'lab', x:-999, y:-999}, m.short); svg.append(t); return t.getComputedTextLength(); })); svg.replaceChildren(); return Math.max(112, Math.ceil(w) + 12); };
+
+/* Pass rate as bars, first in the leaderboard (owner, 2026-10-16, after Artificial Analysis's index charts): one column per
+   model, highest first, in the model's colour with rounded top corners; the pass rate as a whole number in the middle of
+   the bar, the exact value in the tooltip; under each bar the lab's logo on a light tile, the name and the harness.
+   Dashed grid lines, no axis numbers: the bars carry them. */
+const LOGO = {OpenAI:'openai', Anthropic:'anthropic', Google:'google', Meta:'meta', Kimi:'kimi', DeepSeek:'deepseek', 'Z.ai':'zai', Qwen:'qwen'};
+const LOGO_DIR = (document.querySelector('script[src*="fcs2.js"]') || {src:''}).src.replace(/js\/fcs2\.js.*$/, 'img/models/');
+const lightCol = id => { const h = getComputedStyle(document.documentElement).getPropertyValue(`--m-${id}`).trim().replace('#', '');
+  if (h.length !== 6) return false; const [r, g, b] = [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16) / 255);
+  return .2126 * r + .7152 * g + .0722 * b > .6; };   // white as Artificial Analysis has it, dark ink only on the lightest (Sol's grey, GLM Flash's pink)
+function drawPassBars() {
+  const val = passPct, order = [...MODELS].sort((a, b) => val(b) - val(a));
+  const svg = $('#fcibsvg'), W = Math.max(300, $('#fcibplot').clientWidth), an = animates(svg);
+  svg.setAttribute('viewBox', `0 0 ${W} 10`); svg.replaceChildren();
+  const measure = (txt, size, cls = 'lab') => { const t = sv('text', {class:cls, x:-999, y:-999, 'font-size':size}, txt); svg.append(t); const w = t.getComputedTextLength(); t.remove(); return w; };
+  // second style (owner, 2026-10-16): the value large in the middle of its bar, the logo on a light tile, and under it the
+  // name and, in grey, the harness, both upright and wrapped to the column; where the columns are too narrow for upright
+  // names (phones), the name alone, slanted
+  const R = 4, T = 10, band0 = (W - 8) / order.length, flat = band0 >= 72, fs = flat ? 14 : 11, ang = 55, cos = Math.cos(ang * Math.PI / 180);
+  const wrap = (txt, size, maxw) => txt.split(' ').reduce((ls, w) => { const l = ls[ls.length - 1]; if (l && measure(l + ' ' + w, size) <= maxw) ls[ls.length - 1] = l + ' ' + w; else ls.push(w); return ls; }, []);
+  const tile = flat ? 34 : 22, lead = fs * 1.3;
+  let L = 4, B;
+  if (flat) {
+    const lines = order.map(m => [wrap(m.name, fs, band0 - 8), m.h ? wrap(`(${m.h})`, fs - 1, band0 - 8) : []]);
+    order.forEach((m, k) => { m._nl = lines[k]; });
+    B = 14 + tile + 12 + Math.max(...lines.map(([a, b]) => a.length + b.length)) * lead + 6;
+  } else {
+    const lens = order.map(m => measure(m.short, fs));
+    const over = l => Math.max(0, ...lens.map((n, k) => n * cos - fs * .35 - (W - l - R) / order.length * (k + .5) + 2));
+    for (let k = 0; k < 3; k++) L = 4 + over(L);
+    B = 10 + tile + 10 + Math.max(...lens) * Math.sin(ang * Math.PI / 180) + 8;
+  }
+  const PH = CHART_H.fcib || (flat ? 320 : 220), H = T + PH + B;
+  const top = Math.max(...order.map(val)), step = eciStep(top, 4), ymax = top * 1.06;   // the tallest bar near the top: no axis numbers to round to
+  const band = (W - L - R) / order.length, bw = Math.min(96, band * .76), base = T + PH, Y = v => T + (1 - Math.max(0, v) / ymax) * PH;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H);
+  for (let v = step; v <= ymax; v += step) svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1, 'stroke-dasharray':'4 4'}));
+  svg.append(sv('line', {x1:L, x2:W - R, y1:base, y2:base, stroke:'var(--ink-2)', 'stroke-width':1}));
+  const pts = [], vs = flat ? 26 : 13;   // the value's size
+  order.forEach((m, i) => {
+    const e = val(m), cx = L + band * (i + .5), x = cx - bw / 2, y = Y(e), h = base - y, r = Math.min(6, bw / 6, h);
+    const bar = sv('path', {d:`M${x},${base}V${y + r}Q${x},${y} ${x + r},${y}H${x + bw - r}Q${x + bw},${y} ${x + bw},${y + r}V${base}Z`, fill:MCOL[m.id], 'data-m':m.id});
+    const inside = h > vs * 1.8, vtx = sv('text', {x:cx, y:inside ? y + h / 2 + vs * .36 : y - 8, 'text-anchor':'middle', 'font-size':inside ? vs : Math.round(vs * .75), 'font-weight':600,
+      fill:inside ? (lightCol(m.id) ? 'var(--ink)' : '#fff') : 'var(--ink)'}, String(Math.round(e)));
+    svg.append(bar, vtx);
+    const ty = base + (flat ? 14 : 10);
+    svg.append(sv('rect', {x:cx - tile / 2, y:ty, width:tile, height:tile, rx:tile * .2, fill:'#f1f3f4'}));
+    if (LOGO[m.lab]) { const lg = tile * .58; svg.append(sv('image', {href:LOGO_DIR + LOGO[m.lab] + '.svg', x:cx - lg / 2, y:ty + (tile - lg) / 2, width:lg, height:lg})); }
+    if (flat) {
+      const [nl, hl] = m._nl; let ly = ty + tile + 12 + fs;
+      nl.forEach(l => { svg.append(sv('text', {class:'lab', x:cx, y:ly, 'font-size':fs, 'text-anchor':'middle', fill:'var(--ink)'}, l)); ly += lead; });
+      hl.forEach(l => { svg.append(sv('text', {x:cx, y:ly, 'font-size':fs - 1, 'text-anchor':'middle', fill:'var(--muted)'}, l)); ly += lead; });
+    } else {
+      const ny = ty + tile + 12;
+      svg.append(sv('text', {class:'lab', x:cx + fs * .35, y:ny, 'font-size':fs, 'text-anchor':'end', transform:`rotate(${-ang} ${cx + fs * .35} ${ny})`}, m.short));
+    }
+    if (an) { mark(bar, 'a-rise', i * .05); mark(vtx, 'a-fade', .5 + i * .05); }
+    pts.push({x:cx, y, box:[cx - band / 2, cx + band / 2, T, H], html:`<b>${esc(m.name)}</b>${m.h ? ` · ${esc(m.h)}` : ''}<br>Pass rate <b>${f1(e)}%</b>`});   // the whole column, bar, logo and name, shows the tooltip
+  });
+  attachTip(svg, W, H, pts, $('#fcibtip'));
+}
 
 /* FCI: one row per model ranked by ECI, a bar from 0 (Kimi K2.7) to its FCI and its 90% interval as a whisker. */
 function drawECI() {
@@ -185,23 +246,39 @@ function drawTTS(t) {
   const svg = $('#ttssvg'), W = Math.max(300, $('#ttsplot').clientWidth), narrow = W < 560;
   if (t == null) { const run = ++ttsRun; t = 1; if (animates(svg)) { t = 0; svg.addEventListener('shown', () => ttsPlay(run), {once:true}); } }
   const L = 34, R = narrow ? 12 : 24, T = 12, B = 46, H = CHART_H.tts || (narrow ? 300 : 380);
-  const all = TTSM.flatMap(m => ttsCurve(m.id));   // the axes hold every model, so showing one moves nothing
-  const x0 = Math.log10(Math.min(...all.map(p => p[0]))) - .15, x1 = Math.log10(Math.max(...all.map(p => p[0])));
+  const all = TTSM.flatMap(m => ttsCurve(m.id));   // the y axis holds every model, so showing one moves it not
+  const vis = TTSM.filter(m => ttsOn.has(m.id)).flatMap(m => ttsCurve(m.id)), xs = (vis.length ? vis : all).map(p => p[0]);   // the x axis spans the shown curves (owner, 2026-10-16)
+  const x0 = Math.log10(Math.min(...xs)) - .15, x1 = Math.log10(Math.max(...xs));
+  /* A broken axis (owner, 2026-10-16): the longest stretch of budgets where no model's curve runs, if over half a decade,
+     shrinks to a short gap (GU decades of the drawn axis), marked by two slanted strokes on the axis as on the task chart's
+     broken axis; nothing is drawn inside it. Only the shown curves count, so the axis is laid out again when one is shown or hidden (owner, 2026-10-16). */
+  const spans = TTSM.filter(m => ttsOn.has(m.id)).map(m => ttsCurve(m.id)).filter(c => c.length).map(c => [Math.log10(c[0][0]), Math.log10(c[c.length - 1][0])]).sort((a, b) => a[0] - b[0]);
+  let brk = null;
+  for (let i = 0, end = -Infinity; i + 1 < spans.length; i++) { end = Math.max(end, spans[i][1]); const s = spans[i + 1][0];
+    if (s - end > .5 && (!brk || s - end > brk[1] - brk[0])) brk = [end, s]; }
+  if (brk) brk = [brk[0] + .1, brk[1] - .1];
+  const GU = .12, U = lx => !brk || lx <= brk[0] ? lx : lx >= brk[1] ? lx - (brk[1] - brk[0]) + GU : brk[0] + (lx - brk[0]) / (brk[1] - brk[0]) * GU;
   const ytop = Math.max(...all.map(p => p[3])), ystep = eciStep(ytop, narrow ? 4 : 5), ymax = Math.ceil(ytop / ystep) * ystep;   // about five steps from 0, whatever the scale's unit
   const ms = [...TTSM].reverse().filter(m => ttsOn.has(m.id)), cs = ms.map(m => ttsCurve(m.id));
   const play = t < 1, sweep = play ? ttsSweep(cs, x0, x1, ttsEase(t)) : x1;
   const vx1 = play ? Math.min(x1, Math.max(x0 + 1.1, sweep + .45)) : x1;   // the view: at least a decade wide, just past the cursor
-  const X = v => L + (Math.log10(v) - x0) / (vx1 - x0) * (W - L - R), Y = v => T + (1 - v / ymax) * (H - T - B);
+  const X = v => L + (U(Math.log10(v)) - U(x0)) / (U(vx1) - U(x0)) * (W - L - R), Y = v => T + (1 - v / ymax) * (H - T - B);
+  const gapPx = brk && vx1 > brk[0] ? [X(10 ** brk[0]), vx1 >= brk[1] ? X(10 ** brk[1]) : W - R] : null;   // the gap in pixels, once in view
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
   const clip = sv('clipPath', {id:'ttsclip'}); clip.append(sv('rect', {x:L, y:T - 6, width:W - L - R + 10, height:H - T - B + 6})); svg.append(clip);
   for (let i = 0, v = 0; v <= ymax + ystep / 2; v = ++i * ystep) {
-    svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1}));
+    for (const [x1, x2] of gapPx ? [[L, gapPx[0]], [gapPx[1], W - R]] : [[L, W - R]]) svg.append(sv('line', {x1, x2, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1}));
     svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, tick(v)));
   }
-  for (let k = Math.ceil(x0); k <= Math.floor(vx1); k++) {
-    svg.append(sv('line', {x1:X(10 ** k), x2:X(10 ** k), y1:H - B, y2:H - B + 5, stroke:'var(--ink-2)', 'stroke-width':1}));
-    svg.append(sv('text', {x:X(10 ** k), y:H - B + 20, 'text-anchor':'middle'}, usdfmt(10 ** k)));
-  }
+  // ticks at powers of ten on each side of the gap; a side with fewer than two adds 2 and 5 times a power of ten
+  const segs = !brk ? [[x0, vx1]] : vx1 > brk[1] ? [[x0, brk[0]], [brk[1], vx1]] : [[x0, Math.min(vx1, brk[0])]];
+  segs.forEach(([a, b]) => { const tk = [], in_ = v => Math.log10(v) >= a - 1e-9 && Math.log10(v) <= b + 1e-9;
+    for (let k = Math.floor(a); k <= Math.ceil(b); k++) if (in_(10 ** k)) tk.push(10 ** k);
+    if (tk.length < 2) for (let k = Math.floor(a); k <= Math.ceil(b); k++) [2, 5].forEach(f => in_(f * 10 ** k) && tk.push(f * 10 ** k));
+    tk.forEach(v => { svg.append(sv('line', {x1:X(v), x2:X(v), y1:H - B, y2:H - B + 5, stroke:'var(--ink-2)', 'stroke-width':1}));
+      svg.append(sv('text', {x:X(v), y:H - B + 20, 'text-anchor':'middle'}, usdfmt(v))); }); });
+  if (gapPx) [gapPx[0], vx1 >= brk[1] ? gapPx[1] : null].forEach(x => x != null &&
+    svg.append(sv('line', {x1:x - 3, y1:H - B + 6, x2:x + 3, y2:H - B - 6, stroke:'var(--ink-2)', 'stroke-width':1.5})));
   svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'Cost budget per run in US$, log scale'));
   const g = sv('g', {'clip-path':'url(#ttsclip)'}), gb = sv('g'), gl = sv('g'); g.append(gb, gl); svg.append(g);   // bands under every line
   // rising at the cursor: started within the last 0.35 decade, or 2 old points (2 / TTS_PT FCI) gained over it; nothing steps back while nothing rises
@@ -687,7 +764,7 @@ drawPapers();
   const lock = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.2" fill="#3c4043"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="#3c4043" stroke-width="2.2" stroke-linecap="round"/></svg>';
   $('#locked').innerHTML = Array.from({length:6}, (_, i) => all[Math.floor((i + .5) * all.length / 6)]).map(([t, k]) =>
     `<div class="lk-tile" style="background:${ART_FIELD[k]}"><div class="lk-art">${taskArt(t.s, k).replace('<svg class="art"', '<svg width="100%" height="100%" preserveAspectRatio="xMidYMid slice"')}</div><span class="lk-lock">${lock}</span></div>`).join(''); })();
-drawPassCost(); drawTable(); drawLB(); drawECI(); drawTTS(); drawMap(); drawRows();
+drawPassCost(); drawTable(); drawLB(); drawPassBars(); drawECI(); drawTTS(); drawMap(); drawRows();
 // labels are placed by measured text width, so draw again once the web font has loaded and the widths are final
-if (document.fonts) document.fonts.ready.then(() => { drawPassCost(); drawLB(); drawECI(); drawTTS(); drawMap(); });
-let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { drawPassCost(); drawLB(); drawECI(); drawTTS(); drawMap(); drawPapers(); redraws.forEach(f => f()); }, 120); });
+if (document.fonts) document.fonts.ready.then(() => { drawPassCost(); drawLB(); drawPassBars(); drawECI(); drawTTS(); drawMap(); });
+let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { drawPassCost(); drawLB(); drawPassBars(); drawECI(); drawTTS(); drawMap(); drawPapers(); redraws.forEach(f => f()); }, 120); });
