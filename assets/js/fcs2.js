@@ -4,7 +4,7 @@
 document.querySelectorAll('[data-fill]').forEach(el => { el.textContent = {updated:`Last updated: ${UPDATED}`, runs:String(RUNS.length),
   runtasks:`on ${NTASK(RUNS)} tasks`, models:`${MODELS.length} models from ${new Set(MODELS.map(m => m.lab)).size} labs have run so far.`,
   summary:`${RUNS.length} runs on ${NTASK(RUNS)} tasks by ${MODELS.length} models`,
-  ntasks:String(TASKS.length), ndomains:String(new Set(TASKS.map(t => t.d)).size), dmax:fe(Math.max(...Object.values(FDI))), zero:tick(ECI_LOW_VALUE)}[el.dataset.fill]; });
+  ntasks:String(TASKS.length), ndomains:String(new Set(TASKS.map(t => t.d)).size), dmax:fe(Math.max(...Object.values(FDI))), zero:tick(ECI_LOW_VALUE), cunit:DIFF_FIT.c.toFixed(1)}[el.dataset.fill]; });
 // Bring a tab into view inside its own horizontal strip only. scrollIntoView would also scroll the page,
 // which fought the reader's scrolling whenever the section spy fired.
 const reveal = el => { const p = el.parentElement, pr = p.getBoundingClientRect(), er = el.getBoundingClientRect();
