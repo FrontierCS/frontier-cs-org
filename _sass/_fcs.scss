@@ -43,10 +43,10 @@
      Both Meta models take Meta's blue (owner, 2026-10-16; before, Muse Spark 1.3 took a teal).
      Gemini 4 Argon takes Google's green, #34A853 (Qiuyang, 2026-10-16).
      Models of one colour family must still be told apart on a task's chart (Qiuyang, 2026-10-16, on egg): each lab keeps
-     its hue, give or take 14 degrees, and the models take the lightness and hue that keep every pair at least 15.8 apart
-     in CIEDE2000 (blues at L* 28 to 75; before, five blues and both OpenAI models shared colours). GPT-6.1 Sol takes Google
-     grey 700. */
-  --m-astra: #1f1f1f; --m-sol: #5f6368; --m-k3: #34c3fe; --m-muse: #007a99; --m-qwen: #ff7018; --m-ds: #271ae5; --m-glm: #054594; --m-opus: #cc785c; --m-wonder: #008fff; --m-glmf: #3963f9; --m-gemini: #34a853;
+     its hue, give or take 14 degrees, and the models take the lightness and hue that keep every pair at least 15.1 apart
+     in CIEDE2000 (blues at L* 28 to 75; before, five blues and both OpenAI models shared colours). Every colour keeps the
+     leaderboard bars' white label (fcs2.js lightCol: luminance at most .58). GPT-6.1 Sol takes Google grey 700. */
+  --m-astra: #1f1f1f; --m-sol: #5f6368; --m-k3: #016c98; --m-muse: #00a2cc; --m-qwen: #ff7018; --m-ds: #271ae5; --m-glm: #054594; --m-opus: #cc785c; --m-wonder: #008fff; --m-glmf: #3963f9; --m-gemini: #34a853;
   --fail: #bdc1c6;
   --sans: 'Hanken Grotesk', 'Helvetica Neue', Arial, sans-serif;
 }
