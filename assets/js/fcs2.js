@@ -209,7 +209,7 @@ function drawECI() {
    a model's final FCI until another model passes it; the rest of every curve is faint (TTS_FADE), in full again while the
    pointer is on it or its legend entry. */
 let ttsHover = null, ttsRun = 0;
-const TTS_FADE = .25;
+const TTS_FADE = .14;   // Qiuyang: fainter than .25
 const TTSM = RANKED.filter(m => SCALE[m.id]);   // a model with no reported spend has no curve
 const ttsOn = new Set(TTSM.map(m => m.id));
 const ttsBands = () => { document.querySelectorAll('#ttssvg .tband').forEach(b => b.setAttribute('opacity', b.dataset.m === ttsHover ? .12 : 0));
