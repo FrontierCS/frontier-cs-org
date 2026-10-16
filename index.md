@@ -34,8 +34,16 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
 
 <section class="sec" id="leaderboard">
   <h2>Leaderboard</h2>
+  <!-- First in the leaderboard (owner, 2026-10-16): one bar per model, Artificial Analysis style, the pass rate as a whole
+       number in the bar, the exact value in the tooltip; no FCI switch (owner, 2026-10-16) -->
   <figure class="chart" style="margin:0">
-    <div class="chead"><span id="pchead">Pass rate (beat reference)</span><div class="chips cmode" id="pcmode" role="group" aria-label="Measure"><button class="chip" type="button" data-v="pass" aria-pressed="true">Pass rate</button><button class="chip" type="button" data-v="fci" aria-pressed="false">FCI</button></div></div>
+    <div class="chead"><span>Pass rate (beat reference)</span></div>
+    <div class="plot" id="fcibplot"><svg id="fcibsvg" role="img" aria-label="Pass rate (beat reference) by model"></svg><div class="tip" id="fcibtip" hidden></div></div>
+    <div class="cfoot">{% include chart_logo.html %}</div>
+  </figure>
+  <p class="pcontact">To add your model, email its score on every task to both <a class="mail" href="mailto:qmang@berkeley.edu,wenhao.chai@princeton.edu">qmang@berkeley.edu</a> and <a class="mail" href="mailto:qmang@berkeley.edu,wenhao.chai@princeton.edu">wenhao.chai@princeton.edu</a>.</p>
+  <figure class="chart" style="margin:0">
+    <div class="chead"><span>Pass rate (beat reference)</span></div>
     <div class="plot" id="pcplot"><svg id="pcsvg" role="img" aria-label="Pass rate (beat reference) against cost per run"></svg><div class="tip" id="pctip" hidden></div></div>
     <div class="cfoot">{% include chart_logo.html %}</div>
   </figure>
@@ -48,21 +56,11 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
 
   <div class="tbl-wrap" id="eci">
     <h3>FCI</h3>
-    <!-- One bar per model in the style of Artificial Analysis's index chart, the FCI as a whole number in the bar; the
-         chart with 90% intervals is folded under it (owner, 2026-10-16) -->
     <figure class="chart" style="margin:0">
-      <div class="chead"><span id="fcibhead">FrontierCS Capabilities Index (FCI)</span><div class="chips cmode" id="fcibmode" role="group" aria-label="Measure"><button class="chip" type="button" data-v="pass" aria-pressed="false">Pass rate</button><button class="chip" type="button" data-v="fci" aria-pressed="true">FCI</button></div></div>
-      <div class="plot" id="fcibplot"><svg id="fcibsvg" role="img" aria-label="FCI by model"></svg><div class="tip" id="fcibtip" hidden></div></div>
-      <div class="cfoot">{% include chart_logo.html %}<span id="fcibnote">Kimi K2.7 = <span data-fill="zero"></span></span></div>
+      <div class="chead"><span>FrontierCS Capabilities Index (FCI)</span></div>
+      <div class="plot" id="eciplot"><svg id="ecisvg" role="img" aria-label="FCI chart"></svg><div class="tip" id="ecitip" hidden></div></div>
+      <div class="cfoot">{% include chart_logo.html %}<span id="ecinote">Kimi K2.7 = <span data-fill="zero"></span> · whiskers are 90% intervals</span></div>
     </figure>
-    <details class="fold" id="eci-ci">
-      <summary><h3>FCI with 90% intervals</h3></summary>
-      <figure class="chart" style="margin:0">
-        <div class="plot" id="eciplot"><svg id="ecisvg" role="img" aria-label="FCI chart"></svg><div class="tip" id="ecitip" hidden></div></div>
-        <div class="cfoot">{% include chart_logo.html %}<span id="ecinote">Kimi K2.7 = <span data-fill="zero"></span> · whiskers are 90% intervals</span></div>
-      </figure>
-    </details>
-    <p class="pcontact">To add your model, email its score on every task to both <a class="mail" href="mailto:qmang@berkeley.edu,wenhao.chai@princeton.edu">qmang@berkeley.edu</a> and <a class="mail" href="mailto:qmang@berkeley.edu,wenhao.chai@princeton.edu">wenhao.chai@princeton.edu</a>.</p>
     <details class="fold how" id="fci-how">
       <summary><h3>How FCI works</h3></summary>
       <div class="how-body">

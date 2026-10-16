@@ -54,12 +54,7 @@ $('#lblegend').innerHTML = RANKED.map(m => `<span><i style="background:${MCOL[m.
 /* Main chart: pass rate against mean cost per run in US$, one dot per model (PASS, COST); the dots on the Pareto frontier are emphasised. Each label takes the first
    spot right, left, above or below its dot that clears every dot, every placed label and the edges; a dot with no free
    spot keeps no label (the tooltip still names it). No legend: the labels name the dots. */
-/* Each of the two charts has a Pass rate / FCI switch (owner, 2026-10-16): the scatter's y axis and the bars' height. */
-let pcMode = 'pass', fcibMode = 'fci';
-const MEAS = {pass:{v:id => PASS[id][0], head:'Pass rate (beat reference)', name:'Pass rate', fmt:v => f1(v) + '%'},
-  fci:{v:id => ECI[id][0], head:'FrontierCS Capabilities Index (FCI)', name:'FCI', fmt:v => fe(v)}};
-function modeSwitch(id, set) { $('#' + id).addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return;
-  [...$('#' + id).children].forEach(c => c.setAttribute('aria-pressed', String(c === b))); set(b.dataset.v); }); }
+const passPct = m => PASS[m.id][0];   // pass rate in %; both leaderboard charts show it alone (owner, 2026-10-16: no FCI switch)
 function drawPassCost() {
   const svg = $('#pcsvg'), W = Math.max(300, $('#pcplot').clientWidth), narrow = W < 560;
   const L = 44, R = narrow ? 12 : 24, T = 14, B = 46, H = CHART_H.pc || (narrow ? 320 : 400);
@@ -68,14 +63,12 @@ function drawPassCost() {
   // the range loose); an edge dot whose label has no room on its outer side takes another spot
   // (on phones the right side keeps more, so the labels of the dots near the right edge fit on their right)
   const x0 = Math.log10(Math.min(...tx)) - .15, x1 = Math.log10(Math.max(...tx)) + (narrow ? .74 : .15);
-  const M = MEAS[pcMode], val = m => M.v(m.id), fci = pcMode === 'fci', top = Math.max(...ms.map(val));
-  const ystep = fci ? eciStep(top, narrow ? 4 : 5) : 20, ymax = fci ? Math.ceil(top * 1.08 / ystep) * ystep : Math.min(100, Math.ceil((top + 5) / 20) * 20);
-  $('#pchead').textContent = M.head; svg.setAttribute('aria-label', `${M.head} against cost per run`);
+  const val = passPct, ystep = 20, ymax = Math.min(100, Math.ceil((Math.max(...ms.map(val)) + 5) / 20) * 20);
   const X = v => L + (Math.log10(v) - x0) / (x1 - x0) * (W - L - R), Y = v => T + (1 - v / ymax) * (H - T - B);
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
   for (let v = 0; v <= ymax + ystep / 2; v += ystep) {
     svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1}));
-    svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, fci ? tick(v) : v + '%'));
+    svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, v + '%'));
   }
   // ticks at 1, 2 and 5 times each power of ten; a range under one decade still gets several
   for (let k = Math.floor(x0); k <= Math.ceil(x1); k++) [1, 2, 5].forEach(f => { const v = f * 10 ** k, lv = Math.log10(v);
@@ -95,7 +88,7 @@ function drawPassCost() {
     const lead = front.includes(m);
     svg.append(sv('circle', {cx, cy, r:lead ? 7.5 : 5, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':2, 'data-m':m.id}));
     labelDot(svg, boxes, cx, cy, name, {l:L, r:W, t:T, b:H - B}, MTXT(m.id), lead);   // fcs2-data.js
-    pts.push({x:cx, y:cy, mean:true, html:`<b>${esc(m.name)}</b><br>${M.name} <b>${M.fmt(val(m))}</b><br>${usdfmt(COST[m.id][0])} per run, mean`});
+    pts.push({x:cx, y:cy, mean:true, html:`<b>${esc(m.name)}</b><br>Pass rate <b>${f1(val(m))}%</b><br>${usdfmt(COST[m.id][0])} per run, mean`});
   });
   attachTip(svg, W, H, pts, $('#pctip'));
 }
@@ -103,18 +96,17 @@ function drawPassCost() {
 /* On phones the model column is as wide as the longest model name, so every name shows in full (owner: "DeepSeek V4.1 Flash", not cut). */
 const nameCol = svg => { svg.replaceChildren(); const w = Math.max(...MODELS.map(m => { const t = sv('text', {class:'lab', x:-999, y:-999}, m.short); svg.append(t); return t.getComputedTextLength(); })); svg.replaceChildren(); return Math.max(112, Math.ceil(w) + 12); };
 
-/* FCI as bars (owner, 2026-10-16, after Artificial Analysis's Intelligence Index chart): one column per model, highest
-   first, in the model's colour with rounded top corners; the FCI rounded to a whole number sits inside the bar near its
-   top, white (dark ink on a light colour); under each bar the lab's logo and the model's name, slanted. Dotted grid lines,
-   no axis numbers: the bars carry them. Kimi K2.7, the 0 point, has no bar. */
+/* Pass rate as bars, first in the leaderboard (owner, 2026-10-16, after Artificial Analysis's index charts): one column per
+   model, highest first, in the model's colour with rounded top corners; the pass rate as a whole number in the middle of
+   the bar, the exact value in the tooltip; under each bar the lab's logo on a light tile, the name and the harness.
+   Dashed grid lines, no axis numbers: the bars carry them. */
 const LOGO = {OpenAI:'openai', Anthropic:'anthropic', Google:'google', Meta:'meta', Kimi:'kimi', DeepSeek:'deepseek', 'Z.ai':'zai', Qwen:'qwen'};
 const LOGO_DIR = (document.querySelector('script[src*="fcs2.js"]') || {src:''}).src.replace(/js\/fcs2\.js.*$/, 'img/models/');
 const lightCol = id => { const h = getComputedStyle(document.documentElement).getPropertyValue(`--m-${id}`).trim().replace('#', '');
   if (h.length !== 6) return false; const [r, g, b] = [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16) / 255);
   return .2126 * r + .7152 * g + .0722 * b > .6; };   // white as Artificial Analysis has it, dark ink only on the lightest (Sol's grey, GLM Flash's pink)
-function drawFciBars() {
-  const M = MEAS[fcibMode], val = m => M.v(m.id), order = [...MODELS].sort((a, b) => val(b) - val(a));
-  $('#fcibhead').textContent = M.head; $('#fcibnote').hidden = fcibMode !== 'fci';
+function drawPassBars() {
+  const val = passPct, order = [...MODELS].sort((a, b) => val(b) - val(a));
   const svg = $('#fcibsvg'), W = Math.max(300, $('#fcibplot').clientWidth), an = animates(svg);
   svg.setAttribute('viewBox', `0 0 ${W} 10`); svg.replaceChildren();
   const measure = (txt, size, cls = 'lab') => { const t = sv('text', {class:cls, x:-999, y:-999, 'font-size':size}, txt); svg.append(t); const w = t.getComputedTextLength(); t.remove(); return w; };
@@ -160,7 +152,7 @@ function drawFciBars() {
       svg.append(sv('text', {class:'lab', x:cx + fs * .35, y:ny, 'font-size':fs, 'text-anchor':'end', transform:`rotate(${-ang} ${cx + fs * .35} ${ny})`}, m.short));
     }
     if (an) { mark(bar, 'a-rise', i * .05); mark(vtx, 'a-fade', .5 + i * .05); }
-    pts.push({x:cx, y, mean:true, html:`<b>${esc(m.name)}</b>${m.h ? ` · ${esc(m.h)}` : ''}<br>${M.name} <b>${M.fmt(e)}</b>`});
+    pts.push({x:cx, y, mean:true, html:`<b>${esc(m.name)}</b>${m.h ? ` · ${esc(m.h)}` : ''}<br>Pass rate <b>${f1(e)}%</b>`});
   });
   attachTip(svg, W, H, pts, $('#fcibtip'));
 }
@@ -254,12 +246,13 @@ function drawTTS(t) {
   const svg = $('#ttssvg'), W = Math.max(300, $('#ttsplot').clientWidth), narrow = W < 560;
   if (t == null) { const run = ++ttsRun; t = 1; if (animates(svg)) { t = 0; svg.addEventListener('shown', () => ttsPlay(run), {once:true}); } }
   const L = 34, R = narrow ? 12 : 24, T = 12, B = 46, H = CHART_H.tts || (narrow ? 300 : 380);
-  const all = TTSM.flatMap(m => ttsCurve(m.id));   // the axes hold every model, so showing one moves nothing
-  const x0 = Math.log10(Math.min(...all.map(p => p[0]))) - .15, x1 = Math.log10(Math.max(...all.map(p => p[0])));
+  const all = TTSM.flatMap(m => ttsCurve(m.id));   // the y axis holds every model, so showing one moves it not
+  const vis = TTSM.filter(m => ttsOn.has(m.id)).flatMap(m => ttsCurve(m.id)), xs = (vis.length ? vis : all).map(p => p[0]);   // the x axis spans the shown curves (owner, 2026-10-16)
+  const x0 = Math.log10(Math.min(...xs)) - .15, x1 = Math.log10(Math.max(...xs));
   /* A broken axis (owner, 2026-10-16): the longest stretch of budgets where no model's curve runs, if over half a decade,
      shrinks to a short gap (GU decades of the drawn axis), marked by two slanted strokes on the axis as on the task chart's
-     broken axis; nothing is drawn inside it. Every model counts, shown or not, so showing one moves nothing. */
-  const spans = TTSM.map(m => ttsCurve(m.id)).filter(c => c.length).map(c => [Math.log10(c[0][0]), Math.log10(c[c.length - 1][0])]).sort((a, b) => a[0] - b[0]);
+     broken axis; nothing is drawn inside it. Only the shown curves count, so the axis is laid out again when one is shown or hidden (owner, 2026-10-16). */
+  const spans = TTSM.filter(m => ttsOn.has(m.id)).map(m => ttsCurve(m.id)).filter(c => c.length).map(c => [Math.log10(c[0][0]), Math.log10(c[c.length - 1][0])]).sort((a, b) => a[0] - b[0]);
   let brk = null;
   for (let i = 0, end = -Infinity; i + 1 < spans.length; i++) { end = Math.max(end, spans[i][1]); const s = spans[i + 1][0];
     if (s - end > .5 && (!brk || s - end > brk[1] - brk[0])) brk = [end, s]; }
@@ -466,9 +459,6 @@ function drawHow() {
   $('#howalegend').innerHTML = picks.map((s, i) => `<span><i style="background:${INKS[i]}"></i>${esc(NAME(s))}, FDI ${fe(FDI[s])}</span>`).join('');
 }
 $('#fci-how').addEventListener('toggle', drawHow);
-modeSwitch('pcmode', v => { pcMode = v; shown.add('pcsvg'); drawPassCost(); });
-modeSwitch('fcibmode', v => { fcibMode = v; shown.add('fcibsvg'); drawFciBars(); });
-$('#eci-ci').addEventListener('toggle', () => { if ($('#eci-ci').open) { shown.add('ecisvg'); drawECI(); } });   // folded, it drew at no width; opened, it draws at once, with no entrance
 redraws.push(drawHow);
 
 /* ---------- questions ---------- */
@@ -774,7 +764,7 @@ drawPapers();
   const lock = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.2" fill="#3c4043"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="#3c4043" stroke-width="2.2" stroke-linecap="round"/></svg>';
   $('#locked').innerHTML = Array.from({length:6}, (_, i) => all[Math.floor((i + .5) * all.length / 6)]).map(([t, k]) =>
     `<div class="lk-tile" style="background:${ART_FIELD[k]}"><div class="lk-art">${taskArt(t.s, k).replace('<svg class="art"', '<svg width="100%" height="100%" preserveAspectRatio="xMidYMid slice"')}</div><span class="lk-lock">${lock}</span></div>`).join(''); })();
-drawPassCost(); drawTable(); drawLB(); drawFciBars(); drawECI(); drawTTS(); drawMap(); drawRows();
+drawPassCost(); drawTable(); drawLB(); drawPassBars(); drawECI(); drawTTS(); drawMap(); drawRows();
 // labels are placed by measured text width, so draw again once the web font has loaded and the widths are final
-if (document.fonts) document.fonts.ready.then(() => { drawPassCost(); drawLB(); drawFciBars(); drawECI(); drawTTS(); drawMap(); });
-let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { drawPassCost(); drawLB(); drawFciBars(); drawECI(); drawTTS(); drawMap(); drawPapers(); redraws.forEach(f => f()); }, 120); });
+if (document.fonts) document.fonts.ready.then(() => { drawPassCost(); drawLB(); drawPassBars(); drawECI(); drawTTS(); drawMap(); });
+let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { drawPassCost(); drawLB(); drawPassBars(); drawECI(); drawTTS(); drawMap(); drawPapers(); redraws.forEach(f => f()); }, 120); });
