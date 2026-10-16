@@ -430,7 +430,7 @@ function drawTable() {
    workload, grey when it did not, so a run passes when all its squares are dark. The counts are PASSBY's (fcs2-checks.js),
    summed per metric as the converter sums them. A run that failed or was refused (STATE) takes that colour on all its squares;
    a run that timed out shows its metrics like any other (Qiuyang: no timeout state). A task's squares keep one order in every column, the metric the most runs beat first. */
-const KSTATE = {failed:['fa', 'Run failed', 'The run failed: final score 0'],
+const KSTATE = {failed:['fa', 'Run failed', 'The run failed'],
   refused:['rf', 'Refused by the model provider', 'The model provider refused the task: left out of FCI and FDI'], unscored:['un', 'Not scored yet', 'Not scored yet']};
 function drawKebab(ts) {
   const st = typeof STATE === 'undefined' ? {} : STATE, used = new Set();
@@ -452,7 +452,8 @@ function drawKebab(ts) {
       if (!run && !s) return '<td></td>';
       const k = stems.filter(j => won(m.id, j)).length, n = stems.length;
       let html = `<b>${esc(m.name)}</b><br>${esc(NAME(t))}<br>`;
-      if (s) { used.add(s); html += KSTATE[s][2]; }
+      // a failed run shows the platform's final score, 0 for most but not all (Qiuyang, 2026-10-16)
+      if (s) { used.add(s); html += KSTATE[s][2] + (s === 'failed' && run ? `<br>Final score ${f1(run.s)}` : ''); }
       else html += (k === n ? `<b>Passes</b>: beats ${n === 1 ? 'its one metric' : `all ${n} metrics`}` : `Beats ${k} of ${n} metric${n === 1 ? '' : 's'}`)
         + `<br>Final score ${f1(run.s)}${REF[t] != null ? `, human reference ${f1(REF[t])}` : ''}`;
       cells.push(html);
