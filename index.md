@@ -46,8 +46,8 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
     <div class="chead"><span id="pctitle">Pass rate (beat reference)</span><div class="chips" id="pcview" role="tablist" aria-label="View"><button class="chip" type="button" role="tab" data-v="scatter" aria-pressed="true">Scatter</button><button class="chip" type="button" role="tab" data-v="kebab" aria-pressed="false">Kebab</button></div></div>
     <div class="plot" id="pcplot"><svg id="pcsvg" role="img" aria-label="Pass rate (beat reference) against cost per run"></svg><div class="tip" id="pctip" hidden></div></div>
     <div id="kebab" hidden>
+      <div class="legend" id="keblegend"></div>   <!-- the key above the table, read before its rows (Qiuyang) -->
       <div class="plot" id="kebplot"><div class="keb-scroll" id="kebscroll"><table class="keb" id="kebtbl"></table></div><div class="tip" id="kebtip" hidden></div></div>
-      <div class="legend" id="keblegend"></div>
     </div>
     <div class="cfoot">{% include chart_logo.html %}</div>
   </figure>

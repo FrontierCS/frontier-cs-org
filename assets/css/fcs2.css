@@ -172,7 +172,7 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 .keb td.kt a{color:var(--ink)} .keb td.kt a:hover{text-decoration:underline}
 .keb .sqs{display:inline-flex; gap:3px; vertical-align:middle}
 .keb i, #keblegend i{display:block; width:9px; height:9px; box-sizing:border-box}
-#keblegend i{width:11px; height:11px}
+#keblegend{margin:0 0 14px} #keblegend i{width:11px; height:11px}   /* above the table (Qiuyang) */
 .keb i.y, #keblegend i.y{background:var(--accent)}   /* the site's blue, apart from the failed run's red (Qiuyang; dark ink before) */
 .keb i.n, #keblegend i.n{background:var(--fail)}
 .keb i.fa, #keblegend i.fa{background:#d93025}   /* Google red 600 */
