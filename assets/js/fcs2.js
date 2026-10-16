@@ -347,7 +347,8 @@ function drawTTS(t) {
   if (!play) {
     const boxes = [], fr = {l:L, r:W - R, t:T - 6, b:H - B}, lg = 16, gap = 5, h = 18;
     // the lower layers' models are named the same way, lighter, layer by layer, in the room the layers above leave
-    layers.forEach((f, li) => { const onF = onLayer[li], o = li ? Math.max(.55, ttsLayer(li)[0]) : null, seen = new Set();
+    // on a phone only the top two layers are named, as the rest crowd
+    layers.forEach((f, li) => { if (narrow && li > 1) return; const onF = onLayer[li], o = li ? Math.max(.55, ttsLayer(li)[0]) : null, seen = new Set();
     f.map(([k, ps]) => { const end = viss[k][viss[k].length - 1][0], own = ps.filter(p => p[0] <= end * 1.0001);
       return {k, p:own.length ? own[own.length - 1] : ps[0], dot:onF(k)}; })
       .reverse().filter(c => !seen.has(c.k) && seen.add(c.k)).sort((a, b) => b.dot - a.dot)
