@@ -65,27 +65,35 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
       <summary><h3>How FCI works</h3></summary>
       <div class="how-body">
         <div class="how-row">
-          <div class="how-txt">
+          <div>
             <p class="how-step"><span>1</span>What it measures</p>
             <p>A run passes a task when its final submission beats the human reference on every metric the task checks, on every hidden workload. Pass rate counts those passes, but it weighs an easy task like a hard one, and a model that passes everything has nowhere left to climb. FCI puts models and tasks on one scale instead, from two kinds of evidence in every run: which metrics it beat, and how far its final score landed from the human reference’s.</p>
+          </div>
+          <div>
             <p class="how-step"><span>2</span>Beating a metric</p>
             <div class="how-eq">\[ P(\text{run } r \text{ beats metric } g) = \frac{1}{1 + e^{-(\theta_m + u_r - \beta_g)}} \]</div>
             <p>\(\theta_m\) is the strength of model \(m\), \(\beta_g\) the difficulty of metric \(g\), and \(u_r\) how well this one run went; it is shared by all of the run’s metrics, which come from the same submission. When strength equals difficulty, the chance is one half, and every unit of strength above it multiplies the odds by \(e\). Metrics that every run beats or misses together count once. A run passes when it beats every metric, and a task’s <b>FDI</b>, the FrontierCS Difficulty Index, is the strength at which a model passes it half the time.</p>
           </div>
-          <figure class="chart how-fig">
-            <div class="chead"><span>Chance of passing on three tasks</span></div>
-            <div class="plot" id="howaplot"><svg id="howasvg" role="img" aria-label="Chance of passing against FCI on three tasks"></svg><div class="tip" id="howatip" hidden></div></div>
-            <div class="legend" id="howalegend"></div>
-          </figure>
         </div>
-        <p class="how-step"><span>3</span>How far past the human reference</p>
-        <div class="how-eq">\[ y_r = \frac{\text{final score}_r - \text{human reference}_t}{\max(\mathrm{sd}_t,\ c)} \]</div>
-        <div class="how-eq">\[ y_r \sim \mathcal{N}\big(a\,(\theta_m + u_r - h_t),\ \sigma^2\big) \]</div>
-        <p class="how-para">A pass says that a run beat the human reference, not by how much; the final score says how much. Its margin over the human reference’s is measured in units of the task’s score spread \(\mathrm{sd}_t\), at least \(c =\) <span data-fill="cunit"></span> points, so tasks with different scoring scales weigh alike. \(h_t\) is the strength at which a run lands level with the human reference. A run that passes counts its margin in full. A run that does not pass counts how far it fell short, and if its final score is above the human reference’s, it counts only as at least level, \(P(y_r \ge 0)\): its metrics did not confirm more. Without this term, a model that passed every task would sit at the ceiling, and tasks that no model passes could not be told apart.</p>
-        <p class="how-step"><span>4</span>One fit for models and tasks</p>
-        <div class="how-eq">\[ \beta_g \sim \mathcal{N}(h_t + \Delta,\ \tau^2) \]</div>
-        <div class="how-eq">\[ \mathrm{FCI}_m = 10\,(\theta_m - \theta_{\text{Kimi K2.7}}) \]</div>
-        <p class="how-para">A task’s metrics sit near its human level, so its metrics and its final scores inform each other. All strengths, difficulties and levels are fitted at once; the few constants left, \(a\), \(\Delta\), \(\tau\), \(\sigma\) and the spread of \(u_r\), take the values under which the results are most likely. FCI is strength in points: Kimi K2.7 sits at 0, and a model 10 points higher has \(e \approx 2.7\) times the odds of beating any metric. The 90% intervals come from refitting on the tasks drawn again with replacement, 500 times. A run whose model provider refused the task is left out, and so, for now, are the Security tasks.</p>
+        <figure class="chart how-fig">
+          <div class="chead"><span>Chance of passing on three tasks</span></div>
+          <div class="plot" id="howaplot"><svg id="howasvg" role="img" aria-label="Chance of passing against FCI on three tasks"></svg><div class="tip" id="howatip" hidden></div></div>
+          <div class="legend" id="howalegend"></div>
+        </figure>
+        <div class="how-row">
+          <div>
+            <p class="how-step"><span>3</span>How far past the human reference</p>
+            <div class="how-eq">\[ y_r = \frac{\text{final score}_r - \text{human reference}_t}{\max(\mathrm{sd}_t,\ c)} \]</div>
+            <div class="how-eq">\[ y_r \sim \mathcal{N}\big(a\,(\theta_m + u_r - h_t),\ \sigma^2\big) \]</div>
+            <p>A pass says that a run beat the human reference, not by how much; the final score says how much. Its margin over the human reference’s is measured in units of the task’s score spread \(\mathrm{sd}_t\), at least \(c =\) <span data-fill="cunit"></span> points, so tasks with different scoring scales weigh alike. \(h_t\) is the strength at which a run lands level with the human reference. A run that passes counts its margin in full. A run that does not pass counts how far it fell short, and if its final score is above the human reference’s, it counts only as at least level, \(P(y_r \ge 0)\): its metrics did not confirm more. Without this term, a model that passed every task would sit at the ceiling, and tasks that no model passes could not be told apart.</p>
+          </div>
+          <div>
+            <p class="how-step"><span>4</span>One fit for models and tasks</p>
+            <div class="how-eq">\[ \beta_g \sim \mathcal{N}(h_t + \Delta,\ \tau^2) \]</div>
+            <div class="how-eq">\[ \mathrm{FCI}_m = 10\,(\theta_m - \theta_{\text{Kimi K2.7}}) \]</div>
+            <p>A task’s metrics sit near its human level, so its metrics and its final scores inform each other. All strengths, difficulties and levels are fitted at once; the few constants left, \(a\), \(\Delta\), \(\tau\), \(\sigma\) and the spread of \(u_r\), take the values under which the results are most likely. FCI is strength in points: Kimi K2.7 sits at 0, and a model 10 points higher has \(e \approx 2.7\) times the odds of beating any metric. The 90% intervals come from refitting on the tasks drawn again with replacement, 500 times. A run whose model provider refused the task is left out, and so, for now, are the Security tasks.</p>
+          </div>
+        </div>
         <p class="how-step"><span>5</span>Why FCI</p>
         <ul class="how-why">
           <li><b>It puts models and tasks on one scale.</b> A task’s FDI is the FCI a model needs to pass it half the time, so a model’s FCI says which tasks it can be expected to pass.</li>

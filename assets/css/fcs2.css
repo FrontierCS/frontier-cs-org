@@ -116,26 +116,26 @@ h2{font-weight:600; font-size:clamp(25px,2.4vw,30px); line-height:1.2; margin:0}
 .fold summary::after{content:""; flex:none; width:14px; height:14px; background:linear-gradient(currentColor,currentColor) center/14px 1.6px no-repeat, linear-gradient(currentColor,currentColor) center/1.6px 14px no-repeat; transition:background-size .2s}
 .fold[open] summary::after{background-size:14px 1.6px, 1.6px 0}
 .fold[open] summary{margin-bottom:14px}
-/* How FCI works (fold under the FCI chart): numbered steps, each text beside its figure, top aligned on a hairline */
+/* How FCI works (fold under the FCI chart): numbered steps two to a row, top aligned on a hairline, the pass-curve chart across the width (Qiuyang: use both columns) */
 .how{margin-top:28px}
 .how summary h3{font-size:18px}
-.how-row{display:grid; grid-template-columns:minmax(0,5fr) minmax(0,7fr); gap:16px 56px; align-items:start; padding-top:24px; margin-bottom:36px; border-top:1px solid var(--line)}
+.how-row{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px 56px; align-items:start; padding-top:24px; margin-bottom:20px; border-top:1px solid var(--line)}
 @media (max-width:900px){ .how-row{grid-template-columns:1fr; gap:4px; margin-bottom:24px} }
 .how-step{display:flex; align-items:center; gap:10px; margin:0 0 12px; font-size:16px; font-weight:600; color:var(--ink)}
 .how-step span{flex:none; width:24px; height:24px; border-radius:50%; background:#e8f0fe; color:#0b57d0; font-size:13px; font-weight:600; display:inline-flex; align-items:center; justify-content:center}
 .how-body > .how-step{padding-top:24px; border-top:1px solid var(--line); margin-bottom:16px}
 .how-body p{margin:0 0 14px; line-height:1.6; color:var(--ink-2)}
 .how-body p.how-step{color:var(--ink)}
-.how-fig{margin:0}
+.how-fig{margin:0 0 36px}
 .how-fig .chead{margin-top:0}
-/* How FCI works: a formula on its own line, scrolling sideways on a phone rather than widening the page; a full-width paragraph under it */
+/* How FCI works: a formula on its own line, scrolling sideways on a phone rather than widening the page */
 .how-eq{overflow-x:auto; overflow-y:hidden; margin:0 0 6px; color:var(--ink)}
 .how-eq + :not(.how-eq){margin-top:8px}
-.how-body > p.how-para{max-width:760px; line-height:1.6; color:var(--ink-2); margin:0 0 28px}
-.how-why{margin:0; padding:0; list-style:none; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:22px 56px; line-height:1.6; color:var(--ink-2)}
+.how-why{margin:0; padding:0; list-style:none; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); grid-template-rows:auto 1fr; gap:22px 56px; align-items:start; line-height:1.6; color:var(--ink-2)}
 .how-why li{margin:0}
+.how-why li:last-child{grid-column:2; grid-row:1 / span 2}   /* the long third reason fills the right column beside the two short ones */
 .how-why b{display:block; margin-bottom:4px; color:var(--ink); font-weight:600}
-@media (max-width:900px){ .how-why{grid-template-columns:1fr} }
+@media (max-width:900px){ .how-why{grid-template-columns:1fr; grid-template-rows:none} .how-why li:last-child{grid-column:auto; grid-row:auto} }
 .res-scroll{position:relative; overflow-x:auto; -webkit-overflow-scrolling:touch}   /* positioned, so the hidden Pass/Fail words inside clip with the table */
 .res th{white-space:nowrap}
 .plot .halo{paint-order:stroke; stroke:#fff; stroke-width:4px; stroke-linejoin:round}
