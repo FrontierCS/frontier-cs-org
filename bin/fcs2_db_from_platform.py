@@ -17,6 +17,8 @@ What the API does not give, and what stands in for it:
 - The patch behind the final submission. Development payload ids do not match the final checkpoint's, so no
   development score is paired with the hidden score and the converter applies no dev-to-hidden calibration.
 - Check labels. feedback_json.checks lists the metric names of metrics.private.beat_spec_progress.
+- Refusals. feedback_json.refusal is true for a run whose adjudication cause is provider_refusal_no_final: the model's
+  provider refused, so no final submission came. The converter leaves such runs out of FCI and FDI (Qiuyang, 2026-10-16).
 """
 import json, sqlite3, sys, urllib.request, os
 from concurrent.futures import ThreadPoolExecutor
@@ -31,7 +33,8 @@ CACHE = {'GPT-6 Astra': 1.00, 'GPT-6.1 Sol': 0.10, 'Kimi K3 (Modal)': 0.30, 'Dee
          'Claude Code · Opus 5.5 (Subscription, max effort)': None, 'Kimi K2.7 Code': None, 'Muse Code · Muse Wonder 1.0': None,
          'Codex · Qwen 3.8 Max': 0.25,           # as 'qwen' in the converter's PRICE
          'Qwen Code CLI · Qwen 3.8 Max': 0.25,   # the same model on Qwen Code (Qiuyang, 2026-10-14)
-         'GLM 5.3 Flash (ZCode)': 0.03}          # list cached-input rate, eesel.ai's GLM-5.3-Flash pricing write-up, found 2026-10-13   # None: run on a subscription, the platform reports no usage
+         'GLM 5.3 Flash (ZCode)': 0.03,
+         'pi · Gemini 4': None}                  # its gateway reports the cost of every run (Qiuyang, 2026-10-16)          # list cached-input rate, eesel.ai's GLM-5.3-Flash pricing write-up, found 2026-10-13   # None: run on a subscription, the platform reports no usage
 
 
 def get(path):
@@ -111,6 +114,7 @@ for c, r, events in pulled:
     units = lambda x: x * 1e6
     priv = (r.get('metrics') or {}).get('private') or {}
     fb = {'reference_score': priv.get('reference_score'), 'checks': [{'label': k} for k in (priv.get('beat_spec_progress') or {})]}
+    if (r.get('adjudication') or {}).get('cause') == 'provider_refusal_no_final': fb['refusal'] = True   # the model's provider refused and no final came
     db.execute('insert into runs values (?,?,?,?,?,?)', (r['id'], 0.0 if r['score'] is None and r['state'] == 'TIMED_OUT' else r['score'], r['state'], r['verdict'], end - start if start and end else None, json.dumps(fb)))
     db.execute('insert into cells values (?,?,?)', (r['id'], c, r['task_id']))
     n = 0

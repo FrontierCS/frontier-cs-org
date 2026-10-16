@@ -368,6 +368,22 @@
     ]
    }
   },
+  "ivf_pq kernel": {
+   "k27": {
+    "iso_recall": [
+     8,
+     8
+    ],
+    "nn_recall": [
+     8,
+     8
+    ],
+    "search_latency_ms": [
+     1,
+     8
+    ]
+   }
+  },
   "knn kernel": {
    "k27": {
     "distance_consistency": [
@@ -891,11 +907,11 @@
   "Clusterwise SpGEMM": {
    "k27": {
     "execution_time_ms": [
-     6,
+     8,
      8
     ],
     "throughput_mflops": [
-     6,
+     8,
      8
     ]
    }
