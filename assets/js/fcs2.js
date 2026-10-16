@@ -115,31 +115,50 @@ const lightCol = id => { const h = getComputedStyle(document.documentElement).ge
 function drawFciBars() {
   const M = MEAS[fcibMode], val = m => M.v(m.id), order = [...MODELS].sort((a, b) => val(b) - val(a));
   $('#fcibhead').textContent = M.head; $('#fcibnote').hidden = fcibMode !== 'fci';
-  const svg = $('#fcibsvg'), W = Math.max(300, $('#fcibplot').clientWidth), narrow = W < 560, an = animates(svg);
+  const svg = $('#fcibsvg'), W = Math.max(300, $('#fcibplot').clientWidth), an = animates(svg);
   svg.setAttribute('viewBox', `0 0 ${W} 10`); svg.replaceChildren();
-  const fs = narrow ? 11 : 13, ang = narrow ? 55 : 45;   // the names under the bars, slanted by ang degrees
-  const lens = order.map(m => { const t = sv('text', {class:'lab', x:-999, y:-999, 'font-size':fs}, narrow ? m.short : m.name); svg.append(t); return t.getComputedTextLength(); });
-  svg.replaceChildren();
-  const R = narrow ? 4 : 8, T = 10, lg = narrow ? 16 : 20, PH = CHART_H.fcib || (narrow ? 220 : 300), cos = Math.cos(ang * Math.PI / 180);
-  // the left margin lets the first slanted names end inside the chart
-  const over = l => Math.max(0, ...lens.map((n, i) => n * cos - fs * .35 - (W - l - R) / order.length * (i + .5) + 2));
-  let L = 4; for (let k = 0; k < 3; k++) L = 4 + over(L);
-  const B = 10 + lg + 10 + Math.max(...lens) * Math.sin(ang * Math.PI / 180) + 8, H = T + PH + B;
-  const top = Math.max(...order.map(val)), step = eciStep(top, 4), ymax = Math.ceil(top / step) * step;
-  const band = (W - L - R) / order.length, bw = Math.min(56, band * .74), base = T + PH, Y = v => T + (1 - Math.max(0, v) / ymax) * PH;
+  const measure = (txt, size, cls = 'lab') => { const t = sv('text', {class:cls, x:-999, y:-999, 'font-size':size}, txt); svg.append(t); const w = t.getComputedTextLength(); t.remove(); return w; };
+  // second style (owner, 2026-10-16): the value large in the middle of its bar, the logo on a light tile, and under it the
+  // name and, in grey, the harness, both upright and wrapped to the column; where the columns are too narrow for upright
+  // names (phones), the name alone, slanted
+  const R = 4, T = 10, band0 = (W - 8) / order.length, flat = band0 >= 72, fs = flat ? 14 : 11, ang = 55, cos = Math.cos(ang * Math.PI / 180);
+  const wrap = (txt, size, maxw) => txt.split(' ').reduce((ls, w) => { const l = ls[ls.length - 1]; if (l && measure(l + ' ' + w, size) <= maxw) ls[ls.length - 1] = l + ' ' + w; else ls.push(w); return ls; }, []);
+  const tile = flat ? 34 : 22, lead = fs * 1.3;
+  let L = 4, B;
+  if (flat) {
+    const lines = order.map(m => [wrap(m.name, fs, band0 - 8), m.h ? wrap(`(${m.h})`, fs - 1, band0 - 8) : []]);
+    order.forEach((m, k) => { m._nl = lines[k]; });
+    B = 14 + tile + 12 + Math.max(...lines.map(([a, b]) => a.length + b.length)) * lead + 6;
+  } else {
+    const lens = order.map(m => measure(m.short, fs));
+    const over = l => Math.max(0, ...lens.map((n, k) => n * cos - fs * .35 - (W - l - R) / order.length * (k + .5) + 2));
+    for (let k = 0; k < 3; k++) L = 4 + over(L);
+    B = 10 + tile + 10 + Math.max(...lens) * Math.sin(ang * Math.PI / 180) + 8;
+  }
+  const PH = CHART_H.fcib || (flat ? 320 : 220), H = T + PH + B;
+  const top = Math.max(...order.map(val)), step = eciStep(top, 4), ymax = Math.ceil(top * 1.06 / step) * step;
+  const band = (W - L - R) / order.length, bw = Math.min(96, band * .76), base = T + PH, Y = v => T + (1 - Math.max(0, v) / ymax) * PH;
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H);
-  for (let v = step; v <= ymax + step / 2; v += step) svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1, 'stroke-dasharray':'2 4'}));
-  svg.append(sv('line', {x1:L, x2:W - R, y1:base, y2:base, stroke:'var(--grid)', 'stroke-width':1, 'stroke-dasharray':'2 4'}));
-  const pts = [];
+  for (let v = step; v <= ymax + step / 2; v += step) svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1, 'stroke-dasharray':'4 4'}));
+  svg.append(sv('line', {x1:L, x2:W - R, y1:base, y2:base, stroke:'var(--ink-2)', 'stroke-width':1}));
+  const pts = [], vs = flat ? 26 : 13;   // the value's size
   order.forEach((m, i) => {
-    const e = val(m), cx = L + band * (i + .5), x = cx - bw / 2, y = Y(e), h = base - y, r = Math.min(5, bw / 6, h);
+    const e = val(m), cx = L + band * (i + .5), x = cx - bw / 2, y = Y(e), h = base - y, r = Math.min(6, bw / 6, h);
     const bar = sv('path', {d:`M${x},${base}V${y + r}Q${x},${y} ${x + r},${y}H${x + bw - r}Q${x + bw},${y} ${x + bw},${y + r}V${base}Z`, fill:MCOL[m.id], 'data-m':m.id});
-    const inside = h > fs * 2.4, vtx = sv('text', {x:cx, y:inside ? y + fs + 9 : y - 6, 'text-anchor':'middle', 'font-size':fs + 1, 'font-weight':600,
+    const inside = h > vs * 1.8, vtx = sv('text', {x:cx, y:inside ? y + h / 2 + vs * .36 : y - 8, 'text-anchor':'middle', 'font-size':inside ? vs : Math.round(vs * .75), 'font-weight':600,
       fill:inside ? (lightCol(m.id) ? 'var(--ink)' : '#fff') : 'var(--ink)'}, String(Math.round(e)));
-    const logo = LOGO[m.lab] ? sv('image', {href:LOGO_DIR + LOGO[m.lab] + '.svg', x:cx - lg / 2, y:base + 10, width:lg, height:lg}) : null;
-    const ny = base + 10 + lg + 12, name = sv('text', {class:'lab', x:cx + fs * .35, y:ny, 'font-size':fs, 'text-anchor':'end',
-      transform:`rotate(${-ang} ${cx + fs * .35} ${ny})`}, narrow ? m.short : m.name);
-    svg.append(bar, vtx, name); if (logo) svg.append(logo);
+    svg.append(bar, vtx);
+    const ty = base + (flat ? 14 : 10);
+    svg.append(sv('rect', {x:cx - tile / 2, y:ty, width:tile, height:tile, rx:tile * .2, fill:'#f1f3f4'}));
+    if (LOGO[m.lab]) { const lg = tile * .58; svg.append(sv('image', {href:LOGO_DIR + LOGO[m.lab] + '.svg', x:cx - lg / 2, y:ty + (tile - lg) / 2, width:lg, height:lg})); }
+    if (flat) {
+      const [nl, hl] = m._nl; let ly = ty + tile + 12 + fs;
+      nl.forEach(l => { svg.append(sv('text', {class:'lab', x:cx, y:ly, 'font-size':fs, 'text-anchor':'middle', fill:'var(--ink)'}, l)); ly += lead; });
+      hl.forEach(l => { svg.append(sv('text', {x:cx, y:ly, 'font-size':fs - 1, 'text-anchor':'middle', fill:'var(--muted)'}, l)); ly += lead; });
+    } else {
+      const ny = ty + tile + 12;
+      svg.append(sv('text', {class:'lab', x:cx + fs * .35, y:ny, 'font-size':fs, 'text-anchor':'end', transform:`rotate(${-ang} ${cx + fs * .35} ${ny})`}, m.short));
+    }
     if (an) { mark(bar, 'a-rise', i * .05); mark(vtx, 'a-fade', .5 + i * .05); }
     pts.push({x:cx, y, mean:true, html:`<b>${esc(m.name)}</b>${m.h ? ` · ${esc(m.h)}` : ''}<br>${M.name} <b>${M.fmt(e)}</b>`});
   });
