@@ -72,7 +72,7 @@ function drawPassCost() {
   }
   // ticks at 1, 2 and 5 times each power of ten; a range under one decade still gets several
   for (let k = Math.floor(x0); k <= Math.ceil(x1); k++) [1, 2, 5].forEach(f => { const v = f * 10 ** k, lv = Math.log10(v);
-    if (lv < x0 - 1e-9 || lv > x1 + 1e-9 || (narrow && f === 2 && x1 - x0 > 1.5)) return;
+    if (lv < x0 - 1e-9 || lv > x1 + 1e-9 || (narrow && f !== 1 && x1 - x0 > 2.5) || (narrow && f === 2 && x1 - x0 > 1.5)) return;   // phones: over 2.5 decades, powers of ten only, so labels do not crowd
     svg.append(sv('line', {x1:X(v), x2:X(v), y1:T, y2:H - B, stroke:'var(--grid)', 'stroke-width':1}));
     svg.append(sv('text', {x:X(v), y:H - B + 20, 'text-anchor':'middle'}, usdfmt(v))); });
   svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'Cost per run in US$, mean, log scale'));
@@ -128,10 +128,10 @@ function drawPassBars() {
     B = 10 + tile + 10 + Math.max(...lens) * Math.sin(ang * Math.PI / 180) + 8;
   }
   const PH = CHART_H.fcib || (flat ? 320 : 220), H = T + PH + B;
-  const top = Math.max(...order.map(val)), step = eciStep(top, 4), ymax = Math.ceil(top * 1.06 / step) * step;
+  const top = Math.max(...order.map(val)), step = eciStep(top, 4), ymax = top * 1.06;   // the tallest bar near the top: no axis numbers to round to
   const band = (W - L - R) / order.length, bw = Math.min(96, band * .76), base = T + PH, Y = v => T + (1 - Math.max(0, v) / ymax) * PH;
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H);
-  for (let v = step; v <= ymax + step / 2; v += step) svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1, 'stroke-dasharray':'4 4'}));
+  for (let v = step; v <= ymax; v += step) svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1, 'stroke-dasharray':'4 4'}));
   svg.append(sv('line', {x1:L, x2:W - R, y1:base, y2:base, stroke:'var(--ink-2)', 'stroke-width':1}));
   const pts = [], vs = flat ? 26 : 13;   // the value's size
   order.forEach((m, i) => {
