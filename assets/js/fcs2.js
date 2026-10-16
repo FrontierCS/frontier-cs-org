@@ -83,10 +83,10 @@ function drawPassCost() {
   const front = [...ms].sort((p, q) => COST[p.id][0] - COST[q.id][0] || val(q) - val(p)).filter((m, i, a) => a.slice(0, i).every(o => val(o) < val(m)));
   order.forEach(m => {
     const [cx, cy] = at(m), name = narrow ? m.short : m.name;
-    // the frontier reads from the dots themselves, with no line: a model on it has a larger dot and a bold name, a model
-    // under it a smaller dot and a regular name, both at full colour (owner, 2026-10-13: keep the chart clean)
+    // the frontier reads from the names, with no line: a model on it has a bold name, a model under it a regular name;
+    // every dot is the same size, at full colour (owner, 2026-10-13: keep the chart clean; 2026-10-16: one dot size)
     const lead = front.includes(m);
-    svg.append(sv('circle', {cx, cy, r:lead ? 7.5 : 5, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':2, 'data-m':m.id}));
+    svg.append(sv('circle', {cx, cy, r:6.5, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':2, 'data-m':m.id}));   // one dot size for every model (owner, 2026-10-16); the frontier keeps its bold names
     labelDot(svg, boxes, cx, cy, name, {l:L, r:W, t:T, b:H - B}, MTXT(m.id), lead);   // fcs2-data.js
     pts.push({x:cx, y:cy, mean:true, html:`<b>${esc(m.name)}</b><br>Pass rate <b>${f1(val(m))}%</b><br>${usdfmt(COST[m.id][0])} per run, mean`});
   });
@@ -152,7 +152,7 @@ function drawPassBars() {
       svg.append(sv('text', {class:'lab', x:cx + fs * .35, y:ny, 'font-size':fs, 'text-anchor':'end', transform:`rotate(${-ang} ${cx + fs * .35} ${ny})`}, m.short));
     }
     if (an) { mark(bar, 'a-rise', i * .05); mark(vtx, 'a-fade', .5 + i * .05); }
-    pts.push({x:cx, y, mean:true, html:`<b>${esc(m.name)}</b>${m.h ? ` · ${esc(m.h)}` : ''}<br>Pass rate <b>${f1(e)}%</b>`});
+    pts.push({x:cx, y, box:[cx - band / 2, cx + band / 2, T, H], html:`<b>${esc(m.name)}</b>${m.h ? ` · ${esc(m.h)}` : ''}<br>Pass rate <b>${f1(e)}%</b>`});   // the whole column, bar, logo and name, shows the tooltip
   });
   attachTip(svg, W, H, pts, $('#fcibtip'));
 }
