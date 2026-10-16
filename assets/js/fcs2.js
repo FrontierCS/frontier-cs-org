@@ -562,10 +562,6 @@ $('#checks').addEventListener('change', e => { e.target.checked ? picked.add(e.t
   document.addEventListener('pointerdown', e => { if (!menu.hidden && !dd.contains(e.target)) close(false); });
 })();
 $('#ftoggle').addEventListener('click', () => { const f = $('#filter'), o = !f.classList.contains('open'); f.classList.toggle('open', o); $('#ftoggle').setAttribute('aria-expanded', String(o)); });
-// in the kebab view the filter is a menu, which a click outside closes, as the sort menu's does
-document.addEventListener('pointerdown', e => { const f = $('#filter');
-  if (tview === 'kebab' && f.classList.contains('open') && !f.contains(e.target) && getComputedStyle(f.querySelector('.fbody')).position === 'absolute') {
-    f.classList.remove('open'); $('#ftoggle').setAttribute('aria-expanded', 'false'); } });
 $('#q').addEventListener('input', e => { q = e.target.value; again(); });
 // the list scrolls in its own box, all tasks in it (owner, 2026-10-14: no Show more button); the foot fades until the end is reached
 const atEnd = () => { const r = $('#rows'); r.classList.toggle('at-end', r.scrollTop + r.clientHeight >= r.scrollHeight - 2);
