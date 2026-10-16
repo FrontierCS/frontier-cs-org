@@ -425,8 +425,8 @@ function drawTable() {
 
 /* ---------- every run: a kebab (Qiuyang, 2026-10-16), named a kebab rather than Terminal-Bench's waffle: each cell is one skewer of squares ----------
    One row per task, easiest first by FDI, the tasks held off the fits (no FDI) last; one column per model in FCI order. A cell
-   holds one square per metric the task checks: blue when the run's final submission beat the human reference on every hidden
-   workload, grey when it did not, so a run passes when all its squares are blue. The counts are PASSBY's (fcs2-checks.js),
+   holds one square per metric the task checks: dark when the run's final submission beat the human reference on every hidden
+   workload, grey when it did not, so a run passes when all its squares are dark. The counts are PASSBY's (fcs2-checks.js),
    summed per metric as the converter sums them. A run that failed or was refused (STATE) takes that colour on all its squares;
    a run that timed out shows its metrics like any other (Qiuyang: no timeout state). A task's squares keep one order in every column, the metric the most runs beat first. */
 const KSTATE = {failed:['fa', 'Run failed', 'The run failed: final score 0'],
