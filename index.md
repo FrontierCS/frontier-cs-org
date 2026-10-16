@@ -48,11 +48,20 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
 
   <div class="tbl-wrap" id="eci">
     <h3>FCI</h3>
+    <!-- One bar per model in the style of Artificial Analysis's index chart, the FCI as a whole number in the bar; the
+         chart with 90% intervals is folded under it (owner, 2026-10-16) -->
     <figure class="chart" style="margin:0">
       <div class="chead"><span>FrontierCS Capabilities Index (FCI)</span></div>
-      <div class="plot" id="eciplot"><svg id="ecisvg" role="img" aria-label="FCI chart"></svg><div class="tip" id="ecitip" hidden></div></div>
-      <div class="cfoot">{% include chart_logo.html %}<span id="ecinote">Kimi K2.7 = <span data-fill="zero"></span> · whiskers are 90% intervals</span></div>
+      <div class="plot" id="fcibplot"><svg id="fcibsvg" role="img" aria-label="FCI by model"></svg><div class="tip" id="fcibtip" hidden></div></div>
+      <div class="cfoot">{% include chart_logo.html %}<span>Kimi K2.7 = <span data-fill="zero"></span></span></div>
     </figure>
+    <details class="fold" id="eci-ci">
+      <summary><h3>FCI with 90% intervals</h3></summary>
+      <figure class="chart" style="margin:0">
+        <div class="plot" id="eciplot"><svg id="ecisvg" role="img" aria-label="FCI chart"></svg><div class="tip" id="ecitip" hidden></div></div>
+        <div class="cfoot">{% include chart_logo.html %}<span id="ecinote">Kimi K2.7 = <span data-fill="zero"></span> · whiskers are 90% intervals</span></div>
+      </figure>
+    </details>
     <p class="pcontact">To add your model, email its score on every task to both <a class="mail" href="mailto:qmang@berkeley.edu,wenhao.chai@princeton.edu">qmang@berkeley.edu</a> and <a class="mail" href="mailto:qmang@berkeley.edu,wenhao.chai@princeton.edu">wenhao.chai@princeton.edu</a>.</p>
     <details class="fold how" id="fci-how">
       <summary><h3>How FCI works</h3></summary>

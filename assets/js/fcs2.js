@@ -96,6 +96,48 @@ function drawPassCost() {
 /* On phones the model column is as wide as the longest model name, so every name shows in full (owner: "DeepSeek V4.1 Flash", not cut). */
 const nameCol = svg => { svg.replaceChildren(); const w = Math.max(...MODELS.map(m => { const t = sv('text', {class:'lab', x:-999, y:-999}, m.short); svg.append(t); return t.getComputedTextLength(); })); svg.replaceChildren(); return Math.max(112, Math.ceil(w) + 12); };
 
+/* FCI as bars (owner, 2026-10-16, after Artificial Analysis's Intelligence Index chart): one column per model, highest
+   first, in the model's colour with rounded top corners; the FCI rounded to a whole number sits inside the bar near its
+   top, white (dark ink on a light colour); under each bar the lab's logo and the model's name, slanted. Dotted grid lines,
+   no axis numbers: the bars carry them. Kimi K2.7, the 0 point, has no bar. */
+const LOGO = {OpenAI:'openai', Anthropic:'anthropic', Google:'google', Meta:'meta', Kimi:'kimi', DeepSeek:'deepseek', 'Z.ai':'zai', Qwen:'qwen'};
+const LOGO_DIR = (document.querySelector('script[src*="fcs2.js"]') || {src:''}).src.replace(/js\/fcs2\.js.*$/, 'img/models/');
+const lightCol = id => { const h = getComputedStyle(document.documentElement).getPropertyValue(`--m-${id}`).trim().replace('#', '');
+  if (h.length !== 6) return false; const [r, g, b] = [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16) / 255);
+  return .2126 * r + .7152 * g + .0722 * b > .6; };   // white as Artificial Analysis has it, dark ink only on the lightest (Sol's grey, GLM Flash's pink)
+function drawFciBars() {
+  const order = [...MODELS].sort((a, b) => ECI[b.id][0] - ECI[a.id][0]);
+  const svg = $('#fcibsvg'), W = Math.max(300, $('#fcibplot').clientWidth), narrow = W < 560, an = animates(svg);
+  svg.setAttribute('viewBox', `0 0 ${W} 10`); svg.replaceChildren();
+  const fs = narrow ? 11 : 13, ang = narrow ? 55 : 45;   // the names under the bars, slanted by ang degrees
+  const lens = order.map(m => { const t = sv('text', {class:'lab', x:-999, y:-999, 'font-size':fs}, narrow ? m.short : m.name); svg.append(t); return t.getComputedTextLength(); });
+  svg.replaceChildren();
+  const R = narrow ? 4 : 8, T = 10, lg = narrow ? 16 : 20, PH = CHART_H.fcib || (narrow ? 220 : 300), cos = Math.cos(ang * Math.PI / 180);
+  // the left margin lets the first slanted names end inside the chart
+  const over = l => Math.max(0, ...lens.map((n, i) => n * cos - fs * .35 - (W - l - R) / order.length * (i + .5) + 2));
+  let L = 4; for (let k = 0; k < 3; k++) L = 4 + over(L);
+  const B = 10 + lg + 10 + Math.max(...lens) * Math.sin(ang * Math.PI / 180) + 8, H = T + PH + B;
+  const top = Math.max(...order.map(m => ECI[m.id][0])), step = eciStep(top, 4), ymax = Math.ceil(top / step) * step;
+  const band = (W - L - R) / order.length, bw = Math.min(56, band * .74), base = T + PH, Y = v => T + (1 - Math.max(0, v) / ymax) * PH;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H);
+  for (let v = step; v <= ymax + step / 2; v += step) svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1, 'stroke-dasharray':'2 4'}));
+  svg.append(sv('line', {x1:L, x2:W - R, y1:base, y2:base, stroke:'var(--grid)', 'stroke-width':1, 'stroke-dasharray':'2 4'}));
+  const pts = [];
+  order.forEach((m, i) => {
+    const e = ECI[m.id][0], cx = L + band * (i + .5), x = cx - bw / 2, y = Y(e), h = base - y, r = Math.min(5, bw / 6, h);
+    const bar = sv('path', {d:`M${x},${base}V${y + r}Q${x},${y} ${x + r},${y}H${x + bw - r}Q${x + bw},${y} ${x + bw},${y + r}V${base}Z`, fill:MCOL[m.id], 'data-m':m.id});
+    const inside = h > fs * 2.4, val = sv('text', {x:cx, y:inside ? y + fs + 9 : y - 6, 'text-anchor':'middle', 'font-size':fs + 1, 'font-weight':600,
+      fill:inside ? (lightCol(m.id) ? 'var(--ink)' : '#fff') : 'var(--ink)'}, String(Math.round(e)));
+    const logo = LOGO[m.lab] ? sv('image', {href:LOGO_DIR + LOGO[m.lab] + '.svg', x:cx - lg / 2, y:base + 10, width:lg, height:lg}) : null;
+    const ny = base + 10 + lg + 12, name = sv('text', {class:'lab', x:cx + fs * .35, y:ny, 'font-size':fs, 'text-anchor':'end',
+      transform:`rotate(${-ang} ${cx + fs * .35} ${ny})`}, narrow ? m.short : m.name);
+    svg.append(bar, val, name); if (logo) svg.append(logo);
+    if (an) { mark(bar, 'a-rise', i * .05); mark(val, 'a-fade', .5 + i * .05); }
+    pts.push({x:cx, y, mean:true, html:`<b>${esc(m.name)}</b>${m.h ? ` · ${esc(m.h)}` : ''}<br>FCI <b>${fe(e)}</b>`});
+  });
+  attachTip(svg, W, H, pts, $('#fcibtip'));
+}
+
 /* FCI: one row per model ranked by ECI, a bar from 0 (Kimi K2.7) to its FCI and its 90% interval as a whisker. */
 function drawECI() {
   const order = [...MODELS].sort((a, b) => ECI[b.id][0] - ECI[a.id][0]);
@@ -397,6 +439,7 @@ function drawHow() {
   $('#howalegend').innerHTML = picks.map((s, i) => `<span><i style="background:${INKS[i]}"></i>${esc(NAME(s))}, FDI ${fe(FDI[s])}</span>`).join('');
 }
 $('#fci-how').addEventListener('toggle', drawHow);
+$('#eci-ci').addEventListener('toggle', () => { if ($('#eci-ci').open) { shown.add('ecisvg'); drawECI(); } });   // folded, it drew at no width; opened, it draws at once, with no entrance
 redraws.push(drawHow);
 
 /* ---------- questions ---------- */
@@ -702,7 +745,7 @@ drawPapers();
   const lock = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.2" fill="#3c4043"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="#3c4043" stroke-width="2.2" stroke-linecap="round"/></svg>';
   $('#locked').innerHTML = Array.from({length:6}, (_, i) => all[Math.floor((i + .5) * all.length / 6)]).map(([t, k]) =>
     `<div class="lk-tile" style="background:${ART_FIELD[k]}"><div class="lk-art">${taskArt(t.s, k).replace('<svg class="art"', '<svg width="100%" height="100%" preserveAspectRatio="xMidYMid slice"')}</div><span class="lk-lock">${lock}</span></div>`).join(''); })();
-drawPassCost(); drawTable(); drawLB(); drawECI(); drawTTS(); drawMap(); drawRows();
+drawPassCost(); drawTable(); drawLB(); drawFciBars(); drawECI(); drawTTS(); drawMap(); drawRows();
 // labels are placed by measured text width, so draw again once the web font has loaded and the widths are final
-if (document.fonts) document.fonts.ready.then(() => { drawPassCost(); drawLB(); drawECI(); drawTTS(); drawMap(); });
-let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { drawPassCost(); drawLB(); drawECI(); drawTTS(); drawMap(); drawPapers(); redraws.forEach(f => f()); }, 120); });
+if (document.fonts) document.fonts.ready.then(() => { drawPassCost(); drawLB(); drawFciBars(); drawECI(); drawTTS(); drawMap(); });
+let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { drawPassCost(); drawLB(); drawFciBars(); drawECI(); drawTTS(); drawMap(); drawPapers(); redraws.forEach(f => f()); }, 120); });
