@@ -256,8 +256,9 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 .idx > .kebab{grid-column:1 / -1; min-width:0}
 .idx.kv #lhead, .idx.kv .rwrap{display:none}
 @media (min-width:901px){
+  .filter{padding-top:10px}   /* the first checkbox level with the middle of the search field (Qiuyang) */
   .idx.kv{grid-template-columns:minmax(0,1fr); row-gap:18px}
-  .idx.kv > .filter{order:1} .idx.kv > .kebab{order:2}
+  .idx.kv > .filter{order:1; padding-top:0} .idx.kv > .kebab{order:2}
   .idx.kv .checks{flex-direction:row; flex-wrap:wrap; gap:10px 28px}
 }
 .bar{display:flex; gap:12px; align-items:center; flex-wrap:wrap}
