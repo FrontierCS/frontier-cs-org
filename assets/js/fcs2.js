@@ -209,7 +209,7 @@ function drawECI() {
    a model's final FCI until another model passes it; the rest of every curve is faint (TTS_FADE), in full again while the
    pointer is on it or its legend entry. */
 let ttsHover = null, ttsRun = 0;
-const TTS_FADE = .14;   // Qiuyang: fainter than .25
+const TTS_FADE = .2;   // Qiuyang: .25 too strong, .14 too light
 const TTSM = RANKED.filter(m => SCALE[m.id]);   // a model with no reported spend has no curve
 const ttsOn = new Set(TTSM.map(m => m.id));
 const ttsBands = () => { document.querySelectorAll('#ttssvg .tband').forEach(b => b.setAttribute('opacity', b.dataset.m === ttsHover ? .12 : 0));
@@ -330,7 +330,7 @@ function drawTTS(t) {
   // focus moves, the model that leads at the cursor is named at the frontier's head
   if (play && front.length) { const [k, ps] = front[front.length - 1]; tips.push({m:ms[k], e:ps[ps.length - 1]}); }
   front.forEach(([k, ps]) => gl.append(sv('path', {d:ps.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join(''),
-    fill:'none', stroke:MCOL[ms[k].id], 'stroke-width':2.6, 'stroke-linejoin':'round', 'stroke-linecap':'round'})));
+    fill:'none', stroke:MCOL[ms[k].id], 'stroke-width':3, 'stroke-linejoin':'round', 'stroke-linecap':'round'})));
   /* at rest, each model that holds a stretch of the frontier is named over it with its lab's logo (Qiuyang): above the
      stretch's last point on the model's own curve (its end dot, when that is on the frontier), else below it, else not at
      all; models with their end dot on the frontier are placed first, one label per model */
