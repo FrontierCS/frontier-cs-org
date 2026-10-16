@@ -135,6 +135,15 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
     </aside>
   </div>
   </div>
+  <div class="tbl-wrap" id="waffle">
+    <h3>Every run</h3>
+    <figure class="chart" style="margin:0">
+      <div class="chead"><span>One square per metric the task checks</span></div>
+      <div class="plot" id="wafplot"><div class="waf-scroll" id="wafscroll"><table class="waf" id="waftbl"></table></div><div class="tip" id="waftip" hidden></div></div>
+      <div class="legend" id="waflegend"></div>
+      <div class="cfoot">{% include chart_logo.html %}</div>
+    </figure>
+  </div>
 </section>
 
 <section class="sec" id="tasks">
@@ -199,5 +208,6 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
 </div>
 </div>
 <script defer src="{{ '/assets/js/fcs2-data.js' | relative_url }}"></script>
+<script defer src="{{ '/assets/js/fcs2-checks.js' | relative_url }}"></script>
 <script defer src="{{ '/assets/js/fcs2-art.js' | relative_url }}"></script>
 <script defer src="{{ '/assets/js/fcs2.js' | relative_url }}"></script>

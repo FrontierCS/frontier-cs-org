@@ -423,8 +423,63 @@ function drawTable() {
   $('#restbl').innerHTML = head + rows;
 }
 
+/* ---------- every run: a waffle (Qiuyang, 2026-10-16, after Terminal-Bench's) ----------
+   One row per task, easiest first by FDI, the tasks held off the fits (no FDI) last; one column per model in FCI order. A cell
+   holds one square per metric the task checks: dark when the run's final submission beat the human reference on every hidden
+   workload, grey when it did not, so a run passes when all its squares are dark. The counts are PASSBY's (fcs2-checks.js),
+   summed per metric as the converter sums them. A run that timed out, failed or was refused (STATE) takes that colour on all
+   its squares. A task's squares keep one order in every column, the metric the most runs beat first. */
+const WSTATE = {timeout:['to', 'Timed out', 'Timed out: final score 0'], failed:['fa', 'Run failed', 'The run failed: final score 0'],
+  refused:['rf', 'Refused by the model provider', 'The model provider refused the task: left out of FCI and FDI'], unscored:['un', 'Not scored yet', 'Not scored yet']};
+function drawWaffle() {
+  const st = typeof STATE === 'undefined' ? {} : STATE, used = new Set();
+  const tasks = [...RAN].sort((a, b) => (FDI[a] ?? 1e9) - (FDI[b] ?? 1e9) || NAME(a).localeCompare(NAME(b)));
+  const cells = [];
+  const body = tasks.map(t => {
+    // per model, per metric: [hidden workloads beaten, in all]; 'dev/' keys are development workloads, not judged
+    const per = Object.fromEntries(RANKED.map(m => { const agg = {};
+      for (const [k, [b, n]] of Object.entries((PASSBY[t] || {})[m.id] || {})) { if (k.startsWith('dev/')) continue;
+        const j = k.slice(k.lastIndexOf('/') + 1), a = agg[j] ||= [0, 0]; a[0] += b; a[1] += n; }
+      return [m.id, agg]; }));
+    const won = (m, j) => { const a = per[m][j]; return !!a && a[1] > 0 && a[0] === a[1]; };
+    const order = CHECKS[t] ? CHECKS[t].metrics : [];
+    const stems = [...new Set([...order, ...RANKED.flatMap(m => Object.keys(per[m.id]))])];
+    const nwon = j => RANKED.filter(m => won(m.id, j)).length;
+    stems.sort((a, b) => nwon(b) - nwon(a) || order.indexOf(a) - order.indexOf(b));
+    const tds = RANKED.map(m => {
+      const run = RUNS.find(r => r.t === t && r.m === m.id), s = (st[t] || {})[m.id];
+      if (!run && !s) return '<td></td>';
+      const k = stems.filter(j => won(m.id, j)).length, n = stems.length;
+      let html = `<b>${esc(m.name)}</b><br>${esc(NAME(t))}<br>`;
+      if (s) { used.add(s); html += WSTATE[s][2]; }
+      else html += (k === n ? `<b>Passes</b>: beats ${n === 1 ? 'its one metric' : `all ${n} metrics`}` : `Beats ${k} of ${n} metric${n === 1 ? '' : 's'}`)
+        + `<br>Final score ${f1(run.s)}${REF[t] != null ? `, human reference ${f1(REF[t])}` : ''}`;
+      cells.push(html);
+      return `<td data-i="${cells.length - 1}"><span class="sqs">${stems.map(j => `<i class="${s ? WSTATE[s][0] : won(m.id, j) ? 'y' : 'n'}"></i>`).join('')}</span></td>`;
+    }).join('');
+    return `<tr><td class="wt"><a href="${esc(taskHref(t))}">${esc(NAME(t))}</a></td><td class="wf">${FDI[t] != null ? fe(FDI[t]) : '–'}</td>${tds}</tr>`;
+  }).join('');
+  $('#waftbl').innerHTML = `<colgroup><col class="wt"><col class="wf">${RANKED.map(() => '<col>').join('')}</colgroup>`
+    + `<thead><tr><th class="wt">Task</th><th class="wf">FDI</th>${RANKED.map(m => `<th><span class="mn" style="background:${MCOL[m.id]}"></span>${esc(m.name)}</th>`).join('')}</tr></thead><tbody>${body}</tbody>`;
+  $('#waflegend').innerHTML = [['y', 'Beaten on every hidden workload'], ['n', 'Not beaten'], ...Object.entries(WSTATE).filter(([k]) => used.has(k)).map(([, v]) => v)]
+    .map(([c, l]) => `<span><i class="${c}"></i>${l}</span>`).join('');
+  const box = $('#wafplot'), tip = $('#waftip');
+  const show = ev => { const td = ev.target.closest && ev.target.closest('td[data-i]'); if (!td) { tip.hidden = true; return; }
+    const rc = td.getBoundingClientRect(), pr = box.getBoundingClientRect();
+    tip.innerHTML = cells[td.dataset.i]; tip.hidden = false; tip.style.left = (rc.left + rc.width / 2 - pr.left) + 'px'; tip.style.top = (rc.top - pr.top + 4) + 'px'; };
+  box.onpointermove = box.onpointerdown = show;
+  box.onpointerleave = () => { if (!isTouch) tip.hidden = true; };
+  $('#wafscroll').onscroll = () => { tip.hidden = true; };
+  fitWaffle();
+}
+// the table scrolls sideways only when it does not fit, since a scrolling box would keep its header from sticking under the section bar
+function fitWaffle() {
+  const sc = $('#wafscroll'); sc.classList.remove('scroll'); sc.classList.toggle('scroll', $('#waftbl').offsetWidth > sc.clientWidth + 1);
+  $('#waftbl').style.setProperty('--wtop', $('.sub').offsetHeight + 'px');
+}
+
 /* ---------- case studies: a placeholder until the preview runs have their own (owner, 2026-10-09) ---------- */
-const redraws = [];
+const redraws = [fitWaffle];
 
 /* ---------- How FCI works: a fold under the FCI chart (owner, 2026-10-11) ----------
    Three tasks' pass curves, the joint model's own (passChance, fcs2-data.js): an easy, a middle and a hard one, the tasks a sixth, a half and five sixths of the way up the FDI order, so the picture
@@ -764,7 +819,7 @@ drawPapers();
   const lock = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.2" fill="#3c4043"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="#3c4043" stroke-width="2.2" stroke-linecap="round"/></svg>';
   $('#locked').innerHTML = Array.from({length:6}, (_, i) => all[Math.floor((i + .5) * all.length / 6)]).map(([t, k]) =>
     `<div class="lk-tile" style="background:${ART_FIELD[k]}"><div class="lk-art">${taskArt(t.s, k).replace('<svg class="art"', '<svg width="100%" height="100%" preserveAspectRatio="xMidYMid slice"')}</div><span class="lk-lock">${lock}</span></div>`).join(''); })();
-drawPassCost(); drawTable(); drawLB(); drawPassBars(); drawECI(); drawTTS(); drawMap(); drawRows();
+drawPassCost(); drawTable(); drawWaffle(); drawLB(); drawPassBars(); drawECI(); drawTTS(); drawMap(); drawRows();
 // labels are placed by measured text width, so draw again once the web font has loaded and the widths are final
 if (document.fonts) document.fonts.ready.then(() => { drawPassCost(); drawLB(); drawPassBars(); drawECI(); drawTTS(); drawMap(); });
 let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { drawPassCost(); drawLB(); drawPassBars(); drawECI(); drawTTS(); drawMap(); drawPapers(); redraws.forEach(f => f()); }, 120); });
