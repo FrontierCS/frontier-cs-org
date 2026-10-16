@@ -374,7 +374,12 @@ function drawTTS(t) {
       if (labelDot(svg, both, X(e[0]), Y(e[1]), name, fr, MTXT(m.id), false)) boxes.push(both[both.length - 1]);
       else labelDot(svg, boxes, X(e[0]), Y(e[1]), name, fr, MTXT(m.id), false); });
   }
-  $('#ttslegend').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', ttsOn.has(x.dataset.m)));
+  // the legend's bars, on the chart's y scale: each curve's tip, so the model's FCI at rest and its FCI at the cursor while
+  // the chart plays; a hidden model keeps its FCI, greyed (Qiuyang)
+  $('#ttslegend').querySelectorAll('button').forEach(x => { const id = x.dataset.m, on = ttsOn.has(id), k = ms.findIndex(m => m.id === id), c = ttsCurve(id);
+    const v = on && k >= 0 ? (viss[k].length ? viss[k][viss[k].length - 1][1] : null) : c.length ? c[c.length - 1][1] : null;
+    x.setAttribute('aria-pressed', on); x.querySelector('.bar b').style.width = `${v == null ? 0 : Math.min(1, Math.max(0, v / ymax)) * 100}%`;
+    x.querySelector('.v').textContent = v == null ? '' : fe(v); });
   if (play) { svg.onpointermove = svg.onpointerdown = svg.onpointerleave = null; return; }
   attachTip(svg, W, H, pts, $('#ttstip'));
   // the curve under the pointer: the nearest point within 28 px, as the tooltip picks it; set as properties, so a redraw replaces them
@@ -385,7 +390,9 @@ function drawTTS(t) {
   svg.onpointerleave = ev => { tipLeave(ev); ttsHover = null; ttsBands(); };
   ttsBands();
 }
-$('#ttslegend').innerHTML = TTSM.map(m => `<button type="button" data-m="${m.id}" aria-pressed="false"><i class="ln${TTS_DASH.has(m.id) ? ' dash' : ''}" style="color:${MCOL[m.id]}"></i>${esc(m.name)}</button>`).join('');
+$('#ttslegend').innerHTML = TTSM.map(m => `<button type="button" data-m="${m.id}" aria-pressed="false"><i class="ln${TTS_DASH.has(m.id) ? ' dash' : ''}" style="color:${MCOL[m.id]}"></i>`
+  + (LOGO[m.lab] ? `<img class="lg" src="${LOGO_DIR + LOGO[m.lab]}.svg" alt="">` : '<span></span>')
+  + `<span>${esc(m.name)}</span><span class="bar"><b style="background:${MCOL[m.id]}"></b></span><span class="v"></span></button>`).join('');
 $('#ttslegend').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return;
   const m = b.dataset.m; ttsOn.has(m) ? ttsOn.delete(m) : ttsOn.add(m); drawTTS(); });
 $('#ttslegend').addEventListener('pointerover', e => { const b = e.target.closest('button'); if (b && e.pointerType === 'mouse') { ttsHover = b.dataset.m; ttsBands(); } });

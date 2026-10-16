@@ -81,10 +81,17 @@ h2{font-weight:600; font-size:clamp(25px,2.4vw,30px); line-height:1.2; margin:0}
 #ttslegend i.ln{width:22px; height:0; background:none; border-top:3px solid currentColor}   /* a line, as the curves are; dashed for a lab's second model */
 #ttslegend i.ln.dash{border-top-style:dashed}
 #ttslegend button[aria-pressed="false"] i.ln{box-shadow:none; border-top-color:var(--faint)}
-/* Test-time scaling: the chart narrower, its legend a column to its right (Qiuyang); under it again on a narrow screen */
-.tts-body{display:grid; grid-template-columns:minmax(0,1fr) 210px; gap:0 40px; align-items:start}
-.tts-body #ttslegend{flex-direction:column; flex-wrap:nowrap; align-items:flex-start; gap:13px; margin-top:6px}
-@media (max-width:900px){ .tts-body{grid-template-columns:minmax(0,1fr)} .tts-body #ttslegend{flex-direction:row; flex-wrap:wrap; gap:10px 26px; margin-top:14px} }
+/* Test-time scaling: the chart narrower, its legend a column to its right (Qiuyang); under it again on a narrow screen.
+   The legend ranks the models: line, lab logo, name, a bar to the model's FCI and the value, in columns shared by every row */
+.tts-body{display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:0 36px; align-items:start}
+.tts-body #ttslegend{display:grid; grid-template-columns:22px 16px max-content minmax(40px,1fr) auto; gap:9px; margin:2px 0 0}   /* the rows' column gap is the grid's, or a subgrid's own gap eats into its tracks */
+.tts-body #ttslegend button{display:grid; grid-column:1/-1; grid-template-columns:subgrid; gap:0 9px; margin:0 -8px 0 -6px; padding:3px 8px 3px 6px; text-align:left}
+#ttslegend img.lg{width:16px; height:16px; display:block}
+#ttslegend .bar{display:block; height:8px; border-radius:4px; background:var(--grid); overflow:hidden}
+#ttslegend .bar b{display:block; height:100%; width:0; border-radius:4px}
+#ttslegend .v{font-variant-numeric:tabular-nums; font-weight:600; text-align:right; min-width:2.4em}
+#ttslegend button[aria-pressed="false"] .bar b{background:var(--faint)!important} #ttslegend button[aria-pressed="false"] img.lg{opacity:.4}
+@media (max-width:900px){ .tts-body{grid-template-columns:minmax(0,1fr)} .tts-body #ttslegend{margin-top:14px; row-gap:6px} }
 .cfoot{display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:16px; padding-top:14px; border-top:1px solid var(--line); font-size:13px; color:var(--muted-2)}
 /* the FrontierCS logo (mark and wordmark) signs each chart at the bottom left (owner, 2026-10-11) */
 .cfoot .clogo{display:inline-flex; align-items:center; gap:6px; flex:none; white-space:nowrap; font:500 15px/1 'Instrument Sans',var(--sans); letter-spacing:-.01em; color:var(--ink)}
