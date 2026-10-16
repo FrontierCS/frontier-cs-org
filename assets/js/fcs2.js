@@ -268,7 +268,7 @@ function ttsSweep(cs, x0, x1, t) {
   return x0 + (x1 - x0) * (k - 1 + (target - w[k - 1]) / ((w[k] - w[k - 1]) || 1)) / n;
 }
 function ttsPlay(run) {
-  const t0 = performance.now(), D = 3400;
+  const t0 = performance.now(), D = 5500;   // ms for the whole sweep (Qiuyang: slower; it was 3400)
   const step = now => { if (run !== ttsRun) return; const t = Math.min(1, (now - t0) / D); drawTTS(t); if (t < 1) requestAnimationFrame(step); };
   requestAnimationFrame(step);
 }
