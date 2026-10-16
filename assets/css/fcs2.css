@@ -129,7 +129,8 @@ h2{font-weight:600; font-size:clamp(25px,2.4vw,30px); line-height:1.2; margin:0}
 .how-fig{margin:0}
 .how-fig .chead{margin-top:0}
 /* How FCI works: a formula on its own line, scrolling sideways on a phone rather than widening the page; a full-width paragraph under it */
-.how-eq{overflow-x:auto; overflow-y:hidden; margin:4px 0 14px; color:var(--ink)}
+.how-eq{overflow-x:auto; overflow-y:hidden; margin:0 0 6px; color:var(--ink)}
+.how-eq + :not(.how-eq){margin-top:8px}
 .how-body > p.how-para{max-width:760px; line-height:1.6; color:var(--ink-2); margin:0 0 28px}
 .how-why{margin:0; padding:0; list-style:none; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:22px 56px; line-height:1.6; color:var(--ink-2)}
 .how-why li{margin:0}
