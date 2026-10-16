@@ -153,10 +153,15 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 #restbl td:first-child{white-space:nowrap}   /* model names on one line; the table scrolls sideways on phones */
 #restbl td.all, #restbl th.all{font-weight:600; border-right:1px solid var(--line)}
 .res .tk{color:var(--muted)}
-/* Every run (the overview's kebab, under the cost scatter's second tab, Qiuyang): tasks down, models across, one square per metric. The header sticks under the
+/* Every run (the overview's kebab, a view of the Tasks section, Qiuyang): tasks down, models across, one square per metric. The header sticks under the
    section bar (--ktop, set by fcs2.js) while the table fits; a table wider than its box scrolls sideways instead (.scroll),
    the task names staying put. Squares: dark beaten, grey missed; a run that failed or was refused takes one colour. */
-#pcview{font-weight:400}   /* the tabs in the scatter's head: Scatter, Kebab */
+/* the Tasks section's views (List, Kebab), a segmented control as tall as the search field (Qiuyang: chips looked cheap): a grey track, the shown view a raised white segment */
+.seg{display:inline-flex; flex:none; gap:2px; padding:3px; background:var(--soft); border-radius:8px}
+.seg button{border:0; background:none; border-radius:6px; height:36px; padding:0 16px; font:inherit; font-size:15px; font-weight:500; color:var(--muted); cursor:pointer}
+.seg button:hover{color:var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--bg); color:var(--ink); box-shadow:0 1px 2px rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15)}
+.seg button:focus-visible{outline:2px solid var(--teal); outline-offset:1px}
 .keb-scroll.scroll{overflow-x:auto; -webkit-overflow-scrolling:touch}
 .keb{width:100%; min-width:1110px; border-collapse:separate; border-spacing:0; table-layout:fixed; font-size:13px}
 .keb col.kt{width:236px} .keb col.kf{width:54px}
@@ -173,6 +178,7 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 .keb .sqs{display:inline-flex; gap:3px; vertical-align:middle}
 .keb i, #keblegend i{display:block; width:9px; height:9px; box-sizing:border-box}
 #keblegend{margin:0 0 14px} #keblegend i{width:11px; height:11px}   /* above the table (Qiuyang) */
+.keb td.kempty{padding:14px 0; text-align:left; color:var(--muted); font-size:15px}
 .keb i.y, #keblegend i.y{background:var(--ink)}
 .keb i.n, #keblegend i.n{background:var(--fail)}
 .keb i.fa, #keblegend i.fa{background:#d93025}   /* Google red 600 */
@@ -239,11 +245,24 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 .checks input:checked{background:var(--teal); border-color:var(--teal)} .checks input:checked::before{transform:rotate(-45deg) scale(1)}
 .checks label:hover input:not(:checked){border-color:var(--ink-2)}
 .checks input:focus-visible{outline:2px solid var(--teal); outline-offset:2px}
-.ftoggle{display:none}
+.ftoggle{display:none; align-items:center; gap:8px; border:1px solid #80868b; background:#fff; border-radius:4px; height:42px; padding-inline:14px; font-weight:600}
 @media (max-width:900px){
-  .ftoggle{display:inline-flex; align-items:center; gap:8px; border:1px solid #80868b; background:#fff; border-radius:4px; height:42px; padding-inline:14px; font-weight:600}
+  .ftoggle{display:inline-flex}
   .filter .fbody{display:none; margin-top:14px} .filter.open .fbody{display:block}
   .checks{display:grid; grid-template-columns:1fr 1fr; gap:8px 12px; font-size:15px}
+}
+/* the kebab view: the table takes the section's width, so the domain filter folds into its button beside the search
+   field, its checkboxes a menu under it, as the sort menu is */
+.idx > .kebab{grid-column:1 / -1; min-width:0}
+.idx.kv #lhead, .idx.kv .rwrap{display:none}
+@media (min-width:901px){
+  .idx.kv{grid-template-columns:auto minmax(0,1fr); column-gap:12px}
+  .idx.kv .ftoggle{display:inline-flex}
+  .idx.kv .filter{position:relative}
+  .idx.kv .filter .fbody{display:none; position:absolute; z-index:20; top:calc(100% + 6px); left:0; padding:16px 20px; background:#fff; border-radius:8px;
+    box-shadow:0 1px 2px rgba(60,64,67,.3), 0 2px 6px 2px rgba(60,64,67,.15)}
+  .idx.kv .filter.open .fbody{display:block}
+  .idx.kv .checks{display:grid; grid-template-columns:repeat(2, max-content); gap:10px 32px; white-space:nowrap}
 }
 .bar{display:flex; gap:12px; align-items:center; flex-wrap:wrap}
 .bar .field{flex:1 1 260px}

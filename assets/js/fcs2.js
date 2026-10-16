@@ -424,16 +424,17 @@ function drawTable() {
 }
 
 /* ---------- every run: a kebab (Qiuyang, 2026-10-16), named a kebab rather than Terminal-Bench's waffle: each cell is one skewer of squares ----------
-   One row per task, easiest first by FDI, the tasks held off the fits (no FDI) last; one column per model in FCI order. A cell
+   In the Tasks section, under its List / Kebab switch (Qiuyang, 2026-10-16: the kebab belongs with the tasks): one row per task
+   the section's domain filter and search pick, in its order, hardest first to begin with (Qiuyang); one column per model in FCI order. A cell
    holds one square per metric the task checks: dark when the run's final submission beat the human reference on every hidden
    workload, grey when it did not, so a run passes when all its squares are dark. The counts are PASSBY's (fcs2-checks.js),
    summed per metric as the converter sums them. A run that failed or was refused (STATE) takes that colour on all its squares;
    a run that timed out shows its metrics like any other (Qiuyang: no timeout state). A task's squares keep one order in every column, the metric the most runs beat first. */
 const KSTATE = {failed:['fa', 'Run failed', 'The run failed: final score 0'],
   refused:['rf', 'Refused by the model provider', 'The model provider refused the task: left out of FCI and FDI'], unscored:['un', 'Not scored yet', 'Not scored yet']};
-function drawKebab() {
+function drawKebab(ts) {
   const st = typeof STATE === 'undefined' ? {} : STATE, used = new Set();
-  const tasks = [...RAN].sort((a, b) => (FDI[a] ?? 1e9) - (FDI[b] ?? 1e9) || NAME(a).localeCompare(NAME(b)));
+  const tasks = ts.filter(t => RAN.has(t));
   const cells = [];
   const body = tasks.map(t => {
     // per model, per metric: [hidden workloads beaten, in all]; 'dev/' keys are development workloads, not judged
@@ -460,7 +461,8 @@ function drawKebab() {
     return `<tr><td class="kt"><a href="${esc(taskHref(t))}">${esc(NAME(t))}</a></td><td class="kf">${FDI[t] != null ? fe(FDI[t]) : '–'}</td>${tds}</tr>`;
   }).join('');
   $('#kebtbl').innerHTML = `<colgroup><col class="kt"><col class="kf">${RANKED.map(() => '<col>').join('')}</colgroup>`
-    + `<thead><tr><th class="kt">Task</th><th class="kf">FDI</th>${RANKED.map(m => `<th class="km"><span class="nm">${esc(m.name)}</span></th>`).join('')}</tr></thead><tbody>${body}</tbody>`;
+    + `<thead><tr><th class="kt">Task</th><th class="kf">FDI</th>${RANKED.map(m => `<th class="km"><span class="nm">${esc(m.name)}</span></th>`).join('')}</tr></thead>`
+    + `<tbody>${body || `<tr><td class="kempty" colspan="${RANKED.length + 2}">No task matches. Clear the filter or try another word.</td></tr>`}</tbody>`;
   $('#keblegend').innerHTML = [['y', 'Beaten on every hidden workload'], ['n', 'Not beaten'], ...Object.entries(KSTATE).filter(([k]) => used.has(k)).map(([, v]) => v)]
     .map(([c, l]) => `<span><i class="${c}"></i>${l}</span>`).join('');
   const box = $('#kebplot'), tip = $('#kebtip');
@@ -472,15 +474,14 @@ function drawKebab() {
   $('#kebscroll').onscroll = () => { tip.hidden = true; };
   fitKebab();
 }
-// The cost scatter and the kebab share one figure, switched by its tabs (Qiuyang, 2026-10-16); #kebab in the address opens
-// the kebab. A hidden chart has no width, so each is fitted again when its tab opens.
-const PCTITLE = {scatter:$('#pctitle').textContent, kebab:'Every run: one square per metric the task checks'};
-function pcView(v) {
-  [...$('#pcview').children].forEach(c => c.setAttribute('aria-pressed', String(c.dataset.v === v)));
-  $('#pctitle').textContent = PCTITLE[v]; $('#pcplot').hidden = v !== 'scatter'; $('#kebab').hidden = v !== 'kebab';
-  if (v === 'scatter') drawPassCost(); else fitKebab();
+// the Tasks section's view, its list or the kebab (Qiuyang, 2026-10-16); #kebab in the address opens the kebab
+let tview = 'list';
+function tView(v) {
+  tview = v; [...$('#tview').children].forEach(c => c.setAttribute('aria-pressed', String(c.dataset.v === v)));
+  $('#tasks .idx').classList.toggle('kv', v === 'kebab'); $('#kebab').hidden = v !== 'kebab';
+  drawRows();
 }
-$('#pcview').addEventListener('click', e => { const b = e.target.closest('.chip'); if (b) pcView(b.dataset.v); });
+$('#tview').addEventListener('click', e => { const b = e.target.closest('button'); if (b && b.dataset.v !== tview) tView(b.dataset.v); });
 // the table scrolls sideways only when it does not fit, since a scrolling box would keep its header from sticking under the section bar
 function fitKebab() {
   const sc = $('#kebscroll'); sc.classList.remove('scroll'); sc.classList.toggle('scroll', $('#kebtbl').offsetWidth > sc.clientWidth + 1);
@@ -561,6 +562,10 @@ $('#checks').addEventListener('change', e => { e.target.checked ? picked.add(e.t
   document.addEventListener('pointerdown', e => { if (!menu.hidden && !dd.contains(e.target)) close(false); });
 })();
 $('#ftoggle').addEventListener('click', () => { const f = $('#filter'), o = !f.classList.contains('open'); f.classList.toggle('open', o); $('#ftoggle').setAttribute('aria-expanded', String(o)); });
+// in the kebab view the filter is a menu, which a click outside closes, as the sort menu's does
+document.addEventListener('pointerdown', e => { const f = $('#filter');
+  if (tview === 'kebab' && f.classList.contains('open') && !f.contains(e.target) && getComputedStyle(f.querySelector('.fbody')).position === 'absolute') {
+    f.classList.remove('open'); $('#ftoggle').setAttribute('aria-expanded', 'false'); } });
 $('#q').addEventListener('input', e => { q = e.target.value; again(); });
 // the list scrolls in its own box, all tasks in it (owner, 2026-10-14: no Show more button); the foot fades until the end is reached
 const atEnd = () => { const r = $('#rows'); r.classList.toggle('at-end', r.scrollTop + r.clientHeight >= r.scrollHeight - 2);
@@ -801,6 +806,7 @@ function drawRows() {
     <div class="lk">${t.p ? `<a href="${esc(t.p)}" target="_blank" rel="noopener">${t.t ? t.src : 'Project'}</a>` : ''}${t.r ? `<a href="${esc(t.r)}" target="_blank" rel="noopener">Code</a>` : ''}</div></article>`; }).join('')
     || `<p class="empty">No task matches. Clear the filter or try another word.</p>`;
   atEnd();
+  if (tview === 'kebab') drawKebab(h.map(t => t.s));   // the kebab shows the same tasks in the same order
 }
 
 /* Beside the title (under it on narrow screens): the first pages of the tasks' papers laid on a tilted plane, in columns that drift up and down and
@@ -831,8 +837,8 @@ drawPapers();
   const lock = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.2" fill="#3c4043"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="#3c4043" stroke-width="2.2" stroke-linecap="round"/></svg>';
   $('#locked').innerHTML = Array.from({length:6}, (_, i) => all[Math.floor((i + .5) * all.length / 6)]).map(([t, k]) =>
     `<div class="lk-tile" style="background:${ART_FIELD[k]}"><div class="lk-art">${taskArt(t.s, k).replace('<svg class="art"', '<svg width="100%" height="100%" preserveAspectRatio="xMidYMid slice"')}</div><span class="lk-lock">${lock}</span></div>`).join(''); })();
-drawPassCost(); drawTable(); drawKebab(); drawLB(); drawPassBars(); drawECI(); drawTTS(); drawMap(); drawRows();
-if (location.hash === '#kebab') { pcView('kebab'); $('#pcfig').scrollIntoView(); }
+drawPassCost(); drawTable(); drawLB(); drawPassBars(); drawECI(); drawTTS(); drawMap(); drawRows();
+if (location.hash === '#kebab') { tView('kebab'); $('#tasks').scrollIntoView(); }
 // labels are placed by measured text width, so draw again once the web font has loaded and the widths are final
 if (document.fonts) document.fonts.ready.then(() => { drawPassCost(); drawLB(); drawPassBars(); drawECI(); drawTTS(); drawMap(); });
 let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { drawPassCost(); drawLB(); drawPassBars(); drawECI(); drawTTS(); drawMap(); drawPapers(); redraws.forEach(f => f()); }, 120); });
