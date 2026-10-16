@@ -78,13 +78,6 @@ h2{font-weight:600; font-size:clamp(25px,2.4vw,30px); line-height:1.2; margin:0}
 #ttslegend button:hover{background:var(--grid)}
 #ttslegend button[aria-pressed="false"]{color:var(--faint)} #ttslegend button[aria-pressed="false"] i{background:none!important; box-shadow:inset 0 0 0 1.5px var(--faint)}   /* a hidden model: grey and hollow until clicked (hollow, as GPT-6.1 Sol is itself grey) */
 #ttslegend{gap:10px 26px}
-#ttslegend i.ln{width:22px; height:0; background:none; border-top:3px solid currentColor}   /* a line, as the curves are; dashed for a lab's second model */
-#ttslegend i.ln.dash{border-top-style:dashed}
-#ttslegend button[aria-pressed="false"] i.ln{box-shadow:none; border-top-color:var(--faint)}
-/* Test-time scaling: the chart narrower, its legend a column to its right (Qiuyang); under it again on a narrow screen */
-.tts-body{display:grid; grid-template-columns:minmax(0,1fr) 210px; gap:0 40px; align-items:start}
-.tts-body #ttslegend{flex-direction:column; flex-wrap:nowrap; align-items:flex-start; gap:13px; margin-top:6px}
-@media (max-width:900px){ .tts-body{grid-template-columns:minmax(0,1fr)} .tts-body #ttslegend{flex-direction:row; flex-wrap:wrap; gap:10px 26px; margin-top:14px} }
 .cfoot{display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:16px; padding-top:14px; border-top:1px solid var(--line); font-size:13px; color:var(--muted-2)}
 /* the FrontierCS logo (mark and wordmark) signs each chart at the bottom left (owner, 2026-10-11) */
 .cfoot .clogo{display:inline-flex; align-items:center; gap:6px; flex:none; white-space:nowrap; font:500 15px/1 'Instrument Sans',var(--sans); letter-spacing:-.01em; color:var(--ink)}
