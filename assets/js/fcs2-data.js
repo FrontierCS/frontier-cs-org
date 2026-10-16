@@ -173,19 +173,23 @@ const ordinal = n => n + ((n % 100 >= 11 && n % 100 <= 13) ? 'th' : ['th', 'st',
 /* The joint model's own pass curve (Qiuyang, 2026-10-14): a run passes a task when it beats every metric group, and
    a run's groups share one run effect u, so
      P(pass | FCI) = integral of prod_g sigmoid((FCI - beta_g) / ECI_UNIT + u) N(u; 0, (sigma_u / ECI_UNIT)^2) du,
-   with beta_g = GROUPS[task] and sigma_u = DIFF_FIT.sigma_u, both in FCI points. The integral is 24-node Gauss-Hermite
-   quadrature: GH24.t are the 12 positive roots of the physicists' Hermite polynomial H_24 and GH24.w their weights
+   with beta_g = GROUPS[task] and sigma_u = DIFF_FIT.sigma_u, both in FCI points. The integral is 48-node Gauss-Hermite
+   quadrature: GH48.t are the 24 positive roots of the physicists' Hermite polynomial H_48 and GH48.w their weights
    (the rule is symmetric, so each node is used with both signs), giving E[h(u)] = sum_i w_i (h(a t_i) + h(-a t_i)) / sqrt(pi)
    with a = sqrt(2) sigma_u / ECI_UNIT. passChance(task, fci) is that probability, from 0 to 1, or null without GROUPS;
    a task's FDI is where it is one half. */
-const GH24 = {t:[0.2244145474725156, 0.6741711070372123, 1.126760817611245, 1.584250010961694, 2.049003573661699, 2.523881017011427,
-  3.012546137565565, 3.520006813034525, 4.05366440244815, 4.625662756423787, 5.259382927668044, 6.01592556142574],
-  w:[0.4269311638686991, 0.2861795353464429, 0.1277396217845592, 0.03744547050323075, 0.007048355810072666, 0.0008236924826884198,
-  5.688691636404385e-05, 2.158245704902334e-06, 4.018971174941463e-08, 3.046254269987579e-10, 6.584620243078192e-13, 1.6643684964891e-16]};
+const GH48 = {t:[0.15949293584886245, 0.4786463375944961, 0.7983046277785623, 1.1188121524021566, 1.4405252201375651, 1.7638175798953,
+  2.089086660944276, 2.4167609048732164, 2.7473086248223835, 3.0812489886451058, 3.4191659693638847, 3.761726490228358,
+  4.109704603560591, 4.464014546934459, 4.8257572281332095, 5.196287718792364, 5.577316981223729, 5.971072225013545,
+  6.3805640961864105, 6.810064578074141, 7.26604655416435, 7.759295519765774, 8.310752190704784, 8.975315081931686],
+  w:[0.31100103037796295, 0.2539615426647592, 0.16920447194564112, 0.09182229707928527, 0.04047967698460385, 0.01444496157498109,
+  0.0041530049119775534, 0.0009563923198194162, 0.00017515043180117246, 2.528599027748489e-05, 2.8472586917348354e-06, 2.468658993669743e-07,
+  1.6225141358957555e-08, 7.930467495165348e-10, 2.815296537838163e-11, 7.046932581545951e-13, 1.1975898654791812e-14, 1.315159622658413e-16,
+  8.730159601186674e-19, 3.1883873235051517e-21, 5.564577468902299e-24, 3.685036080150723e-27, 5.984612693313826e-31, 7.935551460773976e-36]};
 function passChance(task, fci) {
   const bs = (typeof GROUPS === 'undefined' ? {} : GROUPS)[task]; if (!bs) return null;
   const a = Math.SQRT2 * DIFF_FIT.sigma_u / ECI_UNIT, z = bs.map(b => (fci - b) / ECI_UNIT), all = u => z.reduce((p, v) => p / (1 + Math.exp(-(v + u))), 1);
-  return GH24.t.reduce((s, t, i) => s + GH24.w[i] * (all(a * t) + all(-a * t)), 0) / Math.sqrt(Math.PI);
+  return GH48.t.reduce((s, t, i) => s + GH48.w[i] * (all(a * t) + all(-a * t)), 0) / Math.sqrt(Math.PI);
 }
 // the FCI at which a task's chance of passing is p (0 to 1), by bisection on the rising curve; for the axes of the pass charts
 function passAt(task, p) {

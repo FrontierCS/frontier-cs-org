@@ -754,10 +754,10 @@ half = {t: float(fdi(np.array([b]) / PASS_UNIT, DIFF_FIT['sigma_u'] / PASS_UNIT)
 gap = max(abs(half[t] - DIFF[t][0]) for t in GROUPS)
 # FDI is shown to 0.1, so its rounding alone moves it up to 0.05 from the crossing; the rounding of GROUPS and sigma_u adds a hair
 assert gap <= 0.06, f'the pass curve from GROUPS misses FDI by {gap:.3f} points'
-u24, w24 = np.polynomial.hermite.hermgauss(24)   # the pages integrate with 24 nodes: their curve may differ by a hair more
+u24, w24 = np.polynomial.hermite.hermgauss(48)   # the pages integrate with 48 nodes (GH48; 24 missed by 0.09 at rule B's s_u): their curve may differ by a hair more
 half24 = {t: float(fdi(np.array([b]) / PASS_UNIT, DIFF_FIT['sigma_u'] / PASS_UNIT, (np.sqrt(2) * u24, np.log(w24 / np.sqrt(np.pi))))[0]) * PASS_UNIT for t, b in GROUPS.items()}
 gap24 = max(abs(half24[t] - DIFF[t][0]) for t in GROUPS)
-assert gap24 <= 0.06, f'the pages\' 24-node pass curve misses FDI by {gap24:.3f} points'
+assert gap24 <= 0.06, f'the pages\' 48-node pass curve misses FDI by {gap24:.3f} points'
 assert {m[0] for m in models} <= set(eci_js), f'models without an FCI: {sorted({m[0] for m in models} - set(eci_js))}'
 block = (f'// One entry per scored run in the preview results database of {when:%Y-%m-%d} (bin/fcs2_runs_from_db.py):\n'
          f'// model, domain, task, final score (0-100, the task\'s own scale), passed (1 = verdict PASS). Timeouts score 0; {sum(dropped.values())} unscored runs are left out' + ''.join(f'; {MODEL[c][1]} is left out (only the FCI 0 point)' for c in sorted(HIDDEN)) + '.\n'
@@ -787,7 +787,7 @@ print('PASS', pass_rate(runs))
 print('FCI', eci_js)
 print('DIFF_FIT', DIFF_FIT, '(logits: sigma_u {:.4f}, a {:.4f}, delta {:.4f}, tau {:.4f}, s_e {:.4f}; profile log marginal likelihood {:.3f})'.format(*dfit, dll))
 print(f'FCI bootstrap: {BOOT - nskip} draws, {nskip} skipped (no convergence)')
-print(f'pass curves from GROUPS reach 1/2 within {gap:.3f} points of FDI ({gap24:.3f} with the pages\' 24 nodes)')
+print(f'pass curves from GROUPS reach 1/2 within {gap:.3f} points of FDI ({gap24:.3f} with the pages\' 48 nodes)')
 print('starts', [(tuple(round(float(v), 4) for v in h), round(float(l), 3)) for h, l in dstarts])
 print('importance sampling: smallest effective sample size', round(min(T['ess'] for T in MT.values())), 'of', IS_DRAWS,
       '; below 200:', [short(t) for t, T in MT.items() if T['ess'] < 200])
