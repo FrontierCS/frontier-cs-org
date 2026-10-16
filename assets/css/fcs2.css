@@ -156,12 +156,7 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 /* Every run (the overview's kebab, a view of the Tasks section, Qiuyang): tasks down, models across, one square per metric. The header sticks under the
    section bar (--ktop, set by fcs2.js) while the table fits; a table wider than its box scrolls sideways instead (.scroll),
    the task names staying put. Squares: dark beaten, grey missed; a run that failed or was refused takes one colour. */
-/* the Tasks section's views (List, Kebab), a segmented control as tall as the search field (Qiuyang: chips looked cheap): a grey track, the shown view a raised white segment */
-.seg{display:inline-flex; flex:none; gap:2px; padding:3px; background:var(--soft); border-radius:8px}
-.seg button{border:0; background:none; border-radius:6px; height:36px; padding:0 16px; font:inherit; font-size:15px; font-weight:500; color:var(--muted); cursor:pointer}
-.seg button:hover{color:var(--ink)}
-.seg button[aria-pressed="true"]{background:var(--bg); color:var(--ink); box-shadow:0 1px 2px rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15)}
-.seg button:focus-visible{outline:2px solid var(--teal); outline-offset:1px}
+#tview{flex:none}   /* the Tasks section's views, List and Kebab, as chips like the mean-score chart's Group by (Qiuyang) */
 .keb-scroll.scroll{overflow-x:auto; -webkit-overflow-scrolling:touch}
 .keb{width:100%; min-width:1110px; border-collapse:separate; border-spacing:0; table-layout:fixed; font-size:13px}
 .keb col.kt{width:236px} .keb col.kf{width:54px}

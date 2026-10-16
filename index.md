@@ -154,7 +154,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
           <button class="dd-btn" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Sort tasks"><span class="dd-val">Hardest first</span><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           <ul class="dd-menu" role="listbox" aria-label="Sort tasks" hidden><li role="option" data-v="hard" aria-selected="true">Hardest first</li><li role="option" data-v="easy" aria-selected="false">Easiest first</li><li role="option" data-v="domain" aria-selected="false">By domain</li><li role="option" data-v="name" aria-selected="false">By name</li></ul>
         </div>
-        <div class="seg" id="tview" role="tablist" aria-label="View"><button type="button" role="tab" data-v="list" aria-pressed="true">List</button><button type="button" role="tab" data-v="kebab" aria-pressed="false">Kebab</button></div>
+        <div class="chips" id="tview" role="tablist" aria-label="View"><button class="chip" type="button" role="tab" data-v="list" aria-pressed="true">List</button><button class="chip" type="button" role="tab" data-v="kebab" aria-pressed="false">Kebab</button></div>
       </div>
       <div class="lhead" id="lhead"></div>
       <div class="rwrap"><div class="rows" id="rows" role="region" aria-label="Task list" tabindex="0"></div><div class="rail" id="rail" aria-hidden="true"><i></i></div></div>
