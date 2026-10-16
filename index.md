@@ -35,8 +35,8 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
 <section class="sec" id="leaderboard">
   <h2>Leaderboard</h2>
   <figure class="chart" style="margin:0">
-    <div class="chead"><span id="pchead">Pass rate (over human)</span><div class="chips cmode" id="pcmode" role="group" aria-label="Measure"><button class="chip" type="button" data-v="pass" aria-pressed="true">Pass rate</button><button class="chip" type="button" data-v="fci" aria-pressed="false">FCI</button></div></div>
-    <div class="plot" id="pcplot"><svg id="pcsvg" role="img" aria-label="Pass rate (over human) against cost per run"></svg><div class="tip" id="pctip" hidden></div></div>
+    <div class="chead"><span id="pchead">Pass rate (beat reference)</span><div class="chips cmode" id="pcmode" role="group" aria-label="Measure"><button class="chip" type="button" data-v="pass" aria-pressed="true">Pass rate</button><button class="chip" type="button" data-v="fci" aria-pressed="false">FCI</button></div></div>
+    <div class="plot" id="pcplot"><svg id="pcsvg" role="img" aria-label="Pass rate (beat reference) against cost per run"></svg><div class="tip" id="pctip" hidden></div></div>
     <div class="cfoot">{% include chart_logo.html %}</div>
   </figure>
 

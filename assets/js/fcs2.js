@@ -56,7 +56,7 @@ $('#lblegend').innerHTML = RANKED.map(m => `<span><i style="background:${MCOL[m.
    spot keeps no label (the tooltip still names it). No legend: the labels name the dots. */
 /* Each of the two charts has a Pass rate / FCI switch (owner, 2026-10-16): the scatter's y axis and the bars' height. */
 let pcMode = 'pass', fcibMode = 'fci';
-const MEAS = {pass:{v:id => PASS[id][0], head:'Pass rate (over human)', name:'Pass rate', fmt:v => f1(v) + '%'},
+const MEAS = {pass:{v:id => PASS[id][0], head:'Pass rate (beat reference)', name:'Pass rate', fmt:v => f1(v) + '%'},
   fci:{v:id => ECI[id][0], head:'FrontierCS Capabilities Index (FCI)', name:'FCI', fmt:v => fe(v)}};
 function modeSwitch(id, set) { $('#' + id).addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return;
   [...$('#' + id).children].forEach(c => c.setAttribute('aria-pressed', String(c === b))); set(b.dataset.v); }); }
