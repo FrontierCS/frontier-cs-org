@@ -74,10 +74,17 @@ h2{font-weight:600; font-size:clamp(25px,2.4vw,30px); line-height:1.2; margin:0}
 .legend{display:flex; flex-wrap:wrap; gap:6px 16px; margin-top:14px; font-size:14px}
 .legend span{display:inline-flex; align-items:center; gap:7px}
 .legend i{width:12px; height:12px; display:inline-block}
-#ttslegend button{display:inline-flex; align-items:center; gap:7px; padding:3px 9px 3px 7px; margin:-3px -9px -3px -7px; border:0; border-radius:14px; background:none; font:inherit; color:var(--ink); cursor:pointer}
-#ttslegend button:hover{background:var(--grid)}
+#ttslegend button, #domlegend button{display:inline-flex; align-items:center; gap:7px; padding:3px 9px 3px 7px; margin:-3px -9px -3px -7px; border:0; border-radius:14px; background:none; font:inherit; color:var(--ink); cursor:pointer}
+#ttslegend button:hover, #domlegend button:hover, #domlegend button[aria-pressed="true"]{background:var(--grid)}
 #ttslegend button[aria-pressed="false"]{color:var(--faint)} #ttslegend button[aria-pressed="false"] i{background:none!important; box-shadow:inset 0 0 0 1.5px var(--faint)}   /* a hidden model: grey and hollow until clicked (hollow, as GPT-6.1 Sol is itself grey) */
 #ttslegend{gap:10px 26px}
+/* Pass rate by domain: one row per domain, a dot per model; a legend item lights its model's dots (Qiuyang) */
+#domlegend{gap:10px 26px; margin:4px 0 12px}
+#domlegend i.md{width:11px; height:11px; border-radius:50%; box-sizing:border-box}
+#domlegend i.md.ring{background:none!important; border:2px solid}   /* a lab's second model, hollow as its dots */
+#domsvg circle{transition:opacity .15s}
+#domsvg.focus circle:not(.on){opacity:.12}
+.plot .dn{fill:var(--muted); font-weight:400; font-size:12.5px}
 .cfoot{display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:16px; padding-top:14px; border-top:1px solid var(--line); font-size:13px; color:var(--muted-2)}
 /* the FrontierCS logo (mark and wordmark) signs each chart at the bottom left (owner, 2026-10-11) */
 .cfoot .clogo{display:inline-flex; align-items:center; gap:6px; flex:none; white-space:nowrap; font:500 15px/1 'Instrument Sans',var(--sans); letter-spacing:-.01em; color:var(--ink)}
@@ -147,11 +154,6 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 .res td.e{color:var(--faint)}
 .res td .sq{display:inline-block; width:10px; height:10px; margin-right:9px; vertical-align:0}
 .res tr.all td{font-weight:600; border-bottom:1px solid var(--ink-2)}
-#restbl th.dom{white-space:normal; line-height:1.25}   /* domains across: a long name wraps over its count */
-#restbl th .tk{display:block; font-weight:400; margin-top:2px}
-#restbl{font-size:14px} #restbl th, #restbl td{padding-inline:7px} #restbl th:first-child, #restbl td:first-child{padding-left:0}   /* fourteen columns fit the overview's width */
-#restbl td:first-child{white-space:nowrap}   /* model names on one line; the table scrolls sideways on phones */
-#restbl td.all, #restbl th.all{font-weight:600; border-right:1px solid var(--line)}
 .res .tk{color:var(--muted)}
 .res .best{font-weight:700}
 .res th .mn{display:inline-block; width:9px; height:9px; margin-right:6px}

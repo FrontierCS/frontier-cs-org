@@ -50,8 +50,12 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
 
   <details class="tbl-wrap fold" id="domains">
     <summary><h3>Pass rate by domain</h3></summary>
-    <div class="res-scroll"><table class="res num" id="restbl"></table></div>
-    <p class="cfoot" style="border-top:0; margin-top:10px; padding-top:0">Bold marks the best in a column.</p>
+    <figure class="chart" style="margin:0">
+      <div class="chead"><span>Pass rate (beat reference) by domain, lowest first</span></div>
+      <div class="legend" id="domlegend"></div>
+      <div class="plot" id="domplot"><svg id="domsvg" role="img" aria-label="Pass rate by domain, one dot per model"></svg><div class="tip" id="domtip" hidden></div></div>
+      <div class="cfoot">{% include chart_logo.html %}</div>
+    </figure>
   </details>
 
   <div class="tbl-wrap" id="eci">

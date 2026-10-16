@@ -411,18 +411,53 @@ function drawLB() {
 }
 
 /* ---------- results by domain ---------- */
-/* Pass rate by domain: one row per model, in leaderboard order, one column per domain after all tasks, each domain headed by
-   its task count (owner, 2026-10-14: models down the side, domains across). Bold marks the best model in each column. */
-function drawTable() {
-  const cols = ['All', ...DOMS_WITH_RUNS];
-  const rate = (m, d) => { const s = RUNS.filter(r => r.m === m.id && (d === 'All' || r.d === d)).map(r => r.p * 100); return s.length ? mean(s) : null; };
-  const grid = RANKED.map(m => cols.map(d => rate(m, d)));
-  const best = cols.map((_, j) => { const v = grid.map(row => row[j]).filter(x => x != null); const top = Math.max(...v); return v.length > 1 && top > 0 ? top : null; });   // no bold when every model is at 0%
-  const head = `<tr><th>Model</th>${cols.map(d => `<th class="${d === 'All' ? 'all' : 'dom'}">${d === 'All' ? 'All tasks' : esc(d)}<span class="tk">${NTASK(RUNS.filter(r => d === 'All' || r.d === d))}</span></th>`).join('')}</tr>`;
-  const rows = RANKED.map((m, i) => `<tr><td><span class="sq" style="background:${MCOL[m.id]}"></span><span class="full">${esc(m.name)}</span><span class="short">${esc(m.short)}</span></td>`
-    + grid[i].map((v, j) => v == null ? '<td class="e">–</td>' : `<td class="${[j === 0 ? 'all' : '', v === best[j] ? 'best' : ''].join(' ').trim()}">${Math.round(v)}%</td>`).join('') + '</tr>').join('');
-  $('#restbl').innerHTML = head + rows;
+/* Pass rate by domain as a dot plot (Qiuyang, 2026-10-16; it was a table of models by domains): one row per domain, the
+   lowest pass rate first (the mean over the models of the share of the domain's tasks each passes; a tie puts the domain
+   with more tasks first), headed by its name and task count. One dot per model at the share of the domain's tasks it
+   passes, in its colour, a lab's second model hollow; models at the same share sit in a block of at most four columns,
+   in the legend's order. The legend goes by pass rate, as the leaderboard; an item lights its model's dots in every row
+   while hovered, and keeps them lit once clicked. */
+const DOMM = [...RANKED].sort((a, b) => PASS[b.id][0] - PASS[a.id][0]);
+const DOM_2ND = new Set(RANKED.filter((m, i, a) => a.findIndex(o => o.lab === m.lab) !== i).map(m => m.id));
+let domPin = null;
+const domFocus = id => { const svg = $('#domsvg'); svg.classList.toggle('focus', !!id); svg.querySelectorAll('circle').forEach(c => c.classList.toggle('on', c.dataset.m === id)); };
+function drawDomains() {
+  const svg = $('#domsvg'), W = $('#domplot').clientWidth; if (!W) return;   // inside the closed fold: drawn when it opens
+  const narrow = W < 640, x0 = narrow ? 14 : 244, x1 = W - 14, X = v => x0 + (x1 - x0) * v;
+  const R = 5.5, STEP = 12.5, PER = 4, AX = 24;
+  const kn = (m, d) => { const rs = RUNS.filter(r => r.m === m && r.d === d); return [rs.filter(r => r.p).length, rs.length]; };
+  const nt = d => NTASK(RUNS.filter(r => r.d === d));
+  const share = d => mean(DOMM.map(m => { const [k, n] = kn(m.id, d); return n ? k / n : 0; }));
+  const order = [...DOMS_WITH_RUNS].sort((a, b) => share(a) - share(b) || nt(b) - nt(a));
+  let y = AX;
+  const rows = order.map(d => {
+    const groups = {}; DOMM.forEach(m => { const [k, n] = kn(m.id, d); if (n) (groups[k + '/' + n] ||= {v:k / n, k, n, ms:[]}).ms.push(m); });
+    const lines = Math.max(...Object.values(groups).map(g => Math.ceil(g.ms.length / Math.min(PER, g.ms.length))));
+    const r = {d, groups, y, h:Math.max(32, lines * STEP + 14) + (narrow ? 22 : 0)}; y += r.h; return r; });
+  const H = y + AX;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
+  [0, .25, .5, .75, 1].forEach(v => { svg.append(sv('line', {x1:X(v), x2:X(v), y1:AX - 6, y2:y + 6, stroke:'var(--grid)', 'stroke-width':1}));
+    [AX - 12, y + 20].forEach(ty => svg.append(sv('text', {x:X(v), y:ty, 'text-anchor':'middle'}, `${v * 100}%`))); });
+  const pts = [];
+  rows.forEach(({d, groups, y:ry, h}, i) => {
+    if (i) svg.append(sv('line', {x1:0, x2:W, y1:ry, y2:ry, stroke:'var(--line)', 'stroke-width':1}));
+    const n = nt(d), lab = sv('text', {class:'lab halo', x:0, y:narrow ? ry + 16 : ry + h / 2 + 5}, d + ' ');
+    lab.append(sv('tspan', {class:'dn'}, `${n} ${n === 1 ? 'task' : 'tasks'}`)); svg.append(lab);
+    const cy0 = narrow ? ry + 22 + (h - 22) / 2 : ry + h / 2;
+    Object.values(groups).forEach(g => { const c = Math.min(PER, g.ms.length), lines = Math.ceil(g.ms.length / c);
+      g.ms.forEach((m, j) => { const cx = X(g.v) + (j % c - (c - 1) / 2) * STEP, cy = cy0 + (Math.floor(j / c) - (lines - 1) / 2) * STEP, ring = DOM_2ND.has(m.id);
+        svg.append(sv('circle', {cx, cy, r:ring ? R - 1 : R, fill:ring ? '#fff' : MCOL[m.id], stroke:MCOL[m.id], 'stroke-width':ring ? 2 : 1, 'data-m':m.id}));
+        pts.push({x:cx, y:cy, html:`<b>${esc(m.name)}</b><br>${esc(d)}: ${g.k} of ${g.n} ${g.n === 1 ? 'task' : 'tasks'} passed`}); }); });
+  });
+  domFocus(domPin);
+  attachTip(svg, W, H, pts, $('#domtip'));
 }
+$('#domlegend').innerHTML = DOMM.map(m => `<button type="button" data-m="${m.id}" aria-pressed="false"><i class="md${DOM_2ND.has(m.id) ? ' ring' : ''}" style="background:${MCOL[m.id]}; border-color:${MCOL[m.id]}"></i>${esc(m.name)}</button>`).join('');
+$('#domlegend').addEventListener('pointerover', e => { const b = e.target.closest('button'); if (b && e.pointerType === 'mouse' && !domPin) domFocus(b.dataset.m); });
+$('#domlegend').addEventListener('pointerleave', () => { if (!domPin) domFocus(null); });
+$('#domlegend').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return;
+  domPin = domPin === b.dataset.m ? null : b.dataset.m; $('#domlegend').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.m === domPin))); domFocus(domPin); });
+$('#domains').addEventListener('toggle', drawDomains);
 
 /* ---------- case studies: a placeholder until the preview runs have their own (owner, 2026-10-09) ---------- */
 const redraws = [];
@@ -765,7 +800,7 @@ drawPapers();
   const lock = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.2" fill="#3c4043"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="#3c4043" stroke-width="2.2" stroke-linecap="round"/></svg>';
   $('#locked').innerHTML = Array.from({length:6}, (_, i) => all[Math.floor((i + .5) * all.length / 6)]).map(([t, k]) =>
     `<div class="lk-tile" style="background:${ART_FIELD[k]}"><div class="lk-art">${taskArt(t.s, k).replace('<svg class="art"', '<svg width="100%" height="100%" preserveAspectRatio="xMidYMid slice"')}</div><span class="lk-lock">${lock}</span></div>`).join(''); })();
-drawPassCost(); drawTable(); drawLB(); drawPassBars(); drawECI(); drawTTS(); drawMap(); drawRows();
+drawPassCost(); drawDomains(); drawLB(); drawPassBars(); drawECI(); drawTTS(); drawMap(); drawRows();
 // labels are placed by measured text width, so draw again once the web font has loaded and the widths are final
 if (document.fonts) document.fonts.ready.then(() => { drawPassCost(); drawLB(); drawPassBars(); drawECI(); drawTTS(); drawMap(); });
-let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { drawPassCost(); drawLB(); drawPassBars(); drawECI(); drawTTS(); drawMap(); drawPapers(); redraws.forEach(f => f()); }, 120); });
+let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { drawPassCost(); drawLB(); drawPassBars(); drawECI(); drawTTS(); drawMap(); drawPapers(); drawDomains(); redraws.forEach(f => f()); }, 120); });
