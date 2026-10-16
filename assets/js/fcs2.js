@@ -335,20 +335,32 @@ function drawTTS(t) {
   if (play && front.length) { const [k, ps] = front[front.length - 1]; tips.push({m:ms[k], e:ps[ps.length - 1]}); }
   front.forEach(([k, ps]) => gl.append(sv('path', {d:ps.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join(''),
     fill:'none', stroke:MCOL[ms[k].id], 'stroke-width':3, 'stroke-linejoin':'round', 'stroke-linecap':ttsDash(ms[k].id) ? 'butt' : 'round', 'stroke-dasharray':ttsDash(ms[k].id)})));
-  /* at rest, each model that holds a stretch of the frontier is named over it with its lab's logo (Qiuyang): above the
-     stretch's last point on the model's own curve (its end dot, when that is on the frontier), else below it, else not at
-     all; models with their end dot on the frontier are placed first, one label per model */
+  /* at rest, each model that holds a stretch of the frontier is named over it with its lab's logo (Qiuyang): near the
+     stretch's last point on the model's own curve (its end dot, when that is on the frontier), above, below or beside it,
+     where the name crosses the fewest lines and dots, the frontier's counting four times a faint curve's, and the nearer
+     place wins a tie (Qiuyang: GPT-6 Astra's name sat on Claude Opus 5.5's curve); never over another name, else not at
+     all. Models with their end dot on the frontier are placed first, one label per model */
   if (!play) {
-    const boxes = [], fr = {l:L, r:W - R, t:T - 6, b:H - B}, seen = new Set(), lg = 16, gap = 5, h = 18;
+    const boxes = [], fr = {l:L, r:W - R, t:T - 6, b:H - B}, seen = new Set(), lg = 16, gap = 5, h = 18, near = [];
+    gl.querySelectorAll('path').forEach(el => { const wt = el.classList.contains('tfade') ? 1 : 4, n = el.getTotalLength();
+      for (let l = 0; l <= n; l += 4) { const q = el.getPointAtLength(l); near.push({x:q.x, y:q.y, wt}); } });
+    gd.querySelectorAll('circle').forEach(c => near.push({x:+c.getAttribute('cx'), y:+c.getAttribute('cy'), wt:c.classList.contains('tfade') ? 1 : 4}));
+    const cost = q => near.reduce((s, p) => s + (p.x > q.x - 4 && p.x < q.x + q.w + 4 && p.y > q.y - 3 && p.y < q.y + q.h + 3 ? p.wt : 0), 0);
     front.map(([k, ps]) => { const end = viss[k][viss[k].length - 1][0], own = ps.filter(p => p[0] <= end * 1.0001);
       return {k, p:own.length ? own[own.length - 1] : ps[0], dot:onFront(k)}; })
       .reverse().filter(c => !seen.has(c.k) && seen.add(c.k)).sort((a, b) => b.dot - a.dot)
       .forEach(({k, p}) => {
         const m = ms[k], x = X(p[0]), y = Y(p[1]);
         const txt = sv('text', {class:'lab halo', x:0, y:0, fill:MTXT(m.id), 'font-weight':600}, m.name); svg.append(txt);
-        const w = lg + gap + txt.getComputedTextLength(), left = Math.min(Math.max(x - w / 2, fr.l), fr.r - w);
-        const pos = [y - 9 - h, y + 9].map(top => ({x:left, y:top, w, h})).find(q => q.y >= fr.t && q.y + h <= fr.b
-          && !boxes.some(o => q.x < o.x + o.w && o.x < q.x + q.w && q.y < o.y + o.h && o.y < q.y + q.h));
+        const w = lg + gap + txt.getComputedTextLength(), qs = [];
+        // above and below, centred over the point or reaching left or right of it, a step of 7 px further out each round; then beside it
+        for (let s = 0; s < 4; s++) for (const top of [y - 9 - h - 7 * s, y + 9 + 7 * s]) for (const a of [.5, .85, .15, 1, 0])
+          qs.push({x:x - a * w, y:top, w, h, far:s});
+        qs.push({x:x + 10, y:y - h / 2, w, h, far:1}, {x:x - 10 - w, y:y - h / 2, w, h, far:1});
+        let pos = null, best = Infinity;
+        qs.forEach(q => { q.x = Math.min(Math.max(q.x, fr.l), fr.r - w);
+          if (q.y < fr.t || q.y + h > fr.b || boxes.some(o => q.x < o.x + o.w && o.x < q.x + q.w && q.y < o.y + o.h && o.y < q.y + q.h)) return;
+          const c = cost(q) + 3 * q.far; if (c < best) { best = c; pos = q; } });
         if (!pos) { txt.remove(); return; }
         boxes.push(pos); txt.setAttribute('x', pos.x + lg + gap); txt.setAttribute('y', pos.y + 13.5);
         if (LOGO[m.lab]) svg.append(sv('image', {href:LOGO_DIR + LOGO[m.lab] + '.svg', x:pos.x, y:pos.y + 1, width:lg, height:lg}));
