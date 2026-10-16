@@ -187,21 +187,36 @@ function drawTTS(t) {
   const L = 34, R = narrow ? 12 : 24, T = 12, B = 46, H = CHART_H.tts || (narrow ? 300 : 380);
   const all = TTSM.flatMap(m => ttsCurve(m.id));   // the axes hold every model, so showing one moves nothing
   const x0 = Math.log10(Math.min(...all.map(p => p[0]))) - .15, x1 = Math.log10(Math.max(...all.map(p => p[0])));
+  /* A broken axis (owner, 2026-10-16): the longest stretch of budgets where no model's curve runs, if over half a decade,
+     shrinks to a short gap (GU decades of the drawn axis), marked by two slanted strokes on the axis as on the task chart's
+     broken axis; nothing is drawn inside it. Every model counts, shown or not, so showing one moves nothing. */
+  const spans = TTSM.map(m => ttsCurve(m.id)).filter(c => c.length).map(c => [Math.log10(c[0][0]), Math.log10(c[c.length - 1][0])]).sort((a, b) => a[0] - b[0]);
+  let brk = null;
+  for (let i = 0, end = -Infinity; i + 1 < spans.length; i++) { end = Math.max(end, spans[i][1]); const s = spans[i + 1][0];
+    if (s - end > .5 && (!brk || s - end > brk[1] - brk[0])) brk = [end, s]; }
+  if (brk) brk = [brk[0] + .1, brk[1] - .1];
+  const GU = .12, U = lx => !brk || lx <= brk[0] ? lx : lx >= brk[1] ? lx - (brk[1] - brk[0]) + GU : brk[0] + (lx - brk[0]) / (brk[1] - brk[0]) * GU;
   const ytop = Math.max(...all.map(p => p[3])), ystep = eciStep(ytop, narrow ? 4 : 5), ymax = Math.ceil(ytop / ystep) * ystep;   // about five steps from 0, whatever the scale's unit
   const ms = [...TTSM].reverse().filter(m => ttsOn.has(m.id)), cs = ms.map(m => ttsCurve(m.id));
   const play = t < 1, sweep = play ? ttsSweep(cs, x0, x1, ttsEase(t)) : x1;
   const vx1 = play ? Math.min(x1, Math.max(x0 + 1.1, sweep + .45)) : x1;   // the view: at least a decade wide, just past the cursor
-  const X = v => L + (Math.log10(v) - x0) / (vx1 - x0) * (W - L - R), Y = v => T + (1 - v / ymax) * (H - T - B);
+  const X = v => L + (U(Math.log10(v)) - U(x0)) / (U(vx1) - U(x0)) * (W - L - R), Y = v => T + (1 - v / ymax) * (H - T - B);
+  const gapPx = brk && vx1 > brk[0] ? [X(10 ** brk[0]), vx1 >= brk[1] ? X(10 ** brk[1]) : W - R] : null;   // the gap in pixels, once in view
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
   const clip = sv('clipPath', {id:'ttsclip'}); clip.append(sv('rect', {x:L, y:T - 6, width:W - L - R + 10, height:H - T - B + 6})); svg.append(clip);
   for (let i = 0, v = 0; v <= ymax + ystep / 2; v = ++i * ystep) {
-    svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1}));
+    for (const [x1, x2] of gapPx ? [[L, gapPx[0]], [gapPx[1], W - R]] : [[L, W - R]]) svg.append(sv('line', {x1, x2, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1}));
     svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, tick(v)));
   }
-  for (let k = Math.ceil(x0); k <= Math.floor(vx1); k++) {
-    svg.append(sv('line', {x1:X(10 ** k), x2:X(10 ** k), y1:H - B, y2:H - B + 5, stroke:'var(--ink-2)', 'stroke-width':1}));
-    svg.append(sv('text', {x:X(10 ** k), y:H - B + 20, 'text-anchor':'middle'}, usdfmt(10 ** k)));
-  }
+  // ticks at powers of ten on each side of the gap; a side with fewer than two adds 2 and 5 times a power of ten
+  const segs = !brk ? [[x0, vx1]] : vx1 > brk[1] ? [[x0, brk[0]], [brk[1], vx1]] : [[x0, Math.min(vx1, brk[0])]];
+  segs.forEach(([a, b]) => { const tk = [], in_ = v => Math.log10(v) >= a - 1e-9 && Math.log10(v) <= b + 1e-9;
+    for (let k = Math.floor(a); k <= Math.ceil(b); k++) if (in_(10 ** k)) tk.push(10 ** k);
+    if (tk.length < 2) for (let k = Math.floor(a); k <= Math.ceil(b); k++) [2, 5].forEach(f => in_(f * 10 ** k) && tk.push(f * 10 ** k));
+    tk.forEach(v => { svg.append(sv('line', {x1:X(v), x2:X(v), y1:H - B, y2:H - B + 5, stroke:'var(--ink-2)', 'stroke-width':1}));
+      svg.append(sv('text', {x:X(v), y:H - B + 20, 'text-anchor':'middle'}, usdfmt(v))); }); });
+  if (gapPx) [gapPx[0], vx1 >= brk[1] ? gapPx[1] : null].forEach(x => x != null &&
+    svg.append(sv('line', {x1:x - 3, y1:H - B + 6, x2:x + 3, y2:H - B - 6, stroke:'var(--ink-2)', 'stroke-width':1.5})));
   svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'Cost budget per run in US$, log scale'));
   const g = sv('g', {'clip-path':'url(#ttsclip)'}), gb = sv('g'), gl = sv('g'); g.append(gb, gl); svg.append(g);   // bands under every line
   // rising at the cursor: started within the last 0.35 decade, or 2 old points (2 / TTS_PT FCI) gained over it; nothing steps back while nothing rises
