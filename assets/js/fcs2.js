@@ -193,9 +193,10 @@ function drawECI() {
 
 /* Test-time scaling: the FCI a model would have if every run stopped at a US$ budget (SCALE, from
    bin/fcs2_runs_from_db.py); a run that has ended within the budget counts what it beat, and a run still going counts
-   as beating nothing (Qiuyang, 2026-10-14). Straight segments and one legend (owner, 2026-10-13).
-   Every model with reported spend is in the legend; at first only each lab's model with the highest FCI is drawn and the
-   others are greyed in the legend; a click on an entry shows or hides its curve (owner, 2026-10-14). A model's 90% band
+   as if it timed out there, beating nothing and scoring 0 (Qiuyang, 2026-10-16), so no curve falls. Straight segments and one legend (owner, 2026-10-13).
+   Every model with reported spend is in the legend and drawn (Qiuyang, 2026-10-16: with the frontier in full and the
+   rest faint, every curve fits; before, only each lab's model with the highest FCI, owner, 2026-10-14); a click on an
+   entry shows or hides its curve. A model's 90% band
    shows only while the pointer is on its curve or its legend entry (owner, 2026-10-13: no bands otherwise).
    Each curve starts at its first budget on the scale, FCI 0 or more, as a plain line with no start mark (owner, 2026-10-14; Qiuyang: the
    values under 0 drew every curve in from the bottom edge as a comb of near-vertical strokes). When the chart first comes
@@ -210,7 +211,7 @@ function drawECI() {
 let ttsHover = null, ttsRun = 0;
 const TTS_FADE = .25;
 const TTSM = RANKED.filter(m => SCALE[m.id]);   // a model with no reported spend has no curve
-const ttsOn = new Set(TTSM.filter((m, i, a) => a.findIndex(o => o.lab === m.lab) === i).map(m => m.id));
+const ttsOn = new Set(TTSM.map(m => m.id));
 const ttsBands = () => { document.querySelectorAll('#ttssvg .tband').forEach(b => b.setAttribute('opacity', b.dataset.m === ttsHover ? .12 : 0));
   document.querySelectorAll('#ttssvg .tfade').forEach(e => e.setAttribute('opacity', e.dataset.m === ttsHover ? 1 : e.dataset.op)); };
 const ttsCurve = id => SCALE[id].filter(p => p[1] >= 0);   // [US$, FCI, 90% low, 90% high, share still going], from FCI 0 up
