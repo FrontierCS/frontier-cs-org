@@ -153,33 +153,33 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 #restbl td:first-child{white-space:nowrap}   /* model names on one line; the table scrolls sideways on phones */
 #restbl td.all, #restbl th.all{font-weight:600; border-right:1px solid var(--line)}
 .res .tk{color:var(--muted)}
-/* Every run (the overview's waffle, Qiuyang): tasks down, models across, one square per metric. The header sticks under the
-   section bar (--wtop, set by fcs2.js) while the table fits; a table wider than its box scrolls sideways instead (.scroll),
+/* Every run (the overview's kebab, Qiuyang): tasks down, models across, one square per metric. The header sticks under the
+   section bar (--ktop, set by fcs2.js) while the table fits; a table wider than its box scrolls sideways instead (.scroll),
    the task names staying put. Squares: dark beaten, grey missed; a run that timed out, failed or was refused takes one colour. */
-.waf-scroll.scroll{overflow-x:auto; -webkit-overflow-scrolling:touch}
-.waf{width:100%; min-width:1110px; border-collapse:separate; border-spacing:0; table-layout:fixed; font-size:13px}
-.waf col.wt{width:236px} .waf col.wf{width:54px}
-.waf th{position:sticky; top:var(--wtop,0px); z-index:2; background:var(--bg); font-weight:600; font-size:12.5px; line-height:1.25; color:var(--ink-2); padding:8px 4px; border-bottom:1px solid var(--ink-2); vertical-align:bottom; text-align:center}
-.waf th .mn{display:block; width:18px; height:3px; margin:0 auto 6px}   /* a rule, not a square: squares are the data */
-.waf th.wt, .waf td.wt{text-align:left; padding-left:0}
-.waf th.wf, .waf td.wf{text-align:right; padding-right:14px; color:var(--muted); font-variant-numeric:tabular-nums}
-.waf td{padding:3px 4px; border-bottom:1px solid var(--grid); text-align:center; line-height:1.3}
-.waf td.wt{white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-.waf td.wt a{color:var(--ink)} .waf td.wt a:hover{text-decoration:underline}
-.waf td[data-i]:hover{background:var(--soft)}
-.waf .sqs{display:inline-flex; gap:3px; vertical-align:middle}
-.waf i, #waflegend i{display:block; width:9px; height:9px; box-sizing:border-box}
-#waflegend i{width:11px; height:11px}
-.waf i.y, #waflegend i.y{background:var(--ink)}
-.waf i.n, #waflegend i.n{background:var(--fail)}
-.waf i.to, #waflegend i.to{background:#e37400}   /* Google yellow 900 */
-.waf i.fa, #waflegend i.fa{background:#d93025}   /* Google red 600 */
-.waf i.rf, #waflegend i.rf{border:1.5px solid var(--faint)}
-.waf i.un, #waflegend i.un{border:1.5px dashed var(--faint)}
-.waf-scroll.scroll .waf th{top:0}   /* inside the scrolling box the header has nothing to stick under */
-.waf-scroll.scroll .waf th.wt, .waf-scroll.scroll .waf td.wt{position:sticky; left:0; z-index:1; background:var(--bg)}
-.waf-scroll.scroll .waf th.wt{z-index:3}
-@media (max-width:640px){ .waf{min-width:1060px} .waf col.wt{width:132px} .waf col.wf{width:40px} .waf th.wf, .waf td.wf{padding-right:8px} .waf td.wt{white-space:normal} }
+.keb-scroll.scroll{overflow-x:auto; -webkit-overflow-scrolling:touch}
+.keb{width:100%; min-width:1110px; border-collapse:separate; border-spacing:0; table-layout:fixed; font-size:13px}
+.keb col.kt{width:236px} .keb col.kf{width:54px}
+.keb th{position:sticky; top:var(--ktop,0px); z-index:2; background:var(--bg); font-weight:600; font-size:12.5px; line-height:1.25; color:var(--ink-2); padding:8px 4px; border-bottom:1px solid var(--ink-2); vertical-align:bottom; text-align:center}
+.keb th .mn{display:block; width:18px; height:3px; margin:0 auto 6px}   /* a rule, not a square: squares are the data */
+.keb th.kt, .keb td.kt{text-align:left; padding-left:0}
+.keb th.kf, .keb td.kf{text-align:right; padding-right:14px; color:var(--muted); font-variant-numeric:tabular-nums}
+.keb td{padding:3px 4px; border-bottom:1px solid var(--grid); text-align:center; line-height:1.3}
+.keb td.kt{white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.keb td.kt a{color:var(--ink)} .keb td.kt a:hover{text-decoration:underline}
+.keb td[data-i]:hover{background:var(--soft)}
+.keb .sqs{display:inline-flex; gap:3px; vertical-align:middle}
+.keb i, #keblegend i{display:block; width:9px; height:9px; box-sizing:border-box}
+#keblegend i{width:11px; height:11px}
+.keb i.y, #keblegend i.y{background:var(--ink)}
+.keb i.n, #keblegend i.n{background:var(--fail)}
+.keb i.to, #keblegend i.to{background:#e37400}   /* Google yellow 900 */
+.keb i.fa, #keblegend i.fa{background:#d93025}   /* Google red 600 */
+.keb i.rf, #keblegend i.rf{border:1.5px solid var(--faint)}
+.keb i.un, #keblegend i.un{border:1.5px dashed var(--faint)}
+.keb-scroll.scroll .keb th{top:0}   /* inside the scrolling box the header has nothing to stick under */
+.keb-scroll.scroll .keb th.kt, .keb-scroll.scroll .keb td.kt{position:sticky; left:0; z-index:1; background:var(--bg)}
+.keb-scroll.scroll .keb th.kt{z-index:3}
+@media (max-width:640px){ .keb{min-width:1060px} .keb col.kt{width:132px} .keb col.kf{width:40px} .keb th.kf, .keb td.kf{padding-right:8px} .keb td.kt{white-space:normal} }
 .res .best{font-weight:700}
 .res th .mn{display:inline-block; width:9px; height:9px; margin-right:6px}
 @media (max-width:640px){ .res{font-size:14px} .res .tk{display:none} .res th,.res td{padding-inline:6px} .res .full{display:none} }

@@ -716,7 +716,7 @@ def task_checks(db):
 
 def run_states(db):
     """Per task short name and model id on the site, how a run ended when it was not an ordinary evaluation, for the
-    overview's waffle, which shows it in place of the run's metrics: 'timeout' and 'failed' from the run's state (both
+    overview's kebab, which shows it in place of the run's metrics: 'timeout' and 'failed' from the run's state (both
     score 0), 'refused' where the model's provider refused the task (left out of the fits), 'unscored' for a run not yet scored."""
     out = defaultdict(dict)
     for c, t, st, s, fj in db.execute('''select c.name, t.name, r.state, r.display_score, r.feedback_json from cells ce join runs r on r.id = ce.run_id
