@@ -25,17 +25,17 @@ stops unless PASS is exactly "every metric beaten" for every run. Metrics that p
 apart by the data, and counting each separately makes a task look harder than it is (Qiuyang): metrics whose outcomes
 over the task's runs differ in at most GROUP_TOL runs are linked, a group is a connected set of them (recomputed from
 the data on every run), and the model treats each group as one item that a run beats when it beats every member. A run's
-final score counts by how far above the human reference r_t it is when the run passes, and by how far below it when it does not pass and falls short (rule B, Qiuyang, 2026-10-16): its margin over the human reference r_t it is (r_t
+final score counts by how far above the human reference r_t it is when the run passes, by how far below it when it does not pass and falls short, and as at least level when it does not pass but scores above r_t (rule E, Qiuyang, 2026-10-16): its margin over the human reference r_t it is (r_t
 the median reference_score over the task's runs; 0 or less: REF_DEFAULT's value, else the task has none), in units of
 the task's score spread, at least the median spread over tasks: y = (score - r_t) / unit_t, unit_t = max(sd_t, c), sd_t
 the sd of the task's final scores strictly between 0 and 100 (all of them when fewer than 3), c the median sd_t over the
-tasks with a reference. A run that does not pass contributes its metric groups and, when its final score is below r_t, its margin: how far short it fell; above r_t its final score is not used, its metrics not confirming it (rule B, Qiuyang, 2026-10-16). Tasks in OFF_FIT_DOMAINS (Security, until its tasks are fixed) are left out of every fit too. A run the model's provider refused (feedback_json.refusal: no final submission came) is left out of every fit, FCI, FDI and test-time scaling alike; the page still lists it (Qiuyang, 2026-10-16). The final score comes from the same
+tasks with a reference. A run that does not pass contributes its metric groups and its margin: how far short it fell, or, above r_t, only that it got there, P(y' >= 0), its metrics not confirming more (rule E, Qiuyang, 2026-10-16). Tasks in OFF_FIT_DOMAINS (Security, until its tasks are fixed) are left out of every fit too. A run the model's provider refused (feedback_json.refusal: no final submission came) is left out of every fit, FCI, FDI and test-time scaling alike; the page still lists it (Qiuyang, 2026-10-16). The final score comes from the same
 measurements as the metrics, so a run's metric groups and its margin share one run effect u ~ N(0, SIGMA_U^2). With
 theta_m the model's strength in logits (prior N(0, 1/LAM), LAM = 0.35 as in the site's in-browser TDIFF), a run's
 likelihood is the integral over u, by Gauss-Hermite quadrature (64 nodes; 24 stall Newton near SIGMA_U = 3.7), of prod_j
 sigmoid(theta_m + u - beta_tj)^z (1 - sigmoid(.))^(1 - z), j over the task's metric groups, times, for a run that
-passes, or does not pass and scores below r_t, the normal density of y with mean a (theta_m + u - h_t) and sd S_E, with
-h_t the task's beat-the-human level. Priors: h_t ~ N(0, PRIOR_SD^2) and beta_tj ~ N(h_t + DELTA,
+passes, or does not pass and scores below r_t, the normal density of y with mean a (theta_m + u - h_t) and sd S_E, and
+for a run that does not pass but scores above r_t, the probability that y is at least 0; h_t is the task's beat-the-human level. Priors: h_t ~ N(0, PRIOR_SD^2) and beta_tj ~ N(h_t + DELTA,
 TAU^2); a task without a reference has no margin and no h_t, and beta_tj ~ N(0, PRIOR_SD^2). For given SIGMA_U, a,
 DELTA, TAU and S_E, the strengths and every task's parameters are fitted together at their joint posterior mode
 (Newton's method, the strengths' block solved through the Schur complement); SIGMA_U, a, DELTA, TAU and S_E maximise the
@@ -236,8 +236,9 @@ def metric_tasks(obs, ref, PB):
     beats every member; with every run's PASS equal to all metrics beaten, it is also all groups beaten. With a reference r_t
     the outcome row ends [y, cen]: y = (score - r_t) / unit_t for a run that passes, unit_t = max(sd_t, c), sd_t the sd of the
     task's final scores strictly between 0 and 100 (all of them when fewer than 3), c the median sd_t over the tasks with a
-    reference; cen 0 when the margin counts (a run that passes, or one that does not pass and scores below r_t), 2 when it
-    does not (a run that does not pass and scores at or above r_t). Returns the tasks and c."""
+    reference; cen 0 when the margin counts as it is (a run that passes, or one that does not pass and scores below r_t),
+    1 for a run that does not pass and scores above r_t (y = 0, a lower bound: at least level), 2 for a tie (no margin).
+    Returns the tasks and c."""
     n = Counter((MODEL[o[0]][0], o[1]) for o in obs)
     assert max(n.values()) == 1, 'PASSBY has one entry per task and model: two runs of one model on a task cannot be told apart'
     spread = {}
@@ -268,12 +269,13 @@ def metric_tasks(obs, ref, PB):
         G = np.array([[min(z[stems.index(m)] for m in g) for g in groups] for z in Z])
         share = np.array([sum(v[0] for v in a.values()) / max(1, sum(v[1] for v in a.values())) for a in cnt])   # of hidden checks beaten
         O, w, unit = G, None, None
-        if t in ref:   # the final score's margin over the human reference (Qiuyang, 2026-10-16, rule B): a run that passes
-            # counts it, however far; a run that does not pass counts it only below the human reference, how far short it
-            # fell; a run that does not pass but scores above it (or level) counts no margin, its metrics not confirming it
+        if t in ref:   # the final score's margin over the human reference (Qiuyang, 2026-10-16, rule E): a run that passes
+            # counts it, however far; a run that does not pass counts how far short it fell, and above the human reference
+            # only that it got there, y >= 0 (at least level), its metrics not confirming more; a tie counts no margin
             sc, unit, ok = np.array([o[3] for o in rs]), max(spread[t], unit0), G.all(1)
-            y, below = (sc - ref[t]) / unit, sc < ref[t] - TIE_EPS
-            O, w = np.column_stack([G, y, np.where(ok | below, 0.0, 2.0)]), np.array([win(o[3], ref[t]) for o in rs])
+            y, below, above = (sc - ref[t]) / unit, sc < ref[t] - TIE_EPS, sc > ref[t] + TIE_EPS
+            O, w = (np.column_stack([G, np.where(ok | below, y, 0.0), np.where(ok | below, 0.0, np.where(above, 1.0, 2.0))]),
+                    np.array([win(o[3], ref[t]) for o in rs]))
         out[t] = {'stems': stems, 'Z': Z, 'groups': groups, 'models': [o[0] for o in rs], 'O': O, 'k': len(groups),
                   'np': len(groups) + (t in ref), 'share': share, 'wins': w, 'unit': unit}
     return out, unit0
