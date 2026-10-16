@@ -210,8 +210,6 @@ function drawECI() {
    pointer is on it or its legend entry. */
 let ttsHover = null, ttsRun = 0;
 const TTS_FADE = .2;   // Qiuyang: .25 too strong, .14 too light
-// layer i of the frontiers (0 the Pareto frontier): [opacity, stroke width], from full and 3 px down towards the faint curves
-const ttsLayer = i => [TTS_FADE + (1 - TTS_FADE) * .55 ** i, 2.2 + .8 * .55 ** i];
 const TTSM = RANKED.filter(m => SCALE[m.id]);   // a model with no reported spend has no curve
 const ttsOn = new Set(TTSM.map(m => m.id));
 const ttsBands = () => { document.querySelectorAll('#ttssvg .tband').forEach(b => b.setAttribute('opacity', b.dataset.m === ttsHover ? .12 : 0));
@@ -312,15 +310,8 @@ function drawTTS(t) {
   const g = sv('g', {'clip-path':'url(#ttsclip)'}), gb = sv('g'), gl = sv('g'), gd = sv('g'); g.append(gb, gl, gd); svg.append(g);   // bands under every line, end dots over
   const pts = [], tips = [], viss = cs.map(c => play ? ttsUpTo(c, sweep) : c);
   // the Pareto frontier of what is drawn, at rest and at every frame of the play (Qiuyang); a curve whose tip lies on it keeps its dot in full
-  // and then the layers under it (Qiuyang: peel more): each the same frontier over the models that hold no stretch of a layer
-  // above, until every shown model is on one; each layer lighter and thinner than the one above (ttsLayer)
-  const xe = play ? Math.max(x0, sweep) : x1, layers = [], held = new Set();
-  for (;;) { const f = ttsFrontier(viss.map((v, k) => held.has(k) ? [] : v), x0, xe); if (!f.length) break;
-    layers.push(f); f.forEach(([k]) => held.add(k)); }
-  const front = layers[0] || [];
-  const ends = f => { const fp = f.flatMap(([k, ps]) => ps.map(p => [p[0], k]));
-    return k => { const e = viss[k][viss[k].length - 1][0], at = fp.filter(p => p[0] <= e * 1.0001).pop(); return !!at && at[1] === k; }; };
-  const onLayer = layers.map(ends), layerOf = k => onLayer.findIndex(on => on(k));
+  const front = ttsFrontier(viss, x0, play ? Math.max(x0, sweep) : x1), fpts = front.flatMap(([k, ps]) => ps.map(p => [p[0], k]));
+  const onFront = k => { const e = viss[k][viss[k].length - 1][0], at = fpts.filter(p => p[0] <= e * 1.0001).pop(); return !!at && at[1] === k; };
   ms.forEach((m, k) => {
     const c = cs[k], vis = viss[k];
     if (!vis.length) return;
@@ -331,37 +322,33 @@ function drawTTS(t) {
     const e = vis[vis.length - 1];
     const fade = play ? {} : {class:'tfade', 'data-m':m.id, 'data-op':op};
     gl.append(sv('path', {d:path, fill:'none', stroke:MCOL[m.id], 'stroke-width':2.2, 'stroke-linejoin':'round', opacity:op, ...fade}));
-    gd.append(sv('circle', {cx:X(e[0]), cy:Y(e[1]), r:4.5, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':1.5, ...(layerOf(k) === 0 ? {} : layerOf(k) > 0 ? {opacity:ttsLayer(layerOf(k))[0]} : {opacity:op, ...fade})}));
+    gd.append(sv('circle', {cx:X(e[0]), cy:Y(e[1]), r:4.5, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':1.5, ...(onFront(k) ? {} : {opacity:op, ...fade})}));
     if (!play) c.forEach(p => pts.push({x:X(p[0]), y:Y(p[1]), m:m.id, html:`<b>${esc(m.name)}</b><br>FCI <b>${fe(p[1])}</b> at ${usdfmt(p[0])} per run`
       + `<br>90% interval ${fe(Math.max(p[2], 0))}–${fe(p[3])}<br>${Math.round(p[4] * 100)}% of runs still going`}));
   });
   // the Pareto frontier in full over the faint curves, each stretch in the colour of the model that holds it; while the
   // focus moves, the model that leads at the cursor is named at the frontier's head
   if (play && front.length) { const [k, ps] = front[front.length - 1]; tips.push({m:ms[k], e:ps[ps.length - 1]}); }
-  const trace = (f, wd, o) => f.forEach(([k, ps]) => gl.append(sv('path', {d:ps.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join(''),
-    fill:'none', stroke:MCOL[ms[k].id], 'stroke-width':wd, 'stroke-linejoin':'round', 'stroke-linecap':'round', opacity:o})));
-  [...layers].reverse().forEach((f, i) => { const [o, wd] = ttsLayer(layers.length - 1 - i); trace(f, wd, o < 1 ? o : null); });
+  front.forEach(([k, ps]) => gl.append(sv('path', {d:ps.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join(''),
+    fill:'none', stroke:MCOL[ms[k].id], 'stroke-width':3, 'stroke-linejoin':'round', 'stroke-linecap':'round'})));
   /* at rest, each model that holds a stretch of the frontier is named over it with its lab's logo (Qiuyang): above the
      stretch's last point on the model's own curve (its end dot, when that is on the frontier), else below it, else not at
      all; models with their end dot on the frontier are placed first, one label per model */
   if (!play) {
-    const boxes = [], fr = {l:L, r:W - R, t:T - 6, b:H - B}, lg = 16, gap = 5, h = 18;
-    // the lower layers' models are named the same way, lighter, layer by layer, in the room the layers above leave
-    // on a phone only the top two layers are named, as the rest crowd
-    layers.forEach((f, li) => { if (narrow && li > 1) return; const onF = onLayer[li], o = li ? Math.max(.55, ttsLayer(li)[0]) : null, seen = new Set();
-    f.map(([k, ps]) => { const end = viss[k][viss[k].length - 1][0], own = ps.filter(p => p[0] <= end * 1.0001);
-      return {k, p:own.length ? own[own.length - 1] : ps[0], dot:onF(k)}; })
+    const boxes = [], fr = {l:L, r:W - R, t:T - 6, b:H - B}, seen = new Set(), lg = 16, gap = 5, h = 18;
+    front.map(([k, ps]) => { const end = viss[k][viss[k].length - 1][0], own = ps.filter(p => p[0] <= end * 1.0001);
+      return {k, p:own.length ? own[own.length - 1] : ps[0], dot:onFront(k)}; })
       .reverse().filter(c => !seen.has(c.k) && seen.add(c.k)).sort((a, b) => b.dot - a.dot)
       .forEach(({k, p}) => {
         const m = ms[k], x = X(p[0]), y = Y(p[1]);
-        const txt = sv('text', {class:'lab halo', x:0, y:0, fill:MTXT(m.id), 'font-weight':600, opacity:o}, m.name); svg.append(txt);
+        const txt = sv('text', {class:'lab halo', x:0, y:0, fill:MTXT(m.id), 'font-weight':600}, m.name); svg.append(txt);
         const w = lg + gap + txt.getComputedTextLength(), left = Math.min(Math.max(x - w / 2, fr.l), fr.r - w);
         const pos = [y - 9 - h, y + 9].map(top => ({x:left, y:top, w, h})).find(q => q.y >= fr.t && q.y + h <= fr.b
           && !boxes.some(o => q.x < o.x + o.w && o.x < q.x + q.w && q.y < o.y + o.h && o.y < q.y + q.h));
         if (!pos) { txt.remove(); return; }
         boxes.push(pos); txt.setAttribute('x', pos.x + lg + gap); txt.setAttribute('y', pos.y + 13.5);
-        if (LOGO[m.lab]) svg.append(sv('image', {href:LOGO_DIR + LOGO[m.lab] + '.svg', x:pos.x, y:pos.y + 1, width:lg, height:lg, opacity:o}));
-      }); });
+        if (LOGO[m.lab]) svg.append(sv('image', {href:LOGO_DIR + LOGO[m.lab] + '.svg', x:pos.x, y:pos.y + 1, width:lg, height:lg}));
+      });
   }
   // named off every line where there is room
   if (tips.length) {
