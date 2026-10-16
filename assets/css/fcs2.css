@@ -89,6 +89,7 @@ h2{font-weight:600; font-size:clamp(25px,2.4vw,30px); line-height:1.2; margin:0}
 .chip{border:1px solid #bdc1c6; background:#fff; border-radius:100px; padding:5px 11px; font-size:14px; color:var(--ink-2)}
 .chip[aria-pressed="true"]{background:var(--ink-2); border-color:var(--ink-2); color:#fff}
 .chip:focus-visible{outline:2px solid var(--teal); outline-offset:2px}
+.chead .cmode{gap:6px; font-weight:400} .chead .cmode .chip{font-size:13px; padding:3px 10px}   /* a chart's Pass rate / FCI switch, right of its title (owner, 2026-10-16) */
 .radios{display:flex; flex-direction:column; gap:8px; font-size:15px}
 .radios label{display:flex; align-items:center; gap:10px; cursor:pointer}
 /* a Material 3 radio, the filter checkbox's twin: same size, outline and blue, round with a dot (owner, design audit 5A) */

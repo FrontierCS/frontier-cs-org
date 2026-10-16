@@ -35,7 +35,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
 <section class="sec" id="leaderboard">
   <h2>Leaderboard</h2>
   <figure class="chart" style="margin:0">
-    <div class="chead"><span>Pass rate (over human)</span></div>
+    <div class="chead"><span id="pchead">Pass rate (over human)</span><div class="chips cmode" id="pcmode" role="group" aria-label="Measure"><button class="chip" type="button" data-v="pass" aria-pressed="true">Pass rate</button><button class="chip" type="button" data-v="fci" aria-pressed="false">FCI</button></div></div>
     <div class="plot" id="pcplot"><svg id="pcsvg" role="img" aria-label="Pass rate (over human) against cost per run"></svg><div class="tip" id="pctip" hidden></div></div>
     <div class="cfoot">{% include chart_logo.html %}</div>
   </figure>
@@ -51,9 +51,9 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
     <!-- One bar per model in the style of Artificial Analysis's index chart, the FCI as a whole number in the bar; the
          chart with 90% intervals is folded under it (owner, 2026-10-16) -->
     <figure class="chart" style="margin:0">
-      <div class="chead"><span>FrontierCS Capabilities Index (FCI)</span></div>
+      <div class="chead"><span id="fcibhead">FrontierCS Capabilities Index (FCI)</span><div class="chips cmode" id="fcibmode" role="group" aria-label="Measure"><button class="chip" type="button" data-v="pass" aria-pressed="false">Pass rate</button><button class="chip" type="button" data-v="fci" aria-pressed="true">FCI</button></div></div>
       <div class="plot" id="fcibplot"><svg id="fcibsvg" role="img" aria-label="FCI by model"></svg><div class="tip" id="fcibtip" hidden></div></div>
-      <div class="cfoot">{% include chart_logo.html %}<span>Kimi K2.7 = <span data-fill="zero"></span></span></div>
+      <div class="cfoot">{% include chart_logo.html %}<span id="fcibnote">Kimi K2.7 = <span data-fill="zero"></span></span></div>
     </figure>
     <details class="fold" id="eci-ci">
       <summary><h3>FCI with 90% intervals</h3></summary>

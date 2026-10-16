@@ -54,6 +54,12 @@ $('#lblegend').innerHTML = RANKED.map(m => `<span><i style="background:${MCOL[m.
 /* Main chart: pass rate against mean cost per run in US$, one dot per model (PASS, COST); the dots on the Pareto frontier are emphasised. Each label takes the first
    spot right, left, above or below its dot that clears every dot, every placed label and the edges; a dot with no free
    spot keeps no label (the tooltip still names it). No legend: the labels name the dots. */
+/* Each of the two charts has a Pass rate / FCI switch (owner, 2026-10-16): the scatter's y axis and the bars' height. */
+let pcMode = 'pass', fcibMode = 'fci';
+const MEAS = {pass:{v:id => PASS[id][0], head:'Pass rate (over human)', name:'Pass rate', fmt:v => f1(v) + '%'},
+  fci:{v:id => ECI[id][0], head:'FrontierCS Capabilities Index (FCI)', name:'FCI', fmt:v => fe(v)}};
+function modeSwitch(id, set) { $('#' + id).addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return;
+  [...$('#' + id).children].forEach(c => c.setAttribute('aria-pressed', String(c === b))); set(b.dataset.v); }); }
 function drawPassCost() {
   const svg = $('#pcsvg'), W = Math.max(300, $('#pcplot').clientWidth), narrow = W < 560;
   const L = 44, R = narrow ? 12 : 24, T = 14, B = 46, H = CHART_H.pc || (narrow ? 320 : 400);
@@ -62,12 +68,14 @@ function drawPassCost() {
   // the range loose); an edge dot whose label has no room on its outer side takes another spot
   // (on phones the right side keeps more, so the labels of the dots near the right edge fit on their right)
   const x0 = Math.log10(Math.min(...tx)) - .15, x1 = Math.log10(Math.max(...tx)) + (narrow ? .74 : .15);
-  const ymax = Math.min(100, Math.ceil((Math.max(...ms.map(m => PASS[m.id][0])) + 5) / 20) * 20);
+  const M = MEAS[pcMode], val = m => M.v(m.id), fci = pcMode === 'fci', top = Math.max(...ms.map(val));
+  const ystep = fci ? eciStep(top, narrow ? 4 : 5) : 20, ymax = fci ? Math.ceil(top * 1.08 / ystep) * ystep : Math.min(100, Math.ceil((top + 5) / 20) * 20);
+  $('#pchead').textContent = M.head; svg.setAttribute('aria-label', `${M.head} against cost per run`);
   const X = v => L + (Math.log10(v) - x0) / (x1 - x0) * (W - L - R), Y = v => T + (1 - v / ymax) * (H - T - B);
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
-  for (let v = 0; v <= ymax; v += 20) {
+  for (let v = 0; v <= ymax + ystep / 2; v += ystep) {
     svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1}));
-    svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, v + '%'));
+    svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, fci ? tick(v) : v + '%'));
   }
   // ticks at 1, 2 and 5 times each power of ten; a range under one decade still gets several
   for (let k = Math.floor(x0); k <= Math.ceil(x1); k++) [1, 2, 5].forEach(f => { const v = f * 10 ** k, lv = Math.log10(v);
@@ -75,11 +83,11 @@ function drawPassCost() {
     svg.append(sv('line', {x1:X(v), x2:X(v), y1:T, y2:H - B, stroke:'var(--grid)', 'stroke-width':1}));
     svg.append(sv('text', {x:X(v), y:H - B + 20, 'text-anchor':'middle'}, usdfmt(v))); });
   svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'Cost per run in US$, mean, log scale'));
-  const pts = [], order = [...ms].sort((a, b) => PASS[b.id][0] - PASS[a.id][0]);
-  const at = m => [X(COST[m.id][0]), Y(PASS[m.id][0])];
+  const pts = [], order = [...ms].sort((a, b) => val(b) - val(a));
+  const at = m => [X(COST[m.id][0]), Y(Math.max(0, val(m)))];
   const boxes = order.map(m => { const [cx, cy] = at(m); return {x:cx - 9, y:cy - 9, w:18, h:18}; });
   // the Pareto frontier: the models no cheaper model matches or beats on pass rate
-  const front = [...ms].sort((p, q) => COST[p.id][0] - COST[q.id][0] || PASS[q.id][0] - PASS[p.id][0]).filter((m, i, a) => a.slice(0, i).every(o => PASS[o.id][0] < PASS[m.id][0]));
+  const front = [...ms].sort((p, q) => COST[p.id][0] - COST[q.id][0] || val(q) - val(p)).filter((m, i, a) => a.slice(0, i).every(o => val(o) < val(m)));
   order.forEach(m => {
     const [cx, cy] = at(m), name = narrow ? m.short : m.name;
     // the frontier reads from the dots themselves, with no line: a model on it has a larger dot and a bold name, a model
@@ -87,8 +95,7 @@ function drawPassCost() {
     const lead = front.includes(m);
     svg.append(sv('circle', {cx, cy, r:lead ? 7.5 : 5, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':2, 'data-m':m.id}));
     labelDot(svg, boxes, cx, cy, name, {l:L, r:W, t:T, b:H - B}, MTXT(m.id), lead);   // fcs2-data.js
-    const pct = PASS[m.id][0];
-    pts.push({x:cx, y:cy, mean:true, html:`<b>${esc(m.name)}</b><br>Pass rate <b>${f1(pct)}%</b><br>${usdfmt(COST[m.id][0])} per run, mean`});
+    pts.push({x:cx, y:cy, mean:true, html:`<b>${esc(m.name)}</b><br>${M.name} <b>${M.fmt(val(m))}</b><br>${usdfmt(COST[m.id][0])} per run, mean`});
   });
   attachTip(svg, W, H, pts, $('#pctip'));
 }
@@ -106,7 +113,8 @@ const lightCol = id => { const h = getComputedStyle(document.documentElement).ge
   if (h.length !== 6) return false; const [r, g, b] = [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16) / 255);
   return .2126 * r + .7152 * g + .0722 * b > .6; };   // white as Artificial Analysis has it, dark ink only on the lightest (Sol's grey, GLM Flash's pink)
 function drawFciBars() {
-  const order = [...MODELS].sort((a, b) => ECI[b.id][0] - ECI[a.id][0]);
+  const M = MEAS[fcibMode], val = m => M.v(m.id), order = [...MODELS].sort((a, b) => val(b) - val(a));
+  $('#fcibhead').textContent = M.head; $('#fcibnote').hidden = fcibMode !== 'fci';
   const svg = $('#fcibsvg'), W = Math.max(300, $('#fcibplot').clientWidth), narrow = W < 560, an = animates(svg);
   svg.setAttribute('viewBox', `0 0 ${W} 10`); svg.replaceChildren();
   const fs = narrow ? 11 : 13, ang = narrow ? 55 : 45;   // the names under the bars, slanted by ang degrees
@@ -117,23 +125,23 @@ function drawFciBars() {
   const over = l => Math.max(0, ...lens.map((n, i) => n * cos - fs * .35 - (W - l - R) / order.length * (i + .5) + 2));
   let L = 4; for (let k = 0; k < 3; k++) L = 4 + over(L);
   const B = 10 + lg + 10 + Math.max(...lens) * Math.sin(ang * Math.PI / 180) + 8, H = T + PH + B;
-  const top = Math.max(...order.map(m => ECI[m.id][0])), step = eciStep(top, 4), ymax = Math.ceil(top / step) * step;
+  const top = Math.max(...order.map(val)), step = eciStep(top, 4), ymax = Math.ceil(top / step) * step;
   const band = (W - L - R) / order.length, bw = Math.min(56, band * .74), base = T + PH, Y = v => T + (1 - Math.max(0, v) / ymax) * PH;
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H);
   for (let v = step; v <= ymax + step / 2; v += step) svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1, 'stroke-dasharray':'2 4'}));
   svg.append(sv('line', {x1:L, x2:W - R, y1:base, y2:base, stroke:'var(--grid)', 'stroke-width':1, 'stroke-dasharray':'2 4'}));
   const pts = [];
   order.forEach((m, i) => {
-    const e = ECI[m.id][0], cx = L + band * (i + .5), x = cx - bw / 2, y = Y(e), h = base - y, r = Math.min(5, bw / 6, h);
+    const e = val(m), cx = L + band * (i + .5), x = cx - bw / 2, y = Y(e), h = base - y, r = Math.min(5, bw / 6, h);
     const bar = sv('path', {d:`M${x},${base}V${y + r}Q${x},${y} ${x + r},${y}H${x + bw - r}Q${x + bw},${y} ${x + bw},${y + r}V${base}Z`, fill:MCOL[m.id], 'data-m':m.id});
-    const inside = h > fs * 2.4, val = sv('text', {x:cx, y:inside ? y + fs + 9 : y - 6, 'text-anchor':'middle', 'font-size':fs + 1, 'font-weight':600,
+    const inside = h > fs * 2.4, vtx = sv('text', {x:cx, y:inside ? y + fs + 9 : y - 6, 'text-anchor':'middle', 'font-size':fs + 1, 'font-weight':600,
       fill:inside ? (lightCol(m.id) ? 'var(--ink)' : '#fff') : 'var(--ink)'}, String(Math.round(e)));
     const logo = LOGO[m.lab] ? sv('image', {href:LOGO_DIR + LOGO[m.lab] + '.svg', x:cx - lg / 2, y:base + 10, width:lg, height:lg}) : null;
     const ny = base + 10 + lg + 12, name = sv('text', {class:'lab', x:cx + fs * .35, y:ny, 'font-size':fs, 'text-anchor':'end',
       transform:`rotate(${-ang} ${cx + fs * .35} ${ny})`}, narrow ? m.short : m.name);
-    svg.append(bar, val, name); if (logo) svg.append(logo);
-    if (an) { mark(bar, 'a-rise', i * .05); mark(val, 'a-fade', .5 + i * .05); }
-    pts.push({x:cx, y, mean:true, html:`<b>${esc(m.name)}</b>${m.h ? ` · ${esc(m.h)}` : ''}<br>FCI <b>${fe(e)}</b>`});
+    svg.append(bar, vtx, name); if (logo) svg.append(logo);
+    if (an) { mark(bar, 'a-rise', i * .05); mark(vtx, 'a-fade', .5 + i * .05); }
+    pts.push({x:cx, y, mean:true, html:`<b>${esc(m.name)}</b>${m.h ? ` · ${esc(m.h)}` : ''}<br>${M.name} <b>${M.fmt(e)}</b>`});
   });
   attachTip(svg, W, H, pts, $('#fcibtip'));
 }
@@ -439,6 +447,8 @@ function drawHow() {
   $('#howalegend').innerHTML = picks.map((s, i) => `<span><i style="background:${INKS[i]}"></i>${esc(NAME(s))}, FDI ${fe(FDI[s])}</span>`).join('');
 }
 $('#fci-how').addEventListener('toggle', drawHow);
+modeSwitch('pcmode', v => { pcMode = v; shown.add('pcsvg'); drawPassCost(); });
+modeSwitch('fcibmode', v => { fcibMode = v; shown.add('fcibsvg'); drawFciBars(); });
 $('#eci-ci').addEventListener('toggle', () => { if ($('#eci-ci').open) { shown.add('ecisvg'); drawECI(); } });   // folded, it drew at no width; opened, it draws at once, with no entrance
 redraws.push(drawHow);
 
