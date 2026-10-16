@@ -460,7 +460,7 @@ function drawKebab() {
     return `<tr><td class="kt"><a href="${esc(taskHref(t))}">${esc(NAME(t))}</a></td><td class="kf">${FDI[t] != null ? fe(FDI[t]) : '–'}</td>${tds}</tr>`;
   }).join('');
   $('#kebtbl').innerHTML = `<colgroup><col class="kt"><col class="kf">${RANKED.map(() => '<col>').join('')}</colgroup>`
-    + `<thead><tr><th class="kt">Task</th><th class="kf">FDI</th>${RANKED.map(m => `<th><span class="mn" style="background:${MCOL[m.id]}"></span>${esc(m.name)}</th>`).join('')}</tr></thead><tbody>${body}</tbody>`;
+    + `<thead><tr><th class="kt">Task</th><th class="kf">FDI</th>${RANKED.map(m => `<th class="km"><span class="nm">${esc(m.name)}</span></th>`).join('')}</tr></thead><tbody>${body}</tbody>`;
   $('#keblegend').innerHTML = [['y', 'Beaten on every hidden workload'], ['n', 'Not beaten'], ...Object.entries(KSTATE).filter(([k]) => used.has(k)).map(([, v]) => v)]
     .map(([c, l]) => `<span><i class="${c}"></i>${l}</span>`).join('');
   const box = $('#kebplot'), tip = $('#kebtip');
@@ -485,6 +485,9 @@ $('#pcview').addEventListener('click', e => { const b = e.target.closest('.chip'
 function fitKebab() {
   const sc = $('#kebscroll'); sc.classList.remove('scroll'); sc.classList.toggle('scroll', $('#kebtbl').offsetWidth > sc.clientWidth + 1);
   $('#kebtbl').style.setProperty('--ktop', $('.sub').offsetHeight + 'px');
+  // model names run up at 40 degrees, each on one line (Qiuyang); the header is as tall as the longest one needs
+  const w = Math.max(0, ...[...document.querySelectorAll('#kebtbl .nm')].map(e => e.offsetWidth)), a = 40 * Math.PI / 180;
+  if (w) $('#kebtbl').style.setProperty('--kh', Math.ceil(w * Math.sin(a) + 16 * Math.cos(a) + 12) + 'px');
 }
 
 /* ---------- case studies: a placeholder until the preview runs have their own (owner, 2026-10-09) ---------- */
