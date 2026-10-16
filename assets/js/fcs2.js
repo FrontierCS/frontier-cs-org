@@ -444,8 +444,9 @@ function drawDomains() {
     const n = nt(d), lab = sv('text', {class:'lab halo', x:0, y:narrow ? ry + 16 : ry + h / 2 + 5}, d + ' ');
     lab.append(sv('tspan', {class:'dn'}, `${n} ${n === 1 ? 'task' : 'tasks'}`)); svg.append(lab);
     const cy0 = narrow ? ry + 22 + (h - 22) / 2 : ry + h / 2;
-    Object.values(groups).forEach(g => { const c = Math.min(PER, g.ms.length), lines = Math.ceil(g.ms.length / c);
-      g.ms.forEach((m, j) => { const cx = X(g.v) + (j % c - (c - 1) / 2) * STEP, cy = cy0 + (Math.floor(j / c) - (lines - 1) / 2) * STEP, ring = DOM_2ND.has(m.id);
+    Object.values(groups).forEach(g => { const c = Math.min(PER, g.ms.length), lines = Math.ceil(g.ms.length / c), half = (c - 1) / 2 * STEP + R + 1;
+      const bx = Math.min(Math.max(X(g.v), half), W - half);   // a block at 0% or 100% stays inside the chart on a phone
+      g.ms.forEach((m, j) => { const cx = bx + (j % c - (c - 1) / 2) * STEP, cy = cy0 + (Math.floor(j / c) - (lines - 1) / 2) * STEP, ring = DOM_2ND.has(m.id);
         svg.append(sv('circle', {cx, cy, r:ring ? R - 1 : R, fill:ring ? '#fff' : MCOL[m.id], stroke:MCOL[m.id], 'stroke-width':ring ? 2 : 1, 'data-m':m.id}));
         pts.push({x:cx, y:cy, html:`<b>${esc(m.name)}</b><br>${esc(d)}: ${g.k} of ${g.n} ${g.n === 1 ? 'task' : 'tasks'} passed`}); }); });
   });
