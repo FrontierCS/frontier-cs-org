@@ -212,6 +212,10 @@ let ttsHover = null, ttsRun = 0;
 const TTS_FADE = .2;   // Qiuyang: .25 too strong, .14 too light
 const TTSM = RANKED.filter(m => SCALE[m.id]);   // a model with no reported spend has no curve
 const ttsOn = new Set(TTSM.map(m => m.id));
+// The overview keeps each lab's colour, so two models of one lab share it (Astra and Sol, both Muse, both GLM): the
+// lab's model with the lower FCI is drawn dashed, its curve, its stretch of the frontier and its legend line (Qiuyang)
+const TTS_DASH = new Set(TTSM.filter((m, i, a) => a.findIndex(o => o.lab === m.lab) !== i).map(m => m.id));
+const ttsDash = id => TTS_DASH.has(id) ? '6 4' : null;
 const ttsBands = () => { document.querySelectorAll('#ttssvg .tband').forEach(b => b.setAttribute('opacity', b.dataset.m === ttsHover ? .12 : 0));
   document.querySelectorAll('#ttssvg .tfade').forEach(e => e.setAttribute('opacity', e.dataset.m === ttsHover ? 1 : e.dataset.op)); };
 const ttsCurve = id => SCALE[id].filter(p => p[1] >= 0);   // [US$, FCI, 90% low, 90% high, share still going], from FCI 0 up
@@ -321,7 +325,7 @@ function drawTTS(t) {
       d:c.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[3]).toFixed(1)}`).join('') + [...c].reverse().map(p => `L${X(p[0]).toFixed(1)},${Y(p[2]).toFixed(1)}`).join('') + 'Z'}));
     const e = vis[vis.length - 1];
     const fade = play ? {} : {class:'tfade', 'data-m':m.id, 'data-op':op};
-    gl.append(sv('path', {d:path, fill:'none', stroke:MCOL[m.id], 'stroke-width':2.2, 'stroke-linejoin':'round', opacity:op, ...fade}));
+    gl.append(sv('path', {d:path, fill:'none', stroke:MCOL[m.id], 'stroke-width':2.2, 'stroke-linejoin':'round', 'stroke-dasharray':ttsDash(m.id), opacity:op, ...fade}));
     gd.append(sv('circle', {cx:X(e[0]), cy:Y(e[1]), r:4.5, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':1.5, ...(onFront(k) ? {} : {opacity:op, ...fade})}));
     if (!play) c.forEach(p => pts.push({x:X(p[0]), y:Y(p[1]), m:m.id, html:`<b>${esc(m.name)}</b><br>FCI <b>${fe(p[1])}</b> at ${usdfmt(p[0])} per run`
       + `<br>90% interval ${fe(Math.max(p[2], 0))}–${fe(p[3])}<br>${Math.round(p[4] * 100)}% of runs still going`}));
@@ -330,7 +334,7 @@ function drawTTS(t) {
   // focus moves, the model that leads at the cursor is named at the frontier's head
   if (play && front.length) { const [k, ps] = front[front.length - 1]; tips.push({m:ms[k], e:ps[ps.length - 1]}); }
   front.forEach(([k, ps]) => gl.append(sv('path', {d:ps.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join(''),
-    fill:'none', stroke:MCOL[ms[k].id], 'stroke-width':3, 'stroke-linejoin':'round', 'stroke-linecap':'round'})));
+    fill:'none', stroke:MCOL[ms[k].id], 'stroke-width':3, 'stroke-linejoin':'round', 'stroke-linecap':ttsDash(ms[k].id) ? 'butt' : 'round', 'stroke-dasharray':ttsDash(ms[k].id)})));
   /* at rest, each model that holds a stretch of the frontier is named over it with its lab's logo (Qiuyang): above the
      stretch's last point on the model's own curve (its end dot, when that is on the frontier), else below it, else not at
      all; models with their end dot on the frontier are placed first, one label per model */
@@ -369,7 +373,7 @@ function drawTTS(t) {
   svg.onpointerleave = ev => { tipLeave(ev); ttsHover = null; ttsBands(); };
   ttsBands();
 }
-$('#ttslegend').innerHTML = TTSM.map(m => `<button type="button" data-m="${m.id}" aria-pressed="false"><i style="background:${MCOL[m.id]}"></i>${esc(m.name)}</button>`).join('');
+$('#ttslegend').innerHTML = TTSM.map(m => `<button type="button" data-m="${m.id}" aria-pressed="false"><i class="ln${TTS_DASH.has(m.id) ? ' dash' : ''}" style="color:${MCOL[m.id]}"></i>${esc(m.name)}</button>`).join('');
 $('#ttslegend').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return;
   const m = b.dataset.m; ttsOn.has(m) ? ttsOn.delete(m) : ttsOn.add(m); drawTTS(); });
 $('#ttslegend').addEventListener('pointerover', e => { const b = e.target.closest('button'); if (b && e.pointerType === 'mouse') { ttsHover = b.dataset.m; ttsBands(); } });
