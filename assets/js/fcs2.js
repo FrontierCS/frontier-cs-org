@@ -427,9 +427,9 @@ function drawTable() {
    One row per task, easiest first by FDI, the tasks held off the fits (no FDI) last; one column per model in FCI order. A cell
    holds one square per metric the task checks: dark when the run's final submission beat the human reference on every hidden
    workload, grey when it did not, so a run passes when all its squares are dark. The counts are PASSBY's (fcs2-checks.js),
-   summed per metric as the converter sums them. A run that timed out, failed or was refused (STATE) takes that colour on all
-   its squares. A task's squares keep one order in every column, the metric the most runs beat first. */
-const KSTATE = {timeout:['to', 'Timed out', 'Timed out: final score 0'], failed:['fa', 'Run failed', 'The run failed: final score 0'],
+   summed per metric as the converter sums them. A run that failed or was refused (STATE) takes that colour on all its squares;
+   a run that timed out shows its metrics like any other (Qiuyang: no timeout state). A task's squares keep one order in every column, the metric the most runs beat first. */
+const KSTATE = {failed:['fa', 'Run failed', 'The run failed: final score 0'],
   refused:['rf', 'Refused by the model provider', 'The model provider refused the task: left out of FCI and FDI'], unscored:['un', 'Not scored yet', 'Not scored yet']};
 function drawKebab() {
   const st = typeof STATE === 'undefined' ? {} : STATE, used = new Set();

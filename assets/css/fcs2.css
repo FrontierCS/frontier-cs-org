@@ -155,7 +155,7 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 .res .tk{color:var(--muted)}
 /* Every run (the overview's kebab, Qiuyang): tasks down, models across, one square per metric. The header sticks under the
    section bar (--ktop, set by fcs2.js) while the table fits; a table wider than its box scrolls sideways instead (.scroll),
-   the task names staying put. Squares: dark beaten, grey missed; a run that timed out, failed or was refused takes one colour. */
+   the task names staying put. Squares: dark beaten, grey missed; a run that failed or was refused takes one colour. */
 .keb-scroll.scroll{overflow-x:auto; -webkit-overflow-scrolling:touch}
 .keb{width:100%; min-width:1110px; border-collapse:separate; border-spacing:0; table-layout:fixed; font-size:13px}
 .keb col.kt{width:236px} .keb col.kf{width:54px}
@@ -172,7 +172,6 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 #keblegend i{width:11px; height:11px}
 .keb i.y, #keblegend i.y{background:var(--ink)}
 .keb i.n, #keblegend i.n{background:var(--fail)}
-.keb i.to, #keblegend i.to{background:#e37400}   /* Google yellow 900 */
 .keb i.fa, #keblegend i.fa{background:#d93025}   /* Google red 600 */
 .keb i.rf, #keblegend i.rf{border:1.5px solid var(--faint)}
 .keb i.un, #keblegend i.un{border:1.5px dashed var(--faint)}

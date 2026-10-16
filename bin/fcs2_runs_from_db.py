@@ -716,13 +716,14 @@ def task_checks(db):
 
 def run_states(db):
     """Per task short name and model id on the site, how a run ended when it was not an ordinary evaluation, for the
-    overview's kebab, which shows it in place of the run's metrics: 'timeout' and 'failed' from the run's state (both
-    score 0), 'refused' where the model's provider refused the task (left out of the fits), 'unscored' for a run not yet scored."""
+    overview's kebab, which shows it in place of the run's metrics: 'failed' from the run's state (it scores 0), 'refused'
+    where the model's provider refused the task (left out of the fits), 'unscored' for a run not yet scored. A run that timed
+    out shows its metrics like any other (Qiuyang, 2026-10-16: no timeout state)."""
     out = defaultdict(dict)
     for c, t, st, s, fj in db.execute('''select c.name, t.name, r.state, r.display_score, r.feedback_json from cells ce join runs r on r.id = ce.run_id
       join candidates c on c.id = ce.candidate_id join tasks t on t.id = ce.task_id'''):
         if c in HIDDEN: continue
-        k = 'refused' if refused(fj) else 'unscored' if s is None else {'TIMED_OUT': 'timeout', 'FAILED': 'failed'}.get(st)
+        k = 'refused' if refused(fj) else 'unscored' if s is None else {'FAILED': 'failed'}.get(st)
         if k: out[TASK[t][1] or t.split(' — ')[0]][MODEL[c][0]] = k
     return dict(sorted(out.items()))
 
@@ -791,7 +792,7 @@ block = (f'// One entry per scored run in the preview results database of {when:
          f"// Per task: [D, 90% low, 90% high, passes, wins, runs] in RUNS. D, the difficulty, is the FCI at which a model passes half the time, a pass being every metric beaten at once. It comes from each metric's own difficulty (metrics that pass and fail together share one), fitted on which metrics each run beats and how far its final score is from the human reference (a run that does not pass counts at most as level), in units of the task's score spread (at least the median spread over tasks), with a run effect shared by both (DIFF_FIT). wins counts the runs whose final score beats the reference (a tie is half; null without a reference).\nconst DIFF = {json.dumps(DIFF, ensure_ascii=False)};\n"
          f"// The FCI and FDI model's shared parameters, by Laplace marginal likelihood over all tasks: sigma_u, the sd of a run's effect on its metrics and its margin; a, the margin's slope per logit of strength; delta and tau, the mean and sd of a metric's difficulty above the task's beat-the-human level (sigma_u, delta and tau in FCI points); s_e, the margin's sd in units of the score spread; c, the smallest spread unit, in score points.\nconst DIFF_FIT = {json.dumps(DIFF_FIT)};\n"
          f"// Per task: the metrics its judge checks and the number of hidden final workloads; a run passes only when every check passes on every final workload.\nconst CHECKS = {json.dumps(CHECKS, ensure_ascii=False, separators=(',', ':'))};\n"
-         f"// Per task and model, how a run ended when it was not an ordinary evaluation: timeout or failed (both score 0), refused (the model's provider refused the task; left out of FCI and FDI), unscored (not yet scored).\nconst STATE = {json.dumps(STATE, ensure_ascii=False, separators=(',', ':'))};\n"
+         f"// Per task and model, how a run ended when it was not an ordinary evaluation: failed (it scores 0), refused (the model's provider refused the task; left out of FCI and FDI), unscored (not yet scored).\nconst STATE = {json.dumps(STATE, ensure_ascii=False, separators=(',', ':'))};\n"
          f"// Task descriptions from the paper repo (bin/fcs2_descriptions.tsv).\nconst DESC = {json.dumps(descriptions(), ensure_ascii=False)};\n")
 js = open(js_path, encoding='utf-8').read()   # read late: the fits above take a while
 BEGIN, END = '// BEGIN converter block (bin/fcs2_runs_from_db.py writes everything up to END)\n', '// END converter block\n'
