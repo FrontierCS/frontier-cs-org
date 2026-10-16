@@ -472,6 +472,15 @@ function drawKebab() {
   $('#kebscroll').onscroll = () => { tip.hidden = true; };
   fitKebab();
 }
+// The cost scatter and the kebab share one figure, switched by its tabs (Qiuyang, 2026-10-16); #kebab in the address opens
+// the kebab. A hidden chart has no width, so each is fitted again when its tab opens.
+const PCTITLE = {scatter:$('#pctitle').textContent, kebab:'Every run: one square per metric the task checks'};
+function pcView(v) {
+  [...$('#pcview').children].forEach(c => c.setAttribute('aria-pressed', String(c.dataset.v === v)));
+  $('#pctitle').textContent = PCTITLE[v]; $('#pcplot').hidden = v !== 'scatter'; $('#kebab').hidden = v !== 'kebab';
+  if (v === 'scatter') drawPassCost(); else fitKebab();
+}
+$('#pcview').addEventListener('click', e => { const b = e.target.closest('.chip'); if (b) pcView(b.dataset.v); });
 // the table scrolls sideways only when it does not fit, since a scrolling box would keep its header from sticking under the section bar
 function fitKebab() {
   const sc = $('#kebscroll'); sc.classList.remove('scroll'); sc.classList.toggle('scroll', $('#kebtbl').offsetWidth > sc.clientWidth + 1);
@@ -820,6 +829,7 @@ drawPapers();
   $('#locked').innerHTML = Array.from({length:6}, (_, i) => all[Math.floor((i + .5) * all.length / 6)]).map(([t, k]) =>
     `<div class="lk-tile" style="background:${ART_FIELD[k]}"><div class="lk-art">${taskArt(t.s, k).replace('<svg class="art"', '<svg width="100%" height="100%" preserveAspectRatio="xMidYMid slice"')}</div><span class="lk-lock">${lock}</span></div>`).join(''); })();
 drawPassCost(); drawTable(); drawKebab(); drawLB(); drawPassBars(); drawECI(); drawTTS(); drawMap(); drawRows();
+if (location.hash === '#kebab') { pcView('kebab'); $('#pcfig').scrollIntoView(); }
 // labels are placed by measured text width, so draw again once the web font has loaded and the widths are final
 if (document.fonts) document.fonts.ready.then(() => { drawPassCost(); drawLB(); drawPassBars(); drawECI(); drawTTS(); drawMap(); });
 let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { drawPassCost(); drawLB(); drawPassBars(); drawECI(); drawTTS(); drawMap(); drawPapers(); redraws.forEach(f => f()); }, 120); });

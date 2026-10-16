@@ -153,9 +153,10 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 #restbl td:first-child{white-space:nowrap}   /* model names on one line; the table scrolls sideways on phones */
 #restbl td.all, #restbl th.all{font-weight:600; border-right:1px solid var(--line)}
 .res .tk{color:var(--muted)}
-/* Every run (the overview's kebab, Qiuyang): tasks down, models across, one square per metric. The header sticks under the
+/* Every run (the overview's kebab, under the cost scatter's second tab, Qiuyang): tasks down, models across, one square per metric. The header sticks under the
    section bar (--ktop, set by fcs2.js) while the table fits; a table wider than its box scrolls sideways instead (.scroll),
    the task names staying put. Squares: dark beaten, grey missed; a run that failed or was refused takes one colour. */
+#pcview{font-weight:400}   /* the tabs in the scatter's head: Scatter, Kebab */
 .keb-scroll.scroll{overflow-x:auto; -webkit-overflow-scrolling:touch}
 .keb{width:100%; min-width:1110px; border-collapse:separate; border-spacing:0; table-layout:fixed; font-size:13px}
 .keb col.kt{width:236px} .keb col.kf{width:54px}
