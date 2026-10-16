@@ -150,7 +150,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
 
 <section class="sec" id="private">
   <h2>Private set</h2>
-  <p class="tbd">Tasks we don’t release.</p>
+  <p class="tbd">Tasks and domains we don’t release.</p>
   <div class="locked" id="locked" aria-hidden="true"></div>
   <p class="pcontact">For questions about the private set, email both <a class="mail" href="mailto:qmang@berkeley.edu,wenhao.chai@princeton.edu">qmang@berkeley.edu</a> and <a class="mail" href="mailto:qmang@berkeley.edu,wenhao.chai@princeton.edu">wenhao.chai@princeton.edu</a>.</p>
 </section>
