@@ -82,11 +82,15 @@ h2{font-weight:600; font-size:clamp(25px,2.4vw,30px); line-height:1.2; margin:0}
 #ttslegend i.ln.dash{border-top-style:dashed}
 #ttslegend button[aria-pressed="false"] i.ln{box-shadow:none; border-top-color:var(--faint)}
 /* Test-time scaling: the chart narrower, its legend a column to its right (Qiuyang); under it again on a narrow screen.
-   The legend ranks the models: line, lab logo, name, a bar to the model's FCI and the value, in columns shared by every row */
+   The legend ranks the models: the line with the lab's logo over its middle, the name, a bar to the model's FCI and the value,
+   in columns shared by every row */
 .tts-body{display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:0 36px; align-items:start}
-.tts-body #ttslegend{display:grid; grid-template-columns:22px 16px max-content minmax(40px,1fr) auto; gap:9px; margin:2px 0 0}   /* the rows' column gap is the grid's, or a subgrid's own gap eats into its tracks */
+.tts-body #ttslegend{display:grid; grid-template-columns:48px max-content minmax(40px,1fr) auto; gap:9px; margin:2px 0 0}   /* the rows' column gap is the grid's, or a subgrid's own gap eats into its tracks */
 .tts-body #ttslegend button{display:grid; grid-column:1/-1; grid-template-columns:subgrid; gap:0 9px; margin:0 -8px 0 -6px; padding:3px 8px 3px 6px; text-align:left}
-#ttslegend img.lg{width:16px; height:16px; display:block}
+#ttslegend .mk{position:relative; display:block; width:48px; height:18px}   /* wide enough that a dashed line shows its dashes on each side of the logo */
+#ttslegend .mk i.ln{position:absolute; left:0; right:0; top:50%; width:auto; margin-top:-1.5px}
+#ttslegend .mk img.lg{position:absolute; left:50%; top:50%; width:16px; height:16px; margin:-8px 0 0 -8px; border-radius:4px; background:var(--bg); box-shadow:0 0 0 2px var(--bg)}   /* the line runs under the logo */
+#ttslegend button:hover .mk img.lg{background:var(--grid); box-shadow:0 0 0 2px var(--grid)}
 #ttslegend .bar{display:block; height:8px; border-radius:4px; background:var(--grid); overflow:hidden}
 #ttslegend .bar b{display:block; height:100%; width:0; border-radius:4px}
 #ttslegend .v{font-variant-numeric:tabular-nums; font-weight:600; text-align:right; min-width:2.4em}

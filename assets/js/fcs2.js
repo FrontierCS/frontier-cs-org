@@ -390,9 +390,8 @@ function drawTTS(t) {
   svg.onpointerleave = ev => { tipLeave(ev); ttsHover = null; ttsBands(); };
   ttsBands();
 }
-$('#ttslegend').innerHTML = TTSM.map(m => `<button type="button" data-m="${m.id}" aria-pressed="false"><i class="ln${TTS_DASH.has(m.id) ? ' dash' : ''}" style="color:${MCOL[m.id]}"></i>`
-  + (LOGO[m.lab] ? `<img class="lg" src="${LOGO_DIR + LOGO[m.lab]}.svg" alt="">` : '<span></span>')
-  + `<span>${esc(m.name)}</span><span class="bar"><b style="background:${MCOL[m.id]}"></b></span><span class="v"></span></button>`).join('');
+$('#ttslegend').innerHTML = TTSM.map(m => `<button type="button" data-m="${m.id}" aria-pressed="false"><span class="mk"><i class="ln${TTS_DASH.has(m.id) ? ' dash' : ''}" style="color:${MCOL[m.id]}"></i>`
+  + (LOGO[m.lab] ? `<img class="lg" src="${LOGO_DIR + LOGO[m.lab]}.svg" alt="">` : '') + `</span><span>${esc(m.name)}</span><span class="bar"><b style="background:${MCOL[m.id]}"></b></span><span class="v"></span></button>`).join('');
 $('#ttslegend').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return;
   const m = b.dataset.m; ttsOn.has(m) ? ttsOn.delete(m) : ttsOn.add(m); drawTTS(); });
 $('#ttslegend').addEventListener('pointerover', e => { const b = e.target.closest('button'); if (b && e.pointerType === 'mouse') { ttsHover = b.dataset.m; ttsBands(); } });
