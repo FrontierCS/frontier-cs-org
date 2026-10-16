@@ -203,7 +203,7 @@ function drawECI() {
    into view a moving focus plays (Melissa's and Qiuyang's idea, 2026-10-14): a budget cursor sweeps right, slow where
    curves start or rise and quick across empty stretches; the view follows it, zoomed in on cheap budgets first and
    widening to the whole range; at every frame the frontier so far is drawn in full and the model leading at the cursor
-   is named at its head, the rest faint (Qiuyang, 2026-10-16; before, the curves rising at the cursor were lit). At rest nothing is named in the plot: the legend names the curves.
+   is named at its head, the rest faint (Qiuyang, 2026-10-16; before, the curves rising at the cursor were lit). At rest the models on the frontier are named over it with their lab's logo (Qiuyang, 2026-10-16; before, nothing was named at rest).
    At rest only the Pareto frontier of the shown curves is drawn in full (Qiuyang, 2026-10-16): at each budget, the best
    FCI any shown model reaches at that budget or less. A curve holds its last value past its end, so the frontier stays at
    a model's final FCI until another model passes it; the rest of every curve is faint (TTS_FADE), in full again while the
@@ -331,6 +331,25 @@ function drawTTS(t) {
   if (play && front.length) { const [k, ps] = front[front.length - 1]; tips.push({m:ms[k], e:ps[ps.length - 1]}); }
   front.forEach(([k, ps]) => gl.append(sv('path', {d:ps.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join(''),
     fill:'none', stroke:MCOL[ms[k].id], 'stroke-width':2.6, 'stroke-linejoin':'round', 'stroke-linecap':'round'})));
+  /* at rest, each model that holds a stretch of the frontier is named over it with its lab's logo (Qiuyang): above the
+     stretch's last point on the model's own curve (its end dot, when that is on the frontier), else below it, else not at
+     all; models with their end dot on the frontier are placed first, one label per model */
+  if (!play) {
+    const boxes = [], fr = {l:L, r:W - R, t:T - 6, b:H - B}, seen = new Set(), lg = 16, gap = 5, h = 18;
+    front.map(([k, ps]) => { const end = viss[k][viss[k].length - 1][0], own = ps.filter(p => p[0] <= end * 1.0001);
+      return {k, p:own.length ? own[own.length - 1] : ps[0], dot:onFront(k)}; })
+      .reverse().filter(c => !seen.has(c.k) && seen.add(c.k)).sort((a, b) => b.dot - a.dot)
+      .forEach(({k, p}) => {
+        const m = ms[k], x = X(p[0]), y = Y(p[1]);
+        const txt = sv('text', {class:'lab halo', x:0, y:0, fill:MTXT(m.id), 'font-weight':600}, m.name); svg.append(txt);
+        const w = lg + gap + txt.getComputedTextLength(), left = Math.min(Math.max(x - w / 2, fr.l), fr.r - w);
+        const pos = [y - 9 - h, y + 9].map(top => ({x:left, y:top, w, h})).find(q => q.y >= fr.t && q.y + h <= fr.b
+          && !boxes.some(o => q.x < o.x + o.w && o.x < q.x + q.w && q.y < o.y + o.h && o.y < q.y + q.h));
+        if (!pos) { txt.remove(); return; }
+        boxes.push(pos); txt.setAttribute('x', pos.x + lg + gap); txt.setAttribute('y', pos.y + 13.5);
+        if (LOGO[m.lab]) svg.append(sv('image', {href:LOGO_DIR + LOGO[m.lab] + '.svg', x:pos.x, y:pos.y + 1, width:lg, height:lg}));
+      });
+  }
   // named off every line where there is room
   if (tips.length) {
     const fr = {l:L, r:W, t:T, b:H - B}, boxes = tips.map(({e}) => ({x:X(e[0]) - 7, y:Y(e[1]) - 7, w:14, h:14})), near = [];
