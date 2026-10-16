@@ -39,6 +39,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
   <figure class="chart" style="margin:0">
     <div class="chead"><span>Pass rate (beat reference)</span></div>
     <div class="plot" id="fcibplot"><svg id="fcibsvg" role="img" aria-label="Pass rate (beat reference) by model"></svg><div class="tip" id="fcibtip" hidden></div></div>
+    <div class="cfoot">{% include chart_logo.html %}</div>   <!-- the bars keep their FrontierCS row (owner, 2026-10-16, on #89) -->
   </figure>
   <figure class="chart" style="margin:0">
     <div class="chead"><span>Pass rate (beat reference)</span></div>
