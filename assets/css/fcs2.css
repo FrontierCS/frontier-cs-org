@@ -61,7 +61,7 @@ h2{font-weight:600; font-size:clamp(25px,2.4vw,30px); line-height:1.2; margin:0}
 .mtabs{margin:0 0 22px}
 @media (max-width:1000px){ .cgrid{grid-template-columns:1fr} }
 .chart{min-width:0}
-.chead{display:flex; flex-wrap:wrap; justify-content:space-between; align-items:baseline; font-size:13px; font-weight:600; color:var(--ink); margin-bottom:6px; gap:12px}
+.chead{display:flex; flex-wrap:wrap; justify-content:space-between; align-items:baseline; font-size:15px; font-weight:600; color:var(--ink); margin-bottom:6px; gap:12px}
 .chead .r{color:var(--faint); font-weight:400}
 .plot{position:relative}
 .plot svg{display:block; width:100%; overflow:visible}
