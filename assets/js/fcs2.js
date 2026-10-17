@@ -307,11 +307,17 @@ function drawTTS(t) {
   if (tips.length) {
     const fr = {l:L, r:W, t:T, b:H - B}, boxes = tips.map(({e}) => ({x:X(e[0]) - 7, y:Y(e[1]) - 7, w:14, h:14})), near = [];
     gl.querySelectorAll('path').forEach(el => { const n = el.getTotalLength(); for (let l = 0; l <= n; l += 6) { const q = el.getPointAtLength(l); near.push({x:q.x - 2, y:q.y - 2, w:4, h:4}); } });
-    tips.sort((a, b) => b.e[1] - a.e[1]).forEach(({m, e}) => { const both = boxes.concat(near), name = m.name;   // names are never shortened, phones included
+    tips.sort((a, b) => b.e[1] - a.e[1]).forEach(({m, e}) => { const both = boxes.concat(near), lg = LOGO[m.lab];
+      const name = (lg ? '\u2003\u2002' : '') + m.name;   // names are never shortened, phones included; an em and an en space keep room for the lab's logo and a gap
       const n0 = svg.childElementCount;
       if (labelDot(svg, both, X(e[0]), Y(e[1]), name, fr, MTXT(m.id), false, true)) boxes.push(both[both.length - 1]);
       else labelDot(svg, boxes, X(e[0]), Y(e[1]), name, fr, MTXT(m.id), false, true);
-      if (!TTS_KEY.has(m.id) && svg.childElementCount > n0) svg.lastElementChild.style.opacity = .6; });   // a translucent curve's name lighter too
+      if (svg.childElementCount === n0) return;
+      const lab = svg.lastElementChild, dim = !TTS_KEY.has(m.id);
+      if (lg) {   // the lab's logo before the name, as on the pass rate bars (Qiuyang, 2026-10-17)
+        const b = lab.getBBox(), s = 14, im = sv('image', {href:LOGO_DIR + lg + '.svg', x:b.x, y:b.y + (b.height - s) / 2, width:s, height:s});
+        svg.append(im); if (dim) im.style.opacity = .6; }
+      if (dim) lab.style.opacity = .6; });   // a translucent curve's name and logo lighter too
   }
   if (play) { svg.onpointermove = svg.onpointerdown = svg.onpointerleave = null; return; }
   attachTip(svg, W, H, pts, $('#ttstip'));
