@@ -28,7 +28,7 @@ Guidance for coding agents (Codex and others) when working in this repository. `
 
 The FrontierCS 2 overview (`index.md`) sets the design; match it everywhere.
 
-- Type is Hanken Grotesk; colours are Google Material tones. A model's colour is its `--m-<id>` in `_sass/_fcs.scss`, nothing else.
+- Type is Radio Canada; colours are Google Material tones. A model's colour is its `--m-<id>` in `_sass/_fcs.scss`, nothing else.
 - Links are underlined text or pills. Never use arrow characters (← → ‹ › ↗) as links or separators; breadcrumbs use "/".
 - Draw checkboxes, radios and menus in Material 3 style; never leave the browser's default. The task filter's checkboxes and the mean-score settings' radios share one look.
 - The same kind of element looks the same on every page.
