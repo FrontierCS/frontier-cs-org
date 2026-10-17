@@ -193,21 +193,31 @@ function drawECI() {
 
 /* Test-time scaling: the FCI a model would have if every run stopped at a US$ budget (SCALE, from
    bin/fcs2_runs_from_db.py); a run that has ended within the budget counts what it beat, and a run still going counts
-   as if it timed out there, so no curve falls (Qiuyang, 2026-10-16). Straight segments and one legend (owner, 2026-10-13).
-   Only each lab's model with the highest FCI is in the chart and the legend (owner, 2026-10-16: no Pareto frontier, no
-   line that changes colour, one model per lab); a click on a legend entry shows or hides its curve (owner, 2026-10-14). A model's 90% band
+   as if it timed out there, beating nothing and scoring 0 (Qiuyang, 2026-10-16), so no curve falls. Straight segments and one legend (owner, 2026-10-13).
+   Every model with reported spend is in the legend and drawn (Qiuyang, 2026-10-16: with the frontier in full and the
+   rest faint, every curve fits; before, only each lab's model with the highest FCI, owner, 2026-10-14); a click on an
+   entry shows or hides its curve. A model's 90% band
    shows only while the pointer is on its curve or its legend entry (owner, 2026-10-13: no bands otherwise).
    Each curve starts at its first budget on the scale, FCI 0 or more, as a plain line with no start mark (owner, 2026-10-14; Qiuyang: the
    values under 0 drew every curve in from the bottom edge as a comb of near-vertical strokes). When the chart first comes
    into view a moving focus plays (Melissa's and Qiuyang's idea, 2026-10-14): a budget cursor sweeps right, slow where
    curves start or rise and quick across empty stretches; the view follows it, zoomed in on cheap budgets first and
-   widening to the whole range; curves rising at the cursor are drawn in full and named at their tip while the others
-   step back. At rest nothing is named in the plot: the legend names the curves. */
+   widening to the whole range; at every frame the frontier so far is drawn in full and the model leading at the cursor
+   is named at its head, the rest faint (Qiuyang, 2026-10-16; before, the curves rising at the cursor were lit). At rest the models on the frontier are named over it with their lab's logo (Qiuyang, 2026-10-16; before, nothing was named at rest).
+   At rest only the Pareto frontier of the shown curves is drawn in full (Qiuyang, 2026-10-16): at each budget, the best
+   FCI any shown model reaches at that budget or less. A curve holds its last value past its end, so the frontier stays at
+   a model's final FCI until another model passes it; the rest of every curve is faint (TTS_FADE), in full again while the
+   pointer is on it or its legend entry. */
 let ttsHover = null, ttsRun = 0;
-// a model with no reported spend has no curve; of each lab only the model with the highest FCI (RANKED is in FCI order)
-const TTSM = RANKED.filter(m => SCALE[m.id]).filter((m, i, a) => a.findIndex(o => o.lab === m.lab) === i);
+const TTS_FADE = .2;   // Qiuyang: .25 too strong, .14 too light
+const TTSM = RANKED.filter(m => SCALE[m.id]);   // a model with no reported spend has no curve
 const ttsOn = new Set(TTSM.map(m => m.id));
-const ttsBands = () => document.querySelectorAll('#ttssvg .tband').forEach(b => b.setAttribute('opacity', b.dataset.m === ttsHover ? .12 : 0));
+// The overview keeps each lab's colour, so two models of one lab share it (Astra and Sol, both Muse, both GLM). Qiuyang drew
+// the lab's second model dashed; the owner rejected dashes (2026-10-17), so the set is empty and the names tell them apart
+const TTS_DASH = new Set();   // no dashed lines (owner, 2026-10-17): every curve, frontier stretch and legend line is solid
+const ttsDash = id => TTS_DASH.has(id) ? '6 4' : null;
+const ttsBands = () => { document.querySelectorAll('#ttssvg .tband').forEach(b => b.setAttribute('opacity', b.dataset.m === ttsHover ? .12 : 0));
+  document.querySelectorAll('#ttssvg .tfade').forEach(e => e.setAttribute('opacity', e.dataset.m === ttsHover ? 1 : e.dataset.op)); };
 const ttsCurve = id => SCALE[id].filter(p => p[1] >= 0);   // [US$, FCI, 90% low, 90% high, share still going], from FCI 0 up
 // a curve up to log budget lx, ending on the point interpolated there
 function ttsUpTo(c, lx) {
@@ -219,6 +229,26 @@ function ttsUpTo(c, lx) {
     break;
   }
   return out;
+}
+/* The frontier of curves cs over log budgets x0 to x1: runs of [model index, [[US$, FCI], ...]], each run starting where
+   the one before ends, so the drawn frontier has no breaks; it runs on across the axis gap (Qiuyang: DeepSeek V4.1 Flash's
+   stretch is one line). A sample every 0.002 decade, under a pixel. */
+function ttsFrontier(cs, x0, x1) {
+  // each curve read as ttsUpTo reads it, straight between its points on the log axis, walked once from the left (it runs every frame of the play)
+  const ls = cs.map(c => c.map(p => Math.log10(p[0]))), at = cs.map(() => 0);
+  const runs = []; let rec = -Infinity, who = -1, cur = null;
+  for (let k = 0, n = Math.max(1, Math.ceil((x1 - x0) / .002)); k <= n; k++) {
+    const lx = x0 + (x1 - x0) * k / n;
+    cs.forEach((c, i) => { const l = ls[i]; if (!c.length || lx < l[0]) return;
+      while (at[i] + 1 < c.length && l[at[i] + 1] <= lx) at[i]++;
+      const j = at[i], y = j + 1 < c.length ? c[j][1] + (lx - l[j]) / (l[j + 1] - l[j]) * (c[j + 1][1] - c[j][1]) : c[j][1];
+      if (y > rec) { rec = y; who = i; } });
+    if (who < 0) continue;
+    const p = [10 ** lx, rec];
+    if (!cur || cur[0] !== who) { const last = cur && cur[1][cur[1].length - 1]; cur = [who, last ? [last] : []]; runs.push(cur); }
+    cur[1].push(p);
+  }
+  return runs;
 }
 // the focus's pacing was tuned on the old Human = 25 scale, about 7 of its points to a logit of the pass-based one
 const TTS_PT = 7 / ECI_UNIT;
@@ -238,7 +268,7 @@ function ttsSweep(cs, x0, x1, t) {
   return x0 + (x1 - x0) * (k - 1 + (target - w[k - 1]) / ((w[k] - w[k - 1]) || 1)) / n;
 }
 function ttsPlay(run) {
-  const t0 = performance.now(), D = 3400;
+  const t0 = performance.now(), D = 5500;   // ms for the whole sweep (Qiuyang: slower; it was 3400)
   const step = now => { if (run !== ttsRun) return; const t = Math.min(1, (now - t0) / D); drawTTS(t); if (t < 1) requestAnimationFrame(step); };
   requestAnimationFrame(step);
 }
@@ -281,26 +311,62 @@ function drawTTS(t) {
   if (gapPx) [gapPx[0], vx1 >= brk[1] ? gapPx[1] : null].forEach(x => x != null &&
     svg.append(sv('line', {x1:x - 3, y1:H - B + 6, x2:x + 3, y2:H - B - 6, stroke:'var(--ink-2)', 'stroke-width':1.5})));
   svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'Cost budget per run in US$, log scale'));
-  const g = sv('g', {'clip-path':'url(#ttsclip)'}), gb = sv('g'), gl = sv('g'); g.append(gb, gl); svg.append(g);   // bands under every line
-  // rising at the cursor: started within the last 0.35 decade, or 2 old points (2 / TTS_PT FCI) gained over it; nothing steps back while nothing rises
-  const rising = c => { const s0 = Math.log10(c[0][0]); if (s0 > sweep) return false; const e = ttsUpTo(c, sweep), b = ttsUpTo(c, sweep - .35);
-    return s0 > sweep - .35 || e[e.length - 1][1] - b[b.length - 1][1] >= 2 / TTS_PT; };
-  const anyRising = play && cs.some(rising), pts = [], tips = [];
+  const g = sv('g', {'clip-path':'url(#ttsclip)'}), gb = sv('g'), gl = sv('g'), gd = sv('g'); g.append(gb, gl, gd); svg.append(g);   // bands under every line, end dots over
+  const pts = [], tips = [], viss = cs.map(c => play ? ttsUpTo(c, sweep) : c);
+  // the Pareto frontier of what is drawn, at rest and at every frame of the play (Qiuyang); a curve whose tip lies on it keeps its dot in full
+  const front = ttsFrontier(viss, x0, play ? Math.max(x0, sweep) : x1), fpts = front.flatMap(([k, ps]) => ps.map(p => [p[0], k]));
+  const onFront = k => { const e = viss[k][viss[k].length - 1][0], at = fpts.filter(p => p[0] <= e * 1.0001).pop(); return !!at && at[1] === k; };
   ms.forEach((m, k) => {
-    const c = cs[k], vis = play ? ttsUpTo(c, sweep) : c;
+    const c = cs[k], vis = viss[k];
     if (!vis.length) return;
-    const lit = !anyRising || rising(c), op = lit ? null : .28;
+    const op = TTS_FADE;   // the frontier, drawn below, is the full line
     const path = vis.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join('');
     if (!play) gb.append(sv('path', {class:'tband', 'data-m':m.id, opacity:0, fill:MCOL[m.id],
       d:c.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[3]).toFixed(1)}`).join('') + [...c].reverse().map(p => `L${X(p[0]).toFixed(1)},${Y(p[2]).toFixed(1)}`).join('') + 'Z'}));
     const e = vis[vis.length - 1];
-    gl.append(sv('path', {d:path, fill:'none', stroke:MCOL[m.id], 'stroke-width':2.2, 'stroke-linejoin':'round', opacity:op}),
-      sv('circle', {cx:X(e[0]), cy:Y(e[1]), r:4.5, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':1.5, opacity:op}));
-    if (play && anyRising && lit) tips.push({m, e});
+    const fade = play ? {} : {class:'tfade', 'data-m':m.id, 'data-op':op};
+    gl.append(sv('path', {d:path, fill:'none', stroke:MCOL[m.id], 'stroke-width':2.2, 'stroke-linejoin':'round', 'stroke-dasharray':ttsDash(m.id), opacity:op, ...fade}));
+    gd.append(sv('circle', {cx:X(e[0]), cy:Y(e[1]), r:4.5, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':1.5, ...(onFront(k) ? {} : {opacity:op, ...fade})}));
     if (!play) c.forEach(p => pts.push({x:X(p[0]), y:Y(p[1]), m:m.id, html:`<b>${esc(m.name)}</b><br>FCI <b>${fe(p[1])}</b> at ${usdfmt(p[0])} per run`
       + `<br>90% interval ${fe(Math.max(p[2], 0))}–${fe(p[3])}<br>${Math.round(p[4] * 100)}% of runs still going`}));
   });
-  // while the focus moves, the rising curves are named at their tips, off every line where there is room
+  // the Pareto frontier in full over the faint curves, each stretch in the colour of the model that holds it; while the
+  // focus moves, the model that leads at the cursor is named at the frontier's head
+  if (play && front.length) { const [k, ps] = front[front.length - 1]; tips.push({m:ms[k], e:ps[ps.length - 1]}); }
+  front.forEach(([k, ps]) => gl.append(sv('path', {d:ps.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join(''),
+    fill:'none', stroke:MCOL[ms[k].id], 'stroke-width':3, 'stroke-linejoin':'round', 'stroke-linecap':ttsDash(ms[k].id) ? 'butt' : 'round', 'stroke-dasharray':ttsDash(ms[k].id)})));
+  /* at rest, each model that holds a stretch of the frontier is named over it with its lab's logo (Qiuyang): near the
+     stretch's last point on the model's own curve (its end dot, when that is on the frontier), above, below or beside it,
+     where the name crosses the fewest lines and dots, the frontier's counting four times a faint curve's, and the nearer
+     place wins a tie (Qiuyang: GPT-6 Astra's name sat on Claude Opus 5.5's curve); never over another name, else not at
+     all. Models with their end dot on the frontier are placed first, one label per model */
+  if (!play) {
+    const boxes = [], fr = {l:L, r:W - R, t:T - 6, b:H - B}, seen = new Set(), lg = 16, gap = 5, h = 18, near = [];
+    gl.querySelectorAll('path').forEach(el => { const wt = el.classList.contains('tfade') ? 1 : 4, n = el.getTotalLength();
+      for (let l = 0; l <= n; l += 4) { const q = el.getPointAtLength(l); near.push({x:q.x, y:q.y, wt}); } });
+    gd.querySelectorAll('circle').forEach(c => near.push({x:+c.getAttribute('cx'), y:+c.getAttribute('cy'), wt:c.classList.contains('tfade') ? 1 : 4}));
+    const cost = q => near.reduce((s, p) => s + (p.x > q.x - 4 && p.x < q.x + q.w + 4 && p.y > q.y - 3 && p.y < q.y + q.h + 3 ? p.wt : 0), 0);
+    front.map(([k, ps]) => { const end = viss[k][viss[k].length - 1][0], own = ps.filter(p => p[0] <= end * 1.0001);
+      return {k, p:own.length ? own[own.length - 1] : ps[0], dot:onFront(k)}; })
+      .reverse().filter(c => !seen.has(c.k) && seen.add(c.k)).sort((a, b) => b.dot - a.dot)
+      .forEach(({k, p}) => {
+        const m = ms[k], x = X(p[0]), y = Y(p[1]);
+        const txt = sv('text', {class:'lab halo', x:0, y:0, fill:MTXT(m.id), 'font-weight':600}, m.name); svg.append(txt);
+        const w = lg + gap + txt.getComputedTextLength(), qs = [];
+        // above and below, centred over the point or reaching left or right of it, a step of 7 px further out each round; then beside it
+        for (let s = 0; s < 4; s++) for (const top of [y - 9 - h - 7 * s, y + 9 + 7 * s]) for (const a of [.5, .85, .15, 1, 0])
+          qs.push({x:x - a * w, y:top, w, h, far:s});
+        qs.push({x:x + 10, y:y - h / 2, w, h, far:1}, {x:x - 10 - w, y:y - h / 2, w, h, far:1});
+        let pos = null, best = Infinity;
+        qs.forEach(q => { q.x = Math.min(Math.max(q.x, fr.l), fr.r - w);
+          if (q.y < fr.t || q.y + h > fr.b || boxes.some(o => q.x < o.x + o.w && o.x < q.x + q.w && q.y < o.y + o.h && o.y < q.y + q.h)) return;
+          const c = cost(q) + 3 * q.far; if (c < best) { best = c; pos = q; } });
+        if (!pos) { txt.remove(); return; }
+        boxes.push(pos); txt.setAttribute('x', pos.x + lg + gap); txt.setAttribute('y', pos.y + 13.5);
+        if (LOGO[m.lab]) svg.append(sv('image', {href:LOGO_DIR + LOGO[m.lab] + '.svg', x:pos.x, y:pos.y + 1, width:lg, height:lg}));
+      });
+  }
+  // named off every line where there is room
   if (tips.length) {
     const fr = {l:L, r:W, t:T, b:H - B}, boxes = tips.map(({e}) => ({x:X(e[0]) - 7, y:Y(e[1]) - 7, w:14, h:14})), near = [];
     gl.querySelectorAll('path').forEach(el => { const n = el.getTotalLength(); for (let l = 0; l <= n; l += 6) { const q = el.getPointAtLength(l); near.push({x:q.x - 2, y:q.y - 2, w:4, h:4}); } });
@@ -308,7 +374,12 @@ function drawTTS(t) {
       if (labelDot(svg, both, X(e[0]), Y(e[1]), name, fr, MTXT(m.id), false)) boxes.push(both[both.length - 1]);
       else labelDot(svg, boxes, X(e[0]), Y(e[1]), name, fr, MTXT(m.id), false); });
   }
-  $('#ttslegend').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', ttsOn.has(x.dataset.m)));
+  // the legend's bars, on the chart's y scale: each curve's tip, so the model's FCI at rest and its FCI at the cursor while
+  // the chart plays; a hidden model keeps its FCI, greyed (Qiuyang)
+  $('#ttslegend').querySelectorAll('button').forEach(x => { const id = x.dataset.m, on = ttsOn.has(id), k = ms.findIndex(m => m.id === id), c = ttsCurve(id);
+    const v = on && k >= 0 ? (viss[k].length ? viss[k][viss[k].length - 1][1] : null) : c.length ? c[c.length - 1][1] : null;
+    x.setAttribute('aria-pressed', on); x.querySelector('.bar b').style.width = `${v == null ? 0 : Math.min(1, Math.max(0, v / ymax)) * 100}%`;
+    x.querySelector('.v').textContent = v == null ? '' : fe(v); });
   if (play) { svg.onpointermove = svg.onpointerdown = svg.onpointerleave = null; return; }
   attachTip(svg, W, H, pts, $('#ttstip'));
   // the curve under the pointer: the nearest point within 28 px, as the tooltip picks it; set as properties, so a redraw replaces them
@@ -319,7 +390,8 @@ function drawTTS(t) {
   svg.onpointerleave = ev => { tipLeave(ev); ttsHover = null; ttsBands(); };
   ttsBands();
 }
-$('#ttslegend').innerHTML = TTSM.map(m => `<button type="button" data-m="${m.id}" aria-pressed="false"><i style="background:${MCOL[m.id]}"></i>${esc(m.name)}</button>`).join('');
+$('#ttslegend').innerHTML = TTSM.map(m => `<button type="button" data-m="${m.id}" aria-pressed="false"><span class="mk"><i class="ln${TTS_DASH.has(m.id) ? ' dash' : ''}" style="color:${MCOL[m.id]}"></i>`
+  + (LOGO[m.lab] ? `<img class="lg" src="${LOGO_DIR + LOGO[m.lab]}.svg" alt="">` : '') + `</span><span>${esc(m.name)}</span><span class="bar"><b style="background:${MCOL[m.id]}"></b></span><span class="v"></span></button>`).join('');
 $('#ttslegend').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return;
   const m = b.dataset.m; ttsOn.has(m) ? ttsOn.delete(m) : ttsOn.add(m); drawTTS(); });
 $('#ttslegend').addEventListener('pointerover', e => { const b = e.target.closest('button'); if (b && e.pointerType === 'mouse') { ttsHover = b.dataset.m; ttsBands(); } });
