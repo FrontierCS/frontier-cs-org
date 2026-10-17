@@ -79,14 +79,6 @@ h2{font-weight:600; font-size:clamp(25px,2.4vw,30px); line-height:1.2; margin:0}
 #ttslegend button:hover{background:var(--grid)}
 #ttslegend button[aria-pressed="false"]{color:var(--faint)} #ttslegend button[aria-pressed="false"] i{background:none!important; box-shadow:inset 0 0 0 1.5px var(--faint)}   /* a hidden model: grey and hollow until clicked (hollow, as GPT-6.1 Sol is itself grey) */
 #ttslegend{gap:10px 26px}
-#ttslegend i.ln{width:22px; height:0; background:none; border-top:3px solid currentColor}   /* a line, as the curves are; always solid (owner, 2026-10-17) */
-#ttslegend button[aria-pressed="false"] i.ln{box-shadow:none; border-top-color:var(--faint)}
-/* Test-time scaling: a plain legend under the full-width chart, each entry the line with its lab's logo over the middle and the
-   name (owner, 2026-10-17: no ranked list of FCI bars and values beside the chart) */
-#ttslegend .mk{position:relative; display:block; width:48px; height:18px}
-#ttslegend .mk i.ln{position:absolute; left:0; right:0; top:50%; width:auto; margin-top:-1.5px}
-#ttslegend .mk img.lg{position:absolute; left:50%; top:50%; width:16px; height:16px; margin:-8px 0 0 -8px; border-radius:4px; background:var(--bg); box-shadow:0 0 0 2px var(--bg)}   /* the line runs under the logo */
-#ttslegend button:hover .mk img.lg{background:var(--grid); box-shadow:0 0 0 2px var(--grid)}
 .cfoot{display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:16px; padding-top:14px; border-top:1px solid var(--line); font-size:13px; color:var(--muted-2)}
 /* the FrontierCS logo (mark and wordmark) signs each chart at the bottom left (owner, 2026-10-11) */
 .cfoot .clogo{display:inline-flex; align-items:center; gap:6px; flex:none; white-space:nowrap; font:500 15px/1 'Instrument Sans',var(--sans); letter-spacing:-.01em; color:var(--ink)}
