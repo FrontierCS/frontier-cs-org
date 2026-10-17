@@ -4,13 +4,12 @@ crumb + badge/date + title + standfirst + byline, sticky Contents column on the 
 body column on the right. The body keeps the <d-article> element so per-post `_styles`
 written against it continue to apply.
 {%- endcomment -%}
-{%- assign primary_tag = page.tags | first -%}
 <div class="ar-page post distill">
 
   <div class="ar-head" id="main" tabindex="-1">
     <div class="ar-crumb"><b><a href="{{ '/blog/' | relative_url }}">Blog</a></b><span>/</span><span>{{ page.title }}</span></div>
     <div class="ar-eyebrow">
-      {%- if primary_tag %}<span class="ar-badge">{{ primary_tag }}</span>{% endif -%}
+      {%- include post_tags.html tags=page.tags -%}
       <span>{% if page.date_display %}{{ page.date_display }}{% else %}{{ page.date | date: "%b %-d, %Y" }}{% endif %}</span>
     </div>
     <h1>{{ page.title }}</h1>
