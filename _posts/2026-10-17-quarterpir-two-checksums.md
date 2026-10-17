@@ -1,0 +1,283 @@
+---
+layout: distill
+title: "Two Checksums Shrink Private Lookups by 27%"
+description: "QuarterPIR, a EUROCRYPT 2024 scheme, lets a client read a database without revealing what it reads. Muse Wonder 1.0 cut its bytes per lookup by 27%, with privacy unchanged. We build the scheme up from a 16-entry example to show how."
+thumbnail: assets/img/blog-thumbs/quarterpir-two-checksums.svg
+tags: [Case study]
+case:
+  task: QuarterPIR
+  model: Muse Wonder 1.0
+
+date: 2026-10-17
+date_display: "October 17, 2026"
+
+authors:
+  - name: Qiuyang Mang
+    url: "https://joyemang33.github.io/"
+    affiliations:
+      name: UC Berkeley
+
+toc:
+  - name: The Task
+  - name: One Lookup on 16 Entries
+  - name: Keys Shorten the Request
+  - name: Hiding the Group
+  - name: Each Hint Is Used Once
+  - name: Why Every Reply Carries the Key Parities
+  - name: At Full Size
+  - name: The Two Checksums
+  - name: Why Privacy Is Unchanged
+  - name: Results
+  - name: What the Agents Found
+  - name: References
+
+_styles: >
+  d-article .cs-fig { margin-block: 36px; }
+  d-article .cs-fig .svgwrap { overflow-x: auto; }
+  d-article .cs-fig svg { display: block; width: 100%; min-width: 620px; height: auto; }
+  d-article pre.grid16 { width: fit-content; }
+  d-article p.caption { margin-bottom: 30px !important; }
+  d-article .cs-table th:not(:first-child), d-article .cs-table td:not(:first-child) { text-align: right; }
+  d-article .cs-table td, d-article .cs-table th { white-space: nowrap; font-variant-numeric: tabular-nums; padding-right: 18px; }
+  d-article .cs-table td:last-child, d-article .cs-table th:last-child { padding-right: 0; }
+  /* The figure classes below are the fig2 classes of assets/css/fcs2.css (svg.fig2), copied and scoped to this post:
+     fcs2.css itself cannot load on a post. The agents' part takes the Security and crypto tones. */
+  d-article .fig2 { --a: #A50E0E; --af: #FAD2CF; }
+  d-article .fig2 text { font-family: var(--font-sans); font-size: 13px; fill: var(--ink); }
+  d-article .fig2 .n { fill: var(--muted); }
+  d-article .fig2 .k { font-size: 11.5px; font-weight: 600; letter-spacing: .07em; fill: var(--muted); }
+  d-article .fig2 .h { font-size: 15px; font-weight: 600; }
+  d-article .fig2 .b { font-weight: 600; }
+  d-article .fig2 .ak { fill: var(--a); }
+  d-article .fig2 .sn { font-size: 11.5px; font-weight: 600; }
+  d-article .fig2 .code { font-family: var(--font-code); font-size: 12px; }
+  d-article .fig2 .sm { font-size: 11.5px; }
+  d-article .fig2 .sub { font-size: 9.5px; }
+  d-article .fig2 .mid { text-anchor: middle; }
+  d-article .fig2 .end { text-anchor: end; }
+  d-article .fig2 .given, d-article .fig2 .result { fill: #f1f3f4; }
+  d-article .fig2 .agent { fill: var(--af); }
+  d-article .fig2 .chip { fill: #fff; }
+  d-article .fig2 .chip.lc { stroke: #dadce0; stroke-width: 1; }
+  d-article .fig2 .chip.on { stroke: var(--a); stroke-width: 1.5; }
+  d-article .fig2 .ring { fill: none; stroke: var(--ink); stroke-width: 1.5; }
+  d-article .fig2 .dash { stroke-dasharray: 3 3; }
+  d-article .fig2 .g3 { fill: #dadce0; }
+  d-article .fig2 .g5 { fill: #9aa0a6; }
+  d-article .fig2 .fa { fill: var(--a); }
+  d-article .fig2 .ln2 { fill: none; stroke: #5f6368; stroke-width: 1.3; }
+  d-article .fig2 .arh { fill: #5f6368; }
+---
+
+Muse Wonder 1.0, a model from Meta, cut the bytes of each private database lookup by 27%. Privacy is unchanged. The scheme it improved, QuarterPIR, appeared at EUROCRYPT 2024. The fix is a trick that storage engineers know from RAID-6: two checksums can rebuild two lost values. The model spotted this problem inside a cryptographic protocol. OpenAI's GPT-6 Astra found the same idea on its own in an earlier run.
+
+The result touches three questions that many computer scientists care about. Can a client read data without revealing what it reads? How far does a classic coding trick reach? Can AI agents find research ideas? This post builds the scheme from a 16-entry example. With the example in hand, the two checksums take a few lines.
+
+## The Task
+
+FrontierCS 2 turns published papers into tasks for AI agents. Each task removes the key part of the code that the authors released. An agent must rewrite that part and beat the authors' code, which we call the human reference.
+
+Private information retrieval lets a client read one entry of a database without the server learning which one. Downloading the whole database achieves this at a high cost. Ghoshal, Zhou and Shi [1] designed QuarterPIR to make each lookup cheap. The client reads the database once, ahead of time, and keeps a small summary. Each later lookup costs one short request and one short reply.
+
+The [QuarterPIR task]({{ '/task/#quarterpir' | relative_url }}) removes the server's request handler. The agent writes it and may redesign the client and both messages. Its goal is fewer bytes per lookup. The server may see only a fixed public function of the request that the authors' client would send. This rule keeps privacy intact.
+
+A solution passes only if it beats the human reference on every count. It must send fewer bytes on every lookup. It must also be faster in server time, setup time and lookup time. It may use no more client memory, and every lookup must return the right entry.
+
+## One Lookup on 16 Entries
+
+The example database holds 16 entries in four rows. Each letter stands for the value stored at that position:
+
+<pre class="grid16"><code>row 1:   A  B  C  D
+row 2:   E  F  G  H
+row 3:   I  J  K  L
+row 4:   M  N  O  P</code></pre>
+
+Before any lookup, the client reads the whole database once and builds a hint. A hint is a set of positions, one in each row. Take B, G, I and O. The client stores only the XOR of their values, called the parity of the hint:
+
+$$h = B \oplus G \oplus I \oplus O.$$
+
+XOR is written $$\oplus$$. Anything XORed with itself gives zero, so a value that appears twice cancels. The client also stores one spare entry of row 2 with its value, say F.
+
+To read G, the client swaps G for the spare F. It asks the server for the parity of B, F, I and O. The server XORs those four values and replies. The client XORs the reply with its stored parity, and B, I and O cancel:
+
+$$h \oplus (B \oplus F \oplus I \oplus O) = G \oplus F.$$
+
+The client knows F, so one more XOR gives G.
+
+The server learns nothing about which entry was read. It sees one position in each row. It cannot tell which position replaced the wanted one. This idea is the core of QuarterPIR. The rest of the scheme makes the request short and keeps hints safe over many lookups.
+
+<figure class="cs-fig"><div class="svgwrap"><svg xmlns="http://www.w3.org/2000/svg" class="fig2" viewBox="0 0 760 300" role="img" aria-label="A 16-entry database in four rows. The client stores the parity h of its hint B, G, I, O and a spare entry F of row 2. To read G it asks for the parity of B, F, I, O; XORing the reply with h leaves G XOR F, and one more XOR with F gives G."><defs><marker id="cs1-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arh" d="M0 0L10 5L0 10z"/></marker></defs><rect class="given" x="0" y="0" width="220" height="300" rx="10"/><text class="k" x="18" y="30">THE CLIENT STORES</text><text class="n" x="18" y="62">The parity of its hint</text><rect class="chip" x="18" y="72" width="184" height="32" rx="4"/><text class="b" x="30" y="93">h = B ⊕ G ⊕ I ⊕ O</text><text class="n" x="18" y="140">A spare entry of row 2</text><rect class="chip" x="18" y="150" width="32" height="32" rx="4"/><text class="mid b" x="34" y="171">F</text><text class="n sm" x="60" y="171">and its value</text><text class="n sm" x="18" y="228">Both come from one pass over</text><text class="n sm" x="18" y="244">the database, before any</text><text class="n sm" x="18" y="260">lookup.</text><rect class="result" x="236" y="0" width="268" height="300" rx="10"/><text class="k" x="254" y="30">SERVER DATABASE</text><text class="n sm" x="252" y="73">row 1</text><text class="n sm" x="252" y="111">row 2</text><text class="n sm" x="252" y="149">row 3</text><text class="n sm" x="252" y="187">row 4</text><rect class="chip lc" x="298" y="52" width="42" height="32" rx="4"/><text class="mid n" x="319.0" y="72.5">A</text><rect class="g3" x="346" y="52" width="42" height="32" rx="4"/><rect class="ring" x="346" y="52" width="42" height="32" rx="4"/><text class="mid b" x="367.0" y="72.5">B</text><rect class="chip lc" x="394" y="52" width="42" height="32" rx="4"/><text class="mid n" x="415.0" y="72.5">C</text><rect class="chip lc" x="442" y="52" width="42" height="32" rx="4"/><text class="mid n" x="463.0" y="72.5">D</text><rect class="chip lc" x="298" y="90" width="42" height="32" rx="4"/><text class="mid n" x="319.0" y="110.5">E</text><rect class="g3" x="346" y="90" width="42" height="32" rx="4"/><text class="mid b" x="367.0" y="110.5">F</text><rect class="chip lc" x="394" y="90" width="42" height="32" rx="4"/><rect class="ring" x="394" y="90" width="42" height="32" rx="4"/><text class="mid b" x="415.0" y="110.5">G</text><rect class="chip lc" x="442" y="90" width="42" height="32" rx="4"/><text class="mid n" x="463.0" y="110.5">H</text><rect class="g3" x="298" y="128" width="42" height="32" rx="4"/><rect class="ring" x="298" y="128" width="42" height="32" rx="4"/><text class="mid b" x="319.0" y="148.5">I</text><rect class="chip lc" x="346" y="128" width="42" height="32" rx="4"/><text class="mid n" x="367.0" y="148.5">J</text><rect class="chip lc" x="394" y="128" width="42" height="32" rx="4"/><text class="mid n" x="415.0" y="148.5">K</text><rect class="chip lc" x="442" y="128" width="42" height="32" rx="4"/><text class="mid n" x="463.0" y="148.5">L</text><rect class="chip lc" x="298" y="166" width="42" height="32" rx="4"/><text class="mid n" x="319.0" y="186.5">M</text><rect class="chip lc" x="346" y="166" width="42" height="32" rx="4"/><text class="mid n" x="367.0" y="186.5">N</text><rect class="g3" x="394" y="166" width="42" height="32" rx="4"/><rect class="ring" x="394" y="166" width="42" height="32" rx="4"/><text class="mid b" x="415.0" y="186.5">O</text><rect class="chip lc" x="442" y="166" width="42" height="32" rx="4"/><text class="mid n" x="463.0" y="186.5">P</text><rect class="chip" x="252" y="226" width="16" height="12" rx="4"/><rect class="ring" x="252" y="226" width="16" height="12" rx="2"/><text class="n sm" x="274" y="236">the client’s hint</text><rect class="g3" x="252" y="250" width="16" height="12" rx="2"/><text class="n sm" x="274" y="260">the positions the request asks for</text><rect class="given" x="520" y="0" width="240" height="300" rx="10"/><text class="k" x="538" y="30">READ G</text><circle class="chip" cx="547" cy="62" r="9"/><text class="sn mid" x="547" y="66.5">1</text><text x="564" y="66">Ask for the parity of</text><text class="b" x="564" y="86">B ⊕ F ⊕ I ⊕ O</text><circle class="chip" cx="547" cy="120" r="9"/><text class="sn mid" x="547" y="124.5">2</text><text x="564" y="124">XOR the reply with h:</text><text class="b" x="564" y="144">G ⊕ F</text><text class="n sm" x="620" y="144">B, I and O cancel</text><circle class="chip" cx="547" cy="178" r="9"/><text class="sn mid" x="547" y="182.5">3</text><text x="564" y="182">XOR with F:</text><text class="b" x="564" y="202">G</text><text class="n sm" x="538" y="252">The server sees one position per</text><text class="n sm" x="538" y="268">row. It cannot tell which one</text><text class="n sm" x="538" y="284">was swapped.</text></svg></div><figcaption>Figure 1. One private lookup on a 16-entry database. The client stores the parity h of its hint B, G, I, O. To read G, it asks for the parity of B, F, I, O instead. B, I and O cancel, and XORing with the known spare F leaves G. The server sees one position per row and cannot tell which one was swapped.</figcaption></figure>
+
+## Keys Shorten the Request
+
+Naming one position per row makes the request as long as the database has rows. A real database has thousands of rows. QuarterPIR sends keys instead.
+
+A key is a short random string. A fixed public function turns it into one position in each row of a group of rows. In the example, rows 1 and 2 form group 1, and rows 3 and 4 form group 2. Key 1 picks B and G, and key 2 picks I and O. The hint is now two keys.
+
+The group that holds the wanted entry cannot be sent as a key. No key yields the hint with G swapped for F. For that group, the client lists the positions instead, one per row. To read G, it sends key 2 and the list of positions 2 and 2. In group 1 that list picks B in row 1 and F in row 2.
+
+## Hiding the Group
+
+A list in place of a key would show the server which group holds the wanted entry. So the client also replaces the key of that group with random bytes. Random bytes look like any other key. The list does not say which group it belongs to. The request for G holds random bytes for group 1, key 2 for group 2, and the list.
+
+The server answers for every group, in two steps. First, it XORs what each key picks in its own group. The result is the key parity of that group. The random bytes also pick entries of group 1, say C and E. The two key parities are then
+
+$$K_1 = C \oplus E,$$
+
+$$K_2 = I \oplus O.$$
+
+Second, it applies the list in each group in turn. It adds the key parity of the other group, which gives one candidate per group:
+
+$$\text{cand}_1 = (B \oplus F) \oplus K_2,$$
+
+$$\text{cand}_2 = (J \oplus N) \oplus K_1.$$
+
+The client uses the candidate of the group that holds G. Candidate 1 equals B ⊕ F ⊕ I ⊕ O, the parity the client wanted. The other candidate means nothing to it.
+
+The reply also carries both key parities, $$K_1$$ and $$K_2$$. In this lookup the client ignores them. They exist for a rarer case, which the next two sections explain.
+
+<figure class="cs-fig"><div class="svgwrap"><svg xmlns="http://www.w3.org/2000/svg" class="fig2" viewBox="0 0 760 330" role="img" aria-label="Reading G with two groups of two rows. The request sends random bytes for group 1, key 2 for group 2, and an unlabeled list of positions. The server XORs what each key picks in its own group, giving the key parities K1 and K2, and applies the list in each group, giving one candidate per group. The reply holds both candidates and both key parities; the client uses candidate 1."><defs><marker id="cs2-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arh" d="M0 0L10 5L0 10z"/></marker></defs><rect class="given" x="0" y="0" width="206" height="330" rx="10"/><text class="k" x="18" y="30">REQUEST FOR G</text><rect class="chip" x="18" y="50" width="60" height="28" rx="4"/><text class="sm mid" x="48" y="68.5">random</text><rect class="chip" x="82" y="50" width="52" height="28" rx="4"/><text class="sm mid" x="108" y="68.5">key 2</text><rect class="chip" x="138" y="50" width="50" height="28" rx="4"/><text class="sm mid" x="163" y="68.5">2, 2</text><text class="n sm mid" x="48" y="96">group 1</text><text class="n sm mid" x="108" y="96">group 2</text><text class="n sm mid" x="163" y="96">list</text><text class="n sm" x="18" y="134">G is in group 1, so that</text><text class="n sm" x="18" y="150">group’s key is replaced by</text><text class="n sm" x="18" y="166">random bytes.</text><text class="n sm" x="18" y="198">The list names one position</text><text class="n sm" x="18" y="214">per row of a group. It does</text><text class="n sm" x="18" y="230">not say which group.</text><rect class="result" x="222" y="0" width="312" height="330" rx="10"/><text class="k" x="240" y="30">THE SERVER TRIES EACH GROUP</text><text class="n sm" x="240" y="84">group 1</text><text class="n sm" x="240" y="154">group 2</text><rect class="chip lc" x="300" y="48" width="36" height="26" rx="4"/><text class="mid n" x="318.0" y="65.5">A</text><rect class="g3" x="341" y="48" width="36" height="26" rx="4"/><text class="mid b" x="359.0" y="65.5">B</text><rect class="chip lc" x="382" y="48" width="36" height="26" rx="4"/><rect class="ring dash" x="382" y="48" width="36" height="26" rx="4"/><text class="mid b" x="400.0" y="65.5">C</text><rect class="chip lc" x="423" y="48" width="36" height="26" rx="4"/><text class="mid n" x="441.0" y="65.5">D</text><rect class="chip lc" x="300" y="79" width="36" height="26" rx="4"/><rect class="ring dash" x="300" y="79" width="36" height="26" rx="4"/><text class="mid b" x="318.0" y="96.5">E</text><rect class="g3" x="341" y="79" width="36" height="26" rx="4"/><text class="mid b" x="359.0" y="96.5">F</text><rect class="chip lc" x="382" y="79" width="36" height="26" rx="4"/><text class="mid n" x="400.0" y="96.5">G</text><rect class="chip lc" x="423" y="79" width="36" height="26" rx="4"/><text class="mid n" x="441.0" y="96.5">H</text><rect class="chip lc" x="300" y="118" width="36" height="26" rx="4"/><rect class="ring" x="300" y="118" width="36" height="26" rx="4"/><text class="mid b" x="318.0" y="135.5">I</text><rect class="g3" x="341" y="118" width="36" height="26" rx="4"/><text class="mid b" x="359.0" y="135.5">J</text><rect class="chip lc" x="382" y="118" width="36" height="26" rx="4"/><text class="mid n" x="400.0" y="135.5">K</text><rect class="chip lc" x="423" y="118" width="36" height="26" rx="4"/><text class="mid n" x="441.0" y="135.5">L</text><rect class="chip lc" x="300" y="149" width="36" height="26" rx="4"/><text class="mid n" x="318.0" y="166.5">M</text><rect class="g3" x="341" y="149" width="36" height="26" rx="4"/><text class="mid b" x="359.0" y="166.5">N</text><rect class="chip lc" x="382" y="149" width="36" height="26" rx="4"/><rect class="ring" x="382" y="149" width="36" height="26" rx="4"/><text class="mid b" x="400.0" y="166.5">O</text><rect class="chip lc" x="423" y="149" width="36" height="26" rx="4"/><text class="mid n" x="441.0" y="166.5">P</text><rect class="chip" x="240" y="192" width="16" height="12" rx="4"/><rect class="ring dash" x="240" y="192" width="16" height="12" rx="2"/><text class="n sm" x="262" y="202">random key</text><rect class="chip" x="340" y="192" width="16" height="12" rx="4"/><rect class="ring" x="340" y="192" width="16" height="12" rx="2"/><text class="n sm" x="362" y="202">key 2</text><rect class="g3" x="410" y="192" width="16" height="12" rx="2"/><text class="n sm" x="432" y="202">the list</text><text class="n sm" x="240" y="236">Key parities, each key in its group:</text><text class="b" x="240" y="256">K₁ = C ⊕ E</text><text class="b" x="380" y="256">K₂ = I ⊕ O</text><text class="n sm" x="240" y="288">The list applied in group 1 and 2:</text><text class="b" x="240" y="308">B ⊕ F</text><text class="b" x="380" y="308">J ⊕ N</text><rect class="given" x="550" y="0" width="210" height="330" rx="10"/><text class="k" x="568" y="30">REPLY</text><text class="n sm" x="568" y="58">Candidates, one per group</text><rect class="chip" x="568" y="66" width="174" height="28" rx="4"/><rect class="ring" x="568" y="66" width="174" height="28" rx="4"/><text x="578" y="85">cand₁ = B ⊕ F ⊕ K₂</text><rect class="chip" x="568" y="100" width="174" height="28" rx="4"/><text x="578" y="119">cand₂ = J ⊕ N ⊕ K₁</text><text class="n sm" x="568" y="152">Key parities</text><rect class="chip" x="568" y="160" width="84" height="28" rx="4"/><text class="mid" x="610" y="179">K₁</text><rect class="chip" x="658" y="160" width="84" height="28" rx="4"/><text class="mid" x="700" y="179">K₂</text><text class="n sm" x="568" y="222">The client uses cand₁, the</text><text class="n sm" x="568" y="238">group that holds G.</text><text class="n sm" x="568" y="270">K₁ and K₂ travel in every</text><text class="n sm" x="568" y="286">reply. The client rarely</text><text class="n sm" x="568" y="302">needs either.</text></svg></div><figcaption>Figure 2. The server answers for every group, since the request hides which group holds G. A key parity K is the XOR of what one key picks in its own group. Each candidate applies the list in one group and a key parity elsewhere. The client keeps candidate 1, yet both key parities travel in every reply.</figcaption></figure>
+
+## Each Hint Is Used Once
+
+A hint can serve only one lookup. If the client used B, G, I, O again, key 2 would appear again. The server could then link the two lookups.
+
+After each lookup, the client replaces the used hint. It takes a backup hint prepared for row 2, the row of G. Say its keys pick A and H in group 1, and L and M in group 2. The client swaps H for G, the entry it just read. The new hint is A, G, L, M, and it takes the place of the used one. During setup the client stored the parity of the backup hint and the value of H. It also knows G, so it can update the parity:
+
+$$h' = (A \oplus H \oplus L \oplus M) \oplus H \oplus G.$$
+
+H cancels, which leaves the parity of the new hint:
+
+$$h' = A \oplus G \oplus L \oplus M.$$
+
+Swapping G in keeps the table of hints looking untouched. Before the lookup, that place held a hint that contained G and was random elsewhere. After the refresh it holds the same kind of hint. Ghoshal, Zhou and Shi [1] show that each refresh preserves the distribution of the table. So each lookup looks to the server like the first one. Without the swap, the table would lose hints containing the entries already read.
+
+We call G the inserted entry of the new hint. The keys of the new hint still pick H in row 2, not G. That gap is the price of the refresh.
+
+## Why Every Reply Carries the Key Parities
+
+The gap matters when the client later uses the refreshed hint. Say it reads M, in row 4, with the hint A, G, L, M. M lies in group 2, so group 2 goes as a list. The list keeps L and puts a spare N of row 4 in place of M. Group 1 must go as a key. The hint's own key picks A and H there, not A and G.
+
+QuarterPIR draws random keys until one picks G in row 2. A key that also picks A would be ideal. A real group has many rows, and no search finds a key that matches all of them. So the drawn key picks some other entry of row 1, say D.
+
+The drawn key leaves an error that the client cannot remove alone. The server's candidate for group 2 is now L ⊕ N ⊕ D ⊕ G. XORing it with the hint parity gives
+
+$$h' \oplus \text{cand}_2 = A \oplus D \oplus M \oplus N.$$
+
+The client knows the spare N, which leaves M ⊕ A ⊕ D. It does not know D.
+
+The key parity of group 1 removes the error. The server's key parity $$K_1 = D \oplus G$$ is the XOR of what the drawn key picks. The parity of the client's hint in group 1 is A ⊕ G. XORing the two gives A ⊕ D, the error, and M follows.
+
+The client cannot ask for the key parity of group 1 alone. That request would tell the server that the previous read lay in group 1. The server must not even learn whether a hint was refreshed. So the reply carries the key parity of every group, every time. The client uses at most one of them.
+
+One case needs no key parity. If the inserted entry lies in the group of the wanted entry, it goes into the list.
+
+<figure class="cs-fig"><div class="svgwrap"><svg xmlns="http://www.w3.org/2000/svg" class="fig2" viewBox="0 0 760 340" role="img" aria-label="Left: after reading G, the used hint is discarded and a backup hint for row 2 takes its place, with its entry H swapped for G. Right: a later lookup reads M with that hint. Group 1 must be sent as a key, and the key drawn to pick G picks D in row 1, where the hint has A. The server and the client then disagree on group 1 by A XOR D, which only the server key parity K1 can remove."><defs><marker id="cs3-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arh" d="M0 0L10 5L0 10z"/></marker></defs><rect class="given" x="0" y="0" width="286" height="340" rx="10"/><text class="k" x="18" y="30">AFTER READING G</text><text class="n sm" x="18" y="58">The used hint is discarded</text><rect class="chip" x="18" y="66" width="28" height="26" rx="4"/><text class="mid n" x="32" y="83.5">B</text><rect class="chip" x="50" y="66" width="28" height="26" rx="4"/><text class="mid n" x="64" y="83.5">G</text><rect class="chip" x="82" y="66" width="28" height="26" rx="4"/><text class="mid n" x="96" y="83.5">I</text><rect class="chip" x="114" y="66" width="28" height="26" rx="4"/><text class="mid n" x="128" y="83.5">O</text><line class="ln2" x1="14" y1="79" x2="148" y2="79"/><text class="n sm" x="18" y="116">A backup hint for row 2</text><rect class="chip" x="18" y="124" width="28" height="26" rx="4"/><text class="mid b" x="32" y="141.5">A</text><rect class="chip" x="50" y="124" width="28" height="26" rx="4"/><text class="mid b" x="64" y="141.5">H</text><rect class="chip" x="82" y="124" width="28" height="26" rx="4"/><text class="mid b" x="96" y="141.5">L</text><rect class="chip" x="114" y="124" width="28" height="26" rx="4"/><text class="mid b" x="128" y="141.5">M</text><text class="n sm" x="18" y="174">H swapped for G, in the same place</text><rect class="chip" x="18" y="182" width="28" height="26" rx="4"/><text class="mid b" x="32" y="199.5">A</text><rect class="chip" x="50" y="182" width="28" height="26" rx="4"/><rect class="ring" x="50" y="182" width="28" height="26" rx="4"/><text class="mid b" x="64" y="199.5">G</text><rect class="chip" x="82" y="182" width="28" height="26" rx="4"/><text class="mid b" x="96" y="199.5">L</text><rect class="chip" x="114" y="182" width="28" height="26" rx="4"/><text class="mid b" x="128" y="199.5">M</text><text class="n sm" x="18" y="238">G is the inserted entry. The client</text><text class="n sm" x="18" y="254">updates the parity with H ⊕ G.</text><text class="n sm" x="18" y="286">The new hint’s own key in group 1</text><text class="n sm" x="18" y="302">still picks A and H, not A and G.</text><rect class="result" x="302" y="0" width="458" height="340" rx="10"/><text class="k" x="320" y="30">LATER: READ M WITH THE HINT A, G, L, M</text><text class="n sm" x="320" y="84">group 1</text><text class="n sm" x="320" y="154">group 2</text><rect class="chip lc" x="380" y="48" width="36" height="26" rx="4"/><rect class="ring" x="380" y="48" width="36" height="26" rx="4"/><text class="mid b" x="398.0" y="65.5">A</text><rect class="chip lc" x="421" y="48" width="36" height="26" rx="4"/><text class="mid n" x="439.0" y="65.5">B</text><rect class="chip lc" x="462" y="48" width="36" height="26" rx="4"/><text class="mid n" x="480.0" y="65.5">C</text><rect class="chip lc" x="503" y="48" width="36" height="26" rx="4"/><rect class="ring dash" x="503" y="48" width="36" height="26" rx="4"/><text class="mid b" x="521.0" y="65.5">D</text><rect class="chip lc" x="380" y="79" width="36" height="26" rx="4"/><text class="mid n" x="398.0" y="96.5">E</text><rect class="chip lc" x="421" y="79" width="36" height="26" rx="4"/><text class="mid n" x="439.0" y="96.5">F</text><rect class="chip lc" x="462" y="79" width="36" height="26" rx="4"/><rect class="ring" x="462" y="79" width="36" height="26" rx="4"/><rect class="ring dash" x="465" y="82" width="30" height="20" rx="2"/><text class="mid b" x="480.0" y="96.5">G</text><rect class="chip lc" x="503" y="79" width="36" height="26" rx="4"/><text class="mid n" x="521.0" y="96.5">H</text><rect class="chip lc" x="380" y="118" width="36" height="26" rx="4"/><text class="mid n" x="398.0" y="135.5">I</text><rect class="chip lc" x="421" y="118" width="36" height="26" rx="4"/><text class="mid n" x="439.0" y="135.5">J</text><rect class="chip lc" x="462" y="118" width="36" height="26" rx="4"/><text class="mid n" x="480.0" y="135.5">K</text><rect class="g3" x="503" y="118" width="36" height="26" rx="4"/><rect class="ring" x="503" y="118" width="36" height="26" rx="4"/><text class="mid b" x="521.0" y="135.5">L</text><rect class="chip lc" x="380" y="149" width="36" height="26" rx="4"/><rect class="ring" x="380" y="149" width="36" height="26" rx="4"/><text class="mid b" x="398.0" y="166.5">M</text><rect class="g3" x="421" y="149" width="36" height="26" rx="4"/><text class="mid b" x="439.0" y="166.5">N</text><rect class="chip lc" x="462" y="149" width="36" height="26" rx="4"/><text class="mid n" x="480.0" y="166.5">O</text><rect class="chip lc" x="503" y="149" width="36" height="26" rx="4"/><text class="mid n" x="521.0" y="166.5">P</text><rect class="chip" x="560" y="54" width="16" height="12" rx="4"/><rect class="ring" x="560" y="54" width="16" height="12" rx="2"/><text class="n sm" x="582" y="64">the hint</text><rect class="chip" x="560" y="78" width="16" height="12" rx="4"/><rect class="ring dash" x="560" y="78" width="16" height="12" rx="2"/><text class="n sm" x="582" y="88">a key drawn to pick G</text><rect class="g3" x="560" y="102" width="16" height="12" rx="2"/><text class="n sm" x="582" y="112">the list: L, and N for M</text><text class="n sm" x="320" y="210">Group 1, as the server sees it:</text><text class="b" x="530" y="210">K₁ = D ⊕ G</text><text class="n sm" x="320" y="232">Group 1, in the client’s hint:</text><text class="b" x="530" y="232">A ⊕ G</text><text class="n" x="320" y="266">The two differ by A ⊕ D. The client does not know D,</text><text class="n" x="320" y="284">so it needs the server’s key parity K₁. Asking for</text><text class="n" x="320" y="302">K₁ alone would reveal that G is in group 1, so every</text><text class="n" x="320" y="320">reply carries every key parity.</text></svg></div><figcaption>Figure 3. A refreshed hint causes an error in a later lookup. After G is read, a backup hint takes the place of the used one, with H swapped for G. When M is read later, the key drawn to pick G in group 1 picks D where the hint has A. Only the server key parity K₁ can remove the error A ⊕ D.</figcaption></figure>
+
+## At Full Size
+
+The large database of the task has 67,108,864 entries of 16 bytes each. They form 4,096 rows of 16,384 entries. Each group has 128 rows, so there are 32 groups. The paper calls rows chunks and groups superblocks.
+
+A request is 736 bytes. It carries one 16-byte key per group, 512 bytes in all. The list adds 128 positions of 14 bits each, or 224 bytes.
+
+A reply is 1,024 bytes, and half of it is key parities. It carries 32 candidates and 32 key parities of 16 bytes each. The client uses one candidate per lookup. It uses at most one key parity, and only when its hint was refreshed. A lookup costs 1,760 bytes in all.
+
+## The Two Checksums
+
+Muse Wonder 1.0 replaced the 32 key parities with two checksums. The client still gets the correction it needs. The trick works because the server's list differs from the client's own in only two places.
+
+Two lists of 32 values are in play. Write $$K_b$$ for the server's key parity of group $$b$$. Write $$P_b$$ for the parity of the client's hint in group $$b$$. The two lists agree in every group whose key the request sent unchanged. They differ in two groups only:
+
+- Group $$i$$ holds the wanted entry. Its key was replaced by random bytes, and the two lists differ there by $$v$$.
+- Group $$j$$ holds the inserted entry. Its key was drawn to pick that entry, and the lists differ there by $$u$$.
+
+The difference $$u$$ is the error that the drawn key causes. The client knows $$i$$ and $$j$$, and it needs only $$u$$.
+
+Ordinary numbers show why two sums suffice. Take four groups. Say the server's list is 4, 7, 1, 9 and the client's is 4, 2, 1, 6. The client knows the lists differ only in groups 2 and 4. The server sends its plain sum, 21. It also sends a weighted sum with weights 1 to 4, which is 57. The client's own sums are 13 and 35. Subtracting gives two equations:
+
+$$u + v = 8,$$
+
+$$2u + 4v = 22.$$
+
+So $$u = 5$$ and $$v = 3$$. The client used two sums of each list and never saw the server's list.
+
+QuarterPIR's version uses XOR in place of addition. The server sends a plain sum $$T$$ and a weighted sum $$T_w$$ of its key parities $$K_b$$:
+
+$$T = \bigoplus_b K_b,$$
+
+$$T_w = \bigoplus_b w_b K_b.$$
+
+Each weight $$w_b$$ is a distinct constant, and $$w_b K_b$$ is a product in a finite field. In a finite field every nonzero value has an inverse, so division works. Both sums stay 16 bytes long. Muse Wonder 1.0 uses the field with $$2^{128}$$ elements, whose values are 16 bytes.
+
+The client keeps the matching sums of its own parities $$P_b$$. The plain sum is the hint parity $$h$$, which it stores anyway. The weighted sum $$h_w$$ costs one extra stored value per backup hint. The client computes it in the same pass over the database. Like the parity, it is updated when an entry is swapped in.
+
+Groups where the two lists agree cancel, which leaves two equations:
+
+$$h \oplus T = u \oplus v,$$
+
+$$h_w \oplus T_w = w_j u \oplus w_i v.$$
+
+Solving them gives the correction the client needs:
+
+$$u = \frac{h_w \oplus T_w \oplus w_i\,(h \oplus T)}{w_i \oplus w_j}.$$
+
+The denominator is nonzero because the weights $$w_i$$ and $$w_j$$ differ.
+
+The reply shrinks from 64 values to 34. It holds the 32 candidates and the two checksums: 544 bytes instead of 1,024. A lookup now costs 1,280 bytes instead of 1,760, or 27% less. When a hint was never refreshed, the client ignores both checksums.
+
+<figure class="cs-fig"><div class="svgwrap"><svg xmlns="http://www.w3.org/2000/svg" class="fig2" viewBox="0 0 760 340" role="img" aria-label="Left: the server key parities K1 to K8 and the parities of the client hint agree except in group i, which holds the wanted entry, and group j, which holds the inserted entry. Middle: the server sends a plain sum T and a weighted sum Tw of its key parities instead of the list; with the client sums h and hw, the agreeing groups cancel and two equations in two unknowns remain. Right: the reply falls from 1,024 to 544 bytes, and bytes per lookup from 1,760 to 1,280."><defs><marker id="cs4-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arh" d="M0 0L10 5L0 10z"/></marker></defs><rect class="given" x="0" y="0" width="236" height="340" rx="10"/><text class="k" x="18" y="30">GIVEN</text><text class="n sm" x="18" y="58">The server’s key parities</text><rect class="chip" x="18" y="66" width="22" height="24" rx="4"/><text class="sm mid" x="29" y="82.5">K₁</text><rect class="chip" x="44" y="66" width="22" height="24" rx="4"/><text class="sm mid" x="55" y="82.5">K₂</text><rect class="chip" x="70" y="66" width="22" height="24" rx="4"/><text class="sm mid" x="81" y="82.5">K₃</text><rect class="chip on" x="96" y="66" width="22" height="24" rx="4"/><text class="sm mid ak" x="107" y="82.5">K₄</text><rect class="chip" x="122" y="66" width="22" height="24" rx="4"/><text class="sm mid" x="133" y="82.5">K₅</text><rect class="chip" x="148" y="66" width="22" height="24" rx="4"/><text class="sm mid" x="159" y="82.5">K₆</text><rect class="chip on" x="174" y="66" width="22" height="24" rx="4"/><text class="sm mid ak" x="185" y="82.5">K₇</text><rect class="chip" x="200" y="66" width="22" height="24" rx="4"/><text class="sm mid" x="211" y="82.5">K₈</text><text class="sm mid n" x="29" y="106">=</text><text class="sm mid n" x="55" y="106">=</text><text class="sm mid n" x="81" y="106">=</text><text class="sm mid ak" x="107" y="106">≠</text><text class="sm mid n" x="133" y="106">=</text><text class="sm mid n" x="159" y="106">=</text><text class="sm mid ak" x="185" y="106">≠</text><text class="sm mid n" x="211" y="106">=</text><rect class="chip" x="18" y="114" width="22" height="24" rx="4"/><text class="sm mid" x="29" y="130.5">P₁</text><rect class="chip" x="44" y="114" width="22" height="24" rx="4"/><text class="sm mid" x="55" y="130.5">P₂</text><rect class="chip" x="70" y="114" width="22" height="24" rx="4"/><text class="sm mid" x="81" y="130.5">P₃</text><rect class="chip on" x="96" y="114" width="22" height="24" rx="4"/><text class="sm mid ak" x="107" y="130.5">P₄</text><rect class="chip" x="122" y="114" width="22" height="24" rx="4"/><text class="sm mid" x="133" y="130.5">P₅</text><rect class="chip" x="148" y="114" width="22" height="24" rx="4"/><text class="sm mid" x="159" y="130.5">P₆</text><rect class="chip on" x="174" y="114" width="22" height="24" rx="4"/><text class="sm mid ak" x="185" y="130.5">P₇</text><rect class="chip" x="200" y="114" width="22" height="24" rx="4"/><text class="sm mid" x="211" y="130.5">P₈</text><text class="sm mid ak" x="107" y="154">i</text><text class="sm mid ak" x="185" y="154">j</text><text class="n sm" x="18" y="178">The parities of the client’s hint</text><text class="n sm" x="18" y="214">The lists differ only in group i,</text><text class="n sm" x="18" y="230">which holds the wanted entry, and</text><text class="n sm" x="18" y="246">group j, which holds the inserted one.</text><text class="n sm" x="18" y="278">The client stores two sums of its</text><text class="n sm" x="18" y="294">own list: the hint parity h, and h<tspan class="sub" dy="3">w</tspan><tspan dy="-3">,</tspan></text><text class="n sm" x="18" y="310">one extra value per backup hint.</text><rect class="agent" x="252" y="0" width="276" height="340" rx="10"/><text class="k ak" x="270" y="30">THE TWO CHECKSUMS</text><text class="h" x="270" y="54">Two sums replace the list</text><rect class="chip" x="270" y="68" width="240" height="30" rx="4"/><text class="b" x="282" y="88">T = ⊕ K<tspan class="sub" dy="3">b</tspan></text><text class="n sm end" x="500" y="87">plain sum</text><rect class="chip" x="270" y="106" width="240" height="30" rx="4"/><text class="b" x="282" y="126">T<tspan class="sub" dy="3">w</tspan><tspan dy="-3"> = ⊕ w</tspan><tspan class="sub" dy="3">b</tspan><tspan dy="-3"> K</tspan><tspan class="sub" dy="3">b</tspan></text><text class="n sm end" x="500" y="125">weighted sum</text><text class="n" x="270" y="168">Groups where the lists agree cancel:</text><text class="b" x="270" y="196">h ⊕ T = u ⊕ v</text><text class="b" x="270" y="222">h<tspan class="sub" dy="3">w</tspan><tspan dy="-3"> ⊕ T</tspan><tspan class="sub" dy="3">w</tspan><tspan dy="-3"> = w</tspan><tspan class="sub" dy="3">j</tspan><tspan dy="-3"> u ⊕ w</tspan><tspan class="sub" dy="3">i</tspan><tspan dy="-3"> v</tspan></text><text class="n" x="270" y="258">Two equations, two unknowns. The</text><text class="n" x="270" y="278">client solves for u, the difference</text><text class="n" x="270" y="298">in group j that it needs.</text><text class="n sm" x="270" y="326">⊕ is XOR; w<tspan class="sub" dy="3">b</tspan><tspan dy="-3"> K</tspan><tspan class="sub" dy="3">b</tspan><tspan dy="-3"> multiplies in a finite field.</tspan></text><rect class="result" x="544" y="0" width="216" height="340" rx="10"/><text class="k" x="562" y="30">REPLY PER LOOKUP</text><text class="sm" x="562" y="62">Human reference</text><rect class="g3" x="562" y="70" width="88" height="20" rx="0"/><rect class="g5" x="650" y="70" width="88" height="20" rx="0"/><text class="b end" x="742" y="108">1,024 bytes</text><text class="sm" x="562" y="136">Muse Wonder 1.0</text><rect class="g3" x="562" y="144" width="88" height="20" rx="0"/><rect class="fa" x="650" y="144" width="5.5" height="20" rx="0"/><text class="b end ak" x="742" y="182">544 bytes</text><rect class="g3" x="562" y="204" width="10" height="10" rx="0"/><text class="n sm" x="578" y="213">32 candidates</text><rect class="g5" x="562" y="222" width="10" height="10" rx="0"/><text class="n sm" x="578" y="231">32 key parities</text><rect class="fa" x="562" y="240" width="10" height="10" rx="0"/><text class="n sm" x="578" y="249">the two checksums</text><text class="n" x="562" y="290">Bytes per lookup, with the</text><text class="n" x="562" y="310">request: 1,760 for the human</text><text class="n" x="562" y="330">reference, 1,280 for the agent.</text></svg></div><figcaption>Figure 4. The two checksums. The server key parities and the parities of the client hint differ in two known groups. A plain sum and a weighted sum of each list leave two equations in the two differences. At 67 million entries the reply shrinks from 1,024 to 544 bytes.</figcaption></figure>
+
+## Why Privacy Is Unchanged
+
+The benchmark does not ask for a proof of privacy. It fixes what the server may see. The solution supplies a reduction function, which maps the original request to the bytes that are sent. The trusted harness, the benchmark's own code, does four things for every lookup:
+
+1. It computes the request the original client would send, from the same seeds and the same lookups.
+2. It passes that request to the reduction function in a separate process. The process gets nothing else: no wanted index, no client state, no seeds and no database.
+3. It checks that the solution's client produced exactly the reduced bytes. Any difference makes the submission invalid, and it scores zero.
+4. It sends the reduced bytes to the server, not the bytes of the client.
+
+The server's view is then a fixed public function of the original server's view. Write $$f$$ for the reduction function:
+
+$$V_{\text{new}} = f(V_{\text{orig}}).$$
+
+If the original view cannot tell two wanted entries apart, the reduced view cannot either. Processing can remove information but never add it.
+
+The reply needs no rule. The server computes it from the database and the request alone. It tells the server nothing new.
+
+Muse Wonder 1.0 sends the request of the human reference byte for byte on the large database. Only the reply changed.
+
+Privacy is no worse than in the original scheme, and that is the full claim. It is not proved from scratch. It rests on the security proof of Ghoshal, Zhou and Shi [1]. The harness checks honest execution on the seeds it runs.
+
+## Results
+
+Each run measures a solution and the human reference side by side, with the same seeds. It serves two databases, of 65,536 and 67,108,864 entries. Each database gets two graded experiments of 1,000 random lookups. Table 1 shows the large database.
+
+<div class="table-wrap"><table class="cs-table">
+<thead><tr><th></th><th>Human reference</th><th>Muse Wonder 1.0</th><th>Change</th></tr></thead>
+<tbody>
+<tr><td>Request</td><td>736 bytes</td><td>736 bytes</td><td>same</td></tr>
+<tr><td>Reply</td><td>1,024 bytes</td><td>544 bytes</td><td>47% fewer</td></tr>
+<tr><td>Bytes per lookup</td><td>1,760</td><td>1,280</td><td>27% fewer</td></tr>
+<tr><td>Server time per lookup</td><td>854–858 µs</td><td>99–102 µs</td><td>8.3–8.7× faster</td></tr>
+<tr><td>Client setup</td><td>122.0–122.3 s</td><td>18.4–19.1 s</td><td>6.4–6.6× faster</td></tr>
+<tr><td>Lookup time, end to end</td><td>4.38–4.45 ms</td><td>0.60–0.64 ms</td><td>6.8–7.4× faster</td></tr>
+<tr><td>Client storage</td><td>85.3 MB</td><td>53.1 MB</td><td>38% less</td></tr>
+</tbody></table></div>
+
+<p class="caption">Table 1. Muse Wonder 1.0 against the human reference at 67,108,864 entries, in the same run. Ranges span the two graded experiments, and server times are medians over lookups. Bytes fall only in the reply, while every time and the storage fall too.</p>
+
+Every saved byte comes from the two checksums. The request is unchanged, and the reply is 47% smaller. All 4,000 lookups returned the right entry. The solution scores 58.1 on the leaderboard, against 27.3 for the human reference. Its 666 bytes per lookup, averaged over both databases, are the fewest of any passing run.
+
+Four side results come with it. Most of the speed-up comes from engineering, not from the checksums. Client storage falls by 38%, because the hints in the table take 20 bytes each instead of 56. At 65,536 entries the whole database fits the client's memory budget, so lookups there cost 52 bytes, not 228. GPT-6 Astra found the same two checksums in an earlier run, on a previous version of the task.
+
+## What the Agents Found
+
+Recovering two unknowns from two checksums is textbook coding theory. A RAID-6 disk array rebuilds two failed disks from two parity disks in the same way.
+
+The step lies in seeing this problem inside a cryptographic protocol. The key parities in each reply form a list the client almost knows. It knows where its own list and the server's differ, and it needs one of the two differences. The second checksum costs the client one stored value per backup hint.
+
+Two models from different labs found this step on their own. FrontierCS 2 checked it: every entry comes back right, and every cost beats the human reference.
+
+## References
+
+1. Ashrujit Ghoshal, Mingxun Zhou and Elaine Shi. Efficient pre-processing PIR without public-key cryptography. In *Advances in Cryptology, EUROCRYPT 2024*. [IACR ePrint 2023/1574](https://eprint.iacr.org/2023/1574).
