@@ -108,10 +108,8 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
     <h3>Test-time scaling</h3>
     <figure class="chart" style="margin:0" id="scaling">
       <div class="chead"><span>Test-time scaling: FCI against cost budget per run</span></div>
-      <div class="tts-body">
-        <div class="plot" id="ttsplot"><svg id="ttssvg" role="img" aria-label="Test-time scaling chart"></svg><div class="tip" id="ttstip" hidden></div></div>
-        <div class="legend" id="ttslegend"></div>
-      </div>
+      <div class="plot" id="ttsplot"><svg id="ttssvg" role="img" aria-label="Test-time scaling chart"></svg><div class="tip" id="ttstip" hidden></div></div>
+      <div class="legend" id="ttslegend"></div>   <!-- a plain legend under the chart, no FCI bars or values (owner, 2026-10-17) -->
       <div class="cfoot">{% include chart_logo.html %}</div>
     </figure>
   </div>

@@ -234,11 +234,17 @@ function drawScore() {
   const tx = rs.map(r => r[4]);
   // as the overview: 0.15 decade past the outermost dots, more on the right on phones so the labels there fit
   const x0 = Math.log10(Math.min(...tx)) - .15, x1 = Math.log10(Math.max(...tx)) + (narrow ? .74 : .15);
-  const ymax = Math.min(100, Math.ceil((Math.max(...rs.map(r => r[2]), ref != null ? ref : 0) + 5) / 20) * 20);
-  const X = v => L + (Math.log10(v) - x0) / (x1 - x0) * (W - L - R), Y = v => T + (1 - v / ymax) * (H - T - B);
-  for (let v = 0; v <= ymax; v += 20) {
+  // the y axis spans the dots and the human reference, a tenth of their spread past each but at least 10 points in all,
+  // in about four steps, within 0 to 100, rather than from 0 to the next 20 over the top (Qiuyang, 2026-10-16: on KAMI every
+  // run sat between 16 and 23 on 0 to 40); the 10 points keep runs a point apart from looking far apart
+  const ys = [...rs.map(r => r[2]), ...(ref != null ? [ref] : [])], y0 = Math.min(...ys), y1 = Math.max(...ys), pad = Math.max((y1 - y0) / 10, (10 - (y1 - y0)) / 2);
+  const sh = Math.max(0, pad - y0) - Math.max(0, y1 + pad - 100), keep = y1 - y0 < 8;   // only the 10 points are moved off an end, not the tenth
+  const lo = Math.max(0, y0 - pad + (keep ? sh : 0)), hi = Math.min(100, y1 + pad + (keep ? sh : 0)), ystep = eciStep(hi - lo, 4);
+  const ymin = Math.floor(lo / ystep + 1e-9) * ystep, ymax = Math.ceil(hi / ystep - 1e-9) * ystep;
+  const X = v => L + (Math.log10(v) - x0) / (x1 - x0) * (W - L - R), Y = v => T + (1 - (v - ymin) / (ymax - ymin)) * (H - T - B);
+  for (let i = 0, v = ymin; v <= ymax + ystep / 2; v = ymin + ++i * ystep) {
     svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1}));
-    svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, v));
+    svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, +v.toFixed(2)));
   }
   for (let k = Math.floor(x0); k <= Math.ceil(x1); k++) [1, 2, 5].forEach(f => { const v = f * 10 ** k, lv = Math.log10(v);
     // phones drop the 2s past a decade and a half, as the overview does, and the 5s past two and a half: one run's cost spans more
