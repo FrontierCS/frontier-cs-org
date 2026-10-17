@@ -34,11 +34,11 @@ toc:
 _styles: >
   d-article .cs-fig { margin-block: 36px; }
   d-article .cs-fig .svgwrap { overflow-x: auto; }
-  d-article .cs-fig svg { display: block; width: 100%; min-width: 620px; height: auto; }
+  d-article .cs-fig .svgwrap > svg { display: block; width: 100%; min-width: 620px; height: auto; }   /* the figure only, not a formula inside it or in its caption */
   /* Figures 5 and 6 are charts in the site's chart style (fcs2.css: .chead, .plot text, .legend, .cfoot), copied and
      scoped here; bin/blog_figures.py draws each in two widths and the narrow one shows on phones. */
   d-article .cs-chart .chead { display: flex; justify-content: space-between; gap: 12px; font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
-  d-article .cs-chart svg { min-width: 0; overflow: visible; }
+  d-article .cs-chart .svgwrap > svg { min-width: 0; overflow: visible; }
   d-article .cs-chart svg.narrow { display: none; }
   @media (max-width: 560px) { d-article .cs-chart svg.wide { display: none; } d-article .cs-chart svg.narrow { display: block; } }
   d-article .cs-chart svg text { font-family: var(--sans); font-size: 12px; fill: var(--muted); }
