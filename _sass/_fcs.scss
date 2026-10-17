@@ -1,14 +1,14 @@
 /* ============================================================
    FrontierCS — Academic Journal theme
    Structure ported from wenhaochai.com (assets/site.css); since 2026-10 the
-   FrontierCS skin: white, Material 3 blue, hairline rules, Instrument Sans.
+   FrontierCS skin: white, Material 3 blue, hairline rules, Hanken Grotesk.
    Blog index follows blogs.html; article pages follow the report
    layout of blogs/loopdit.html.
    ============================================================ */
 
 /* ---------- Tokens ---------- */
 :root {
-  /* FrontierCS skin (2026-10): Material 3 primary blue on white, Google GM2 greys, Instrument Sans */
+  /* FrontierCS skin (2026-10): Material 3 primary blue on white, Google GM2 greys, Hanken Grotesk */
   --paper: #ffffff;
   --paper-2: #f1f3f4;
   --ink: #1f1f1f;
@@ -23,9 +23,9 @@
   --link-line: rgba(11, 87, 208, 0.35);
   --scrim: rgba(32, 33, 36, 0.45);
 
-  --font-serif: 'Instrument Sans', 'Helvetica Neue', Arial, sans-serif;   /* headings: one sans family site-wide */
-  --font-sans: 'Instrument Sans', 'Helvetica Neue', Arial, sans-serif;
-  --font-mono: 'Instrument Sans', 'Helvetica Neue', Arial, sans-serif;    /* small labels */
+  --font-serif: 'Hanken Grotesk', 'Helvetica Neue', Arial, sans-serif;   /* headings: one sans family site-wide */
+  --font-sans: 'Hanken Grotesk', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'Hanken Grotesk', 'Helvetica Neue', Arial, sans-serif;    /* small labels */
   --font-code: 'Google Sans Code', ui-monospace, Menlo, monospace;      /* code, terminal */
 
   --max: 1440px;   /* 1320px of content plus two 60px gutters, as on the FrontierCS 2 page. A plain length: the CSS minifier breaks calc() with var() inside, and the gutter is 60px wherever this limit applies */
@@ -44,7 +44,7 @@
      Gemini 4 Argon takes Google's green, #34A853 (Qiuyang, 2026-10-16). */
   --m-astra: #1f1f1f; --m-sol: #1f1f1f; --m-k3: #047afe; --m-muse: #0089f4; --m-qwen: #ff7018; --m-ds: #2243e6; --m-glm: #1c7ff8; --m-opus: #cc785c; --m-wonder: #0089f4; --m-glmf: #1c7ff8; --m-gemini: #34a853;
   --fail: #bdc1c6;
-  --sans: 'Instrument Sans', 'Helvetica Neue', Arial, sans-serif;
+  --sans: 'Hanken Grotesk', 'Helvetica Neue', Arial, sans-serif;
 }
 /* On a task's page every model takes its own shade, its lab's hue give or take 14 degrees, every pair at least 15.1 apart
    in CIEDE2000: a task's chart crowds the dots, and models sharing their lab's colour could not be told apart there (27 of
@@ -1047,7 +1047,6 @@ nav .pagination {
   color: var(--ink-4);
   margin-bottom: 22px;
 }
-.ar-badge { border: 1px solid var(--accent); border-radius: 2px; padding: 5px 8px; color: var(--accent); }
 .ar-head h1 {
   font-family: var(--font-serif);
   font-weight: 400;
@@ -1083,6 +1082,9 @@ nav .pagination {
   width: 100%;
 }
 .ar-author { display: flex; flex-direction: column; gap: 2px; }
+/* a post with checked_by in its front matter: the byline and "Solution checked by" side by side over one rule (Qiuyang) */
+.ar-credits { display: flex; flex-wrap: wrap; gap: 16px 56px; margin: 32px 0 0; padding-top: 18px; border-top: 1px solid var(--rule); }
+.ar-credits .ar-authors { margin: 0; padding: 0; border: 0; }
 .ar-author a { color: var(--ink); border-bottom: 1px solid var(--link-line); padding: 0 1px; align-self: flex-start; }
 .ar-author a:hover { color: var(--accent); border-bottom-color: var(--accent); }
 .ar-author em {
@@ -1509,6 +1511,14 @@ footer.foot { margin-top: 120px; padding: 56px 0 28px; background: #202124; colo
 .fc-pills { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
 .pill { display: inline-flex; align-items: center; gap: 8px; background: #d3e3fd; color: #041e49; border-radius: 50px; font-weight: 600; font-size: 14px; padding: 7px 14px; }
 .pill:hover { background: #c2d7fb; }
+/* post tags (owner, 2026-10-17): small tonal pills that open the tag's page, in the article header, the blog list and the
+   keep-reading tiles. The first tag names the project and takes the pill's blue; the others are a neutral grey. Two classes
+   deep, so the article's link rule (.ar-main a) does not reach them. */
+.ptags { display: inline-flex; flex-wrap: wrap; gap: 6px; }
+.ptags .ptag { display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border: 0; border-radius: 12px; background: #e9eef6; color: #444746; font-family: var(--font-sans); font-size: 12.5px; font-weight: 600; letter-spacing: .01em; line-height: 1; white-space: nowrap; text-decoration: none; transition: background-color .15s; }
+.ptags .ptag:hover { background: #dde3ea; color: #1f1f1f; }
+.ptags .ptag.lead { background: #d3e3fd; color: #041e49; }
+.ptags .ptag.lead:hover { background: #c2d7fb; }
 .tagbox { border: 1px solid #a8c7fa; border-radius: 2px; padding: 3px 9px; font-weight: 500; color: var(--ink-2); background: #fff; }
 .dotdate { display: inline-flex; align-items: center; gap: 7px; } .dotdate i { width: 11px; height: 11px; border-radius: 50%; background: var(--ink-3); }
 .fc-feature-cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; margin-top: 44px; }

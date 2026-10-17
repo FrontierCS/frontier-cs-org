@@ -4,17 +4,17 @@ crumb + badge/date + title + standfirst + byline, sticky Contents column on the 
 body column on the right. The body keeps the <d-article> element so per-post `_styles`
 written against it continue to apply.
 {%- endcomment -%}
-{%- assign primary_tag = page.tags | first -%}
 <div class="ar-page post distill">
 
   <div class="ar-head" id="main" tabindex="-1">
     <div class="ar-crumb"><b><a href="{{ '/blog/' | relative_url }}">Blog</a></b><span>/</span><span>{{ page.title }}</span></div>
     <div class="ar-eyebrow">
-      {%- if primary_tag %}<span class="ar-badge">{{ primary_tag }}</span>{% endif -%}
+      {%- include post_tags.html tags=page.tags -%}
       <span>{% if page.date_display %}{{ page.date_display }}{% else %}{{ page.date | date: "%b %-d, %Y" }}{% endif %}</span>
     </div>
     <h1>{{ page.title }}</h1>
     {% if page.description %}<p class="ar-standfirst">{{ page.description }}</p>{% endif %}
+    {% if page.checked_by %}<div class="ar-credits">{% endif %}
     {% if page.authors %}
     <div class="ar-authors">
       <span class="ar-by">By</span>
@@ -28,6 +28,14 @@ written against it continue to apply.
     {% elsif page.author %}
     <div class="ar-authors"><span class="ar-by">By</span><span class="ar-author"><span>{{ page.author }}</span></span></div>
     {% endif %}
+    {% if page.checked_by %}
+    <div class="ar-authors">
+      <span class="ar-by">Solution checked by</span>
+      {% for c in page.checked_by -%}
+      <span class="ar-author">{% if c.url %}<a href="{{ c.url }}">{{ c.name }}</a>{% else %}<span>{{ c.name }}</span>{% endif %}</span>
+      {% endfor %}
+    </div>
+    </div>{% endif %}
   </div>
 
   {% if page.toc %}

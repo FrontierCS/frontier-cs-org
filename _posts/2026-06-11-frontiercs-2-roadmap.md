@@ -5,6 +5,7 @@ description: "FrontierCS 2 extends open-ended evaluation from static sandboxed t
 thumbnail: assets/img/blog-thumbs/frontiercs-2-roadmap.svg
 og_image: assets/img/fcs2-card.png   # link previews need a raster image
 
+tags: [FrontierCS 2, Roadmap]
 date: 2026-06-11
 date_display: "Jun 11, 2026"
 htmlwidgets: true

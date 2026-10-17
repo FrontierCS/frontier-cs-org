@@ -6,6 +6,7 @@ image: assets/img/2026-05-15-frontiersmith/pipeline.png
 thumbnail: assets/img/blog-thumbs/frontiersmith.svg
 og_image: assets/img/2026-05-15-frontiersmith/pipeline.png
 
+tags: [FrontierSmith, Training]
 date: 2026-05-15
 date_display: "May 15, 2026"
 htmlwidgets: true
