@@ -100,7 +100,7 @@ const nameCol = svg => { svg.replaceChildren(); const w = Math.max(...MODELS.map
    model, highest first, in the model's colour with rounded top corners; the pass rate as a whole number in the middle of
    the bar, the exact value in the tooltip; under each bar the lab's logo on a light tile, the name and the harness.
    Dashed grid lines, no axis numbers: the bars carry them. */
-const LOGO = {OpenAI:'openai', Anthropic:'anthropic', Google:'google', Meta:'meta', Kimi:'kimi', DeepSeek:'deepseek', 'Z.ai':'zai', Qwen:'qwen'};
+const LOGO = {OpenAI:'openai', Anthropic:'anthropic', Google:'google', Meta:'meta', Kimi:'kimi', DeepSeek:'deepseek', 'Z.ai':'zai', Qwen:'qwen', StepFun:'stepfun'};
 const LOGO_DIR = (document.querySelector('script[src*="fcs2.js"]') || {src:''}).src.replace(/js\/fcs2\.js.*$/, 'img/models/');
 const lightCol = id => { const h = getComputedStyle(document.documentElement).getPropertyValue(`--m-${id}`).trim().replace('#', '');
   if (h.length !== 6) return false; const [r, g, b] = [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16) / 255);

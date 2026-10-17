@@ -34,7 +34,8 @@ CACHE = {'GPT-6 Astra': 1.00, 'GPT-6.1 Sol': 0.10, 'Kimi K3 (Modal)': 0.30, 'Dee
          'Codex · Qwen 3.8 Max': 0.25,           # as 'qwen' in the converter's PRICE
          'Qwen Code CLI · Qwen 3.8 Max': 0.25,   # the same model on Qwen Code (Qiuyang, 2026-10-14)
          'GLM 5.3 Flash (ZCode)': 0.03,
-         'pi · Gemini 4': None}                  # its gateway reports the cost of every run (Qiuyang, 2026-10-16)          # list cached-input rate, eesel.ai's GLM-5.3-Flash pricing write-up, found 2026-10-13   # None: run on a subscription, the platform reports no usage
+         'pi · Gemini 4': None,                  # its gateway reports the cost of every run (Qiuyang, 2026-10-16)          # list cached-input rate, eesel.ai's GLM-5.3-Flash pricing write-up, found 2026-10-13   # None: run on a subscription, the platform reports no usage
+         'Step Code - Step 5 Preview': None}     # so does its gateway (Qiuyang, 2026-10-17)
 
 
 def get(path):
