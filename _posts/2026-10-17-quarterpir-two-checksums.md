@@ -3,7 +3,7 @@ layout: distill
 title: "Two Checksums Shrink Private Lookups by 27%"
 description: "QuarterPIR, a EUROCRYPT 2024 scheme, lets a client read a database without revealing what it reads. Muse Wonder 1.0 cut its bytes per lookup by 27%, with privacy unchanged. We build the scheme up from a 16-entry example to show how."
 thumbnail: assets/img/blog-thumbs/quarterpir-two-checksums.svg
-tags: [Case study]
+tags: [FrontierCS 2, Case study]
 case:
   task: QuarterPIR
   model: Muse Wonder 1.0
