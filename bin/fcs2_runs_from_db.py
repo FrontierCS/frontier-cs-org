@@ -725,12 +725,13 @@ def run_states(db):
     """Per task short name and model id on the site, how a run ended when it was not an ordinary evaluation, for the
     overview's kebab, which shows it in place of the run's metrics: 'failed' from the run's state (it scores 0), 'refused'
     where the model's provider refused the task (left out of the fits), 'unscored' for a run not yet scored. A run that timed
-    out shows its metrics like any other (Qiuyang, 2026-10-16: no timeout state)."""
+    out shows its metrics like any other (Qiuyang, 2026-10-16: no timeout state). A run that completed with a score but no
+    verdict, so no metrics either (Step 5 Preview's Egg run, scored 0), is 'failed' too: the site counts it a fail with 0."""
     out = defaultdict(dict)
-    for c, t, st, s, fj in db.execute('''select c.name, t.name, r.state, r.display_score, r.feedback_json from cells ce join runs r on r.id = ce.run_id
-      join candidates c on c.id = ce.candidate_id join tasks t on t.id = ce.task_id'''):
+    for c, t, st, s, v, fj in db.execute('''select c.name, t.name, r.state, r.display_score, r.display_verdict, r.feedback_json from cells ce
+      join runs r on r.id = ce.run_id join candidates c on c.id = ce.candidate_id join tasks t on t.id = ce.task_id'''):
         if c in HIDDEN: continue
-        k = 'refused' if refused(fj) else 'unscored' if s is None else {'FAILED': 'failed'}.get(st)
+        k = 'refused' if refused(fj) else 'unscored' if s is None else 'failed' if st == 'FAILED' or (st == 'COMPLETED' and v is None) else None
         if k: out[TASK[t][1] or t.split(' — ')[0]][MODEL[c][0]] = k
     return dict(sorted(out.items()))
 
