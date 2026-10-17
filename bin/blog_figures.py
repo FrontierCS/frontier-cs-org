@@ -309,23 +309,27 @@ def site_const(name):
     return json.JSONDecoder().raw_decode(src, re.search(rf'^const {name} = ', src, re.M).end())[0]
 
 def site_models():
-    """id: (name, colour) for each model, from MODELS in fcs2-data.js and its --m-<id> in _sass/_fcs.scss."""
+    """id: (name, colour) for each model, from MODELS in fcs2-data.js and its --m-<id> in _sass/_fcs.scss: the colour a
+    task page gives it, the lab's colour on :root with the model's own shade from .taskpage over it, as these charts
+    compare the models on one task."""
     import re
     src = open(os.path.join(SITE, 'assets', 'js', 'fcs2-data.js')).read()
     scss = open(os.path.join(SITE, '_sass', '_fcs.scss')).read()
-    col = dict(re.findall(r'--m-([a-z0-9]+): (#[0-9a-fA-F]{6});', scss))
+    m = lambda block: dict(re.findall(r'--m-([a-z0-9]+): (#[0-9a-fA-F]{6});', block))
+    lab, shade = re.search(r':root\s*\{(.*?)\}', scss, re.S), re.search(r'\.taskpage\s*\{(.*?)\}', scss, re.S)
+    col = {**m(lab.group(1)), **(m(shade.group(1)) if shade else {})}
     return {i: (n, col[i]) for i, n in re.findall(r"\{id:'([a-z0-9]+)', name:'([^']+)'", src)}
 
 # Bytes per lookup of Muse Wonder 1.0's development submissions on QuarterPIR, at 67,108,864 and at 65,536 entries, in
 # the order TRAJ lists them: the platform's verifier results for the run (export of 2026-10-16). TRAJ has their scores
 # and costs but not their bytes. The final submission is the code of the last development submission (same payload hash).
 WONDER_PIR_BYTES = [(1280, 196), (1280, 100), (1280, 100), (1280, 100), (1280, 100), (1280, 100), (1280, 52), (1280, 52)]
-WONDER, WONDER_TXT = '#0089f4', '#006bbe'   # --m-wonder, and its label colour: the model colour mixed 78% with black (MTXT)
 
 def wonder_pir_run(narrow):
     """QuarterPIR case study: each development submission of Muse Wonder 1.0's run, its development score against the
     cost so far, and the final score at the cost of the whole run; the human reference's final score as a dashed line."""
     run = next(r for r in site_const('TRAJ') if r[0] == 'wonder' and r[1] == 'QuarterPIR')
+    WONDER = site_models()['wonder'][1]; WONDER_TXT = mtxt(WONDER)   # the label colour: the model's mixed 78% with black (MTXT)
     ref, final, cost, dev = site_const('REF')['QuarterPIR'], run[2], run[4], run[6]
     assert len(dev) == len(WONDER_PIR_BYTES) and all(b == 1280 for b, _ in WONDER_PIR_BYTES)
     W, H = (360, 340) if narrow else (760, 330)
