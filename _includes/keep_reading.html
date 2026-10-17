@@ -29,7 +29,6 @@
             {% assign thumb = "assets/img/" | append: image_rel %}
           {% endif %}
         {% endif %}
-        {% assign primary_tag = post.tags | first %}
 
         <article class="tile">
           {% if thumb != blank %}
@@ -38,7 +37,7 @@
           <a class="tile-thumb placeholder" href="{{ post_link }}"{% if is_external %} target="_blank" rel="noopener noreferrer"{% endif %} aria-hidden="true"></a>
           {% endif %}
           <div class="tile-meta">
-            {% if primary_tag %}<span>{{ primary_tag }}</span><span class="dot">·</span>{% endif -%}
+            {%- include post_tags.html tags=post.tags -%}
             <span>{{ post.date | date: '%b %-d, %Y' }}</span>
           </div>
           <h3 class="tile-title"><a href="{{ post_link }}"{% if is_external %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ post.title }}</a></h3>
