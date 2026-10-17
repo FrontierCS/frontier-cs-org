@@ -308,7 +308,7 @@ function drawTTS(t) {
     const fr = {l:L, r:W, t:T, b:H - B}, boxes = tips.map(({e}) => ({x:X(e[0]) - 7, y:Y(e[1]) - 7, w:14, h:14})), near = [];
     gl.querySelectorAll('path').forEach(el => { const n = el.getTotalLength(); for (let l = 0; l <= n; l += 6) { const q = el.getPointAtLength(l); near.push({x:q.x - 2, y:q.y - 2, w:4, h:4}); } });
     tips.sort((a, b) => b.e[1] - a.e[1]).forEach(({m, e}) => { const both = boxes.concat(near), lg = LOGO[m.lab];
-      const name = (lg ? '\u2003\u2009' : '') + m.name;   // names are never shortened, phones included; an em space keeps room for the lab's logo
+      const name = (lg ? '\u2003\u2002' : '') + m.name;   // names are never shortened, phones included; an em and an en space keep room for the lab's logo and a gap
       const n0 = svg.childElementCount;
       if (labelDot(svg, both, X(e[0]), Y(e[1]), name, fr, MTXT(m.id), false, true)) boxes.push(both[both.length - 1]);
       else labelDot(svg, boxes, X(e[0]), Y(e[1]), name, fr, MTXT(m.id), false, true);
