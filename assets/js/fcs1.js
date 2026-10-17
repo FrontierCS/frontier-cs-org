@@ -133,11 +133,11 @@ function wmDiagonal(n, edges) {
     for (let i = 0; i < n; i++) { const x = x0 + i * (cw + gap), fresh = now[i] && !was[i], v = fresh ? (turn > .5 ? now[i] : 0) : now[i], hue = v && HUES[v % 3], sx = fresh ? Math.abs(1 - 2 * turn) : 1;
       g.save(); g.translate(x + cw / 2, 0); g.scale(Math.max(.04, sx), 1);                                                                  // the hidden permutation
       rr(g, -cw / 2, y1, cw, cw * 1.25, 8); g.fillStyle = v ? hue[1] : '#fff'; g.fill(); g.strokeStyle = v ? hue[0] : '#bdc1c6'; g.lineWidth = 1.5; g.stroke();
-      g.fillStyle = v ? INK : '#9aa0a6'; g.font = `600 ${Math.round(cw * .42)}px 'Hanken Grotesk', sans-serif`; g.fillText(v || '?', 0, y1 + cw * .64); g.restore();
+      g.fillStyle = v ? INK : '#9aa0a6'; g.font = `600 ${Math.round(cw * .42)}px 'Instrument Sans', sans-serif`; g.fillText(v || '?', 0, y1 + cw * .64); g.restore();
       const probe = s.probe.includes(i), dy = (1 - qin) * cw * .35; g.globalAlpha = qin;                                                    // the query
       rr(g, x + cw * .12, y2 + dy, cw * .76, cw * .76, 6); g.fillStyle = probe ? HUES[0][0] : '#fff'; g.fill(); if (!probe) { g.strokeStyle = '#dadce0'; g.lineWidth = 1; g.stroke(); }
-      g.fillStyle = probe ? '#fff' : '#5f6368'; g.font = `600 ${Math.round(cw * .34)}px 'Hanken Grotesk', sans-serif`; g.fillText(s.q[i], x + cw / 2, y2 + dy + cw * .4); g.globalAlpha = 1; }
-    const ax = x0 + n * (cw + gap) + cw * .2; g.globalAlpha = ain; g.fillStyle = INK; g.font = `600 ${Math.round(cw * .34)}px 'Hanken Grotesk', sans-serif`; g.textAlign = 'left';
+      g.fillStyle = probe ? '#fff' : '#5f6368'; g.font = `600 ${Math.round(cw * .34)}px 'Instrument Sans', sans-serif`; g.fillText(s.q[i], x + cw / 2, y2 + dy + cw * .4); g.globalAlpha = 1; }
+    const ax = x0 + n * (cw + gap) + cw * .2; g.globalAlpha = ain; g.fillStyle = INK; g.font = `600 ${Math.round(cw * .34)}px 'Instrument Sans', sans-serif`; g.textAlign = 'left';
     g.fillText('→ ' + s.ans, ax, y2 + cw * .4); g.globalAlpha = 1;                                                                            // the answer: how many positions match
     label.firstChild.textContent = `${k + 1} ${k ? 'queries' : 'query'}`; }); }
 
