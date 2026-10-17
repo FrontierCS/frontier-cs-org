@@ -46,7 +46,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
     <div class="plot" id="pcplot"><svg id="pcsvg" role="img" aria-label="Pass rate (beat reference) against cost per run"></svg><div class="tip" id="pctip" hidden></div></div>
     <div class="cfoot">{% include chart_logo.html %}</div>
   </figure>
-  <p class="pcontact">To add your model, email its score on every task to both <a class="mail" href="mailto:qmang@berkeley.edu,wenhao.chai@princeton.edu">qmang@berkeley.edu</a> and <a class="mail" href="mailto:qmang@berkeley.edu,wenhao.chai@princeton.edu">wenhao.chai@princeton.edu</a>.</p>
+  <p class="pcontact">To add your model, email its score on every task to <strong>both</strong> <a class="mail" href="mailto:qmang@berkeley.edu,wenhao.chai@princeton.edu">qmang@berkeley.edu</a> and <a class="mail" href="mailto:qmang@berkeley.edu,wenhao.chai@princeton.edu">wenhao.chai@princeton.edu</a>.</p>
 
   <details class="tbl-wrap fold" id="domains">
     <summary><h3>Pass rate by domain</h3></summary>
@@ -165,14 +165,21 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
 
 <section class="sec" id="cases">
   <h2>Case studies</h2>
-  <p class="tbd">Case studies of single runs from the preview will appear here.</p>
+  {%- assign cases = site.posts | where_exp: "p", "p.tags contains 'Case study'" %}
+  <ul class="cases">
+    {%- for p in cases %}
+    <li>{% if p.thumbnail %}<a class="cth" href="{{ p.url | relative_url }}" tabindex="-1" aria-hidden="true"><img src="{{ p.thumbnail | relative_url }}" alt=""></a>{% endif %}
+      <div class="ctx"><a class="ctt" href="{{ p.url | relative_url }}">{{ p.title }}</a>{% if p.case.summary %}<p>{{ p.case.summary }}</p>{% endif %}<span class="cmt">{{ p.case.task }}, {{ p.case.model }}, {{ p.date | date: "%B %-d, %Y" }}</span></div>
+      {%- if p.case.result %}<div class="cres"><b>{{ p.case.result }}</b><span>{{ p.case.result_note }}</span></div>{% endif %}</li>
+    {%- endfor %}
+  </ul>
 </section>
 
 <section class="sec" id="private">
   <h2>Private set</h2>
   <p class="tbd">Tasks and domains we don’t release.</p>
   <div class="locked" id="locked" aria-hidden="true"></div>
-  <p class="pcontact">For questions about the private set, email both <a class="mail" href="mailto:qmang@berkeley.edu,wenhao.chai@princeton.edu">qmang@berkeley.edu</a> and <a class="mail" href="mailto:qmang@berkeley.edu,wenhao.chai@princeton.edu">wenhao.chai@princeton.edu</a>.</p>
+  <p class="pcontact">For questions about the private set, email <strong>both</strong> <a class="mail" href="mailto:qmang@berkeley.edu,wenhao.chai@princeton.edu">qmang@berkeley.edu</a> and <a class="mail" href="mailto:qmang@berkeley.edu,wenhao.chai@princeton.edu">wenhao.chai@princeton.edu</a>.</p>
 </section>
 
 <section class="sec" id="sponsors">
