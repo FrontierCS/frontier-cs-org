@@ -1078,6 +1078,9 @@ nav .pagination {
   width: 100%;
 }
 .ar-author { display: flex; flex-direction: column; gap: 2px; }
+/* a post with checked_by in its front matter: the byline and "Solution checked by" side by side over one rule (Qiuyang) */
+.ar-credits { display: flex; flex-wrap: wrap; gap: 16px 56px; margin: 32px 0 0; padding-top: 18px; border-top: 1px solid var(--rule); }
+.ar-credits .ar-authors { margin: 0; padding: 0; border: 0; }
 .ar-author a { color: var(--ink); border-bottom: 1px solid var(--link-line); padding: 0 1px; align-self: flex-start; }
 .ar-author a:hover { color: var(--accent); border-bottom-color: var(--accent); }
 .ar-author em {

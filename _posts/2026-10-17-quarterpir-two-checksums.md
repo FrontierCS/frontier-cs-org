@@ -12,10 +12,9 @@ date: 2026-10-17
 date_display: "October 17, 2026"
 
 authors:
-  - name: Qiuyang Mang
-    url: "https://joyemang33.github.io/"
-    affiliations:
-      name: UC Berkeley
+  - name: FrontierCS 2 Team
+checked_by:
+  - name: Bo Peng
 
 toc:
   - name: The Task
