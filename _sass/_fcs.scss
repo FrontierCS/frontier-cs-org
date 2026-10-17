@@ -1,14 +1,14 @@
 /* ============================================================
    FrontierCS — Academic Journal theme
    Structure ported from wenhaochai.com (assets/site.css); since 2026-10 the
-   FrontierCS skin: white, Material 3 blue, hairline rules, Hanken Grotesk.
+   FrontierCS skin: white, Material 3 blue, hairline rules, Radio Canada.
    Blog index follows blogs.html; article pages follow the report
    layout of blogs/loopdit.html.
    ============================================================ */
 
 /* ---------- Tokens ---------- */
 :root {
-  /* FrontierCS skin (2026-10): Material 3 primary blue on white, Google GM2 greys, Hanken Grotesk */
+  /* FrontierCS skin (2026-10): Material 3 primary blue on white, Google GM2 greys, Radio Canada */
   --paper: #ffffff;
   --paper-2: #f1f3f4;
   --ink: #1f1f1f;
@@ -23,9 +23,9 @@
   --link-line: rgba(11, 87, 208, 0.35);
   --scrim: rgba(32, 33, 36, 0.45);
 
-  --font-serif: 'Hanken Grotesk', 'Helvetica Neue', Arial, sans-serif;   /* headings: one sans family site-wide */
-  --font-sans: 'Hanken Grotesk', 'Helvetica Neue', Arial, sans-serif;
-  --font-mono: 'Hanken Grotesk', 'Helvetica Neue', Arial, sans-serif;    /* small labels */
+  --font-serif: 'Radio Canada', 'Helvetica Neue', Arial, sans-serif;   /* headings: one sans family site-wide */
+  --font-sans: 'Radio Canada', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'Radio Canada', 'Helvetica Neue', Arial, sans-serif;    /* small labels */
   --font-code: 'Google Sans Code', ui-monospace, Menlo, monospace;      /* code, terminal */
 
   --max: 1440px;   /* 1320px of content plus two 60px gutters, as on the FrontierCS 2 page. A plain length: the CSS minifier breaks calc() with var() inside, and the gutter is 60px wherever this limit applies */
@@ -44,7 +44,7 @@
      Gemini 4 Argon takes Google's green, #34A853 (Qiuyang, 2026-10-16). */
   --m-astra: #1f1f1f; --m-sol: #1f1f1f; --m-k3: #047afe; --m-muse: #0089f4; --m-qwen: #ff7018; --m-ds: #2243e6; --m-glm: #1c7ff8; --m-opus: #cc785c; --m-wonder: #0089f4; --m-glmf: #1c7ff8; --m-gemini: #34a853;
   --fail: #bdc1c6;
-  --sans: 'Hanken Grotesk', 'Helvetica Neue', Arial, sans-serif;
+  --sans: 'Radio Canada', 'Helvetica Neue', Arial, sans-serif;
 }
 
 * { box-sizing: border-box; }
