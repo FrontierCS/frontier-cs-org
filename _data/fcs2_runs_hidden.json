@@ -1,6 +1,6 @@
 {
  "note": "Runs of models kept off the site (HIDDEN in bin/fcs2_runs_from_db.py), in the columns of RUNS in assets/js/fcs2-data.js. Timeouts score 0; unscored runs are left out. Not shown on any page.",
- "generated_at": "2026-10-15T23:36:47.354015+00:00",
+ "generated_at": "2026-10-16T11:13:32.988061+00:00",
  "models": {
   "k27": "Kimi K2.7"
  },
@@ -31,7 +31,7 @@
   ["k27", "HPC", "Parallel DBSCAN", 69.26, 0],
   ["k27", "Bioinformatics", "Exact Sequence Alignment", 37.6, 0],
   ["k27", "Database", "FARGO paper-aligned query core", 51.71, 1],
-  ["k27", "Architecture", "Clusterwise SpGEMM", 73.5, 1],
+  ["k27", "Architecture", "Clusterwise SpGEMM", 59.52, 1],
   ["k27", "Machine Learning", "Nano World Model", 79.12, 0],
   ["k27", "MLSys", "knn kernel", 13.52, 0],
   ["k27", "MLSys", "dbscan kernel", 0.0, 0],
