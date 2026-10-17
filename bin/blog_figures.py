@@ -297,6 +297,161 @@ def calico_graph():
     for x, y, v in N: g += C(x, y, 44, BLUE, '#fff', 4) + T(x, y + 10, str(v), 30, 600, '#fff', 'middle')
     return g + L(110, 520, 150, 520, BLUE, 4) + T(162, 526, 'Constraint', 16) + L(300, 520, 340, 520, MUTED, 4, '8 8') + T(352, 526, 'Discarded', 16), 540, 560
 
+# ---------- charts drawn into a post ----------
+# A post cannot load fcs2.js or fcs2.css, so a chart from the site's data is SVG in the post itself, between two marker
+# comments, and takes the page's type and the post's _styles; this script redraws it from assets/js/fcs2-data.js
+# (Qiuyang, 2026-10-17). Each chart comes in two widths, one for phones, so its text stays at the site's chart sizes.
+SITE = os.path.join(os.path.dirname(__file__), '..')
+def site_const(name):
+    """A JSON constant of assets/js/fcs2-data.js, as the converter writes it (const NAME = <json>, maybe with a .map after it)."""
+    import json, re
+    src = open(os.path.join(SITE, 'assets', 'js', 'fcs2-data.js')).read()
+    return json.JSONDecoder().raw_decode(src, re.search(rf'^const {name} = ', src, re.M).end())[0]
+
+def site_models():
+    """id: (name, colour) for each model, from MODELS in fcs2-data.js and its --m-<id> in _sass/_fcs.scss: the colour a
+    task page gives it, the lab's colour on :root with the model's own shade from .taskpage over it, as these charts
+    compare the models on one task."""
+    import re
+    src = open(os.path.join(SITE, 'assets', 'js', 'fcs2-data.js')).read()
+    scss = open(os.path.join(SITE, '_sass', '_fcs.scss')).read()
+    m = lambda block: dict(re.findall(r'--m-([a-z0-9]+): (#[0-9a-fA-F]{6});', block))
+    lab, shade = re.search(r':root\s*\{(.*?)\}', scss, re.S), re.search(r'\.taskpage\s*\{(.*?)\}', scss, re.S)
+    col = {**m(lab.group(1)), **(m(shade.group(1)) if shade else {})}
+    return {i: (n, col[i]) for i, n in re.findall(r"\{id:'([a-z0-9]+)', name:'([^']+)'", src)}
+
+# Bytes per lookup of Muse Wonder 1.0's development submissions on QuarterPIR, at 67,108,864 and at 65,536 entries, in
+# the order TRAJ lists them: the platform's verifier results for the run (export of 2026-10-16). TRAJ has their scores
+# and costs but not their bytes. The final submission is the code of the last development submission (same payload hash).
+WONDER_PIR_BYTES = [(1280, 196), (1280, 100), (1280, 100), (1280, 100), (1280, 100), (1280, 100), (1280, 52), (1280, 52)]
+
+def wonder_pir_run(narrow):
+    """QuarterPIR case study: each development submission of Muse Wonder 1.0's run, its development score against the
+    cost so far, and the final score at the cost of the whole run; the human reference's final score as a dashed line."""
+    run = next(r for r in site_const('TRAJ') if r[0] == 'wonder' and r[1] == 'QuarterPIR')
+    WONDER = site_models()['wonder'][1]; WONDER_TXT = mtxt(WONDER)   # the label colour: the model's mixed 78% with black (MTXT)
+    ref, final, cost, dev = site_const('REF')['QuarterPIR'], run[2], run[4], run[6]
+    assert len(dev) == len(WONDER_PIR_BYTES) and all(b == 1280 for b, _ in WONDER_PIR_BYTES)
+    W, H = (360, 340) if narrow else (760, 330)
+    L, R, T, B = 40, 14 if narrow else 20, 24, 48
+    xmax, ymax = 10 * math.ceil(cost / 10), 80
+    X = lambda v: L + v / xmax * (W - L - R); Y = lambda v: T + (1 - v / ymax) * (H - T - B)
+    t = lambda x, y, s, cls='', anchor='start': f'<text x="{x:.1f}" y="{y:.1f}"' + (f' class="{cls}"' if cls else '') + (f' text-anchor="{anchor}"' if anchor != 'start' else '') + f'>{s}</text>'
+    g = ''
+    for v in range(0, ymax + 1, 20):
+        g += f'<line x1="{L}" x2="{W - R}" y1="{Y(v):.1f}" y2="{Y(v):.1f}" stroke="var(--grid)"/>' + t(L - 8, Y(v) + 4, v, anchor='end')
+    for v in range(0, xmax + 1, 10 if narrow else 5):
+        g += f'<line x1="{X(v):.1f}" x2="{X(v):.1f}" y1="{T}" y2="{H - B}" stroke="var(--grid)"/>' + t(X(v), H - B + 20, f'${v}', anchor='middle')
+    g += t(L + (W - L - R) / 2, H - 6, 'Cost of the run so far in US$', 'ax', 'middle')
+    g += f'<line x1="{L}" x2="{W - R}" y1="{Y(ref):.1f}" y2="{Y(ref):.1f}" stroke="var(--ink-2)" stroke-width="1.2" stroke-dasharray="4 4"/>'
+    g += t(W - R, Y(ref) - 7, f'Human reference {ref:.1f}', 'lab', 'end')
+    pts = [(X(c), Y(s)) for c, s in dev]
+    g += f'<polyline points="{" ".join(f"{x:.1f},{y:.1f}" for x, y in pts)}" fill="none" stroke="{WONDER}" stroke-width="2" stroke-linejoin="round"/>'
+    fx, fy = X(cost), Y(final)
+    g += f'<line x1="{pts[-1][0]:.1f}" y1="{pts[-1][1]:.1f}" x2="{fx:.1f}" y2="{fy:.1f}" stroke="{WONDER}" stroke-width="1.5" stroke-dasharray="3 3"/>'
+    g += ''.join(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="4.5" fill="{WONDER}" stroke="#fff" stroke-width="1.5"/>' for x, y in pts)
+    g += f'<circle cx="{fx:.1f}" cy="{fy:.1f}" r="7.5" fill="{WONDER}" stroke="#fff" stroke-width="2"/>'
+    lab = lambda x, y, s, anchor='middle', bold=False: f'<text x="{x:.1f}" y="{y:.1f}" class="lab" text-anchor="{anchor}" fill="{WONDER_TXT}"' + (' font-weight="600"' if bold else '') + f' style="fill:{WONDER_TXT}">{s}</text>'
+    # the first submission already sends 1,280 bytes per lookup at 67 million entries; the seventh is the first at 52 bytes at 65,536
+    (x1, y1), first = pts[0], dev[0][1]
+    d1, d2 = (19, 34) if narrow else (24, 40)   # under the dot, above the human reference's line
+    g += lab(x1, y1 + d1, f'First submission, {first:.1f}') + lab(x1, y1 + d2, '1,280 bytes per lookup')
+    k = next(i for i, (_, s) in enumerate(WONDER_PIR_BYTES) if s == 52)
+    g += lab(pts[k][0], pts[k][1] - 14, '52 bytes at 65,536 entries')
+    g += lab(fx + 8, fy + 26, f'Final score {final:.1f}', 'end', True)
+    label = (f'Muse Wonder 1.0 on QuarterPIR. Development submissions score {dev[0][1]:.1f} to {max(s for _, s in dev):.1f} as the run spends '
+             f'${dev[0][0]:.2f} to ${dev[-1][0]:.2f}; the final score is {final:.1f} at ${cost:.2f}; the human reference scores {ref:.1f}.')
+    return (f'<svg class="{"narrow" if narrow else "wide"}" viewBox="0 0 {W} {H}" role="img" aria-label="{label}">{g}</svg>')
+
+# Bytes per lookup at 67,108,864 entries of each model's run on QuarterPIR: the platform's final evidence (exports of
+# 2026-10-16 and 2026-10-17); every lookup of a run sends the same. Step 5 Preview's run timed out and has none.
+PIR_LARGE_BYTES = {'k3': 736, 'wonder': 1280, 'sol': 1664, 'gemini': 1664, 'opus': 1728, 'glmf': 1728, 'ds': 1728,
+                   'glm': 1744, 'astra': 1752, 'qwen': 1760, 'muse': 1760}
+PIR_LARGE_REF = 1760
+mtxt = lambda c: '#' + ''.join(f'{round(int(c[i:i + 2], 16) * .78):02x}' for i in (1, 3, 5))   # MTXT: the colour 78%, black 22%
+
+def pir_bytes_by_model(narrow):
+    """QuarterPIR case study: bytes per lookup at the large database, one row per model, a filled dot for a run that
+    passes and a ring for one that fails, the human reference as a dashed line; Kimi K3's ring notes its client storage."""
+    models, runs = site_models(), {r[0]: r for r in site_const('RUNS') if r[2] == 'QuarterPIR'}
+    rows = sorted(PIR_LARGE_BYTES.items(), key=lambda kv: (kv[1], -runs[kv[0]][3]))
+    W = 360 if narrow else 760
+    L, R, T, B, RH = (132, 22, 34, 46, 25) if narrow else (178, 24, 34, 46, 27)
+    H = T + RH * len(rows) + B
+    x0, x1 = 600, 1800
+    X = lambda v: L + (v - x0) / (x1 - x0) * (W - L - R)
+    t = lambda x, y, s, cls='', anchor='start', fill='': f'<text x="{x:.1f}" y="{y:.1f}"' + (f' class="{cls}"' if cls else '') + (f' text-anchor="{anchor}"' if anchor != 'start' else '') + (f' style="fill:{fill}"' if fill else '') + f'>{s}</text>'
+    g = ''
+    for v in range(x0, x1 + 1, 400 if narrow else 200):
+        g += f'<line x1="{X(v):.1f}" x2="{X(v):.1f}" y1="{T - 8}" y2="{H - B}" stroke="var(--grid)"/>' + t(X(v), H - B + 20, f'{v:,}', anchor='middle')
+    g += t(L + (W - L - R) / 2, H - 6, 'Bytes per lookup at 67 million entries', 'ax', 'middle')
+    g += f'<line x1="{X(PIR_LARGE_REF):.1f}" x2="{X(PIR_LARGE_REF):.1f}" y1="{T - 8}" y2="{H - B}" stroke="var(--ink-2)" stroke-width="1.2" stroke-dasharray="4 4"/>'
+    g += t(X(PIR_LARGE_REF), T - 16, f'Human reference {PIR_LARGE_REF:,}', 'lab', 'end')
+    for k, (m, v) in enumerate(rows):
+        y, (name, col), ok = T + RH * k + RH / 2, models[m], runs[m][4]
+        g += t(8, y + 4.5, name, 'lab' if ok else 'lab off')
+        cx = X(v)
+        g += (f'<circle cx="{cx:.1f}" cy="{y:.1f}" r="5.5" fill="{col}" stroke="#fff" stroke-width="1.5"/>' if ok else
+              f'<circle cx="{cx:.1f}" cy="{y:.1f}" r="4.5" fill="#fff" stroke="{col}" stroke-width="2"/>')
+        right = v < 1500
+        note = f'{v:,}' + (', but 606.8 MB on the client' if m == 'k3' else '')
+        g += t(cx + (10 if right else -10), y + 4.5, note, 'val', 'start' if right else 'end', mtxt(col))
+    label = ('Bytes per lookup at 67 million entries, by model: ' + ', '.join(f'{models[m][0]} {v:,}{"" if runs[m][4] else " (fails)"}' for m, v in rows)
+             + f'; the human reference sends {PIR_LARGE_REF:,}.')
+    return f'<svg class="{"narrow" if narrow else "wide"}" viewBox="0 0 {W} {H}" role="img" aria-label="{label}">{g}</svg>'
+
+# Muse Wonder 1.0 against the human reference at 67,108,864 entries, in the same run: the means of the two graded
+# experiments in the run's final evidence (export of 2026-10-16); server time is each experiment's median over lookups.
+# metric: (human reference, Muse Wonder 1.0, unit, decimals)
+PIR_RESULTS = [('Bytes per lookup', 1760, 1280, 'bytes', 0), ('Server time per lookup', 856.4, 100.5, 'µs', 0),
+               ('Client setup', 122.2, 18.7, 's', 1), ('Lookup time, end to end', 4.42, 0.62, 'ms', 2),
+               ('Client storage', 85.3, 53.1, 'MB', 1)]
+
+def pir_results(narrow):
+    """QuarterPIR case study, in place of a table: each metric as a share of the human reference's, a grey dot at 100%
+    and Muse Wonder 1.0's dot where it lands, both values written under their dots."""
+    WONDER = site_models()['wonder'][1]
+    W = 360 if narrow else 760
+    L, R, T, B, RH = 10, 22, 8, 46, 58
+    H = T + RH * len(PIR_RESULTS) + B
+    X = lambda f: L + f * (W - L - R)
+    t = lambda x, y, s, cls='', anchor='start', fill='': f'<text x="{x:.1f}" y="{y:.1f}"' + (f' class="{cls}"' if cls else '') + (f' text-anchor="{anchor}"' if anchor != 'start' else '') + (f' style="fill:{fill}"' if fill else '') + f'>{s}</text>'
+    fmt = lambda v, d, u: f'{v:,.{d}f} {u}'
+    g = ''
+    for f in (0, .25, .5, .75, 1):
+        g += f'<line x1="{X(f):.1f}" x2="{X(f):.1f}" y1="{T}" y2="{H - B}" stroke="var(--grid)"/>' + t(X(f), H - B + 20, f'{f:.0%}', anchor='middle' if 0 < f < 1 else ('start' if f == 0 else 'end'))
+    g += t(L + (W - L - R) / 2, H - 6, 'Share of the human reference', 'ax', 'middle')
+    for k, (name, ref, won, unit, d) in enumerate(PIR_RESULTS):
+        y0 = T + RH * k; y = y0 + 30; f = won / ref
+        g += t(L, y0 + 14, name, 'lab')
+        g += f'<line x1="{X(f):.1f}" x2="{X(1):.1f}" y1="{y}" y2="{y}" stroke="#bdc1c6" stroke-width="2"/>'
+        g += f'<circle cx="{X(1):.1f}" cy="{y}" r="5.5" fill="#9aa0a6" stroke="#fff" stroke-width="1.5"/>'
+        g += f'<circle cx="{X(f):.1f}" cy="{y}" r="6.5" fill="{WONDER}" stroke="#fff" stroke-width="1.5"/>'
+        g += t(X(1), y + 19, fmt(ref, d, unit), 'val', 'end')
+        # under its dot, ending at it in the right half so it clears the human reference's label
+        g += t(X(f) + (7 if f > .5 else 0), y + 19, fmt(won, d, unit), 'val', 'end' if f > .5 else 'middle', mtxt(WONDER))
+    label = ('Muse Wonder 1.0 as a share of the human reference at 67 million entries: ' + '; '.join(f'{n} {fmt(w, d, u)} against {fmt(r, d, u)}' for n, r, w, u, d in PIR_RESULTS) + '.')
+    return f'<svg class="{"narrow" if narrow else "wide"}" viewBox="0 0 {W} {H}" role="img" aria-label="{label}">{g}</svg>'
+
+def pir_results_block():
+    WONDER = site_models()['wonder'][1]
+    return (pir_results(False) + pir_results(True)
+            + f'<div class="legend"><span><i style="background:#9aa0a6"></i>Human reference</span><span><i style="background:{WONDER}"></i>Muse Wonder 1.0</span></div>')
+
+INLINE = {'2026-10-17-quarterpir-two-checksums.md': {'pir-results': pir_results_block,
+                                                   'wonder-run': lambda: wonder_pir_run(False) + wonder_pir_run(True),
+                                                   'pir-bytes': lambda: pir_bytes_by_model(False) + pir_bytes_by_model(True)}}
+
+def draw_inline():
+    """Replace what lies between <!-- name --> and <!-- /name --> in each post with the chart drawn now."""
+    import re
+    for post, charts in INLINE.items():
+        path = os.path.join(SITE, '_posts', post); src = open(path).read()
+        for name, draw in charts.items():
+            src, n = re.subn(rf'(<!-- {name} -->).*?(<!-- /{name} -->)', lambda m: m.group(1) + draw() + m.group(2), src, flags=re.S)
+            assert n == 1, (post, name)
+        open(path, 'w').write(src)
+
 FIGS = {'2026-02-14-negative-optimization/closed-vs-open.svg': closed_vs_open, '2026-02-14-negative-optimization/query-budget.svg': query_budget,
         '2026-02-14-negative-optimization/best-of-n.svg': best_of_n, '2026-02-14-negative-optimization/binary-vs-continuous.svg': binary_vs_continuous,
         '2026-02-10-evaluation/pipeline.svg': eval_pipeline, '2026-02-10-evaluation/traditional-vs-frontiercs.svg': eval_traditional_vs_fcs,
@@ -312,3 +467,4 @@ if __name__ == '__main__':
     for path, draw in FIGS.items():
         body, w, h = draw()
         open(os.path.join(root, path), 'w').write(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}" {FONT}><rect width="{w}" height="{h}" fill="#fff"/>{body}</svg>\n')
+    draw_inline()
