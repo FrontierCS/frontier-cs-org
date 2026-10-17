@@ -400,7 +400,46 @@ def pir_bytes_by_model(narrow):
              + f'; the human reference sends {PIR_LARGE_REF:,}.')
     return f'<svg class="{"narrow" if narrow else "wide"}" viewBox="0 0 {W} {H}" role="img" aria-label="{label}">{g}</svg>'
 
-INLINE = {'2026-10-17-quarterpir-two-checksums.md': {'wonder-run': lambda: wonder_pir_run(False) + wonder_pir_run(True),
+# Muse Wonder 1.0 against the human reference at 67,108,864 entries, in the same run: the means of the two graded
+# experiments in the run's final evidence (export of 2026-10-16); server time is each experiment's median over lookups.
+# metric: (human reference, Muse Wonder 1.0, unit, decimals)
+PIR_RESULTS = [('Bytes per lookup', 1760, 1280, 'bytes', 0), ('Server time per lookup', 856.4, 100.5, 'µs', 0),
+               ('Client setup', 122.2, 18.7, 's', 1), ('Lookup time, end to end', 4.42, 0.62, 'ms', 2),
+               ('Client storage', 85.3, 53.1, 'MB', 1)]
+
+def pir_results(narrow):
+    """QuarterPIR case study, in place of a table: each metric as a share of the human reference's, a grey dot at 100%
+    and Muse Wonder 1.0's dot where it lands, both values written under their dots."""
+    WONDER = site_models()['wonder'][1]
+    W = 360 if narrow else 760
+    L, R, T, B, RH = 10, 22, 8, 46, 58
+    H = T + RH * len(PIR_RESULTS) + B
+    X = lambda f: L + f * (W - L - R)
+    t = lambda x, y, s, cls='', anchor='start', fill='': f'<text x="{x:.1f}" y="{y:.1f}"' + (f' class="{cls}"' if cls else '') + (f' text-anchor="{anchor}"' if anchor != 'start' else '') + (f' style="fill:{fill}"' if fill else '') + f'>{s}</text>'
+    fmt = lambda v, d, u: f'{v:,.{d}f} {u}'
+    g = ''
+    for f in (0, .25, .5, .75, 1):
+        g += f'<line x1="{X(f):.1f}" x2="{X(f):.1f}" y1="{T}" y2="{H - B}" stroke="var(--grid)"/>' + t(X(f), H - B + 20, f'{f:.0%}', anchor='middle' if 0 < f < 1 else ('start' if f == 0 else 'end'))
+    g += t(L + (W - L - R) / 2, H - 6, 'Share of the human reference', 'ax', 'middle')
+    for k, (name, ref, won, unit, d) in enumerate(PIR_RESULTS):
+        y0 = T + RH * k; y = y0 + 30; f = won / ref
+        g += t(L, y0 + 14, name, 'lab')
+        g += f'<line x1="{X(f):.1f}" x2="{X(1):.1f}" y1="{y}" y2="{y}" stroke="#bdc1c6" stroke-width="2"/>'
+        g += f'<circle cx="{X(1):.1f}" cy="{y}" r="5.5" fill="#9aa0a6" stroke="#fff" stroke-width="1.5"/>'
+        g += f'<circle cx="{X(f):.1f}" cy="{y}" r="6.5" fill="{WONDER}" stroke="#fff" stroke-width="1.5"/>'
+        g += t(X(1), y + 19, fmt(ref, d, unit), 'val', 'end')
+        # under its dot, ending at it in the right half so it clears the human reference's label
+        g += t(X(f) + (7 if f > .5 else 0), y + 19, fmt(won, d, unit), 'val', 'end' if f > .5 else 'middle', mtxt(WONDER))
+    label = ('Muse Wonder 1.0 as a share of the human reference at 67 million entries: ' + '; '.join(f'{n} {fmt(w, d, u)} against {fmt(r, d, u)}' for n, r, w, u, d in PIR_RESULTS) + '.')
+    return f'<svg class="{"narrow" if narrow else "wide"}" viewBox="0 0 {W} {H}" role="img" aria-label="{label}">{g}</svg>'
+
+def pir_results_block():
+    WONDER = site_models()['wonder'][1]
+    return (pir_results(False) + pir_results(True)
+            + f'<div class="legend"><span><i style="background:#9aa0a6"></i>Human reference</span><span><i style="background:{WONDER}"></i>Muse Wonder 1.0</span></div>')
+
+INLINE = {'2026-10-17-quarterpir-two-checksums.md': {'pir-results': pir_results_block,
+                                                   'wonder-run': lambda: wonder_pir_run(False) + wonder_pir_run(True),
                                                    'pir-bytes': lambda: pir_bytes_by_model(False) + pir_bytes_by_model(True)}}
 
 def draw_inline():
