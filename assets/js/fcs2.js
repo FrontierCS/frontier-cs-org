@@ -133,7 +133,7 @@ function drawPassBars() {
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H);
   for (let v = step; v <= ymax; v += step) svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1, 'stroke-dasharray':'4 4'}));
   svg.append(sv('line', {x1:L, x2:W - R, y1:base, y2:base, stroke:'var(--ink-2)', 'stroke-width':1}));
-  const pts = [], vs = flat ? 26 : 13;   // the value's size
+  const pts = [], vs = flat ? 22 : 12;   // the value's size, a size down from 26 and 13 (owner, 2026-10-17)
   order.forEach((m, i) => {
     const e = val(m), cx = L + band * (i + .5), x = cx - bw / 2, y = Y(e), h = base - y, r = Math.min(6, bw / 6, h);
     const bar = sv('path', {d:`M${x},${base}V${y + r}Q${x},${y} ${x + r},${y}H${x + bw - r}Q${x + bw},${y} ${x + bw},${y + r}V${base}Z`, fill:MCOL[m.id], 'data-m':m.id});
