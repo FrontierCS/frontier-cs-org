@@ -458,7 +458,7 @@ function drawKebab(ts) {
       else html += (k === n ? `<b>Passes</b>: beats ${n === 1 ? 'its one metric' : `all ${n} metrics`}` : `Beats ${k} of ${n} metric${n === 1 ? '' : 's'}`)
         + `<br>Final score ${f1(run.s)}${REF[t] != null ? `, human reference ${f1(REF[t])}` : ''}`;
       cells.push(html);
-      return `<td data-i="${cells.length - 1}"><span class="sqs">${stems.map(j => `<i class="${s ? KSTATE[s][0] : won(m.id, j) ? 'y' : 'n'}"></i>`).join('')}</span></td>`;
+      return `<td data-i="${cells.length - 1}"><span class="sqs" style="max-width:${(n <= 4 ? n : Math.ceil(n / 2)) * 12 - 3}px">${stems.map(j => `<i class="${s ? KSTATE[s][0] : won(m.id, j) ? 'y' : 'n'}"></i>`).join('')}</span></td>`;
     }).join('');
     return `<tr><td class="kt"><a href="${esc(taskHref(t))}">${esc(NAME(t))}</a></td><td class="kf">${FDI[t] != null ? fe(FDI[t]) : '–'}</td>${tds}</tr>`;
   }).join('');
@@ -486,11 +486,16 @@ function tView(v) {
 $('#tview').addEventListener('click', e => { const b = e.target.closest('button'); if (b && b.dataset.v !== tview) tView(b.dataset.v); });
 // the table scrolls sideways only when it does not fit, since a scrolling box would keep its header from sticking under the section bar
 function fitKebab() {
-  const sc = $('#kebscroll'); sc.classList.remove('scroll'); sc.classList.toggle('scroll', $('#kebtbl').offsetWidth > sc.clientWidth + 1);
-  $('#kebtbl').style.setProperty('--ktop', $('.sub').offsetHeight + 'px');
+  const sc = $('#kebscroll'), tb = $('#kebtbl'); sc.classList.remove('scroll'); tb.style.width = '';
+  tb.style.setProperty('--ktop', $('.sub').offsetHeight + 'px');
   // model names run up at 40 degrees, each on one line (Qiuyang); the header is as tall as the longest one needs
-  const w = Math.max(0, ...[...document.querySelectorAll('#kebtbl .nm')].map(e => e.offsetWidth)), a = 40 * Math.PI / 180;
-  if (w) $('#kebtbl').style.setProperty('--kh', Math.ceil(w * Math.sin(a) + 16 * Math.cos(a) + 12) + 'px');
+  const nms = [...tb.querySelectorAll('.nm')], w = Math.max(0, ...nms.map(e => e.offsetWidth)), a = 40 * Math.PI / 180;
+  if (w) tb.style.setProperty('--kh', Math.ceil(w * Math.sin(a) + 16 * Math.cos(a) + 12) + 'px');
+  // the last name runs up to the right past the table's edge; the table gives it that room inside the box, so the box
+  // does not scroll for it (#92 review: 1,195 px of content in a 1,173 px box at 1280 px)
+  const last = nms[nms.length - 1], over = last ? Math.ceil(last.getBoundingClientRect().right - sc.getBoundingClientRect().right) : 0;
+  if (over > 0) tb.style.width = `calc(100% - ${over + 2}px)`;   // set here: the site's CSS minifier breaks var() inside calc()
+  sc.classList.toggle('scroll', tb.offsetWidth > sc.clientWidth + 1);
 }
 
 /* ---------- case studies: a placeholder until the preview runs have their own (owner, 2026-10-09) ---------- */

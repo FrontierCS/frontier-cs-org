@@ -171,7 +171,7 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 .keb tbody tr:first-child td{padding-top:6px}
 .keb td.kt{white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 .keb td.kt a{color:var(--ink)} .keb td.kt a:hover{text-decoration:underline}
-.keb .sqs{display:inline-flex; gap:3px; vertical-align:middle}
+.keb .sqs{display:inline-flex; flex-wrap:wrap; justify-content:center; gap:3px; vertical-align:middle}   /* at most four squares a line (fcs2.js sets the max-width); five or more take two lines, so a cell stays well inside its column (#92 review) */
 .keb i, #keblegend i{display:block; width:9px; height:9px; box-sizing:border-box}
 #keblegend{margin:0 0 14px} #keblegend i{width:11px; height:11px}   /* above the table (Qiuyang) */
 .keb td.kempty{padding:14px 0; text-align:left; color:var(--muted); font-size:15px}
