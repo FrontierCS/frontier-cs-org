@@ -268,7 +268,7 @@ Each run measures a solution and the human reference side by side, with the same
 
 Every saved byte comes from the two checksums. The request is unchanged, and the reply is 47% smaller. All 4,000 lookups returned the right entry. The solution scores 58.1 on the leaderboard, against 27.3 for the human reference. Its 666 bytes per lookup, averaged over both databases, are the fewest of any passing run.
 
-Four side results come with it. Most of the speed-up comes from engineering, not from the checksums. Client storage falls by 38%, because the hints in the table take 20 bytes each instead of 56. At 65,536 entries the whole database fits the client's memory budget, so lookups there cost 52 bytes, not 228. GPT-6 Astra found the same two checksums in an earlier run, on a previous version of the task.
+Four side results come with it. The checksums save bytes, not time, so the speed-ups come from engineering. Client storage falls by 38%, because the hints in the table take 20 bytes each instead of 56. At 65,536 entries the whole database fits the client's memory budget, so lookups there cost 52 bytes, not 228. GPT-6 Astra found the same two checksums in an earlier run, on a previous version of the task.
 
 ## What the Agents Found
 
@@ -276,7 +276,7 @@ Recovering two unknowns from two checksums is textbook coding theory. A RAID-6 d
 
 The step lies in seeing this problem inside a cryptographic protocol. The key parities in each reply form a list the client almost knows. It knows where its own list and the server's differ, and it needs one of the two differences. The second checksum costs the client one stored value per backup hint.
 
-Two models from different labs found this step on their own. FrontierCS 2 checked it: every entry comes back right, and every cost beats the human reference.
+Two models from different labs found this step on their own. FrontierCS 2 checked the solution of Muse Wonder 1.0: every entry came back right, and every cost beat the human reference.
 
 ## References
 
