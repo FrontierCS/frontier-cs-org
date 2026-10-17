@@ -15,6 +15,7 @@ authors:
   - name: FrontierCS 2 Team
 checked_by:
   - name: Bo Peng
+    url: "https://p-b-p-b.github.io/"
 
 toc:
   - name: The Task
