@@ -109,7 +109,6 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
     <figure class="chart" style="margin:0" id="scaling">
       <div class="chead"><span>Test-time scaling: FCI against cost budget per run</span></div>
       <div class="plot" id="ttsplot"><svg id="ttssvg" role="img" aria-label="Test-time scaling chart"></svg><div class="tip" id="ttstip" hidden></div></div>
-      <div class="legend" id="ttslegend"></div>
       <div class="cfoot">{% include chart_logo.html %}</div>
     </figure>
   </div>
@@ -163,7 +162,14 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
 
 <section class="sec" id="cases">
   <h2>Case studies</h2>
-  <p class="tbd">Case studies of single runs from the preview will appear here.</p>
+  {%- assign cases = site.posts | where_exp: "p", "p.tags contains 'Case study'" %}
+  <ul class="cases">
+    {%- for p in cases %}
+    <li>{% if p.thumbnail %}<a class="cth" href="{{ p.url | relative_url }}" tabindex="-1" aria-hidden="true"><img src="{{ p.thumbnail | relative_url }}" alt=""></a>{% endif %}
+      <div class="ctx"><a class="ctt" href="{{ p.url | relative_url }}">{{ p.title }}</a>{% if p.case.summary %}<p>{{ p.case.summary }}</p>{% endif %}<span class="cmt">{{ p.case.task }}, {{ p.case.model }}, {{ p.date | date: "%B %-d, %Y" }}</span></div>
+      {%- if p.case.result %}<div class="cres"><b>{{ p.case.result }}</b><span>{{ p.case.result_note }}</span></div>{% endif %}</li>
+    {%- endfor %}
+  </ul>
 </section>
 
 <section class="sec" id="private">

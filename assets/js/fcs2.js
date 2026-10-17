@@ -133,7 +133,7 @@ function drawPassBars() {
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H);
   for (let v = step; v <= ymax; v += step) svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1, 'stroke-dasharray':'4 4'}));
   svg.append(sv('line', {x1:L, x2:W - R, y1:base, y2:base, stroke:'var(--ink-2)', 'stroke-width':1}));
-  const pts = [], vs = flat ? 26 : 13;   // the value's size
+  const pts = [], vs = flat ? 22 : 12;   // the value's size, a size down from 26 and 13 (owner, 2026-10-17)
   order.forEach((m, i) => {
     const e = val(m), cx = L + band * (i + .5), x = cx - bw / 2, y = Y(e), h = base - y, r = Math.min(6, bw / 6, h);
     const bar = sv('path', {d:`M${x},${base}V${y + r}Q${x},${y} ${x + r},${y}H${x + bw - r}Q${x + bw},${y} ${x + bw},${y + r}V${base}Z`, fill:MCOL[m.id], 'data-m':m.id});
@@ -195,15 +195,17 @@ function drawECI() {
    bin/fcs2_runs_from_db.py); a run that has ended within the budget counts what it beat, and a run still going counts
    as if it timed out there, so no curve falls (Qiuyang, 2026-10-16). Straight segments and one legend (owner, 2026-10-13).
    Only each lab's model with the highest FCI is in the chart and the legend (owner, 2026-10-16: no Pareto frontier, no
-   line that changes colour, one model per lab); a click on a legend entry shows or hides its curve (owner, 2026-10-14). A model's 90% band
-   shows only while the pointer is on its curve or its legend entry (owner, 2026-10-13: no bands otherwise).
+   line that changes colour, one model per lab). A model's 90% band
+   shows only while the pointer is on its curve (owner, 2026-10-13: no bands otherwise).
    Each curve starts at its first budget on the scale, FCI 0 or more, as a plain line with no start mark (owner, 2026-10-14; Qiuyang: the
    values under 0 drew every curve in from the bottom edge as a comb of near-vertical strokes). When the chart first comes
    into view a moving focus plays (Melissa's and Qiuyang's idea, 2026-10-14): a budget cursor sweeps right, slow where
    curves start or rise and quick across empty stretches; the view follows it, zoomed in on cheap budgets first and
    widening to the whole range; curves rising at the cursor are drawn in full and named at their tip while the others
-   step back. At rest nothing is named in the plot: the legend names the curves. */
+   step back. At rest every curve is named at its end, off the lines where there is room, as in the paper's figure, and there
+   is no legend (owner, 2026-10-17). */
 let ttsHover = null, ttsRun = 0;
+const TTS_KEY = new Set(['opus', 'ds']), TTS_FADE = .3;   // the two curves in full colour (owner, 2026-10-17)
 // a model with no reported spend has no curve; of each lab only the model with the highest FCI (RANKED is in FCI order)
 const TTSM = RANKED.filter(m => SCALE[m.id]).filter((m, i, a) => a.findIndex(o => o.lab === m.lab) === i);
 const ttsOn = new Set(TTSM.map(m => m.id));
@@ -246,7 +248,7 @@ function ttsPlay(run) {
 function drawTTS(t) {
   const svg = $('#ttssvg'), W = Math.max(300, $('#ttsplot').clientWidth), narrow = W < 560;
   if (t == null) { const run = ++ttsRun; t = 1; if (animates(svg)) { t = 0; svg.addEventListener('shown', () => ttsPlay(run), {once:true}); } }
-  const L = 34, R = narrow ? 12 : 24, T = 12, B = 46, H = CHART_H.tts || (narrow ? 300 : 380);
+  const L = 34, R = narrow ? 12 : 110, T = 12, B = 46, H = CHART_H.tts || (narrow ? 420 : 380);   // room on the right for the end labels; a taller phone chart so they spread (owner, 2026-10-17: labels, no legend)
   const all = TTSM.flatMap(m => ttsCurve(m.id));   // the y axis holds every model, so showing one moves it not
   const vis = TTSM.filter(m => ttsOn.has(m.id)).flatMap(m => ttsCurve(m.id)), xs = (vis.length ? vis : all).map(p => p[0]);   // the x axis spans the shown curves (owner, 2026-10-16)
   const x0 = Math.log10(Math.min(...xs)) - .15, x1 = Math.log10(Math.max(...xs));
@@ -260,7 +262,8 @@ function drawTTS(t) {
   if (brk) brk = [brk[0] + .1, brk[1] - .1];
   const GU = .12, U = lx => !brk || lx <= brk[0] ? lx : lx >= brk[1] ? lx - (brk[1] - brk[0]) + GU : brk[0] + (lx - brk[0]) / (brk[1] - brk[0]) * GU;
   const ytop = Math.max(...all.map(p => p[3])), ystep = eciStep(ytop, narrow ? 4 : 5), ymax = Math.ceil(ytop / ystep) * ystep;   // about five steps from 0, whatever the scale's unit
-  const ms = [...TTSM].reverse().filter(m => ttsOn.has(m.id)), cs = ms.map(m => ttsCurve(m.id));
+  // only Claude Opus 5.5 and DeepSeek V4.1 Flash in full colour, drawn last so they sit on top; the rest translucent (owner, 2026-10-17)
+  const ms = [...TTSM].reverse().filter(m => ttsOn.has(m.id)).sort((a, b) => TTS_KEY.has(a.id) - TTS_KEY.has(b.id)), cs = ms.map(m => ttsCurve(m.id));
   const play = t < 1, sweep = play ? ttsSweep(cs, x0, x1, ttsEase(t)) : x1;
   const vx1 = play ? Math.min(x1, Math.max(x0 + 1.1, sweep + .45)) : x1;   // the view: at least a decade wide, just past the cursor
   const X = v => L + (U(Math.log10(v)) - U(x0)) / (U(vx1) - U(x0)) * (W - L - R), Y = v => T + (1 - v / ymax) * (H - T - B);
@@ -289,26 +292,27 @@ function drawTTS(t) {
   ms.forEach((m, k) => {
     const c = cs[k], vis = play ? ttsUpTo(c, sweep) : c;
     if (!vis.length) return;
-    const lit = !anyRising || rising(c), op = lit ? null : .28;
+    const lit = !anyRising || rising(c), op = !lit ? .28 : TTS_KEY.has(m.id) ? null : TTS_FADE;
     const path = vis.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join('');
     if (!play) gb.append(sv('path', {class:'tband', 'data-m':m.id, opacity:0, fill:MCOL[m.id],
       d:c.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[3]).toFixed(1)}`).join('') + [...c].reverse().map(p => `L${X(p[0]).toFixed(1)},${Y(p[2]).toFixed(1)}`).join('') + 'Z'}));
     const e = vis[vis.length - 1];
     gl.append(sv('path', {d:path, fill:'none', stroke:MCOL[m.id], 'stroke-width':2.2, 'stroke-linejoin':'round', opacity:op}),
       sv('circle', {cx:X(e[0]), cy:Y(e[1]), r:4.5, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':1.5, opacity:op}));
-    if (play && anyRising && lit) tips.push({m, e});
+    if (play ? anyRising && lit : true) tips.push({m, e});   // at rest every curve is named (owner, 2026-10-17)
     if (!play) c.forEach(p => pts.push({x:X(p[0]), y:Y(p[1]), m:m.id, html:`<b>${esc(m.name)}</b><br>FCI <b>${fe(p[1])}</b> at ${usdfmt(p[0])} per run`
       + `<br>90% interval ${fe(Math.max(p[2], 0))}–${fe(p[3])}<br>${Math.round(p[4] * 100)}% of runs still going`}));
   });
-  // while the focus moves, the rising curves are named at their tips, off every line where there is room
+  // while the focus moves the rising curves are named at their tips, and at rest every curve is, off every line where there is room
   if (tips.length) {
     const fr = {l:L, r:W, t:T, b:H - B}, boxes = tips.map(({e}) => ({x:X(e[0]) - 7, y:Y(e[1]) - 7, w:14, h:14})), near = [];
     gl.querySelectorAll('path').forEach(el => { const n = el.getTotalLength(); for (let l = 0; l <= n; l += 6) { const q = el.getPointAtLength(l); near.push({x:q.x - 2, y:q.y - 2, w:4, h:4}); } });
-    tips.sort((a, b) => b.e[1] - a.e[1]).forEach(({m, e}) => { const both = boxes.concat(near), name = narrow ? m.short : m.name;
-      if (labelDot(svg, both, X(e[0]), Y(e[1]), name, fr, MTXT(m.id), false)) boxes.push(both[both.length - 1]);
-      else labelDot(svg, boxes, X(e[0]), Y(e[1]), name, fr, MTXT(m.id), false); });
+    tips.sort((a, b) => b.e[1] - a.e[1]).forEach(({m, e}) => { const both = boxes.concat(near), name = m.name;   // names are never shortened, phones included
+      const n0 = svg.childElementCount;
+      if (labelDot(svg, both, X(e[0]), Y(e[1]), name, fr, MTXT(m.id), false, true)) boxes.push(both[both.length - 1]);
+      else labelDot(svg, boxes, X(e[0]), Y(e[1]), name, fr, MTXT(m.id), false, true);
+      if (!TTS_KEY.has(m.id) && svg.childElementCount > n0) svg.lastElementChild.style.opacity = .6; });   // a translucent curve's name lighter too
   }
-  $('#ttslegend').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', ttsOn.has(x.dataset.m)));
   if (play) { svg.onpointermove = svg.onpointerdown = svg.onpointerleave = null; return; }
   attachTip(svg, W, H, pts, $('#ttstip'));
   // the curve under the pointer: the nearest point within 28 px, as the tooltip picks it; set as properties, so a redraw replaces them
@@ -319,11 +323,6 @@ function drawTTS(t) {
   svg.onpointerleave = ev => { tipLeave(ev); ttsHover = null; ttsBands(); };
   ttsBands();
 }
-$('#ttslegend').innerHTML = TTSM.map(m => `<button type="button" data-m="${m.id}" aria-pressed="false"><i style="background:${MCOL[m.id]}"></i>${esc(m.name)}</button>`).join('');
-$('#ttslegend').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return;
-  const m = b.dataset.m; ttsOn.has(m) ? ttsOn.delete(m) : ttsOn.add(m); drawTTS(); });
-$('#ttslegend').addEventListener('pointerover', e => { const b = e.target.closest('button'); if (b && e.pointerType === 'mouse') { ttsHover = b.dataset.m; ttsBands(); } });
-$('#ttslegend').addEventListener('pointerleave', () => { ttsHover = null; ttsBands(); });
 
 const TASK_OF = Object.fromEntries(TASKS.map(t => [t.s, t]));
 const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
