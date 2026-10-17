@@ -5,6 +5,7 @@ description: "QuarterPIR, a EUROCRYPT 2024 scheme, lets a client read a database
 thumbnail: assets/img/blog-thumbs/quarterpir-two-checksums.svg
 tags: [FrontierCS 2, Case study]
 case:
+  thumbnail: assets/img/case-thumbs/quarterpir-two-checksums.svg   # the overview row, in the Cryptography tones
   task: QuarterPIR
   model: Muse Wonder 1.0
   # the overview's Case studies row (owner, 2026-10-17): a one-line summary and the key result beside the thumbnail

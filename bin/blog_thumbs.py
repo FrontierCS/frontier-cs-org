@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Blog list thumbnails: one 1600x1000 schematic per post, in the manner of the experiment thumbnails on wenhaochai.com
 (a flat ground, ink outlines slightly roughened, fills printed a little off-register) in the site's blues.
-Writes assets/img/blog-thumbs/<slug>.svg; a post picks its own with `thumbnail:` in its front matter.
+Writes assets/img/blog-thumbs/<slug>.svg; a post picks its own with `thumbnail:` in its front matter. Case studies also get
+a copy in their task's domain tones in assets/img/case-thumbs/, for the overview's Case studies row.
     python3 bin/blog_thumbs.py"""
 import math, os
 
@@ -106,10 +107,23 @@ POSTS = {'humans-still-beat-ai': humans, 'frontiercs-2-roadmap': roadmap, 'front
          'alma': alma, 'agent-evaluation': evolving, 'negative-optimization': negative, 'evaluation': pipeline, 'feb-release': release,
          'quarterpir-two-checksums': pir}
 
+# The overview's Case studies row shows a case study's thumbnail in its task's domain tones, while the blog list keeps the
+# site's blues (Qiuyang, 2026-10-17). Writes assets/img/case-thumbs/<slug>.svg; the post points at it with case.thumbnail.
+DOMAIN = {'sec': dict(BG='#fce8e6', MINT='#fad2cf', SKY='#f6aea9', BLUE='#a50e0e')}   # Security and crypto: Material red 50, 100, 200, 900
+CASES = {'quarterpir-two-checksums': 'sec'}
+
+def page(draw):
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000"><defs><filter id="rough" filterUnits="userSpaceOnUse" x="0" y="0" width="1600" height="1000">'
+            f'<feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="7"/><feDisplacementMap in="SourceGraphic" scale="4.5"/></filter></defs>'
+            f'<rect width="1600" height="1000" fill="{BG}"/>{draw()}</svg>\n')
+
 if __name__ == '__main__':
-    out = os.path.join(os.path.dirname(__file__), '..', 'assets', 'img', 'blog-thumbs'); os.makedirs(out, exist_ok=True)
+    img = os.path.join(os.path.dirname(__file__), '..', 'assets', 'img')
+    out = os.path.join(img, 'blog-thumbs'); os.makedirs(out, exist_ok=True)
     for slug, draw in POSTS.items():
-        svg = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000"><defs><filter id="rough" filterUnits="userSpaceOnUse" x="0" y="0" width="1600" height="1000">'
-               f'<feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="7"/><feDisplacementMap in="SourceGraphic" scale="4.5"/></filter></defs>'
-               f'<rect width="1600" height="1000" fill="{BG}"/>{draw()}</svg>\n')
-        open(os.path.join(out, slug + '.svg'), 'w').write(svg)
+        open(os.path.join(out, slug + '.svg'), 'w').write(page(draw))
+    out = os.path.join(img, 'case-thumbs'); os.makedirs(out, exist_ok=True)
+    for slug, dom in CASES.items():
+        keep = {k: globals()[k] for k in DOMAIN[dom]}; globals().update(DOMAIN[dom])
+        open(os.path.join(out, slug + '.svg'), 'w').write(page(POSTS[slug]))
+        globals().update(keep)
