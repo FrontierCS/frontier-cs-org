@@ -5,6 +5,7 @@ description: "FrontierCS scores solutions on a continuous scale across heterogen
 thumbnail: assets/img/blog-thumbs/evaluation.svg
 og_image: assets/img/2026-02-10-evaluation/preview.png
 
+tags: [FrontierCS, Infrastructure]
 date: 2026-02-10
 date_display: "Feb 10, 2026"
 htmlwidgets: true

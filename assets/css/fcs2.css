@@ -333,6 +333,7 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 /* the two addresses, marked; either link writes to both (Qiuyang, 2026-10-14) */
 .pcontact .mail{white-space:nowrap; color:#0b57d0; font-weight:600; text-decoration:underline; text-decoration-color:#a8c7fa; text-underline-offset:3px}   /* blue text, no ground (Qiuyang, 2026-10-14) */
 .pcontact .mail:hover{text-decoration-color:currentColor}
+.pcontact strong{color:var(--ink); font-weight:600}   /* "both": a score or a question goes to the two addresses together (Qiuyang, 2026-10-17) */
 /* private set: blurred task illustrations under locks (the post card's picture) */
 .locked{display:grid; grid-template-columns:repeat(6, minmax(0,1fr)); gap:6px; margin-top:24px}
 .lk-tile{position:relative; aspect-ratio:3/2; border-radius:8px; overflow:hidden}

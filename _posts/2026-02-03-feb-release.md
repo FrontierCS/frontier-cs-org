@@ -5,6 +5,7 @@ description: We are releasing FrontierCS 1.0, a major update to our open-ended C
 thumbnail: assets/img/blog-thumbs/feb-release.svg
 og_image: assets/img/2026-02-03-feb-release/preview.png
 
+tags: [FrontierCS, Release]
 date: 2026-02-03
 date_display: "Feb 3, 2026"
 htmlwidgets: true

@@ -6,6 +6,7 @@ image: assets/img/2026-06-16-humans-still-beat-ai/human-vs-agent-elo.png
 thumbnail: assets/img/blog-thumbs/humans-still-beat-ai.svg
 og_image: assets/img/2026-06-16-humans-still-beat-ai/human-vs-agent-elo.png
 
+tags: [FrontierCS, Humans vs. AI]
 date: 2026-06-16
 date_display: "June 16, 2026"
 htmlwidgets: true
