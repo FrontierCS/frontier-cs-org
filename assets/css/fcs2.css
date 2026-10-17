@@ -313,6 +313,12 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
   .faq details[open]::details-content{block-size:auto}
 }
 .tbd{color:var(--ink-2); font-size:16px; margin:0}
+/* case studies: one row per post tagged "Case study", ruled like the questions; the title is the link */
+.cases{list-style:none; margin:0; padding:0; border-top:1px solid var(--line); max-width:56em}
+.cases li{display:flex; flex-wrap:wrap; justify-content:space-between; align-items:baseline; gap:6px 32px; padding:16px 0; border-bottom:1px solid var(--line)}
+.cases a{min-width:0; font-size:clamp(18px,1.7vw,21px); font-weight:500; line-height:1.3; color:var(--ink); text-decoration:underline; text-underline-offset:4px; text-decoration-color:var(--line-2)}
+.cases a:hover{color:var(--teal); text-decoration-color:currentColor}
+.cases span{color:var(--ink-2); font-size:16px}
 .pcontact{color:var(--ink-2); font-size:16px; margin:20px 0 40px}   /* under the leaderboard bars, room before the next chart */
 /* the two addresses, marked; either link writes to both (Qiuyang, 2026-10-14) */
 .pcontact .mail{white-space:nowrap; color:#0b57d0; font-weight:600; text-decoration:underline; text-decoration-color:#a8c7fa; text-underline-offset:3px}   /* blue text, no ground (Qiuyang, 2026-10-14) */

@@ -163,7 +163,12 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
 
 <section class="sec" id="cases">
   <h2>Case studies</h2>
-  <p class="tbd">Case studies of single runs from the preview will appear here.</p>
+  {%- assign cases = site.posts | where_exp: "p", "p.tags contains 'Case study'" %}
+  <ul class="cases">
+    {%- for p in cases %}
+    <li><a href="{{ p.url | relative_url }}">{{ p.title }}</a><span>{{ p.case.task }}, {{ p.case.model }}, {{ p.date | date: "%B %-d, %Y" }}</span></li>
+    {%- endfor %}
+  </ul>
 </section>
 
 <section class="sec" id="private">
