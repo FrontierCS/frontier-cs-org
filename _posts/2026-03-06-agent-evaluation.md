@@ -4,6 +4,7 @@ title: Evaluating Evolving Agent Systems at Scale with FrontierCS
 description: "Evolving agent systems are advancing fast, but evaluation hasn't kept up. We show how FrontierCS enables comprehensive, large-scale benchmarking of evolving agents—moving beyond small case studies for comparison at scale."
 thumbnail: assets/img/blog-thumbs/agent-evaluation.svg
 
+tags: [FrontierCS, Agents]
 date: 2026-03-10
 date_display: "Mar 10, 2026"
 og_image: assets/img/2026-03-06-agent-evaluation/result.png   # link previews need a raster image

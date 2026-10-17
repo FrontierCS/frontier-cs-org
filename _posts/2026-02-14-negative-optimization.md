@@ -5,6 +5,7 @@ description: "Modern LLMs claim superhuman algorithmic abilities, but what happe
 thumbnail: assets/img/blog-thumbs/negative-optimization.svg
 og_image: assets/img/2026-02-14-negative-optimization/preview.png
 
+tags: [FrontierCS, Analysis]
 date: 2026-02-26
 date_display: "Feb 26, 2026"
 htmlwidgets: true
