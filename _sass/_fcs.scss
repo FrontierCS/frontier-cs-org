@@ -1504,12 +1504,13 @@ footer.foot { margin-top: 120px; padding: 56px 0 28px; background: #202124; colo
 .pill { display: inline-flex; align-items: center; gap: 8px; background: #d3e3fd; color: #041e49; border-radius: 50px; font-weight: 600; font-size: 14px; padding: 7px 14px; }
 .pill:hover { background: #c2d7fb; }
 /* post tags (owner, 2026-10-17): small tonal pills that open the tag's page, in the article header, the blog list and the
-   keep-reading tiles. The first tag names the project and takes the pill's blue; the others are a neutral grey. */
+   keep-reading tiles. The first tag names the project and takes the pill's blue; the others are a neutral grey. Two classes
+   deep, so the article's link rule (.ar-main a) does not reach them. */
 .ptags { display: inline-flex; flex-wrap: wrap; gap: 6px; }
-.ptag { display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 12px; background: #e9eef6; color: #444746; font-family: var(--font-sans); font-size: 12.5px; font-weight: 600; letter-spacing: .01em; line-height: 1; white-space: nowrap; text-decoration: none; transition: background-color .15s; }
-.ptag:hover { background: #dde3ea; color: #1f1f1f; }
-.ptag.lead { background: #d3e3fd; color: #041e49; }
-.ptag.lead:hover { background: #c2d7fb; }
+.ptags .ptag { display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border: 0; border-radius: 12px; background: #e9eef6; color: #444746; font-family: var(--font-sans); font-size: 12.5px; font-weight: 600; letter-spacing: .01em; line-height: 1; white-space: nowrap; text-decoration: none; transition: background-color .15s; }
+.ptags .ptag:hover { background: #dde3ea; color: #1f1f1f; }
+.ptags .ptag.lead { background: #d3e3fd; color: #041e49; }
+.ptags .ptag.lead:hover { background: #c2d7fb; }
 .tagbox { border: 1px solid #a8c7fa; border-radius: 2px; padding: 3px 9px; font-weight: 500; color: var(--ink-2); background: #fff; }
 .dotdate { display: inline-flex; align-items: center; gap: 7px; } .dotdate i { width: 11px; height: 11px; border-radius: 50%; background: var(--ink-3); }
 .fc-feature-cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; margin-top: 44px; }
