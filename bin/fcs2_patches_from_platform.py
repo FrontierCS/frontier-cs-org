@@ -2,6 +2,7 @@
 """Export every leaderboard run's final patch, one JSON file per task: assets/patches/<slug>.json, read by the task page.
 
 usage: python3 bin/fcs2_patches_from_platform.py [out_dir] [--api=http://127.0.0.1:18080/api/v1/] [--models=opus,astra|all]
+       python3 bin/fcs2_patches_from_platform.py --export=DIR --out=FILE
 
 Read-only on the platform API. The evaluations are the ones bin/fcs2_db_from_platform.py takes (formal, 47 runs or more,
 not archived, latest per model), named through the TASK and MODEL maps of bin/fcs2_runs_from_db.py. For each run the patch
@@ -10,6 +11,9 @@ is the submission the platform judged (the run's default submission): its eviden
 bytes is cut there and marked; its line counts are of the whole patch.
 Only Claude Opus 5.5 by default (owner, 2026-10-14): task versions still change and other models' runs on a task may be of
 earlier versions, so the site shows one model's patches until the runs settle; --models= takes model ids, or all.
+--export=DIR reads one run's final submission that Codex exported from the platform instead (Qiuyang, 2026-10-17: patches
+go through Codex): DIR/solution.patch, DIR/run-before.json and DIR/default-submission.json. It writes FILE in the same
+format, one run, for a page outside the task pages (a case study).
 """
 import ast, io, json, pathlib, re, subprocess, sys, tarfile, urllib.request
 from concurrent.futures import ThreadPoolExecutor
@@ -56,18 +60,35 @@ def patch_of(run):
         m = next(m for m in t.getmembers() if m.isfile() and m.name.endswith('.patch'))
         return s.get('label') or s['id'], t.extractfile(m).read().decode('utf-8', 'replace')
 
+def record(rec, label, patch):
+    """A run's record with its patch: files, line counts, size, and the text, cut at CAP bytes."""
+    lines = patch.splitlines()
+    files = [l.split(' b/', 1)[-1] for l in lines if l.startswith('diff --git ')]
+    add = sum(l.startswith('+') and not l.startswith('+++') for l in lines); rem = sum(l.startswith('-') and not l.startswith('---') for l in lines)
+    big = len(patch.encode()) > CAP
+    return {**rec, 'submission': label, 'files': files, 'add': add, 'del': rem, 'bytes': len(patch.encode()),
+            'truncated': big, 'patch': patch.encode()[:CAP].decode('utf-8', 'ignore') if big else patch}
+
 def one(job):
     key, mid, run = job
     try: label, patch = patch_of(run)
     except Exception as x: label, patch = None, f'not exported ({type(x).__name__})'
     rec = {'run': run['run_id'], 'verdict': run.get('verdict'), 'score': run.get('score')}
     if label is None: return key, mid, {**rec, 'missing': patch}
-    lines = patch.splitlines()
-    files = [l.split(' b/', 1)[-1] for l in lines if l.startswith('diff --git ')]
-    add = sum(l.startswith('+') and not l.startswith('+++') for l in lines); rem = sum(l.startswith('-') and not l.startswith('---') for l in lines)
-    big = len(patch.encode()) > CAP
-    return key, mid, {**rec, 'submission': label, 'files': files, 'add': add, 'del': rem, 'bytes': len(patch.encode()),
-                      'truncated': big, 'patch': patch.encode()[:CAP].decode('utf-8', 'ignore') if big else patch}
+    return key, mid, record(rec, label, patch)
+
+EXPORT = next((a.split('=', 1)[1] for a in sys.argv[1:] if a.startswith('--export=')), None)
+if EXPORT:
+    d = pathlib.Path(EXPORT); run = json.loads((d / 'run-before.json').read_text()); sub = json.loads((d / 'default-submission.json').read_text())
+    if sub['id'] != 'final' or sub['run_id'] != run['id']: sys.exit(f'{d}: not the final submission of {run["id"]}')
+    key, mid = TASK[run['task_name']][1], MODEL[run['candidate_name']][0]
+    rec = record({'run': run['id'], 'verdict': run.get('verdict'), 'score': run.get('score')}, sub.get('label') or sub['id'], (d / 'solution.patch').read_text())
+    out = pathlib.Path(next(a.split('=', 1)[1] for a in sys.argv[1:] if a.startswith('--out=')))
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps({'task': key, 'generated_at': datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%MZ'), 'runs': {mid: rec}},
+                              ensure_ascii=False, separators=(',', ':')))
+    print(f"{out}: {key}, {mid}, {len(rec['files'])} files, +{rec['add']} -{rec['del']}, {rec['bytes']} bytes")
+    sys.exit()
 
 evs = {}
 for e in sorted(evaluations(), key=lambda e: e['created_at']):
