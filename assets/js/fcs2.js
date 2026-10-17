@@ -209,14 +209,8 @@ function drawECI() {
    a model's final FCI until another model passes it; the rest of every curve is faint (TTS_FADE), in full again while the
    pointer is on it or its legend entry. */
 let ttsHover = null, ttsRun = 0;
-<<<<<<< HEAD
 const TTS_FADE = .2;   // Qiuyang: .25 too strong, .14 too light
 const TTSM = RANKED.filter(m => SCALE[m.id]);   // a model with no reported spend has no curve
-=======
-const TTS_KEY = new Set(['opus', 'ds']), TTS_FADE = .3;   // the two curves in full colour (owner, 2026-10-17)
-// a model with no reported spend has no curve; of each lab only the model with the highest FCI (RANKED is in FCI order)
-const TTSM = RANKED.filter(m => SCALE[m.id]).filter((m, i, a) => a.findIndex(o => o.lab === m.lab) === i);
->>>>>>> origin/redesign
 const ttsOn = new Set(TTSM.map(m => m.id));
 // The overview keeps each lab's colour, so two models of one lab share it (Astra and Sol, both Muse, both GLM). Qiuyang drew
 // the lab's second model dashed; the owner rejected dashes (2026-10-17), so the set is empty and the names tell them apart
@@ -296,8 +290,7 @@ function drawTTS(t) {
   if (brk) brk = [brk[0] + .1, brk[1] - .1];
   const GU = .12, U = lx => !brk || lx <= brk[0] ? lx : lx >= brk[1] ? lx - (brk[1] - brk[0]) + GU : brk[0] + (lx - brk[0]) / (brk[1] - brk[0]) * GU;
   const ytop = Math.max(...all.map(p => p[3])), ystep = eciStep(ytop, narrow ? 4 : 5), ymax = Math.ceil(ytop / ystep) * ystep;   // about five steps from 0, whatever the scale's unit
-  // only Claude Opus 5.5 and DeepSeek V4.1 Flash in full colour, drawn last so they sit on top; the rest translucent (owner, 2026-10-17)
-  const ms = [...TTSM].reverse().filter(m => ttsOn.has(m.id)).sort((a, b) => TTS_KEY.has(a.id) - TTS_KEY.has(b.id)), cs = ms.map(m => ttsCurve(m.id));
+  const ms = [...TTSM].reverse().filter(m => ttsOn.has(m.id)), cs = ms.map(m => ttsCurve(m.id));
   const play = t < 1, sweep = play ? ttsSweep(cs, x0, x1, ttsEase(t)) : x1;
   const vx1 = play ? Math.min(x1, Math.max(x0 + 1.1, sweep + .45)) : x1;   // the view: at least a decade wide, just past the cursor
   const X = v => L + (U(Math.log10(v)) - U(x0)) / (U(vx1) - U(x0)) * (W - L - R), Y = v => T + (1 - v / ymax) * (H - T - B);
@@ -326,11 +319,7 @@ function drawTTS(t) {
   ms.forEach((m, k) => {
     const c = cs[k], vis = viss[k];
     if (!vis.length) return;
-<<<<<<< HEAD
     const op = TTS_FADE;   // the frontier, drawn below, is the full line
-=======
-    const lit = !anyRising || rising(c), op = !lit ? .28 : TTS_KEY.has(m.id) ? null : TTS_FADE;
->>>>>>> origin/redesign
     const path = vis.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join('');
     if (!play) gb.append(sv('path', {class:'tband', 'data-m':m.id, opacity:0, fill:MCOL[m.id],
       d:c.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[3]).toFixed(1)}`).join('') + [...c].reverse().map(p => `L${X(p[0]).toFixed(1)},${Y(p[2]).toFixed(1)}`).join('') + 'Z'}));
@@ -381,17 +370,9 @@ function drawTTS(t) {
   if (tips.length) {
     const fr = {l:L, r:W, t:T, b:H - B}, boxes = tips.map(({e}) => ({x:X(e[0]) - 7, y:Y(e[1]) - 7, w:14, h:14})), near = [];
     gl.querySelectorAll('path').forEach(el => { const n = el.getTotalLength(); for (let l = 0; l <= n; l += 6) { const q = el.getPointAtLength(l); near.push({x:q.x - 2, y:q.y - 2, w:4, h:4}); } });
-<<<<<<< HEAD
-    tips.sort((a, b) => b.e[1] - a.e[1]).forEach(({m, e}) => { const both = boxes.concat(near), name = narrow ? m.short : m.name;
-      if (labelDot(svg, both, X(e[0]), Y(e[1]), name, fr, MTXT(m.id), false)) boxes.push(both[both.length - 1]);
-      else labelDot(svg, boxes, X(e[0]), Y(e[1]), name, fr, MTXT(m.id), false); });
-=======
-    tips.sort((a, b) => b.e[1] - a.e[1]).forEach(({m, e}) => { const both = boxes.concat(near), name = m.name;   // names are never shortened, phones included
-      const n0 = svg.childElementCount;
+    tips.sort((a, b) => b.e[1] - a.e[1]).forEach(({m, e}) => { const both = boxes.concat(near), name = m.name;   // names are never shortened, phones included (from b9661b0)
       if (labelDot(svg, both, X(e[0]), Y(e[1]), name, fr, MTXT(m.id), false, true)) boxes.push(both[both.length - 1]);
-      else labelDot(svg, boxes, X(e[0]), Y(e[1]), name, fr, MTXT(m.id), false, true);
-      if (!TTS_KEY.has(m.id) && svg.childElementCount > n0) svg.lastElementChild.style.opacity = .6; });   // a translucent curve's name lighter too
->>>>>>> origin/redesign
+      else labelDot(svg, boxes, X(e[0]), Y(e[1]), name, fr, MTXT(m.id), false, true); });
   }
   // the legend's bars, on the chart's y scale: each curve's tip, so the model's FCI at rest and its FCI at the cursor while
   // the chart plays; a hidden model keeps its FCI, greyed (Qiuyang)
