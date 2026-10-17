@@ -237,7 +237,7 @@ const MTXT = id => `color-mix(in srgb, ${MCOL[id]} 78%, #000)`;
    Claude Opus 5.5 is "Opus 5.5") before it moves a line or two away; a label is dropped only when neither form fits
    anywhere. A placed label wears fill, its dot's colour darkened to read on white, so a crowded patch still pairs each
    name with its dot, and is bold for a lead dot. Returns whether it was placed. */
-function labelDot(svg, boxes, cx, cy, name, frame, fill, bold, whole) {   // whole: never fall back to the short form of the name
+function labelDot(svg, boxes, cx, cy, name, frame, fill, bold) {
   const lab = sv('text', {class:'lab halo', x:cx, y:cy}, name); svg.append(lab);
   let w = lab.getComputedTextLength() + 2;
   const spots = [[cx + 12, cy + 4.5, 'start'], [cx - 12, cy + 4.5, 'end'], [cx, cy - 13, 'middle'], [cx, cy + 22, 'middle'],
@@ -246,7 +246,7 @@ function labelDot(svg, boxes, cx, cy, name, frame, fill, bold, whole) {   // who
     [cx, cy - 49, 'middle'], [cx, cy + 58, 'middle'], [cx - 6, cy - 47, 'end'], [cx - 6, cy + 56, 'end']];
   const box = ([x, y, an]) => ({x:an === 'start' ? x : an === 'end' ? x - w : x - w / 2, y:y - 11, w, h:14});   // the glyphs' own height, so a label can sit beside its dot in a tight cluster
   const hit = q => boxes.some(o => q.x < o.x + o.w && o.x < q.x + q.w && q.y < o.y + o.h && o.y < q.y + q.h) || q.x < frame.l || q.x + q.w > frame.r || q.y < frame.t || q.y + q.h > frame.b;
-  const tight = !whole && /^\S+ (\S+ \d[\d.]*)$/.exec(name), forms = tight ? [name, tight[1]] : [name];
+  const tight = /^\S+ (\S+ \d[\d.]*)$/.exec(name), forms = tight ? [name, tight[1]] : [name];
   let spot;
   for (const [str, from] of [...forms.map(f => [f, spots.slice(0, 8)]), ...forms.map(f => [f, spots])]) {
     lab.textContent = str; w = lab.getComputedTextLength() + 2; spot = from.find(sp => !hit(box(sp))); if (spot) break; }
