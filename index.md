@@ -165,7 +165,9 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
   {%- assign cases = site.posts | where_exp: "p", "p.tags contains 'Case study'" %}
   <ul class="cases">
     {%- for p in cases %}
-    <li><a href="{{ p.url | relative_url }}">{{ p.title }}</a><span>{{ p.case.task }}, {{ p.case.model }}, {{ p.date | date: "%B %-d, %Y" }}</span></li>
+    <li>{% if p.thumbnail %}<a class="cth" href="{{ p.url | relative_url }}" tabindex="-1" aria-hidden="true"><img src="{{ p.thumbnail | relative_url }}" alt=""></a>{% endif %}
+      <div class="ctx"><a class="ctt" href="{{ p.url | relative_url }}">{{ p.title }}</a>{% if p.case.summary %}<p>{{ p.case.summary }}</p>{% endif %}<span class="cmt">{{ p.case.task }}, {{ p.case.model }}, {{ p.date | date: "%B %-d, %Y" }}</span></div>
+      {%- if p.case.result %}<div class="cres"><b>{{ p.case.result }}</b><span>{{ p.case.result_note }}</span></div>{% endif %}</li>
     {%- endfor %}
   </ul>
 </section>

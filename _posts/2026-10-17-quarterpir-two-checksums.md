@@ -7,6 +7,10 @@ tags: [FrontierCS 2, Case study]
 case:
   task: QuarterPIR
   model: Muse Wonder 1.0
+  # the overview's Case studies row (owner, 2026-10-17): a one-line summary and the key result beside the thumbnail
+  summary: "QuarterPIR lets a client read a database without revealing what it reads. Muse Wonder 1.0 cut its bytes per lookup by 27%, with privacy unchanged."
+  result: "27% fewer"
+  result_note: "bytes per lookup than the human reference, 1,760 to 1,280"
 
 date: 2026-10-17
 date_display: "October 17, 2026"
