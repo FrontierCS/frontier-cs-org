@@ -71,8 +71,10 @@ draws); Epoch's code raises when a draw puts the anchors in the wrong order, and
 
 Test-time scaling (SCALE): the same model with every task's parameters held at the leaderboard fit (Qiuyang,
 2026-10-14). At a budget B of US$ (usd() below), a run that has ended within B (its spend at the end is at most B)
-contributes its metric groups and, if it passed, its margin; a run still going contributes no group beaten and no
-margin. FCI(model, B) is the strength that maximises the model's likelihood under the same prior, so it equals the
+contributes its metric groups and its margin; a run still going is scored as if it timed out at B, as a timeout scores 0:
+no group beaten, and with a reference a final score of 0, its margin counted as it is (Qiuyang, 2026-10-16; before, it
+counted no margin, so a run that ended below the reference could pull a curve down). A run's evidence then only improves
+as B grows, and the likelihood is monotone in it, so a curve never falls. FCI(model, B) is the strength that maximises the model's likelihood under the same prior, so it equals the
 leaderboard FCI at full budget; it is mapped with the leaderboard's theta of PASS_ZERO. Its 90% interval resamples the
 model's tasks (SCALE_BOOT draws, task parameters held).
 
@@ -277,7 +279,7 @@ def metric_tasks(obs, ref, PB):
             O, w = (np.column_stack([G, np.where(ok | below, y, 0.0), np.where(ok | below, 0.0, np.where(above, 1.0, 2.0))]),
                     np.array([win(o[3], ref[t]) for o in rs]))
         out[t] = {'stems': stems, 'Z': Z, 'groups': groups, 'models': [o[0] for o in rs], 'O': O, 'k': len(groups),
-                  'np': len(groups) + (t in ref), 'share': share, 'wins': w, 'unit': unit}
+                  'np': len(groups) + (t in ref), 'share': share, 'wins': w, 'unit': unit, 'ref': ref.get(t)}
     return out, unit0
 
 
@@ -581,7 +583,8 @@ def theta_at(items, counts, hyp):
     raise ArithmeticError('theta_at did not converge')
 
 
-notyet = lambda o, k: np.r_[np.zeros(k), [0.0, 2.0]] if len(o) > k else np.zeros(k)   # no group beaten, no margin
+# a run still going at a budget, scored as if it timed out there: no group beaten and, with a reference, a final score of 0
+notyet = lambda T: np.r_[np.zeros(T['k']), [-T['ref'] / T['unit'], 0.0]] if T['ref'] is not None else np.zeros(T['k'])
 
 
 refused = lambda fj: bool(fj) and bool(json.loads(fj).get('refusal'))   # bin/fcs2_db_from_platform.py marks a provider refusal
@@ -590,7 +593,8 @@ refused = lambda fj: bool(fj) and bool(json.loads(fj).get('refusal'))   # bin/fc
 def scaling(db, tasks, hyp, theta0):
     """{model id: [[US$ budget, FCI, 90% low, 90% high, share of runs still going], ...]}; spend from usd(). The joint
     model with every task's parameters held at the leaderboard fit: at budget B a run that has ended contributes its
-    metric groups and, if it passed, its margin; a run still going contributes no group beaten and no margin."""
+    metric groups and its margin; a run still going is scored as a timeout at B (notyet): no group, a final score of 0.
+    Each curve is checked to never fall."""
     info = {r: (c, t) for r, c, t, s, fj in db.execute('''select r.id, cd.name, t.name, r.display_score, r.feedback_json from cells ce
         join runs r on r.id = ce.run_id join candidates cd on cd.id = ce.candidate_id join tasks t on t.id = ce.task_id''') if s is not None and c not in HIDDEN and not refused(fj) and TASK[t][0] not in OFF_FIT_DOMAINS}
     pts = {(r, sid): (tt, ot) for r, sid, tt, ot in db.execute('select run_id, submission_id, total_tokens, output_tokens from score_points')}
@@ -606,11 +610,13 @@ def scaling(db, tasks, hyp, theta0):
         rng, curve = np.random.default_rng(3), []
         # budgets are rounded up to the stored precision before use, so each point is exact at its stored budget
         for B in np.ceil(np.geomspace(1e-3, max(ends), SCALE_POINTS) * 1e5) / 1e5:
-            items = [(tasks[t]['x'], O[t] if end.get(runs[t], 0) <= B else notyet(O[t], tasks[t]['k']), tasks[t]['k']) for t in tl]
+            items = [(tasks[t]['x'], O[t] if end.get(runs[t], 0) <= B else notyet(tasks[t]), tasks[t]['k']) for t in tl]
             counts = np.array([np.ones(len(tl))] + [np.bincount([tl.index(t) for t in rng.choice(tl, len(tl))], minlength=len(tl)) for _ in range(SCALE_BOOT)])
             v = on_scale(theta_at(items, counts, hyp), theta0)
             lo, hi = np.percentile(v[1:], [5, 95])
             curve.append([float(B), round(float(v[0]), DEC), round(float(lo), DEC), round(float(hi), DEC), round(float(np.mean([e > B for e in ends])), 2)])
+        drop = max([a[1] - b[1] for a, b in zip(curve, curve[1:])] + [0])
+        assert drop <= 10 ** -DEC, f'{MODEL[c][0]}: test-time FCI falls by {drop} between budgets'
         out[MODEL[c][0]] = curve
     return out
 
@@ -784,7 +790,7 @@ block = (f'// One entry per scored run in the preview results database of {when:
          f"// Pass rate per model: [percent, runs that pass, runs].\nconst PASS = {json.dumps(pass_rate(runs))};\n"
          f"// FCI per model: [point, 90% low, 90% high, tasks], from the model that also gives FDI: every run's metric groups and how far its final score is from the human reference (a run that does not pass counts at most as level), in units of the task's score spread (at least the median spread over tasks), with a run effect shared by both and a strength prior N(0, 1/{LAM:g}), every model a respondent ({zero} too); FCI = {PASS_ZERO_VALUE:g} + {PASS_UNIT:g} x (strength - {zero}'s strength), strengths in logits (ECI_LOW, ECI_LOW_VALUE, ECI_UNIT); the interval resamples tasks and refits ({BOOT} bootstrap draws).\n"
          f"const ECI = {json.dumps(eci_js)};\nconst ECI_LOW = '{MODEL[PASS_ZERO][0]}', ECI_LOW_NAME = '{zero}', ECI_LOW_VALUE = {PASS_ZERO_VALUE:g}, ECI_UNIT = {PASS_UNIT:g};\n"
-         f"// Test-time scaling per model: [US$ budget per run, FCI, 90% low, 90% high, share of runs still going]; at a budget a run that has ended counts its metric groups and its margin (at most level if it did not pass); a run still going counts no group and no margin; task parameters held at the FCI fit (see the converter's docstring).\nconst SCALE = {json.dumps(SC, separators=(',', ':'))};\n"
+         f"// Test-time scaling per model: [US$ budget per run, FCI, 90% low, 90% high, share of runs still going]; at a budget a run that has ended counts its metric groups and its margin (at most level if it did not pass); a run still going counts as timed out at the budget (no group, final score 0), so a curve never falls; task parameters held at the FCI fit (see the converter's docstring).\nconst SCALE = {json.dumps(SC, separators=(',', ':'))};\n"
          f"// Cost per model: [mean US$ per scored run, runs]; output tokens x output price + every token x cache-read price (PRICE above).\nconst COST = {json.dumps(CO)};\nconst PRICE = {json.dumps(PRICE)};\n"
          f"// Every scored run: [model, task, final score, passed, US$ at end, hours, [[US$, dev score] per development submission]].\nconst TRAJ = {json.dumps(trajectories(db), separators=(',', ':'), ensure_ascii=False)};\n"
          f"// Per task: the authors' reference score, the median over the task's runs; where the database has none, the converter's REF_DEFAULT (" + ', '.join(f'{k}: {v:g}' for k, v in REF_DEFAULT.items()) + f"), else the task is left out.\nconst REF = {json.dumps(REF, ensure_ascii=False)};\n"

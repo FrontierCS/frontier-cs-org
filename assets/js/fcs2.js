@@ -193,9 +193,9 @@ function drawECI() {
 
 /* Test-time scaling: the FCI a model would have if every run stopped at a US$ budget (SCALE, from
    bin/fcs2_runs_from_db.py); a run that has ended within the budget counts what it beat, and a run still going counts
-   as beating nothing (Qiuyang, 2026-10-14). Straight segments and one legend (owner, 2026-10-13).
-   Every model with reported spend is in the legend; at first only each lab's model with the highest FCI is drawn and the
-   others are greyed in the legend; a click on an entry shows or hides its curve (owner, 2026-10-14). A model's 90% band
+   as if it timed out there, so no curve falls (Qiuyang, 2026-10-16). Straight segments and one legend (owner, 2026-10-13).
+   Only each lab's model with the highest FCI is in the chart and the legend (owner, 2026-10-16: no Pareto frontier, no
+   line that changes colour, one model per lab); a click on a legend entry shows or hides its curve (owner, 2026-10-14). A model's 90% band
    shows only while the pointer is on its curve or its legend entry (owner, 2026-10-13: no bands otherwise).
    Each curve starts at its first budget on the scale, FCI 0 or more, as a plain line with no start mark (owner, 2026-10-14; Qiuyang: the
    values under 0 drew every curve in from the bottom edge as a comb of near-vertical strokes). When the chart first comes
@@ -204,8 +204,9 @@ function drawECI() {
    widening to the whole range; curves rising at the cursor are drawn in full and named at their tip while the others
    step back. At rest nothing is named in the plot: the legend names the curves. */
 let ttsHover = null, ttsRun = 0;
-const TTSM = RANKED.filter(m => SCALE[m.id]);   // a model with no reported spend has no curve
-const ttsOn = new Set(TTSM.filter((m, i, a) => a.findIndex(o => o.lab === m.lab) === i).map(m => m.id));
+// a model with no reported spend has no curve; of each lab only the model with the highest FCI (RANKED is in FCI order)
+const TTSM = RANKED.filter(m => SCALE[m.id]).filter((m, i, a) => a.findIndex(o => o.lab === m.lab) === i);
+const ttsOn = new Set(TTSM.map(m => m.id));
 const ttsBands = () => document.querySelectorAll('#ttssvg .tband').forEach(b => b.setAttribute('opacity', b.dataset.m === ttsHover ? .12 : 0));
 const ttsCurve = id => SCALE[id].filter(p => p[1] >= 0);   // [US$, FCI, 90% low, 90% high, share still going], from FCI 0 up
 // a curve up to log budget lx, ending on the point interpolated there
