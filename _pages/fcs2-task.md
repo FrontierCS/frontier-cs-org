@@ -3,7 +3,7 @@ layout: default
 title: FrontierCS 2 tasks
 description: One FrontierCS 2 task at a time, the paper it starts from, what the agent must write back, and the score of every run on it.
 permalink: /task/
-page_css: fcs2
+page_css: [fcs2, fcs2-patch]
 ---
 <div class="fcs2 taskpage">
 <div class="col" id="main" tabindex="-1">
@@ -29,4 +29,5 @@ page_css: fcs2
 <script defer src="{{ '/assets/js/fcs2-checks.js' | relative_url }}"></script>
 <script defer src="{{ '/assets/js/fcs2-metrics.js' | relative_url }}"></script>
 <script defer src="{{ '/assets/js/fcs2-solutions.js' | relative_url }}"></script>
+<script defer src="{{ '/assets/js/fcs2-patch.js' | relative_url }}"></script>
 <script defer src="{{ '/assets/js/fcs2-task.js' | relative_url }}"></script>
