@@ -46,7 +46,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
     <div class="plot" id="pcplot"><svg id="pcsvg" role="img" aria-label="Pass rate (beat reference) against cost per run"></svg><div class="tip" id="pctip" hidden></div></div>
     <div class="cfoot">{% include chart_logo.html %}</div>
   </figure>
-  <p class="pcontact">To add your model, email its score on every task to both <a class="mail" href="mailto:qmang@berkeley.edu,wenhao.chai@princeton.edu">qmang@berkeley.edu</a> and <a class="mail" href="mailto:qmang@berkeley.edu,wenhao.chai@princeton.edu">wenhao.chai@princeton.edu</a>.</p>
+  <p class="pcontact">To add your model, email its score on every task to <strong>both</strong> <a class="mail" href="mailto:qmang@berkeley.edu,wenhao.chai@princeton.edu">qmang@berkeley.edu</a> and <a class="mail" href="mailto:qmang@berkeley.edu,wenhao.chai@princeton.edu">wenhao.chai@princeton.edu</a>.</p>
 
   <details class="tbl-wrap fold" id="domains">
     <summary><h3>Pass rate by domain</h3></summary>
@@ -172,7 +172,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
   <h2>Private set</h2>
   <p class="tbd">Tasks and domains we don’t release.</p>
   <div class="locked" id="locked" aria-hidden="true"></div>
-  <p class="pcontact">For questions about the private set, email both <a class="mail" href="mailto:qmang@berkeley.edu,wenhao.chai@princeton.edu">qmang@berkeley.edu</a> and <a class="mail" href="mailto:qmang@berkeley.edu,wenhao.chai@princeton.edu">wenhao.chai@princeton.edu</a>.</p>
+  <p class="pcontact">For questions about the private set, email <strong>both</strong> <a class="mail" href="mailto:qmang@berkeley.edu,wenhao.chai@princeton.edu">qmang@berkeley.edu</a> and <a class="mail" href="mailto:qmang@berkeley.edu,wenhao.chai@princeton.edu">wenhao.chai@princeton.edu</a>.</p>
 </section>
 
 <section class="sec" id="sponsors">
