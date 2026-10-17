@@ -429,8 +429,82 @@ function drawTable() {
   $('#restbl').innerHTML = head + rows;
 }
 
+/* ---------- every run: a kebab (Qiuyang, 2026-10-16), named a kebab rather than Terminal-Bench's waffle: each cell is one skewer of squares ----------
+   In the Tasks section, under its List / Kebab switch (Qiuyang, 2026-10-16: the kebab belongs with the tasks): one row per task
+   the section's domain filter and search pick, in its order, hardest first to begin with (Qiuyang); one column per model in FCI order. A cell
+   holds one square per metric the task checks: dark when the run's final submission beat the human reference on every hidden
+   workload, grey when it did not, so a run passes when all its squares are dark. The counts are PASSBY's (fcs2-checks.js),
+   summed per metric as the converter sums them. A run that failed or was refused (STATE) takes that colour on all its squares;
+   a run that timed out shows its metrics like any other (Qiuyang: no timeout state). A task's squares keep one order in every column, the metric the most runs beat first. */
+const KSTATE = {failed:['fa', 'Run failed', 'The run failed'],
+  refused:['rf', 'Refused by the model provider', 'The model provider refused the task: left out of FCI and FDI'], unscored:['un', 'Not scored yet', 'Not scored yet']};
+function drawKebab(ts) {
+  const st = typeof STATE === 'undefined' ? {} : STATE, used = new Set();
+  const tasks = ts.filter(t => RAN.has(t));
+  const cells = [];
+  const body = tasks.map(t => {
+    // per model, per metric: [hidden workloads beaten, in all]; 'dev/' keys are development workloads, not judged
+    const per = Object.fromEntries(RANKED.map(m => { const agg = {};
+      for (const [k, [b, n]] of Object.entries((PASSBY[t] || {})[m.id] || {})) { if (k.startsWith('dev/')) continue;
+        const j = k.slice(k.lastIndexOf('/') + 1), a = agg[j] ||= [0, 0]; a[0] += b; a[1] += n; }
+      return [m.id, agg]; }));
+    const won = (m, j) => { const a = per[m][j]; return !!a && a[1] > 0 && a[0] === a[1]; };
+    const order = CHECKS[t] ? CHECKS[t].metrics : [];
+    const stems = [...new Set([...order, ...RANKED.flatMap(m => Object.keys(per[m.id]))])];
+    const nwon = j => RANKED.filter(m => won(m.id, j)).length;
+    stems.sort((a, b) => nwon(b) - nwon(a) || order.indexOf(a) - order.indexOf(b));
+    const tds = RANKED.map(m => {
+      const run = RUNS.find(r => r.t === t && r.m === m.id), s = (st[t] || {})[m.id];
+      if (!run && !s) return '<td></td>';
+      const k = stems.filter(j => won(m.id, j)).length, n = stems.length;
+      let html = `<b>${esc(m.name)}</b><br>${esc(NAME(t))}<br>`;
+      // a failed run shows the platform's final score, 0 for most but not all (Qiuyang, 2026-10-16)
+      if (s) { used.add(s); html += KSTATE[s][2] + (s === 'failed' && run ? `<br>Final score ${f1(run.s)}` : ''); }
+      else html += (k === n ? `<b>Passes</b>: beats ${n === 1 ? 'its one metric' : `all ${n} metrics`}` : `Beats ${k} of ${n} metric${n === 1 ? '' : 's'}`)
+        + `<br>Final score ${f1(run.s)}${REF[t] != null ? `, human reference ${f1(REF[t])}` : ''}`;
+      cells.push(html);
+      return `<td data-i="${cells.length - 1}"><span class="sqs" style="max-width:${(n <= 4 ? n : Math.ceil(n / 2)) * 12 - 3}px">${stems.map(j => `<i class="${s ? KSTATE[s][0] : won(m.id, j) ? 'y' : 'n'}"></i>`).join('')}</span></td>`;
+    }).join('');
+    return `<tr><td class="kt"><a href="${esc(taskHref(t))}">${esc(NAME(t))}</a></td><td class="kf">${FDI[t] != null ? fe(FDI[t]) : '–'}</td>${tds}</tr>`;
+  }).join('');
+  $('#kebtbl').innerHTML = `<colgroup><col class="kt"><col class="kf">${RANKED.map(() => '<col>').join('')}</colgroup>`
+    + `<thead><tr><th class="kt">Task</th><th class="kf">FDI</th>${RANKED.map(m => `<th class="km">${LOGO[m.lab] ? `<img class="lg" src="${LOGO_DIR + LOGO[m.lab]}.svg" alt="" width="14" height="14">` : ''}<span class="nm">${esc(m.name)}</span></th>`).join('')}</tr></thead>`
+    + `<tbody>${body || `<tr><td class="kempty" colspan="${RANKED.length + 2}">No task matches. Clear the filter or try another word.</td></tr>`}</tbody>`;
+  $('#keblegend').innerHTML = [['y', 'Beaten on every hidden workload'], ['n', 'Not beaten'], ...Object.entries(KSTATE).filter(([k]) => used.has(k)).map(([, v]) => v)]
+    .map(([c, l]) => `<span><i class="${c}"></i>${l}</span>`).join('');
+  const box = $('#kebplot'), tip = $('#kebtip');
+  const show = ev => { const td = ev.target.closest && ev.target.closest('td[data-i]'); if (!td) { tip.hidden = true; return; }
+    const rc = td.getBoundingClientRect(), pr = box.getBoundingClientRect();
+    tip.innerHTML = cells[td.dataset.i]; tip.hidden = false; tip.style.left = (rc.left + rc.width / 2 - pr.left) + 'px'; tip.style.top = (rc.top - pr.top + 4) + 'px'; };
+  box.onpointermove = box.onpointerdown = show;
+  box.onpointerleave = () => { if (!isTouch) tip.hidden = true; };
+  $('#kebscroll').onscroll = () => { tip.hidden = true; };
+  fitKebab();
+}
+// the Tasks section's view, its list or the kebab (Qiuyang, 2026-10-16); #kebab in the address opens the kebab
+let tview = 'list';
+function tView(v) {
+  tview = v; [...$('#tview').children].forEach(c => c.setAttribute('aria-pressed', String(c.dataset.v === v)));
+  $('#tasks .idx').classList.toggle('kv', v === 'kebab'); $('#kebab').hidden = v !== 'kebab';
+  drawRows();
+}
+$('#tview').addEventListener('click', e => { const b = e.target.closest('button'); if (b && b.dataset.v !== tview) tView(b.dataset.v); });
+// the table scrolls sideways only when it does not fit, since a scrolling box would keep its header from sticking under the section bar
+function fitKebab() {
+  const sc = $('#kebscroll'), tb = $('#kebtbl'); sc.classList.remove('scroll'); tb.style.width = '';
+  tb.style.setProperty('--ktop', $('.sub').offsetHeight + 'px');
+  // model names run up at 40 degrees, each on one line (Qiuyang); the header is as tall as the longest one needs
+  const nms = [...tb.querySelectorAll('.nm')], w = Math.max(0, ...nms.map(e => e.offsetWidth)), a = 40 * Math.PI / 180;
+  if (w) tb.style.setProperty('--kh', Math.ceil(w * Math.sin(a) + 16 * Math.cos(a) + 12 + (tb.querySelector('th.km img') ? 20 : 0)) + 'px');   // and 20 for the logo under the name
+  // the last name runs up to the right past the table's edge; the table gives it that room inside the box, so the box
+  // does not scroll for it (#92 review: 1,195 px of content in a 1,173 px box at 1280 px)
+  const last = nms[nms.length - 1], over = last ? Math.ceil(last.getBoundingClientRect().right - sc.getBoundingClientRect().right) : 0;
+  if (over > 0) tb.style.width = `calc(100% - ${over + 2}px)`;   // set here: the site's CSS minifier breaks var() inside calc()
+  sc.classList.toggle('scroll', tb.offsetWidth > sc.clientWidth + 1);
+}
+
 /* ---------- case studies: a placeholder until the preview runs have their own (owner, 2026-10-09) ---------- */
-const redraws = [];
+const redraws = [fitKebab];
 
 /* ---------- How FCI works: a fold under the FCI chart (owner, 2026-10-11) ----------
    Three tasks' pass curves, the joint model's own (passChance, fcs2-data.js): an easy, a middle and a hard one, the tasks a sixth, a half and five sixths of the way up the FDI order, so the picture
@@ -740,6 +814,7 @@ function drawRows() {
     <div class="lk">${t.p ? `<a href="${esc(t.p)}" target="_blank" rel="noopener">${t.t ? t.src : 'Project'}</a>` : ''}${t.r ? `<a href="${esc(t.r)}" target="_blank" rel="noopener">Code</a>` : ''}</div></article>`; }).join('')
     || `<p class="empty">No task matches. Clear the filter or try another word.</p>`;
   atEnd();
+  if (tview === 'kebab') drawKebab(h.map(t => t.s));   // the kebab shows the same tasks in the same order
 }
 
 /* Beside the title (under it on narrow screens): the first pages of the tasks' papers laid on a tilted plane, in columns that drift up and down and
@@ -771,6 +846,7 @@ drawPapers();
   $('#locked').innerHTML = Array.from({length:6}, (_, i) => all[Math.floor((i + .5) * all.length / 6)]).map(([t, k]) =>
     `<div class="lk-tile" style="background:${ART_FIELD[k]}"><div class="lk-art">${taskArt(t.s, k).replace('<svg class="art"', '<svg width="100%" height="100%" preserveAspectRatio="xMidYMid slice"')}</div><span class="lk-lock">${lock}</span></div>`).join(''); })();
 drawPassCost(); drawTable(); drawLB(); drawPassBars(); drawECI(); drawTTS(); drawMap(); drawRows();
+if (location.hash === '#kebab') { tView('kebab'); $('#tasks').scrollIntoView(); }
 // labels are placed by measured text width, so draw again once the web font has loaded and the widths are final
 if (document.fonts) document.fonts.ready.then(() => { drawPassCost(); drawLB(); drawPassBars(); drawECI(); drawTTS(); drawMap(); });
 let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { drawPassCost(); drawLB(); drawPassBars(); drawECI(); drawTTS(); drawMap(); drawPapers(); redraws.forEach(f => f()); }, 120); });
