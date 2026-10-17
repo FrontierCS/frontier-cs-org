@@ -178,6 +178,7 @@ MODEL = {
     'Qwen Code CLI · Qwen 3.8 Max': ('qwen', 'Qwen 3.8 Max', 'Qwen 3.8 Max', 'Qwen Code', 'Qwen'),   # re-run on Qwen Code (Qiuyang, 2026-10-14)
     'GLM 5.3 Flash (ZCode)': ('glmf', 'GLM 5.3 Flash', 'GLM 5.3 Flash', 'ZCode', 'Z.ai'),
     'pi · Gemini 4': ('gemini', 'Gemini 4 Argon', 'Gemini 4 Argon', 'Pi', 'Google'),   # on the Pi agent harness (Qiuyang, 2026-10-16); shown as Gemini 4 Argon (owner, 2026-10-16)
+    'Step Code - Step 5 Preview': ('step', 'Step 5 Preview', 'Step 5 Preview', 'Step Code', 'StepFun'),   # on StepFun's Step Code agent (Qiuyang, 2026-10-17)
 }
 
 HIDDEN = {'Kimi K2.7 Code'}                    # owner's call, 2026-10-09: off the leaderboard, kept in the fits (it is the FCI's 0 point)
