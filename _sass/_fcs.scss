@@ -1782,3 +1782,26 @@ section.journal.team-sec.team-top { padding-top: clamp(56px, 6vw, 72px); }
   .sponsor-row img.modal { height: 26px; }
 }
 .sec-intro a { text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--rule); }
+
+/* Shared parts of the FrontierCS 2 pages, also used by the case studies' patch viewer (Qiuyang, 2026-10-17): the site's
+   fold (a heading, then a plus that turns to a minus) and a box that scrolls with a drawn rail (the overview's task list,
+   a patch's file). */
+.fold summary{list-style:none; display:flex; align-items:center; gap:10px; cursor:pointer}
+.fold summary::-webkit-details-marker{display:none}
+.fold summary h3{margin:0}
+.fold summary::after{content:""; flex:none; width:14px; height:14px; background:linear-gradient(currentColor,currentColor) center/14px 1.6px no-repeat, linear-gradient(currentColor,currentColor) center/1.6px 14px no-repeat; transition:background-size .2s}
+.fold[open] summary::after{background-size:14px 1.6px, 1.6px 0}
+.fold[open] summary{margin-bottom:14px}
+/* the list scrolls in its own box with a scroll bar of the page's own (owner, 2026-10-14: the browser's bar looked
+   undesigned): a 2 px grey rail the height of the list and a rounded thumb on it, grey 500, grey 800 and wider on hover or
+   while dragged; a click on the rail jumps there. The foot fades until the last row. Hidden when the list fits. */
+.rows, .ccbox{max-height:min(68vh,760px); overflow-y:auto; padding-right:28px; outline:0; scrollbar-width:none}   /* .ccbox: a task's patch */
+.rows::-webkit-scrollbar, .ccbox::-webkit-scrollbar{display:none}
+.rows::after, .ccbox::after{content:""; position:sticky; bottom:0; display:block; height:56px; margin-top:-56px; background:linear-gradient(rgba(255,255,255,0), var(--bg)); pointer-events:none; transition:opacity .2s}
+.rows.at-end::after, .ccbox.at-end::after{opacity:0}
+.rail{position:absolute; top:0; right:0; bottom:0; width:14px; cursor:pointer; touch-action:none}
+.rail::before{content:""; position:absolute; top:0; bottom:0; left:6px; width:2px; border-radius:1px; background:#e8eaed}
+.rail i{position:absolute; left:4px; width:6px; min-height:36px; border-radius:3px; background:#9aa0a6; transition:background .15s, width .15s, left .15s}
+.rail:hover i, .rail.drag i{left:3px; width:8px; border-radius:4px; background:#3c4043}
+.rail[hidden]{display:none}
+.rows:focus-visible, .ccbox:focus-visible{box-shadow:0 0 0 2px var(--teal)}
