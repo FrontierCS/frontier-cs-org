@@ -13,6 +13,20 @@ permalink: /team/
 <section class="journal team-sec team-top">
 <div class="page">
   <h1 class="vh" id="main" tabindex="-1">Team</h1>
+  {%- assign t2 = site.data.team.fcs2 %}
+  <div class="team-fold team-open">   <!-- the newest project first, not folded (owner, 2026-10-17) -->
+    <h3 class="team-group">FrontierCS 2 <span>{{ t2.venue }} · {{ t2.contributors.size | plus: t2.advisors.size }} authors</span></h3>
+    <p class="team-note"><a href="{{ '/' | relative_url }}">{{ t2.title }}</a>, in paper order.</p>
+    <h4 class="team-sub">Contributors <span>{{ t2.contributors.size }}</span></h4>
+    <ul class="team-grid">
+      {%- for p in t2.contributors %}{% include team_person.html p=p eq="Equal contribution" %}{% endfor %}
+    </ul>
+    <h4 class="team-sub">Advisors <span>{{ t2.advisors.size }}</span></h4>
+    <ul class="team-grid">
+      {%- for p in t2.advisors %}{% include team_person.html p=p %}{% endfor %}
+    </ul>
+    <p class="team-note">* Equal contribution.</p>
+  </div>
   {%- assign later = "easyppo,tts,fsmith" | split: "," -%}
   {%- for k in later %}{% assign pp = site.data.team[k] %}
   <details class="team-fold">
@@ -82,6 +96,7 @@ permalink: /team/
   <ul class="sponsor-row even">
     <li><a href="https://modal.com/" target="_blank" rel="noopener noreferrer"><img src="{{ 'assets/img/sponsors/modal.svg' | relative_url }}" class="modal" alt="Modal"></a></li>
     <li><a href="https://www.laude.org/" target="_blank" rel="noopener noreferrer"><img src="{{ 'assets/img/sponsors/laude-institute-wordmark.png' | relative_url }}" class="laude" alt="Laude Institute"></a></li>
+    <li><a href="https://scale.com/" target="_blank" rel="noopener noreferrer"><img src="{{ 'assets/img/sponsors/scale.svg' | relative_url }}" class="scale" alt="Scale AI"></a></li>
   </ul>
 </div>
 </section>

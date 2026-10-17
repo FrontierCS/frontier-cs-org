@@ -21,6 +21,73 @@ institutions:
   - {name: Michigan, logo: michigan.png, h: 32}
   - {name: MIT, logo: mit.png, h: 38}
 
+# fcs2: authors of "FrontierCS 2: A Benchmark for Computer Science R&D", in the order of the paper's author page
+#   (fcs2-overleaf main.tex, 2026-10-17): the six equal contributors, the other contributors, then the advisors.
+#   Homepages are reused from the other papers' entries where the name matches. Shown first and unfolded (owner, 2026-10-17).
+fcs2:
+  title: "FrontierCS 2: A Benchmark for Computer Science R&D"
+  venue: 2026
+  contributors:
+    - {name: Qiuyang Mang, affil: [UC Berkeley], eq: true, url: "https://joyemang33.github.io"}
+    - {name: Wenhao Chai, affil: [Princeton University], eq: true, url: "https://wenhaochai.com/"}
+    - {name: Runyuan He, affil: [UC Berkeley], eq: true}
+    - {name: Dongruixuan Li, affil: [University of Waterloo], eq: true}
+    - {name: Zihan Zheng, affil: [New York University], eq: true}
+    - {name: Yujun He, affil: [Georgia Institute of Technology], eq: true}
+    - {name: Xuanyi Zhou, affil: [UC Berkeley]}
+    - {name: Hao Wang, affil: [UC Berkeley]}
+    - {name: Siddhant Ray, affil: [University of Chicago]}
+    - {name: Bo Peng, affil: [Princeton University]}
+    - {name: Ruyi Ji, affil: [University of Michigan]}
+    - {name: Shuo Yang, affil: [UC Berkeley]}
+    - {name: Haocheng Xi, affil: [UC Berkeley]}
+    - {name: Boru Chen, affil: [UC Berkeley]}
+    - {name: Xinyang David Han, affil: [UC Berkeley]}
+    - {name: Melissa Pan, affil: [UC Berkeley]}
+    - {name: Mayank Mishra, affil: [UC Berkeley]}
+    - {name: Boxi Yu, affil: [University of Limerick]}
+    - {name: Sijia Liu, affil: [Princeton University]}
+    - {name: Kerem Akillioglu, affil: [UC Berkeley]}
+    - {name: Yi Pan, affil: [UC Berkeley]}
+    - {name: Zirui Wang, affil: [UC Berkeley]}
+    - {name: Mert Cemri, affil: [UC Berkeley]}
+    - {name: Sidharth Sankhe, affil: [UC Berkeley]}
+    - {name: Diogo Antunes, affil: [UC Berkeley]}
+    - {name: Yichuan Wang, affil: [UC Berkeley]}
+    - {name: Aiwei Ivy Zhang, affil: [Georgia Institute of Technology]}
+    - {name: Zhenyang Chen, affil: [Georgia Institute of Technology]}
+    - {name: Qizheng Zhang, affil: [Stanford University], url: "https://alex-q-z.github.io/"}
+    - {name: Kaiyuan Liu, affil: [University of Washington]}
+    - {name: Wenyuan Huang, affil: [University of Wisconsin-Madison], url: "https://whuang369.com/"}
+    - {name: Shu Liu, affil: [UC Berkeley], url: "https://shulynnliu.com/"}
+    - {name: Dacheng Li, affil: [UC Berkeley]}
+    - {name: Zerui Cheng, affil: [Princeton University]}
+    - {name: Zeyu Shen, affil: [Princeton University]}
+    - {name: Shang Zhou, affil: [UCSD], url: "https://scholar.google.com/citations?user=_0dEBNAAAAAJ"}
+    - {name: Hanfei Chen, affil: [Georgia Institute of Technology]}
+    - {name: Yuzhong Zhang, affil: [UNSW]}
+    - {name: Bohan Lyu, affil: [UC Berkeley]}
+    - {name: Qu Ao, affil: [MIT]}
+    - {name: Han Zheng, affil: [MIT]}
+    - {name: Chonghe Jiang, affil: [MIT]}
+    - {name: Jingzhuo Hu, affil: [University of Pennsylvania]}
+    - {name: Xiaokun Chen, affil: [Harbor Framework]}
+    - {name: Kunjun Li, affil: [UC Berkeley]}
+    - {name: Zhiqing Zhong, affil: [Aalto University]}
+    - {name: Haoye Tian, affil: [Aalto University]}
+    - {name: Tong Zhao, affil: [Scale AI]}
+    - {name: Yunzhong He, affil: [Scale AI]}
+    - {name: Hanchen Li, affil: [UC Berkeley], url: "https://hanchenli.github.io/"}
+  advisors:
+    - {name: Ofir Press, affil: []}
+    - {name: Karthik R. Narasimhan, affil: [Princeton University]}
+    - {name: Koushik Sen, affil: [UC Berkeley]}
+    - {name: Ion Stoica, affil: [UC Berkeley]}
+    - {name: Jingbo Shang, affil: [UCSD], url: "https://shangjingbo1226.github.io/"}
+    - {name: Alex Dimakis, affil: [UC Berkeley]}
+    - {name: Joseph E. Gonzalez, affil: [UC Berkeley], url: "https://people.eecs.berkeley.edu/~jegonzal/"}
+    - {name: Alvin Cheung, affil: [UC Berkeley], url: "https://people.eecs.berkeley.edu/~akcheung/"}
+
 fcs1:
   title: "FrontierCS: Evolving Challenges for Evolving Intelligence"
   url: https://arxiv.org/abs/2512.15699
