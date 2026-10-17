@@ -462,7 +462,7 @@ function drawKebab(ts) {
     return `<tr><td class="kt"><a href="${esc(taskHref(t))}">${esc(NAME(t))}</a></td><td class="kf">${FDI[t] != null ? fe(FDI[t]) : '–'}</td>${tds}</tr>`;
   }).join('');
   $('#kebtbl').innerHTML = `<colgroup><col class="kt"><col class="kf">${RANKED.map(() => '<col>').join('')}</colgroup>`
-    + `<thead><tr><th class="kt">Task</th><th class="kf">FDI</th>${RANKED.map(m => `<th class="km"><span class="nm">${esc(m.name)}</span></th>`).join('')}</tr></thead>`
+    + `<thead><tr><th class="kt">Task</th><th class="kf">FDI</th>${RANKED.map(m => `<th class="km">${LOGO[m.lab] ? `<img class="lg" src="${LOGO_DIR + LOGO[m.lab]}.svg" alt="" width="14" height="14">` : ''}<span class="nm">${esc(m.name)}</span></th>`).join('')}</tr></thead>`
     + `<tbody>${body || `<tr><td class="kempty" colspan="${RANKED.length + 2}">No task matches. Clear the filter or try another word.</td></tr>`}</tbody>`;
   $('#keblegend').innerHTML = [['y', 'Beaten on every hidden workload'], ['n', 'Not beaten'], ...Object.entries(KSTATE).filter(([k]) => used.has(k)).map(([, v]) => v)]
     .map(([c, l]) => `<span><i class="${c}"></i>${l}</span>`).join('');
@@ -489,7 +489,7 @@ function fitKebab() {
   tb.style.setProperty('--ktop', $('.sub').offsetHeight + 'px');
   // model names run up at 40 degrees, each on one line (Qiuyang); the header is as tall as the longest one needs
   const nms = [...tb.querySelectorAll('.nm')], w = Math.max(0, ...nms.map(e => e.offsetWidth)), a = 40 * Math.PI / 180;
-  if (w) tb.style.setProperty('--kh', Math.ceil(w * Math.sin(a) + 16 * Math.cos(a) + 12) + 'px');
+  if (w) tb.style.setProperty('--kh', Math.ceil(w * Math.sin(a) + 16 * Math.cos(a) + 12 + (tb.querySelector('th.km img') ? 20 : 0)) + 'px');   // and 20 for the logo under the name
   // the last name runs up to the right past the table's edge; the table gives it that room inside the box, so the box
   // does not scroll for it (#92 review: 1,195 px of content in a 1,173 px box at 1280 px)
   const last = nms[nms.length - 1], over = last ? Math.ceil(last.getBoundingClientRect().right - sc.getBoundingClientRect().right) : 0;

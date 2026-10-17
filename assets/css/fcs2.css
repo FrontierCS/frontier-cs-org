@@ -163,7 +163,8 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 .keb thead{position:sticky; top:var(--ktop,0px); z-index:2; background:var(--bg)}   /* the whole row sticks, so no cell's background covers the slanted name of the column before it */
 .keb th{position:relative; font-weight:600; font-size:12.5px; line-height:1.25; color:var(--ink-2); padding:8px 4px 7px; border-bottom:1px solid var(--ink-2); vertical-align:bottom; text-align:center}
 .keb th.km{height:var(--kh,100px); padding:0 4px 8px}   /* --kh from fcs2.js: what the longest slanted name needs */
-.keb th.km .nm{position:absolute; left:50%; bottom:8px; transform-origin:0 100%; transform:rotate(-40deg); white-space:nowrap}   /* one line, rising from its column */
+.keb th.km .nm{position:absolute; left:50%; bottom:28px; transform-origin:0 100%; transform:rotate(-40deg); white-space:nowrap}   /* one line, rising from its column, from over the logo */
+.keb th.km img.lg{position:absolute; left:50%; bottom:8px; width:14px; height:14px; margin-left:-7px}   /* the lab's logo upright at the foot of the name, over its column, as the pass rate bars and the test-time scaling chart mark models (Qiuyang) */
 .keb th.kt, .keb td.kt{text-align:left; padding-left:0}
 .keb th.kf, .keb td.kf{text-align:right; padding-right:14px; color:var(--muted); font-variant-numeric:tabular-nums}
 .keb td{padding:1px 4px; text-align:center; line-height:1.3}   /* no rule between rows: the rows sit close (Qiuyang) */
