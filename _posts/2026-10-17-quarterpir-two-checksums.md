@@ -21,6 +21,8 @@ authors:
 checked_by:
   - name: Bo Peng
     url: "https://p-b-p-b.github.io/"
+    affiliations:
+      name: Princeton University
 
 toc:
   - name: The Task

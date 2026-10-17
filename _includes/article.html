@@ -32,7 +32,7 @@ written against it continue to apply.
     <div class="ar-authors">
       <span class="ar-by">Solution checked by</span>
       {% for c in page.checked_by -%}
-      <span class="ar-author">{% if c.url %}<a href="{{ c.url }}">{{ c.name }}</a>{% else %}<span>{{ c.name }}</span>{% endif %}</span>
+      <span class="ar-author">{% if c.url %}<a href="{{ c.url }}">{{ c.name }}</a>{% else %}<span>{{ c.name }}</span>{% endif %}{% if c.affiliations.name %}<em>{{ c.affiliations.name }}</em>{% endif %}</span>
       {% endfor %}
     </div>
     </div>{% endif %}
