@@ -46,6 +46,11 @@
   --fail: #bdc1c6;
   --sans: 'Hanken Grotesk', 'Helvetica Neue', Arial, sans-serif;
 }
+/* On a task's page every model takes its own shade, its lab's hue give or take 14 degrees, every pair at least 15.1 apart
+   in CIEDE2000: a task's chart crowds the dots, and models sharing their lab's colour could not be told apart there (27 of
+   49 task charts had two same-family dots under 40 px apart). The overview keeps each lab's colour (Qiuyang and owner,
+   2026-10-16). */
+.taskpage { --m-sol: #5f6368; --m-k3: #016c98; --m-muse: #00a2cc; --m-ds: #271ae5; --m-glm: #054594; --m-wonder: #008fff; --m-glmf: #3963f9; }
 
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; overflow-x: clip; }
