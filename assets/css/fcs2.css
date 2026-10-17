@@ -78,8 +78,7 @@ h2{font-weight:600; font-size:clamp(25px,2.4vw,30px); line-height:1.2; margin:0}
 #ttslegend button:hover{background:var(--grid)}
 #ttslegend button[aria-pressed="false"]{color:var(--faint)} #ttslegend button[aria-pressed="false"] i{background:none!important; box-shadow:inset 0 0 0 1.5px var(--faint)}   /* a hidden model: grey and hollow until clicked (hollow, as GPT-6.1 Sol is itself grey) */
 #ttslegend{gap:10px 26px}
-#ttslegend i.ln{width:22px; height:0; background:none; border-top:3px solid currentColor}   /* a line, as the curves are; dashed for a lab's second model */
-#ttslegend i.ln.dash{border-top-style:dashed}
+#ttslegend i.ln{width:22px; height:0; background:none; border-top:3px solid currentColor}   /* a line, as the curves are; always solid (owner, 2026-10-17) */
 #ttslegend button[aria-pressed="false"] i.ln{box-shadow:none; border-top-color:var(--faint)}
 /* Test-time scaling: the chart narrower, its legend a column to its right (Qiuyang); under it again on a narrow screen.
    The legend ranks the models: the line with the lab's logo over its middle, the name, a bar to the model's FCI and the value,

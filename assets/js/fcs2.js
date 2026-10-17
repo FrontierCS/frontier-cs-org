@@ -212,9 +212,9 @@ let ttsHover = null, ttsRun = 0;
 const TTS_FADE = .2;   // Qiuyang: .25 too strong, .14 too light
 const TTSM = RANKED.filter(m => SCALE[m.id]);   // a model with no reported spend has no curve
 const ttsOn = new Set(TTSM.map(m => m.id));
-// The overview keeps each lab's colour, so two models of one lab share it (Astra and Sol, both Muse, both GLM): the
-// lab's model with the lower FCI is drawn dashed, its curve, its stretch of the frontier and its legend line (Qiuyang)
-const TTS_DASH = new Set(TTSM.filter((m, i, a) => a.findIndex(o => o.lab === m.lab) !== i).map(m => m.id));
+// The overview keeps each lab's colour, so two models of one lab share it (Astra and Sol, both Muse, both GLM). Qiuyang drew
+// the lab's second model dashed; the owner rejected dashes (2026-10-17), so the set is empty and the names tell them apart
+const TTS_DASH = new Set();   // no dashed lines (owner, 2026-10-17): every curve, frontier stretch and legend line is solid
 const ttsDash = id => TTS_DASH.has(id) ? '6 4' : null;
 const ttsBands = () => { document.querySelectorAll('#ttssvg .tband').forEach(b => b.setAttribute('opacity', b.dataset.m === ttsHover ? .12 : 0));
   document.querySelectorAll('#ttssvg .tfade').forEach(e => e.setAttribute('opacity', e.dataset.m === ttsHover ? 1 : e.dataset.op)); };
