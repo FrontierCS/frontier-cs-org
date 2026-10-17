@@ -95,8 +95,16 @@ def release():   # the task set as a grid, and a ranking beside it
     rank = ''.join(box(1020, 240 + i * 112, [460, 400, 320, 250, 190][i], 70, BLUE if i == 0 else (SKY if i < 3 else MINT), rx=10, off=8) for i in range(5))
     return grid + line(950, 200, 950, 820, dotted=True) + rank
 
+def pir():       # a hint, one entry in each row of the database, and the two checksums that replace a list in every reply
+    picks = {(0, 1), (1, 2), (2, 0), (3, 2)}
+    grid = ''.join(f'<rect x="{190 + c * 130}" y="{190 + r * 160}" width="100" height="120" rx="12" fill="{BLUE if (r, c) in picks else MINT}"/>' for r in range(4) for c in range(4))
+    return (grid + arrow(730, 500, 950, 500)
+            + box(1000, 260, 400, 180, SKY) + lines(1050, 320, 300, 3, 30)
+            + box(1000, 560, 400, 180, WHITE) + lines(1050, 620, 300, 3, 30))
+
 POSTS = {'humans-still-beat-ai': humans, 'frontiercs-2-roadmap': roadmap, 'frontiersmith': smith, 'harbor': harbor, 'calico': calico,
-         'alma': alma, 'agent-evaluation': evolving, 'negative-optimization': negative, 'evaluation': pipeline, 'feb-release': release}
+         'alma': alma, 'agent-evaluation': evolving, 'negative-optimization': negative, 'evaluation': pipeline, 'feb-release': release,
+         'quarterpir-two-checksums': pir}
 
 if __name__ == '__main__':
     out = os.path.join(os.path.dirname(__file__), '..', 'assets', 'img', 'blog-thumbs'); os.makedirs(out, exist_ok=True)

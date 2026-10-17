@@ -15,6 +15,7 @@ written against it continue to apply.
     </div>
     <h1>{{ page.title }}</h1>
     {% if page.description %}<p class="ar-standfirst">{{ page.description }}</p>{% endif %}
+    {% if page.checked_by %}<div class="ar-credits">{% endif %}
     {% if page.authors %}
     <div class="ar-authors">
       <span class="ar-by">By</span>
@@ -28,6 +29,14 @@ written against it continue to apply.
     {% elsif page.author %}
     <div class="ar-authors"><span class="ar-by">By</span><span class="ar-author"><span>{{ page.author }}</span></span></div>
     {% endif %}
+    {% if page.checked_by %}
+    <div class="ar-authors">
+      <span class="ar-by">Solution checked by</span>
+      {% for c in page.checked_by -%}
+      <span class="ar-author">{% if c.url %}<a href="{{ c.url }}">{{ c.name }}</a>{% else %}<span>{{ c.name }}</span>{% endif %}</span>
+      {% endfor %}
+    </div>
+    </div>{% endif %}
   </div>
 
   {% if page.toc %}

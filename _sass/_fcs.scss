@@ -1,14 +1,14 @@
 /* ============================================================
    FrontierCS — Academic Journal theme
    Structure ported from wenhaochai.com (assets/site.css); since 2026-10 the
-   FrontierCS skin: white, Material 3 blue, hairline rules, Hanken Grotesk.
+   FrontierCS skin: white, Material 3 blue, hairline rules, Instrument Sans.
    Blog index follows blogs.html; article pages follow the report
    layout of blogs/loopdit.html.
    ============================================================ */
 
 /* ---------- Tokens ---------- */
 :root {
-  /* FrontierCS skin (2026-10): Material 3 primary blue on white, Google GM2 greys, Hanken Grotesk */
+  /* FrontierCS skin (2026-10): Material 3 primary blue on white, Google GM2 greys, Instrument Sans */
   --paper: #ffffff;
   --paper-2: #f1f3f4;
   --ink: #1f1f1f;
@@ -23,9 +23,9 @@
   --link-line: rgba(11, 87, 208, 0.35);
   --scrim: rgba(32, 33, 36, 0.45);
 
-  --font-serif: 'Hanken Grotesk', 'Helvetica Neue', Arial, sans-serif;   /* headings: one sans family site-wide */
-  --font-sans: 'Hanken Grotesk', 'Helvetica Neue', Arial, sans-serif;
-  --font-mono: 'Hanken Grotesk', 'Helvetica Neue', Arial, sans-serif;    /* small labels */
+  --font-serif: 'Instrument Sans', 'Helvetica Neue', Arial, sans-serif;   /* headings: one sans family site-wide */
+  --font-sans: 'Instrument Sans', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'Instrument Sans', 'Helvetica Neue', Arial, sans-serif;    /* small labels */
   --font-code: 'Google Sans Code', ui-monospace, Menlo, monospace;      /* code, terminal */
 
   --max: 1440px;   /* 1320px of content plus two 60px gutters, as on the FrontierCS 2 page. A plain length: the CSS minifier breaks calc() with var() inside, and the gutter is 60px wherever this limit applies */
@@ -45,8 +45,13 @@
      (Qiuyang, 2026-10-17). */
   --m-astra: #1f1f1f; --m-sol: #1f1f1f; --m-k3: #047afe; --m-muse: #0089f4; --m-qwen: #ff7018; --m-ds: #2243e6; --m-glm: #1c7ff8; --m-opus: #cc785c; --m-wonder: #0089f4; --m-glmf: #1c7ff8; --m-gemini: #34a853; --m-step: #00f5e7;
   --fail: #bdc1c6;
-  --sans: 'Hanken Grotesk', 'Helvetica Neue', Arial, sans-serif;
+  --sans: 'Instrument Sans', 'Helvetica Neue', Arial, sans-serif;
 }
+/* On a task's page every model takes its own shade, its lab's hue give or take 14 degrees, every pair at least 15.1 apart
+   in CIEDE2000: a task's chart crowds the dots, and models sharing their lab's colour could not be told apart there (27 of
+   49 task charts had two same-family dots under 40 px apart). The overview keeps each lab's colour (Qiuyang and owner,
+   2026-10-16). */
+.taskpage { --m-sol: #5f6368; --m-k3: #016c98; --m-muse: #00a2cc; --m-ds: #271ae5; --m-glm: #054594; --m-wonder: #008fff; --m-glmf: #3963f9; }
 
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; overflow-x: clip; }
@@ -1079,6 +1084,9 @@ nav .pagination {
   width: 100%;
 }
 .ar-author { display: flex; flex-direction: column; gap: 2px; }
+/* a post with checked_by in its front matter: the byline and "Solution checked by" side by side over one rule (Qiuyang) */
+.ar-credits { display: flex; flex-wrap: wrap; gap: 16px 56px; margin: 32px 0 0; padding-top: 18px; border-top: 1px solid var(--rule); }
+.ar-credits .ar-authors { margin: 0; padding: 0; border: 0; }
 .ar-author a { color: var(--ink); border-bottom: 1px solid var(--link-line); padding: 0 1px; align-self: flex-start; }
 .ar-author a:hover { color: var(--accent); border-bottom-color: var(--accent); }
 .ar-author em {

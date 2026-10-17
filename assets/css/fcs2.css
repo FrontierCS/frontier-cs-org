@@ -23,6 +23,7 @@ button{font:inherit; color:inherit; cursor:pointer}
 .upd{display:flex; align-items:center; gap:7px; font-size:14px; font-weight:600; color:var(--ink-2); margin:0 0 12px}
 .upd i{width:12px; height:12px; border-radius:50%; background:#5f6368; display:inline-block}
 h1{font-weight:600; font-size:clamp(34px,4.6vw,46px); line-height:1.1; margin:0; max-width:15em; text-wrap:balance}
+.hero h1{font-size:clamp(34px,4.4vw,44px)}   /* Instrument Sans sets wider than Hanken Grotesk: 44 px keeps the title on two lines at 1280 px, as before (owner, 2026-10-17) */
 .lead{font-size:clamp(18px,1.6vw,20px); line-height:1.3; color:var(--ink-2); max-width:32em; margin:22px 0 0; text-wrap:pretty}
 h2{font-weight:600; font-size:clamp(25px,2.4vw,30px); line-height:1.2; margin:0}
 .field{display:flex; align-items:center; gap:10px; border:1px solid #80868b; border-radius:4px; height:42px; padding-inline:12px; background:#fff}
@@ -78,14 +79,6 @@ h2{font-weight:600; font-size:clamp(25px,2.4vw,30px); line-height:1.2; margin:0}
 #ttslegend button:hover{background:var(--grid)}
 #ttslegend button[aria-pressed="false"]{color:var(--faint)} #ttslegend button[aria-pressed="false"] i{background:none!important; box-shadow:inset 0 0 0 1.5px var(--faint)}   /* a hidden model: grey and hollow until clicked (hollow, as GPT-6.1 Sol is itself grey) */
 #ttslegend{gap:10px 26px}
-#ttslegend i.ln{width:22px; height:0; background:none; border-top:3px solid currentColor}   /* a line, as the curves are; always solid (owner, 2026-10-17) */
-#ttslegend button[aria-pressed="false"] i.ln{box-shadow:none; border-top-color:var(--faint)}
-/* Test-time scaling: a plain legend under the full-width chart, each entry the line with its lab's logo over the middle and the
-   name (owner, 2026-10-17: no ranked list of FCI bars and values beside the chart) */
-#ttslegend .mk{position:relative; display:block; width:48px; height:18px}
-#ttslegend .mk i.ln{position:absolute; left:0; right:0; top:50%; width:auto; margin-top:-1.5px}
-#ttslegend .mk img.lg{position:absolute; left:50%; top:50%; width:16px; height:16px; margin:-8px 0 0 -8px; border-radius:4px; background:var(--bg); box-shadow:0 0 0 2px var(--bg)}   /* the line runs under the logo */
-#ttslegend button:hover .mk img.lg{background:var(--grid); box-shadow:0 0 0 2px var(--grid)}
 .cfoot{display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:16px; padding-top:14px; border-top:1px solid var(--line); font-size:13px; color:var(--muted-2)}
 /* the FrontierCS logo (mark and wordmark) signs each chart at the bottom left (owner, 2026-10-11) */
 .cfoot .clogo{display:inline-flex; align-items:center; gap:6px; flex:none; white-space:nowrap; font:500 15px/1 'Instrument Sans',var(--sans); letter-spacing:-.01em; color:var(--ink)}
@@ -321,6 +314,22 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
   .faq details[open]::details-content{block-size:auto}
 }
 .tbd{color:var(--ink-2); font-size:16px; margin:0}
+/* case studies: one row per post tagged "Case study", ruled like the questions: the post's thumbnail, the title (the link),
+   a one-line summary and the task, model and date, then the key result (owner, 2026-10-17: rows with a picture and the result) */
+.cases{list-style:none; margin:0; padding:0; border-top:1px solid var(--line)}
+.cases li{display:grid; grid-template-columns:240px minmax(0,1fr) 300px; gap:16px 28px; align-items:start; padding:20px 0; border-bottom:1px solid var(--line)}
+.cases .cth{display:block; aspect-ratio:16/10; border:1px solid var(--line); border-radius:6px; overflow:hidden; background:var(--paper-2)}
+.cases .cth img{display:block; width:100%; height:100%; object-fit:cover; transition:transform .35s cubic-bezier(.2,.7,.3,1)}
+.cases li:hover .cth img{transform:scale(1.03)}
+.cases .ctt{font-size:clamp(18px,1.7vw,21px); font-weight:500; line-height:1.3; color:var(--ink); text-decoration:underline; text-underline-offset:4px; text-decoration-color:var(--line-2)}
+.cases .ctt:hover{color:var(--teal); text-decoration-color:currentColor}
+.cases .ctx p{margin:8px 0 10px; color:var(--ink-2); font-size:16px; line-height:1.5}
+.cases .cmt{color:var(--muted); font-size:14px}
+.cases .cres{border-left:1px solid var(--line); padding-left:24px}
+.cases .cres b{display:block; font-size:34px; font-weight:600; line-height:1.1; color:var(--ink)}
+.cases .cres span{display:block; margin-top:4px; color:var(--ink-2); font-size:14px; line-height:1.4}
+@media (max-width:900px){ .cases li{grid-template-columns:200px minmax(0,1fr)} .cases .cres{grid-column:2; border-left:0; padding-left:0} }
+@media (max-width:600px){ .cases li{grid-template-columns:1fr} .cases .cres{grid-column:auto} }
 .pcontact{color:var(--ink-2); font-size:16px; margin:20px 0 40px}   /* under the leaderboard bars, room before the next chart */
 /* the two addresses, marked; either link writes to both (Qiuyang, 2026-10-14) */
 .pcontact .mail{white-space:nowrap; color:#0b57d0; font-weight:600; text-decoration:underline; text-decoration-color:#a8c7fa; text-underline-offset:3px}   /* blue text, no ground (Qiuyang, 2026-10-14) */
