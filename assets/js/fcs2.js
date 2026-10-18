@@ -163,7 +163,7 @@ function drawECI() {
   const svg = $('#ecisvg'), W = Math.max(300, $('#eciplot').clientWidth), narrow = W < 560;
   const L = narrow ? nameCol(svg) : 190, R = 34, T = 14, B = 46, lane = CHART_H.eciLane || (narrow ? 56 : 64);
   // the axis holds 0 and every whisker, on a grid of about six steps (four on phones) whatever the scale's unit
-  const bot = Math.min(0, ...MODELS.map(m => ECI[m.id][1])), top = Math.max(...MODELS.map(m => ECI[m.id][2])), step = eciStep(top - bot, narrow ? 4 : 6);
+  const bot = 0, top = Math.max(...MODELS.map(m => ECI[m.id][2])), step = eciStep(top - bot, narrow ? 4 : 6);   // the axis starts at 0, Kimi K2.7 (owner, 2026-10-17)
   const xmin = Math.floor(bot / step) * step, xmax = Math.ceil(top / step) * step;
   const H = T + order.length * lane + B, an = animates(svg), bh = narrow ? 24 : 28;   // bars near half the lane (owner, 2026-10-14: 18 px read too thin)
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
@@ -182,7 +182,8 @@ function drawECI() {
     if (m.h) svg.append(sv('text', {x:0, y:yc + 14, 'font-size':12}, m.h));
     const bar = sv('rect', {class:'ebar', x:Math.min(X(0), X(e)), y:yc - bh / 2, width:Math.abs(X(e) - X(0)), height:bh, fill:MCOL[m.id], 'data-m':m.id});
     if (e < 0) bar.style.transformOrigin = 'right center';   // a bar below Kimi K2.7 grows leftwards from 0
-    const wk = sv('path', {class:'ewhisk', d:`M${X(lo)},${yc}H${X(hi)}M${X(lo)},${yc - 7}v14M${X(hi)},${yc - 7}v14`, fill:'none', stroke:'var(--ink)', 'stroke-width':1.5});
+    // an interval below 0 is cut at the axis's 0 with no cap there (owner, 2026-10-17: the axis starts at 0); the tooltip keeps the full interval
+    const lo0 = Math.max(lo, 0), wk = sv('path', {class:'ewhisk', d:`M${X(lo0)},${yc}H${X(hi)}${lo >= 0 ? `M${X(lo)},${yc - 7}v14` : ''}M${X(hi)},${yc - 7}v14`, fill:'none', stroke:'var(--ink)', 'stroke-width':1.5});
     const val = sv('text', {class:'val halo', x:X(e), y:yc - bh / 2 - 6, fill:MTXT(m.id), 'text-anchor':'middle'}, fe(e));   // as many decimals as keep the models apart
     svg.append(bar, wk, val);
     if (an) { mark(bar, 'a-bar', i * .07); mark(wk, 'a-fade', .55 + i * .07); mark(val, 'a-fade', .55 + i * .07); }
