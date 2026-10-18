@@ -239,22 +239,46 @@ const MTXT = id => `color-mix(in srgb, ${MCOL[id]} 78%, #000)`;
    never past the axis line or over the chart's head (Qiuyang, 2026-10-14). A name with no spot next to its dot sheds its brand word ("Muse Wonder 1.0" becomes "Wonder 1.0", as
    Claude Opus 5.5 is "Opus 5.5") before it moves a line or two away; a label is dropped only when neither form fits
    anywhere. A placed label wears fill, its dot's colour darkened to read on white, so a crowded patch still pairs each
-   name with its dot, and is bold for a lead dot. Returns whether it was placed. */
-function labelDot(svg, boxes, cx, cy, name, frame, fill, bold, whole) {   // whole: never fall back to the short form of the name
-  const lab = sv('text', {class:'lab halo', x:cx, y:cy}, name); svg.append(lab);
+   name with its dot, and is bold for a lead dot. No label has a white outline or box behind it (owner, 2026-10-18), so
+   boxes holds every mark a label must not cover. With far, a label with no free spot near its dot may sit up to 150 px
+   away on a thin grey leader line, whose path joins boxes so later labels keep off it too. Returns whether it was placed. */
+function labelDot(svg, boxes, cx, cy, name, frame, fill, bold, whole, far) {   // whole: never fall back to the short form of the name
+  const lab = sv('text', {class:'lab', x:cx, y:cy}, name); svg.append(lab);
   let w = lab.getComputedTextLength() + 2;
   const spots = [[cx + 12, cy + 4.5, 'start'], [cx - 12, cy + 4.5, 'end'], [cx, cy - 13, 'middle'], [cx, cy + 22, 'middle'],
     [cx + 8, cy - 11, 'start'], [cx - 8, cy - 11, 'end'], [cx + 8, cy + 20, 'start'], [cx - 8, cy + 20, 'end'],
     [cx, cy - 31, 'middle'], [cx, cy + 40, 'middle'], [cx + 6, cy - 29, 'start'], [cx - 6, cy - 29, 'end'], [cx + 6, cy + 38, 'start'], [cx - 6, cy + 38, 'end'],
     [cx, cy - 49, 'middle'], [cx, cy + 58, 'middle'], [cx - 6, cy - 47, 'end'], [cx - 6, cy + 56, 'end']];
+  const near = spots.length;
+  // far spots: rings 64 to 160 px out in sixteen directions, and rows flush with the frame's left and right edges
+  if (far) {
+    for (let r = 64; r <= 160; r += 12) for (let a = 0; a < 16; a++) {
+      const t = a * Math.PI / 8, c = Math.cos(t), y = cy + r * Math.sin(t);
+      spots.push([cx + r * c, y + 4.5, c > .3 ? 'start' : c < -.3 ? 'end' : 'middle']); }
+    for (let dy = -160; dy <= 160; dy += 8) spots.push([frame.r - 1, cy + dy + 4.5, 'end'], [frame.l + 1, cy + dy + 4.5, 'start']);
+  }
   const box = ([x, y, an]) => ({x:an === 'start' ? x : an === 'end' ? x - w : x - w / 2, y:y - 11, w, h:14});   // the glyphs' own height, so a label can sit beside its dot in a tight cluster
   const hit = q => boxes.some(o => q.x < o.x + o.w && o.x < q.x + q.w && q.y < o.y + o.h && o.y < q.y + q.h) || q.x < frame.l || q.x + q.w > frame.r || q.y < frame.t || q.y + q.h > frame.b;
   const tight = !whole && /^\S+ (\S+ \d[\d.]*)$/.exec(name), forms = tight ? [name, tight[1]] : [name];
+  // a far spot's leader runs from the dot's edge to the label box's nearest point; far spots are tried shortest leader
+  // first, and a leader that would cross a mark or a label counts as 60 px longer
+  const leader = b => { const nx = Math.min(Math.max(cx, b.x), b.x + b.w), ny = Math.min(Math.max(cy, b.y + 3), b.y + b.h - 3), d = Math.hypot(nx - cx, ny - cy) || 1;
+    const ux = (nx - cx) / d, uy = (ny - cy) / d; return {d, x1:cx + ux * 7, y1:cy + uy * 7, x2:nx - ux * 3, y2:ny - uy * 3}; };
+  const segs = q => { const out = []; for (let k = 0, n = Math.max(1, Math.ceil(Math.hypot(q.x2 - q.x1, q.y2 - q.y1) / 6)); k <= n; k++) out.push({x:q.x1 + (q.x2 - q.x1) * k / n - 2, y:q.y1 + (q.y2 - q.y1) * k / n - 2, w:4, h:4}); return out; };
+  const crosses = q => segs(q).some(p => boxes.some(o => Math.hypot(o.x + o.w / 2 - cx, o.y + o.h / 2 - cy) > 10 && p.x < o.x + o.w && o.x < p.x + p.w && p.y < o.y + o.h && o.y < p.y + p.h));
+  const farFind = () => spots.slice(near).map(sp => { const b = box(sp); if (hit(b)) return null; const q = leader(b); return {sp, cost:q.d + (crosses(q) ? 60 : 0)}; })
+    .filter(Boolean).sort((a, b) => a.cost - b.cost).map(c => c.sp)[0];
   let spot;
-  for (const [str, from] of [...forms.map(f => [f, spots.slice(0, 8)]), ...forms.map(f => [f, spots])]) {
-    lab.textContent = str; w = lab.getComputedTextLength() + 2; spot = from.find(sp => !hit(box(sp))); if (spot) break; }
+  for (const [str, from] of [...forms.map(f => [f, spots.slice(0, 8)]), ...forms.map(f => [f, spots.slice(0, near)]), ...(far ? forms.map(f => [f, null]) : [])]) {
+    lab.textContent = str; w = lab.getComputedTextLength() + 2; spot = from ? from.find(sp => !hit(box(sp))) : farFind(); if (spot) break; }
   if (!spot) { lab.remove(); return false; }
-  boxes.push(box(spot)); lab.setAttribute('x', spot[0]); lab.setAttribute('y', spot[1]); lab.setAttribute('text-anchor', spot[2]);
+  const b = box(spot);
+  if (spots.indexOf(spot) >= near && leader(b).d > 16) {   // a thin grey leader, which later labels keep off as well
+    const q = leader(b);
+    svg.insertBefore(sv('line', {class:'leader', x1:q.x1, y1:q.y1, x2:q.x2, y2:q.y2, stroke:'var(--faint)', 'stroke-width':1}), lab);
+    boxes.push(...segs(q));
+  }
+  boxes.push(b); lab.setAttribute('x', spot[0]); lab.setAttribute('y', spot[1]); lab.setAttribute('text-anchor', spot[2]);
   lab.style.fill = fill; if (bold) lab.style.fontWeight = 600;
   return true;
 }
