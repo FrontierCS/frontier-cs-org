@@ -1585,11 +1585,10 @@ footer.foot { margin-top: 120px; padding: 56px 0 28px; background: #202124; colo
 .fcs1 .steps { display: block; width: 100%; height: auto; padding: 16px 18px 6px; border-bottom: 1px solid var(--grid); box-sizing: border-box; }
 .fcs1 .term-body { padding: 14px 18px 18px; font-family: var(--font-code); font-size: 13px; line-height: 1.7; color: var(--ink-2); }
 .fcs1 .tl { margin: 0; white-space: pre; } .fcs1 .tp { color: var(--teal); font-weight: 500; } .fcs1 .tl:nth-child(2) { margin-bottom: 8px; }
-.fcs1 .ts { display: flex; align-items: center; gap: 10px; color: var(--ink); } .fcs1 .ts span { margin-left: auto; }
-.fcs1 .ts i { flex: none; width: 72px; height: 4px; border-radius: 2px; background: var(--grid); overflow: hidden; } .fcs1 .ts i b { display: block; height: 100%; background: var(--teal); }
+.fcs1 .ts { display: flex; align-items: center; gap: 10px; color: var(--ink); } .fcs1 .ts span { margin-left: auto; color: var(--muted); }   /* no score shown (owner, 2026-10-17) */
 .fcs1 .tok { color: var(--teal); margin-top: 8px; }
 .fcs1 .lf.live .ts, .fcs1 .lf.live .tok { opacity: .16; transition: opacity .35s; } .fcs1 .lf.live .on { opacity: 1; }   /* lines still to come stay faintly visible, so the window never looks empty */
-@media (max-width: 640px) { .fcs1 .lf { padding: 32px 6%; } .fcs1 .term-body { font-size: 11px; padding-inline: 12px; } .fcs1 .ts i { width: 44px; } }
+@media (max-width: 640px) { .fcs1 .lf { padding: 32px 6%; } .fcs1 .term-body { font-size: 11px; padding-inline: 12px; } }
 .fcs1 .probs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 48px 32px; }
 .fcs1 .ptile { position: relative; margin: 0 0 18px; aspect-ratio: 4 / 3; }
 .fcs1 .ptile canvas { display: block; width: 100%; height: 100%; }
