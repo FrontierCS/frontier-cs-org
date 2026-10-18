@@ -438,7 +438,156 @@ def pir_results_block():
     return (pir_results(False) + pir_results(True)
             + f'<div class="legend"><span><i style="background:#9aa0a6"></i>Human reference</span><span><i style="background:{WONDER}"></i>Muse Wonder 1.0</span></div>')
 
-INLINE = {'2026-10-17-quarterpir-two-checksums.md': {'pir-results': pir_results_block,
+# BBQ case study. The five tree sizes of the task, each run's final evidence (export of 2026-10-16) and the task's clock
+# model: operations per second of each design as a multiple of the human reference's in the same run, on the hidden
+# workloads (the four public trees rerun with fresh seeds give the same values).
+BBQ_TREES = ['2 levels, width 4', '2 levels, width 8', '3 levels, width 4', '3 levels, width 8', '3 levels, width 16']
+BBQ_SPEED = {'gemini': [1.5595, 1.2203, 1.5593, 1.4382, 1.3604], 'opus': [1.5556, 1.5556, 1.5630, 1.8421, 1.6600]}
+# At 4,096 priorities (3 levels, width 16): lookup tables and registers of each design, as the task's synthesis counts them
+BBQ_AREA = [('Human reference', None, 1694, 2431), ('Gemini 4 Argon', 'gemini', 2126, 2295), ('Claude Opus 5.5', 'opus', 26763, 48454)]
+# Clock period at width 16 of each model with a correct circuit there; GLM 5.3, GLM 5.3 Flash, Qwen 3.8 Max and Step 5
+# Preview have none (wrong answers or a failed build)
+BBQ_PERIOD16 = {'opus': 2300, 'gemini': 2800, 'sol': 3800, 'k3': 4300, 'astra': 4800, 'wonder': 5300, 'muse': 5800, 'ds': 8300}
+BBQ_REF_PERIOD16 = 3800
+
+def chart_text():
+    return lambda x, y, s, cls='', anchor='start', fill='': f'<text x="{x:.1f}" y="{y:.1f}"' + (f' class="{cls}"' if cls else '') + (f' text-anchor="{anchor}"' if anchor != 'start' else '') + (f' style="fill:{fill}"' if fill else '') + f'>{s}</text>'
+
+def bbq_speed(narrow):
+    """BBQ case study: operations per second as a multiple of the human reference's, one row per tree size, a dot for
+    each of the two models, the human reference as a dashed line at 1."""
+    models = site_models()
+    W = 360 if narrow else 760
+    L, R, T, B, RH = (10, 22, 30, 46, 58) if narrow else (150, 24, 30, 46, 40)
+    H = T + RH * len(BBQ_TREES) + B
+    x0, x1 = 1.0, 2.0
+    X = lambda v: L + (v - x0) / (x1 - x0) * (W - L - R)
+    t = chart_text(); g = ''
+    for v in (1.0, 1.25, 1.5, 1.75, 2.0):
+        g += f'<line x1="{X(v):.1f}" x2="{X(v):.1f}" y1="{T - 8}" y2="{H - B}" stroke="var(--grid)"/>' + t(X(v), H - B + 20, f'{v:g}×', anchor='middle' if 1 < v < 2 else ('start' if v == 1 else 'end'))
+    g += t(L + (W - L - R) / 2, H - 6, 'Operations per second, times the human reference', 'ax', 'middle')
+    g += f'<line x1="{X(1):.1f}" x2="{X(1):.1f}" y1="{T - 8}" y2="{H - B}" stroke="var(--ink-2)" stroke-width="1.2" stroke-dasharray="4 4"/>'
+    g += t(X(1) + 6, T - 14, 'Human reference', 'lab')
+    for k, tree in enumerate(BBQ_TREES):
+        y0 = T + RH * k
+        y = y0 + (32 if narrow else RH / 2)
+        g += t(L + 6 if narrow else 8, y0 + 14 if narrow else y + 4.5, tree, 'lab')   # on phones, right of the human reference's line
+        pts = [(m, BBQ_SPEED[m][k]) for m in ('gemini', 'opus')]
+        lo, hi = min(v for _, v in pts), max(v for _, v in pts)
+        g += f'<line x1="{X(lo):.1f}" x2="{X(hi):.1f}" y1="{y:.1f}" y2="{y:.1f}" stroke="#bdc1c6" stroke-width="2"/>'
+        for m, v in pts:
+            col = models[m][1]
+            g += f'<circle cx="{X(v):.1f}" cy="{y:.1f}" r="6" fill="{col}" stroke="#fff" stroke-width="1.5"/>'
+        # each value beside its dot, outward; level values share one label
+        (ma, va), (mb, vb) = sorted(pts, key=lambda p: p[1])
+        if abs(va - vb) < .02:   # level: the two dots overlap, one label for both
+            g += t(X(vb) + 10, y + 4.5, f'{vb:.2f}×, both', 'val')
+        else:
+            g += t(X(va) - 10, y + 4.5, f'{va:.2f}×', 'val', 'end', mtxt(models[ma][1])) + t(X(vb) + 10, y + 4.5, f'{vb:.2f}×', 'val', 'start', mtxt(models[mb][1]))
+    label = ('Operations per second as a multiple of the human reference, by tree size: ' + '; '.join(
+        f'{tree}: Gemini 4 Argon {BBQ_SPEED["gemini"][k]:.2f}, Claude Opus 5.5 {BBQ_SPEED["opus"][k]:.2f}' for k, tree in enumerate(BBQ_TREES)) + '.')
+    return f'<svg class="{"narrow" if narrow else "wide"}" viewBox="0 0 {W} {H}" role="img" aria-label="{label}">{g}</svg>'
+
+def bbq_two_models_legend():
+    m = site_models()
+    return f'<div class="legend"><span><i style="background:{m["gemini"][1]}"></i>Gemini 4 Argon</span><span><i style="background:{m["opus"][1]}"></i>Claude Opus 5.5</span></div>'
+
+def bbq_area(narrow):
+    """BBQ case study: lookup tables and registers at 4,096 priorities, one bar per design in each of two panels."""
+    models = site_models()
+    W = 360 if narrow else 760
+    L, R, BH, GAP = (122, 56, 18, 8) if narrow else (150, 70, 20, 8)
+    t = chart_text(); g = ''
+    y = 18
+    for title, col_i in (('Lookup tables', 2), ('Registers', 3)):
+        top = max(r[col_i] for r in BBQ_AREA)
+        X = lambda v: L + v / top * (W - L - R)
+        g += t(L if not narrow else 8, y, title, 'ax')
+        y += 12
+        for name, m, *vals in BBQ_AREA:
+            v = vals[col_i - 2]
+            col = models[m][1] if m else '#9aa0a6'
+            g += t(8, y + BH / 2 + 4.5, name, 'lab' if m else 'lab off')
+            g += f'<rect x="{L}" y="{y}" width="{max(2, X(v) - L):.1f}" height="{BH}" rx="3" fill="{col}"/>'
+            g += t(X(v) + 6, y + BH / 2 + 4.5, f'{v:,}', 'val', 'start', mtxt(col) if m else '')
+            y += BH + GAP
+        y += 22
+    H = y - 10
+    label = ('At 4,096 priorities: ' + '; '.join(f'{n} {lut:,} lookup tables and {reg:,} registers' for n, _, lut, reg in BBQ_AREA) + '.')
+    return f'<svg class="{"narrow" if narrow else "wide"}" viewBox="0 0 {W} {H}" role="img" aria-label="{label}">{g}</svg>'
+
+def bbq_runs(narrow):
+    """BBQ case study: each development submission of the two runs, its development score against the cost so far, and
+    each run's final score at its whole cost; the human reference's final score as a dashed line."""
+    models = site_models(); trajs = {r[0]: r for r in site_const('TRAJ') if r[1] == 'BBQ'}
+    ref = site_const('REF')['BBQ']
+    W, H = (360, 340) if narrow else (760, 330)
+    L, R, T, B = 40, 14 if narrow else 20, 24, 48
+    xmax, ymax = 50, 50
+    X = lambda v: L + v / xmax * (W - L - R); Y = lambda v: T + (1 - v / ymax) * (H - T - B)
+    t = chart_text(); g = ''
+    for v in range(0, ymax + 1, 10):
+        g += f'<line x1="{L}" x2="{W - R}" y1="{Y(v):.1f}" y2="{Y(v):.1f}" stroke="var(--grid)"/>' + t(L - 8, Y(v) + 4, v, anchor='end')
+    for v in range(0, xmax + 1, 10):
+        g += f'<line x1="{X(v):.1f}" x2="{X(v):.1f}" y1="{T}" y2="{H - B}" stroke="var(--grid)"/>' + t(X(v), H - B + 20, f'${v}', anchor='middle')
+    g += t(L + (W - L - R) / 2, H - 6, 'Cost of the run so far in US$', 'ax', 'middle')
+    g += f'<line x1="{L}" x2="{W - R}" y1="{Y(ref):.1f}" y2="{Y(ref):.1f}" stroke="var(--ink-2)" stroke-width="1.2" stroke-dasharray="4 4"/>'
+    g += t(W - R, Y(ref) + 16, f'Human reference {ref:.1f}', 'lab', 'end')
+    for m in ('gemini', 'opus'):
+        run, col = trajs[m], models[m][1]
+        final, cost, dev = run[2], run[4], run[6]
+        pts = [(X(c), Y(s)) for c, s in dev]
+        g += f'<polyline points="{" ".join(f"{x:.1f},{y:.1f}" for x, y in pts)}" fill="none" stroke="{col}" stroke-width="2" stroke-linejoin="round"/>'
+        fx, fy = X(cost), Y(final)
+        g += f'<line x1="{pts[-1][0]:.1f}" y1="{pts[-1][1]:.1f}" x2="{fx:.1f}" y2="{fy:.1f}" stroke="{col}" stroke-width="1.5" stroke-dasharray="3 3"/>'
+        g += ''.join(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="4.5" fill="{col}" stroke="#fff" stroke-width="1.5"/>' for x, y in pts)
+        g += f'<circle cx="{fx:.1f}" cy="{fy:.1f}" r="7.5" fill="{col}" stroke="#fff" stroke-width="2"/>'
+        name = models[m][0]
+        lab = f'{name}, final {final:.1f}'
+        if m == 'opus':
+            g += t(fx, fy - 14, lab, 'lab', 'middle' if narrow else 'start', mtxt(col))
+        else:
+            g += t(fx, fy + 24, lab, 'lab', 'end', mtxt(col))
+    label = ('Two runs on BBQ, development score against cost. ' + ' '.join(
+        f'{models[m][0]}: development submissions score {trajs[m][6][0][1]:.1f} to {max(s for _, s in trajs[m][6]):.1f}; final score {trajs[m][2]:.1f} at ${trajs[m][4]:.2f}.'
+        for m in ('opus', 'gemini')) + f' The human reference scores {ref:.1f}.')
+    return f'<svg class="{"narrow" if narrow else "wide"}" viewBox="0 0 {W} {H}" role="img" aria-label="{label}">{g}</svg>'
+
+def bbq_models(narrow):
+    """BBQ case study: the clock period at width 16 of each model with a correct circuit there, a filled dot for a run that
+    passes and a ring for one that fails, the human reference's period as a dashed line."""
+    models, runs = site_models(), {r[0]: r for r in site_const('RUNS') if r[2] == 'BBQ'}
+    rows = sorted(BBQ_PERIOD16.items(), key=lambda kv: kv[1])
+    W = 360 if narrow else 760
+    L, R, T, B, RH = (132, 22, 34, 46, 25) if narrow else (178, 24, 34, 46, 27)
+    H = T + RH * len(rows) + B
+    x0, x1 = 0, 9000
+    X = lambda v: L + (v - x0) / (x1 - x0) * (W - L - R)
+    t = chart_text(); g = ''
+    for v in range(x0, x1 + 1, 3000 if narrow else 1500):
+        g += f'<line x1="{X(v):.1f}" x2="{X(v):.1f}" y1="{T - 8}" y2="{H - B}" stroke="var(--grid)"/>' + t(X(v), H - B + 20, f'{v:,}', anchor='middle')
+    g += t(L + (W - L - R) / 2, H - 6, 'Clock period at width 16, ps' if narrow else 'Clock period at width 16 in ps, lower is faster', 'ax', 'middle')
+    g += f'<line x1="{X(BBQ_REF_PERIOD16):.1f}" x2="{X(BBQ_REF_PERIOD16):.1f}" y1="{T - 8}" y2="{H - B}" stroke="var(--ink-2)" stroke-width="1.2" stroke-dasharray="4 4"/>'
+    g += t(X(BBQ_REF_PERIOD16), T - 16, f'Human reference {BBQ_REF_PERIOD16:,}', 'lab', 'middle')
+    for k, (m, v) in enumerate(rows):
+        y, (name, col), ok = T + RH * k + RH / 2, models[m], runs[m][4]
+        g += t(8, y + 4.5, name, 'lab' if ok else 'lab off')
+        cx = X(v)
+        g += (f'<circle cx="{cx:.1f}" cy="{y:.1f}" r="5.5" fill="{col}" stroke="#fff" stroke-width="1.5"/>' if ok else
+              f'<circle cx="{cx:.1f}" cy="{y:.1f}" r="4.5" fill="#fff" stroke="{col}" stroke-width="2"/>')
+        # the value beside its dot, on the side where it crosses neither the human reference's line nor the edge
+        lw = 34
+        left = (cx < X(BBQ_REF_PERIOD16) < cx + 10 + lw) or cx + 10 + lw > W - 4
+        g += t(cx + (-10 if left else 10), y + 4.5, f'{v:,}', 'val', 'end' if left else 'start', mtxt(col))
+    label = ('Clock period at width 16, by model: ' + ', '.join(f'{models[m][0]} {v:,} ps{"" if runs[m][4] else " (fails)"}' for m, v in rows)
+             + f'; the human reference runs at {BBQ_REF_PERIOD16:,} ps.')
+    return f'<svg class="{"narrow" if narrow else "wide"}" viewBox="0 0 {W} {H}" role="img" aria-label="{label}">{g}</svg>'
+
+INLINE = {'2026-10-18-bbq-two-faster-clocks.md': {'bbq-speed': lambda: bbq_speed(False) + bbq_speed(True) + bbq_two_models_legend(),
+                                                'bbq-area': lambda: bbq_area(False) + bbq_area(True),
+                                                'bbq-runs': lambda: bbq_runs(False) + bbq_runs(True) + bbq_two_models_legend(),
+                                                'bbq-models': lambda: bbq_models(False) + bbq_models(True)},
+          '2026-10-17-quarterpir-two-checksums.md': {'pir-results': pir_results_block,
                                                    'wonder-run': lambda: wonder_pir_run(False) + wonder_pir_run(True),
                                                    'pir-bytes': lambda: pir_bytes_by_model(False) + pir_bytes_by_model(True)}}
 
