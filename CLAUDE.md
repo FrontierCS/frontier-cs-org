@@ -34,6 +34,7 @@ The FrontierCS 2 overview (`index.md`) sets the design; match it everywhere.
 - The same kind of element looks the same on every page.
 - Subtract. Do not add a second way to do the same thing, and do not add grey notes that repeat a chart title, a legend or the questions.
 - Charts follow Epoch AI's grammar: a light grid, labels on the marks, the source note and wordmark under the chart. Model names are never shortened.
+- No white halo or outline behind any text (owner, 2026-10-18). Where a label would cover a line or mark, move it or give it a thin grey leader line; never a white box.
 - The test-time scaling chart (`#scaling` in `index.md`, `drawTTS` in `assets/js/fcs2.js` and its rules in `assets/css/fcs2.css`) changes only through a pull request that Qiuyang approves; do not change it on `redesign` directly.
 - Task diagrams (`assets/img/fcs2-tasks/<slug>.svg`) use only the `fig2` classes in `assets/css/fcs2.css`: what is given on grey, the agent's part on its domain's tone, 760 wide, no frame, and no text outside its region.
 
