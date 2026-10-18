@@ -240,8 +240,8 @@ const MTXT = id => `color-mix(in srgb, ${MCOL[id]} 78%, #000)`;
    Claude Opus 5.5 is "Opus 5.5") before it moves a line or two away; a label is dropped only when neither form fits
    anywhere. A placed label wears fill, its dot's colour darkened to read on white, so a crowded patch still pairs each
    name with its dot, and is bold for a lead dot. No label has a white outline or box behind it (owner, 2026-10-18), so
-   boxes holds every mark a label must not cover. With far, a label with no free spot near its dot may sit up to 150 px
-   away on a thin grey leader line, whose path joins boxes so later labels keep off it too. Returns whether it was placed. */
+   boxes holds every mark a label must not cover. With far, a label with no free spot near its dot may sit up to 160 px
+   away (or flush with the frame edge) on a thin grey leader line, whose path joins boxes so later labels keep off it too. Returns whether it was placed. */
 function labelDot(svg, boxes, cx, cy, name, frame, fill, bold, whole, far) {   // whole: never fall back to the short form of the name
   const lab = sv('text', {class:'lab', x:cx, y:cy}, name); svg.append(lab);
   let w = lab.getComputedTextLength() + 2;
