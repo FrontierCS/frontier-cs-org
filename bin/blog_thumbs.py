@@ -103,14 +103,23 @@ def pir():       # a hint, one entry in each row of the database, and the two ch
             + box(1000, 260, 400, 180, SKY) + lines(1050, 320, 300, 3, 30)
             + box(1000, 560, 400, 180, WHITE) + lines(1050, 620, 300, 3, 30))
 
+def bbq():       # a tree of bitmaps with the first set bit followed down, and two clock stretches, one cut short
+    top = ''.join(f'<rect x="{230 + i * 140}" y="190" width="120" height="120" rx="14" fill="{BLUE if i == 0 else (SKY if i == 2 else MINT)}"/>' for i in range(4))
+    bot = ''.join(f'<rect x="{150 + g * 180 + c * 42}" y="600" width="34" height="150" rx="8" fill="{BLUE if (g, c) == (0, 1) else (SKY if (g, c) in ((0, 2), (2, 1)) else MINT)}"/>'
+                  for g in range(4) for c in range(4))
+    tree = top + bot + line(290, 330, 209, 580) + line(570, 330, 569, 580, dotted=True)
+    return (tree + box(980, 280, 460, 130, SKY) + lines(1030, 325, 360, 2, 40)
+            + box(980, 610, 260, 130, BLUE) + line(1290, 600, 1290, 750, dotted=True) + line(1440, 600, 1440, 750, dotted=True))
+
 POSTS = {'humans-still-beat-ai': humans, 'frontiercs-2-roadmap': roadmap, 'frontiersmith': smith, 'harbor': harbor, 'calico': calico,
          'alma': alma, 'agent-evaluation': evolving, 'negative-optimization': negative, 'evaluation': pipeline, 'feb-release': release,
-         'quarterpir-two-checksums': pir}
+         'quarterpir-two-checksums': pir, 'bbq-two-faster-clocks': bbq}
 
 # The overview's Case studies row shows a case study's thumbnail in its task's domain tones, while the blog list keeps the
 # site's blues (Qiuyang, 2026-10-17). Writes assets/img/case-thumbs/<slug>.svg; the post points at it with case.thumbnail.
-DOMAIN = {'sec': dict(BG='#fce8e6', MINT='#fad2cf', SKY='#f6aea9', BLUE='#a50e0e')}   # Security and crypto: Material red 50, 100, 200, 900
-CASES = {'quarterpir-two-checksums': 'sec'}
+DOMAIN = {'sec': dict(BG='#fce8e6', MINT='#fad2cf', SKY='#f6aea9', BLUE='#a50e0e'),   # Security and crypto: Material red 50, 100, 200, 900
+          'sys': dict(BG='#e8f0fe', MINT='#d2e3fc', SKY='#aecbfa', BLUE='#174ea6')}   # Systems: Material blue 50, 100, 200, 900
+CASES = {'quarterpir-two-checksums': 'sec', 'bbq-two-faster-clocks': 'sys'}
 
 def page(draw):
     return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000"><defs><filter id="rough" filterUnits="userSpaceOnUse" x="0" y="0" width="1600" height="1000">'
