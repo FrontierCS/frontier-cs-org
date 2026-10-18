@@ -40,7 +40,7 @@ papers = sorted(p.relative_to(IMG) for p in (IMG / 'fcs1-papers').glob('*.jpg'))
 marks = ['berkeley', 'princeton', 'stanford', 'mit', 'washington', 'ucsd', 'nyu', 'uiuc', 'michigan', 'toronto', 'gatech', 'ntu']
 CARDS = {
     'frontiercs': ('FrontierCS', 'Open-ended algorithmic problems',
-                   '188 problems where any valid answer is accepted and a better one scores higher.', one('blog-thumbs/feb-release.svg')),
+                   '180 problems where any valid answer is accepted and a better one scores higher.', one('blog-thumbs/feb-release.svg')),
     'workshop': ('Workshop', 'How Far Are AI Agents from Becoming Computer Scientists?',
                  'A proposed ICLR 2027 workshop and challenge.', workshop_art()),
     'research': ('Research', 'Papers from the FrontierCS team',
