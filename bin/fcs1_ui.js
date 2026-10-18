@@ -7,6 +7,9 @@ const mix = (a, b, t) => '#' + [1, 3, 5].map(k => Math.round(parseInt(a.substr(k
 const LABEL = 40;   // the strip at the foot of a tile that holds its label
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const ease = v => v <= 0 ? 0 : v >= 1 ? 1 : v * v * (3 - 2 * v), lerp = (a, b, t) => a + (b - a) * t;
+// FrontierCS 1.1 scoring (FrontierCS/Frontier-CS#197): the lower curve L up to the reference (60 points), then 60 + ln r, at most 100,
+// where r is how many times better than the reference the answer is
+const score11 = (L, r) => L <= 60 ? L : Math.min(100, 60 + Math.log(r));
 // a tile's canvas fills its figure; `paint(ctx, w, h, t)` draws one frame in CSS pixels, t in seconds (-1: the last frame, for reduced motion)
 function tile(id, hue, paint) { const c = document.getElementById(id); if (!c) return;
   const ground = '#fff';
@@ -36,7 +39,8 @@ __GEN__
     P.forEach((p, id) => { g.fillStyle = TONES[id % TONES.length]; for (const [cx, cy] of p.o.c) g.fillRect(x0 + (p.x + cy) * cell - .3, y0 + (p.y + cx) * cell - .3, cell + .6, cell + .6); });
     if (cell >= 4) { g.fillStyle = '#fff'; for (const p of P) for (const [ex, ey, dx, dy] of p.o.edges) g.fillRect(x0 + (p.x + ey) * cell - .5, y0 + (p.y + ex) * cell - .5, dy * cell + 1, dx * cell + 1); }
     g.strokeStyle = INK; g.lineWidth = 1.5; g.strokeRect(x0 - 1, y0 - 1, W * cell + 2, H * cell + 2);
-    label.firstChild.textContent = 'Score ' + lerp(A.score, B.score, a).toFixed(1); }); }
+    const fill = lerp(A.score, B.score, a);   // the recorded score is the share of the rectangle filled, in %; the reference is a 60% fill
+    label.firstChild.textContent = 'Score ' + score11(fill, fill / 60).toFixed(1); }); }
 
 // ---- World Map (problem 6): two valid maps of one of the task's test cases (14 countries, 28 borders), a walk laid
 // out one column per step and the same walk laid along diagonals. Both satisfy the checker's rule.
@@ -80,7 +84,7 @@ function wmDiagonal(n, edges) {
 { const maps = [wmRows(WM.n, WM.e), wmDiagonal(WM.n, WM.e)], K0 = maps[0].length, K1 = maps[1].length, label = document.getElementById('wmlabel');
   // each hue in five steps from its dark to near white: fifteen colours for the fourteen countries
   const PAL = HUES.flatMap(([d, l]) => [0, .3, .6, .85, 1.15].map(t => t <= 1 ? mix(d, l, t) : mix(l, '#ffffff', .5))), tone = c => PAL[(c * 4) % 15];
-  const score = K => Math.max(0, Math.min(100, (6 - K / WM.n) / 4.5 * 100));
+  const score = K => score11(60 * Math.max(0, (6 - K / WM.n) / 4.5), 1.5 * WM.n / K);   // problem 6: the reference is K = 1.5 N
   const T = [3.2, 1.8, .9, 3.2, 4.4], CY = T.reduce((a, b) => a + b);   // draw the first map, hold, let it fade to an outline, draw the second inside it, hold
   tile('wmtile', 1, (g, w, h, t) => { const u = t < 0 ? CY - .01 : t % CY, hh = h - LABEL, pad = 28, cell = Math.min(w - 2 * pad, hh - pad) / K0;
     const box = K => [(w - K * cell) / 2, pad / 2 + (hh - K * cell) / 2], draw = (C, p, alpha, key) => { const K = C.length, [x0, y0] = box(K); g.globalAlpha = alpha;
