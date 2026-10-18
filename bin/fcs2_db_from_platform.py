@@ -59,9 +59,16 @@ for e in sorted(evaluations(), key=lambda e: e['created_at']):
 items = {c: get('evaluations/' + e['id'])['items'] for c, e in evs.items()}
 done = lambda i: i['score'] is not None or i['run_state'] == 'TIMED_OUT'   # a timeout is a result: it scores 0
 items = {c: v for c, v in items.items() if sum(map(done, v)) >= MIN}
-rids = [(c, i['run_id']) for c, v in items.items() for i in v if i.get('run_id')]
+# Tasks kept off the site (Qiuyang, 2026-10-18: "vllm这题先不加入"): their runs are not collected.
+OFF_SITE = {'GPU vLLM Serving Optimization'}
+# A run that stands in for the formal evaluation's run of a task, keyed by (candidate, task): a rerun on the task's current
+# version that ran in an evaluation of its own. Gemini 4's Sparse Video Attention Policy follows the task's new version
+# (cfg-e01e1a2f6173) as every other model's does (Qiuyang, 2026-10-18); its first try there died at start-up and was rerun.
+RERUN = {('pi · Gemini 4', 'Sparse Video Attention Policy'): 'run_01M56053RVYXEC4EZTF9RWM8RK'}
+rids = [(c, RERUN.get((c, i['task_name']), i['run_id'])) for c, v in items.items() for i in v if i.get('run_id') and i['task_name'] not in OFF_SITE]
 with ThreadPoolExecutor(16) as ex:
     pulled = list(ex.map(lambda cr: (cr[0], get('runs/' + cr[1]), get(f'runs/{cr[1]}/events?limit=500')), rids))
+assert all(r['candidate_version_id'] == evs[c]['candidate_version_id'] for c, r, _ in pulled if r['id'] in RERUN.values()), 'a rerun of another candidate version'
 
 # Claude Code usage with tokens but no cost (a run without the CLI's final result): price the four token kinds at the
 # rates implied by the runs that report both, per model (least squares; the CLI's cost is linear in them).
