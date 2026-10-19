@@ -207,7 +207,7 @@ Gemini 4 Argon went back to Sparse VideoGen2. Its SVG-EAR processors only call t
 
 It passed all twelve speed checks, at 833.0 seconds per clip on average. It lost on fidelity. It beat the reference's LPIPS on 4 of the 12 clips, and its PSNR and SSIM on 5. Its mean PSNR was 21.21 dB, against 21.67.
 
-Its misses covered all four HunyuanVideo clips, on every image score, and four of the eight Wan clips. On HunyuanVideo its PSNR fell below the reference's on every clip, while Astra's rose above it on every clip. The estimate of the dropped blocks is what the HunyuanVideo clips needed.
+Its misses covered all four HunyuanVideo clips, on every image score, and four of the eight Wan clips. On HunyuanVideo its PSNR fell below the reference's on every clip, while Astra's rose above it on every clip. Gemini 4 Argon kept no estimate of the dropped blocks; Astra kept one.
 
 Dropping the estimate did not buy the most speed. Astra's clips, estimates and all, took 728.6 seconds. Gemini 4 Argon's run scored 34.98.
 
