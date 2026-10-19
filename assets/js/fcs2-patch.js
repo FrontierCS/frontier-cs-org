@@ -106,7 +106,9 @@ function fill(view, p) {
 function mount(el) {
   const src = el.querySelector('a[hidden]');
   if (!src) return;
-  fetch(src.href).then(r => r.ok ? r.json() : null).then(d => {
+  // the link's own relative path, not its resolved .href: inside the claude.ai preview the resolved URL of a link does
+  // not reach the file, while the relative path does, as the task pages' PATCH_DIR does (Qiuyang, 2026-10-19)
+  fetch(src.getAttribute('href')).then(r => r.ok ? r.json() : null).then(d => {
     if (!d) return;
     const [mid, p] = Object.entries(d.runs)[0];
     el.insertAdjacentHTML('beforeend', `<p class="tsum"><span class="sq" style="background:var(--m-${mid})"></span><b>${esc(el.dataset.model)}</b>`
