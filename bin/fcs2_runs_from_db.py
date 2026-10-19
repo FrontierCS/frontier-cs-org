@@ -117,7 +117,7 @@ TASK = {
     'Private Set List Decoding': ('Crypto', 'QuarterPIR'),
     'Register-aware Branch Prediction': ('Arch', 'RUNLTS'),
     'Approximate-MIPS Query Stopping': ('Database', None),
-    'Argument-aware runtime privilege control': ('Security', 'Progent'),
+    'Privilege Control for Tool-Using LLM Agents': ('Security', 'Progent'),   # renamed on the platform 2026-10-19 (was 'Argument-aware runtime privilege control')
     'BBQ bitmap traversal': ('Network', 'BBQ'),
     'Batch Local Counting': ('Database', 'SCOPE'),
     'Bounded EVM Path Prediction': ('Database', 'Seer'),

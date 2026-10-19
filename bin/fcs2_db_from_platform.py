@@ -59,9 +59,11 @@ for e in sorted(evaluations(), key=lambda e: e['created_at']):
 items = {c: get('evaluations/' + e['id'])['items'] for c, e in evs.items()}
 done = lambda i: i['score'] is not None or i['run_state'] == 'TIMED_OUT'   # a timeout is a result: it scores 0
 items = {c: v for c, v in items.items() if sum(map(done, v)) >= MIN}
-# Tasks whose runs are not collected. Kept off the site (Qiuyang, 2026-10-18: "vllm这题先不加入"): vLLM, shown as Continuum.
-# Off the site (Qiuyang, 2026-10-19: Security keeps only Progent and LRR): the other four Security tasks.
-OFF_SITE = {'GPU vLLM Serving Optimization',
+# Tasks whose runs are not collected. Still being built, so listed on the site with no runs and left out of FCI, FDI and
+# every total (Qiuyang, 2026-10-18: "vllm这题先不加入"; 2026-10-19: Progent, its formal runs half rerun on its new version):
+# vLLM (shown as Continuum) and Progent, under its new name and its old one. Off the site (Qiuyang, 2026-10-19: Security
+# keeps only Progent and LRR): the other four Security tasks.
+OFF_SITE = {'GPU vLLM Serving Optimization', 'Privilege Control for Tool-Using LLM Agents', 'Argument-aware runtime privilege control',
             'Adaptive Robustness Evaluation for Prompt-Injection Defense', 'BROP: Hacking Blind — Return-Oriented Programming Without Binary Knowledge',
             'Enclave-Resident Admissible-Set Filter', 'Safe Abstract Trace-Cut — Coupled Optimization'}
 # A run that stands in for the formal evaluation's run of a task, keyed by (candidate, task): a rerun on the task's current

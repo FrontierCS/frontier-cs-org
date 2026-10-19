@@ -41,7 +41,8 @@ function drawPage() {
   const parts = NEWDESC(t.s) ? DESC[t.s].split(/\s*¶\s*/) : [];
   const lead = parts.length ? `<section class="tabout">${parts.map((p, i) => `<div><h3>${['The idea', 'What the agent writes', 'How it is judged'][i] || ''}</h3><p>${esc(p)}</p></div>`).join('')}</section>`
     : DESC[t.s] ? `<details class="fold tdet"${goal ? '' : ' open'}><summary><h3>Task details</h3></summary><p>${esc(DESC[t.s])}</p></details>` : '';
-  if (!runs.length) { $('#tbody').innerHTML = lead + '<p class="tbd">No runs on this task yet.</p>'; loadFig(t); drawPager(t); scrollTo(0, 0); return; }
+  // a task with no runs is one still being built (fcs2-data.js): Continuum, KV Compaction, LRR, Progent (Qiuyang, 2026-10-19)
+  if (!runs.length) { $('#tbody').innerHTML = lead + '<p class="tbd">This task is still being built. Its runs will show here, and count toward FCI and FDI, once it is ready.</p>'; loadFig(t); drawPager(t); scrollTo(0, 0); return; }
   const ref = REF[t.s], ms = new Set(runs.map(r => r[0])), np = new Set(runs.filter(r => r[3]).map(r => r[0])).size;
   const best = runs.reduce((a, r) => r[2] > a[2] ? r : a);
   // beside who passes, the runs whose final score is above the human reference's, and those level with it apart (Qiuyang,
