@@ -583,7 +583,65 @@ def bbq_models(narrow):
              + f'; the human reference runs at {BBQ_REF_PERIOD16:,} ps.')
     return f'<svg class="{"narrow" if narrow else "wide"}" viewBox="0 0 {W} {H}" role="img" aria-label="{label}">{g}</svg>'
 
-INLINE = {'2026-10-18-bbq-two-faster-clocks.md': {'bbq-speed': lambda: bbq_speed(False) + bbq_speed(True) + bbq_two_models_legend(),
+# SVG-EAR case study: each model's mean time per clip and mean PSNR over the twelve hidden clips (METRIC_STATS in
+# assets/js/fcs2-metrics.js) and the human reference's, as a cross. A name sits beside its dot; in the crowded middle
+# it hangs off a thin grey elbow, (lane offset from the dot, column x). Step 5 Preview, far slower, is in the source note.
+def site_metrics(task):
+    import json, re
+    src = open(os.path.join(SITE, 'assets', 'js', 'fcs2-metrics.js')).read()
+    return json.JSONDecoder().raw_decode(src, re.search(r'^const METRIC_STATS = ', src, re.M).end())[0][task]
+
+SVGEAR_OFF = 'step'
+SVGEAR_LABELS = {   # model: (anchor, dx, dy) beside the dot, or ('elbow', lane offset, column x); wide, then narrow
+    False: {'astra': ('start', 10, 4.5), 'sol': ('start', 10, 4.5), 'glm': ('end', -10, 4.5), 'qwen': ('start', 10, 4.5),
+            'k3': ('end', -10, 4.5), 'glmf': ('end', -10, 4.5), 'opus': ('end', -10, -2.5),
+            'ds': ('elbow', -41.3, 328), 'muse': ('elbow', -25.7, 328), 'wonder': ('elbow', 25.6, 328), 'gemini': ('elbow', 43.2, 328)},
+    True: {'astra': ('start', 10, 4.5), 'sol': ('start', 10, 4.5), 'glm': ('end', 10, 19), 'qwen': ('start', 10, 4.5),
+           'k3': ('end', -10, 4.5), 'glmf': ('end', -6, 17.6), 'opus': ('elbow', -68.4, 199), 'ds': ('elbow', -57.7, 199),
+           'muse': ('elbow', -37.6, 199), 'wonder': ('elbow', 33.4, 199), 'gemini': ('elbow', 50.9, 199)}}
+
+def svgear_time_psnr(narrow):
+    """SVG-EAR case study: mean PSNR against mean time per clip, a dot per model in its task-page colour, the human
+    reference as a cross."""
+    models, ms = site_models(), site_metrics('SVG-EAR')
+    lat, psnr = ms['e2e_latency_seconds'], ms['psnr_db']
+    W, H = (360, 500) if narrow else (760, 416)
+    L, R, T, B = (34, 14, 36, 48) if narrow else (50, 20, 36, 48)
+    x0, x1, y0, y1 = 700, 1100, 18, 26
+    X = lambda v: L + (v - x0) / (x1 - x0) * (W - L - R); Y = lambda v: T + (y1 - v) / (y1 - y0) * (H - T - B)
+    t = chart_text(); g = ''
+    for v in range(x0, x1 + 1, 200 if narrow else 100):
+        g += f'<line x1="{X(v):.1f}" x2="{X(v):.1f}" y1="{T}" y2="{H - B}" stroke="var(--grid)"/>' + t(X(v), H - B + 20, f'{v:,}', anchor='middle')
+    for v in range(y0, y1 + 1, 2 if narrow else 1):
+        g += f'<line x1="{L}" x2="{W - R}" y1="{Y(v):.1f}" y2="{Y(v):.1f}" stroke="var(--grid)"/>' + t(L - 6, Y(v) + 4, v, anchor='end')
+    g += t(L + (W - L - R) / 2, H - 6, 'Mean time per clip, s' if narrow else 'Mean time per clip in seconds, lower is faster', 'ax', 'middle')
+    g += t(8, T - 16, 'Mean PSNR, dB' if narrow else 'Mean PSNR in dB, higher is closer to full attention', 'ax')
+    ref = (lat['ref'], psnr['ref']); rx, ry = X(ref[0]), Y(ref[1])
+    g += (f'<line x1="{rx - 6:.1f}" x2="{rx + 6:.1f}" y1="{ry:.1f}" y2="{ry:.1f}" stroke="var(--ink-2)" stroke-width="1.8"/>'
+          f'<line x1="{rx:.1f}" x2="{rx:.1f}" y1="{ry - 6:.1f}" y2="{ry + 6:.1f}" stroke="var(--ink-2)" stroke-width="1.8"/>')
+    g += t(rx + 12, ry + 4.5, 'Human reference', 'lab')
+    pts = {m: (lat['by'][m][0], psnr['by'][m][0]) for m in lat['by'] if m != SVGEAR_OFF and lat['by'][m][0] is not None}
+    marks, labels = '', ''
+    for m, (tv, pv) in pts.items():
+        name, col = models[m]; cx, cy = X(tv), Y(pv)
+        marks += f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="5.5" fill="{col}" stroke="#fff" stroke-width="1.5"/>'
+        spec = SVGEAR_LABELS[narrow][m]
+        if spec[0] == 'elbow':
+            lane, col_x = cy + spec[1], spec[2]
+            y_from = cy + (6 if spec[1] > 0 else -6)
+            labels += f'<polyline points="{cx:.1f},{y_from:.1f} {cx:.1f},{lane:.1f} {col_x - 4:.1f},{lane:.1f}" fill="none" stroke="#bdc1c6" stroke-width="1"/>'
+            labels += t(col_x, lane + 4.5, name, 'lab', 'start', mtxt(col))
+        else:
+            labels += t(cx + spec[1], cy + spec[2], name, 'lab', spec[0], mtxt(col))
+    g += labels + marks
+    off = lat['by'][SVGEAR_OFF][0], psnr['by'][SVGEAR_OFF][0]
+    label = ('Mean PSNR against mean time per clip on the twelve hidden clips of SVG-EAR: ' + '; '.join(
+        f'{models[m][0]} {tv:,.1f} s and {pv:.2f} dB' for m, (tv, pv) in sorted(pts.items(), key=lambda kv: kv[1][0]))
+        + f'; {models[SVGEAR_OFF][0]} {off[0]:,.1f} s and {off[1]:.2f} dB, off the chart; the human reference {ref[0]:,.1f} s and {ref[1]:.2f} dB.')
+    return f'<svg class="{"narrow" if narrow else "wide"}" viewBox="0 0 {W} {H}" role="img" aria-label="{label}">{g}</svg>'
+
+INLINE = {'2026-10-19-svg-ear-measured-error.md': {'svgear-time-psnr': lambda: svgear_time_psnr(False) + svgear_time_psnr(True)},
+          '2026-10-18-bbq-two-faster-clocks.md': {'bbq-speed': lambda: bbq_speed(False) + bbq_speed(True) + bbq_two_models_legend(),
                                                 'bbq-area': lambda: bbq_area(False) + bbq_area(True),
                                                 'bbq-runs': lambda: bbq_runs(False) + bbq_runs(True) + bbq_two_models_legend(),
                                                 'bbq-models': lambda: bbq_models(False) + bbq_models(True)},
