@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="fig2" viewBox="0 0 760 284" role="img" aria-label="Left, what is given: a regular expression that backtracks, such as ^(a+)+$, which takes exponential time on a string of a&#8217;s ending in b; the part at fault, (a+)+, which RegexScalpel finds; and Qwen3-8B with fixed decoding. Middle, what the agent writes: the instructions the model reads, built from the regex and the part found, such as: fix the ReDoS in ^(a+)+$, edit only (a+)+, answer with one regex; the model answers ^a+$. Right, the benchmark: a repair counts when it compiles, ReDoSHunter finds no attack, and it still matches some of the original&#8217;s strings; to pass, a submission must beat the human reference on eight counts in every group of regexes.">
+<defs><marker id="lrr-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arh" d="M0 0L10 5L0 10z"/></marker></defs>
+<rect class="given" x="0" y="0" width="228" height="284" rx="10"/>
+<text class="k" x="18" y="30">GIVEN</text>
+<text class="b" x="18" y="56">A regex that backtracks</text>
+<rect class="chip" x="16" y="66" width="196" height="30" rx="6"/>
+<text class="code" x="30" y="85.5">^<tspan class="bad">(a+)+</tspan>$</text>
+<text class="n" x="18" y="116">slow on aaa…ab: it tries</text>
+<text class="n" x="18" y="134">every way to split the a&#8217;s</text>
+<text class="b" x="18" y="168">RegexScalpel finds the part</text>
+<rect class="chip" x="16" y="178" width="196" height="30" rx="6"/>
+<text class="code" x="30" y="197.5">(a+)+</text>
+<text x="18" y="244">Qwen3-8B repairs it,</text>
+<text x="18" y="262">its decoding fixed</text>
+<rect class="agent" x="244" y="0" width="264" height="284" rx="10"/>
+<text class="k ak" x="264" y="30">THE AGENT WRITES</text>
+<text class="h" x="264" y="53">The model&#8217;s instructions</text>
+<rect class="chip on" x="264" y="66" width="224" height="96" rx="6"/>
+<text class="code" x="278" y="89">Fix the ReDoS in</text>
+<text class="code" x="278" y="109">^(a+)+$</text>
+<text class="code" x="278" y="129">Edit only (a+)+</text>
+<text class="code" x="278" y="149">Answer with one regex</text>
+<line class="ar" x1="376" y1="166" x2="376" y2="188" marker-end="url(#lrr-ar)"/>
+<rect class="chip" x="264" y="192" width="224" height="30" rx="6"/>
+<text class="code" x="278" y="211.5">^a+$</text>
+<text class="n" x="346" y="211.5">the model&#8217;s repair</text>
+<text class="n" x="264" y="250">From the regex and the part found;</text>
+<text class="n" x="264" y="268">the model never changes</text>
+<rect class="result" x="524" y="0" width="236" height="284" rx="10"/>
+<text class="k" x="542" y="30">THE BENCHMARK</text>
+<text class="b" x="542" y="56">A repair counts when it</text>
+<rect class="fa" x="542" y="76" width="8" height="8" rx="2"/>
+<text x="558" y="84">compiles</text>
+<rect class="fa" x="542" y="98" width="8" height="8" rx="2"/>
+<text x="558" y="106">has no attack ReDoSHunter finds</text>
+<rect class="fa" x="542" y="120" width="8" height="8" rx="2"/>
+<text x="558" y="128">still matches some of the</text>
+<text x="558" y="146">original&#8217;s strings</text>
+<text class="b" x="542" y="196">To pass, beat the human</text>
+<text class="b" x="542" y="214">reference in every group on</text>
+<text class="n" x="542" y="240">repaired, no longer vulnerable,</text>
+<text class="n" x="542" y="258">well formed, growth, edits and</text>
+<text class="n" x="542" y="276">three overlaps of language</text>
+</svg>

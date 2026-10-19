@@ -334,7 +334,7 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
   .faq details[open]::details-content{block-size:auto}
 }
 .tbd{color:var(--ink-2); font-size:16px; margin:0}
-.tabout + .tbd{margin-top:32px}   /* a task with a description and no runs yet (Continuum) */
+.tabout + .tbd{margin-top:32px}   /* a task with a description and no runs yet: one still being built */
 /* case studies: one row per post tagged "Case study", ruled like the questions: the post's thumbnail, the title (the link),
    a one-line summary and the task, model and date, then the key result (owner, 2026-10-17: rows with a picture and the result) */
 .cases{list-style:none; margin:0; padding:0; border-top:1px solid var(--line)}
@@ -451,6 +451,9 @@ a.pbtn:hover{border-color:var(--teal); color:var(--teal-d)}
 .fig2 .bad{fill:#c5221f} .fig2 .sbad{fill:none; stroke:#c5221f; stroke-width:1.5}
 .fig2 .result{fill:#f1f3f4}
 .fig2 .sm{font-size:11.5px} .fig2 .mid{text-anchor:middle} .fig2 .end{text-anchor:end}
+/* formulas: TeX, drawn by bin/fcs2_fig_tex.py as MathJax's glyphs in paths (Qiuyang, 2026-10-19: a proper math face);
+   a formula takes its line's colour */
+.fig2 .tex{color:var(--ink)} .fig2 .tex.n{color:var(--muted)} .fig2 .tex.ak{color:var(--a, #174ea6)}
 .rtab th.rv, .rtab td.rv{text-align:left}
 .rtab th.rs, .rtab td.rs{width:50%; text-align:left}
 .rtab .rb{position:relative; display:block; height:14px; margin-right:3.2em}   /* the margin holds the value past a full bar */

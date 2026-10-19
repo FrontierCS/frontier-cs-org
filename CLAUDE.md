@@ -37,6 +37,7 @@ The FrontierCS 2 overview (`index.md`) sets the design; match it everywhere.
 - No white halo or outline behind any text (owner, 2026-10-18). Where a label would cover a line or mark, move it or give it a thin grey leader line; never a white box.
 - The test-time scaling chart (`#scaling` in `index.md`, `drawTTS` in `assets/js/fcs2.js` and its rules in `assets/css/fcs2.css`) changes only through a pull request that Qiuyang approves; do not change it on `redesign` directly.
 - Task diagrams (`assets/img/fcs2-tasks/<slug>.svg`) use only the `fig2` classes in `assets/css/fcs2.css`: what is given on grey, the agent's part on its domain's tone, 760 wide, no frame, and no text outside its region.
+- Formulas, and the variables and symbols of a formula, are TeX in task diagrams as on the pages, never a plain or code face with Unicode sub- and superscripts (Qiuyang, 2026-10-19). Code, names and labels that are not math, and plain numbers such as a size 45 × 80, keep their face. In a diagram, write the math between `$` signs in a `<text>` line and run `bin/fcs2_fig_tex.py` on the file; it draws it as MathJax's TeX glyphs, as the pages' own formulas are.
 
 ## Words
 
