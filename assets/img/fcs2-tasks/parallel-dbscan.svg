@@ -28,7 +28,7 @@
 <text class="n sm" x="150" y="141">6</text>
 <text class="n sm end" x="117" y="140">11</text>
 <text class="n sm mid" x="198" y="80">12</text>
-<text class="n" x="18" y="230">Each cell’s diagonal is ε.</text>
+<g data-tex="Each cell’s diagonal is $\varepsilon$." data-attrs="class=&quot;n&quot; x=&quot;18&quot; y=&quot;230&quot;"><text class="n" x="18.0" y="230" xml:space="preserve">Each cell’s diagonal is </text><svg class="tex n" x="147.0" y="223.35" width="6.85" height="6.97" viewBox="0 -452 466 474" overflow="visible"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g><g><path d="M190 -22Q124 -22 76 11T27 107Q27 174 97 232L107 239L99 248Q76 273 76 304Q76 364 144 408T290 452H302Q360 452 405 421Q428 405 428 392Q428 381 417 369T391 356Q382 356 371 365T338 383T283 392Q217 392 167 368T116 308Q116 289 133 272Q142 263 145 262T157 264Q188 278 238 278H243Q308 278 308 247Q308 206 223 206Q177 206 142 219L132 212Q68 169 68 112Q68 39 201 39Q253 39 286 49T328 72T345 94T362 105Q376 103 376 88Q376 79 365 62T334 26T275 -8T190 -22Z"></path></g></g></g></svg><text class="n" x="153.9" y="230" xml:space="preserve">.</text></g><!--tex-->
 <circle class="ink" cx="22" cy="254" r="4"/>
 <text class="n" x="33" y="258">core point</text>
 <circle class="ring" cx="22" cy="276" r="3.8"/>
@@ -37,7 +37,7 @@
 <text class="k ak" x="272" y="30">THE AGENT WRITES</text>
 <text class="h" x="272" y="53">The links between core cells</text>
 <text class="n" x="272" y="78">Link cells whose core points lie</text>
-<text class="n" x="272" y="96">within ε of each other.</text>
+<g data-tex="within $\varepsilon$ of each other." data-attrs="class=&quot;n&quot; x=&quot;272&quot; y=&quot;96&quot;"><text class="n" x="272.0" y="96" xml:space="preserve">within </text><svg class="tex n" x="310.0" y="89.35" width="6.85" height="6.97" viewBox="0 -452 466 474" overflow="visible"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g><g><path d="M190 -22Q124 -22 76 11T27 107Q27 174 97 232L107 239L99 248Q76 273 76 304Q76 364 144 408T290 452H302Q360 452 405 421Q428 405 428 392Q428 381 417 369T391 356Q382 356 371 365T338 383T283 392Q217 392 167 368T116 308Q116 289 133 272Q142 263 145 262T157 264Q188 278 238 278H243Q308 278 308 247Q308 206 223 206Q177 206 142 219L132 212Q68 169 68 112Q68 39 201 39Q253 39 286 49T328 72T345 94T362 105Q376 103 376 88Q376 79 365 62T334 26T275 -8T190 -22Z"></path></g></g></g></svg><text class="n" x="316.9" y="96" xml:space="preserve"> of each other.</text></g><!--tex-->
 <rect class="chip" x="282" y="112" width="36" height="36" rx="4"/>
 <rect class="chip" x="322" y="112" width="36" height="36" rx="4"/>
 <rect class="chip" x="282" y="152" width="36" height="36" rx="4"/>
@@ -65,7 +65,7 @@
 <line class="sbad dash" x1="352" y1="178" x2="428" y2="170"/>
 <path class="sbad" d="M384.0 168.0l12 12M396.0 168.0l-12 12"/>
 <text class="n" x="272" y="220">Closest core pair</text>
-<text class="n" x="272" y="238">farther than ε</text>
+<g data-tex="farther than $\varepsilon$" data-attrs="class=&quot;n&quot; x=&quot;272&quot; y=&quot;238&quot;"><text class="n" x="272.0" y="238" xml:space="preserve">farther than </text><svg class="tex n" x="344.0" y="231.35" width="6.85" height="6.97" viewBox="0 -452 466 474" overflow="visible"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g><g><path d="M190 -22Q124 -22 76 11T27 107Q27 174 97 232L107 239L99 248Q76 273 76 304Q76 364 144 408T290 452H302Q360 452 405 421Q428 405 428 392Q428 381 417 369T391 356Q382 356 371 365T338 383T283 392Q217 392 167 368T116 308Q116 289 133 272Q142 263 145 262T157 264Q188 278 238 278H243Q308 278 308 247Q308 206 223 206Q177 206 142 219L132 212Q68 169 68 112Q68 39 201 39Q253 39 286 49T328 72T345 94T362 105Q376 103 376 88Q376 79 365 62T334 26T275 -8T190 -22Z"></path></g></g></g></svg></g><!--tex-->
 <text class="n" x="272" y="280">Each core cell gets a component id.</text>
 <rect class="result" x="568" y="0" width="192" height="300" rx="10"/>
 <text class="k" x="586" y="30">OUTPUT</text>
