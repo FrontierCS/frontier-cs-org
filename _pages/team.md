@@ -83,6 +83,7 @@ permalink: /team/
 <div class="page">
   <div class="sec-head"><h2 class="sec-title">Partners</h2></div>
   <ul class="sponsor-row even">
+    <li><a href="https://www.kaggle.com/" target="_blank" rel="noopener noreferrer"><img src="{{ 'assets/img/partners/kaggle.svg' | relative_url }}" class="kaggle" alt="Kaggle"></a></li>
     <li><a class="partner" href="https://openrsi.foundation/" target="_blank" rel="noopener noreferrer"><img src="{{ 'assets/img/partners/openrsi.svg' | relative_url }}" class="openrsi" alt=""><span>OpenRSI</span></a></li>
     <li><a href="https://www.yukon.org/frontiercs" target="_blank" rel="noopener noreferrer"><img src="{{ 'assets/img/partners/yukon.svg' | relative_url }}" class="yukon" alt="Yukon"></a></li>
     <li><a class="partner harbor" href="https://www.harborframework.com/" target="_blank" rel="noopener noreferrer"><span>harbor</span></a></li>
@@ -95,6 +96,7 @@ permalink: /team/
   <div class="sec-head"><h2 class="sec-title">Sponsors</h2></div>
   <ul class="sponsor-row even">
     <li><a href="https://modal.com/" target="_blank" rel="noopener noreferrer"><img src="{{ 'assets/img/sponsors/modal.svg' | relative_url }}" class="modal" alt="Modal"></a></li>
+    <li><a href="https://www.kaggle.com/" target="_blank" rel="noopener noreferrer"><img src="{{ 'assets/img/partners/kaggle.svg' | relative_url }}" class="kaggle" alt="Kaggle"></a></li>
     <li><a href="https://www.laude.org/" target="_blank" rel="noopener noreferrer"><img src="{{ 'assets/img/sponsors/laude-institute-wordmark.png' | relative_url }}" class="laude" alt="Laude Institute"></a></li>
     <li><a href="https://scale.com/" target="_blank" rel="noopener noreferrer"><img src="{{ 'assets/img/sponsors/scale.svg' | relative_url }}" class="scale" alt="Scale AI"></a></li>
   </ul>
