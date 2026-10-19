@@ -14,7 +14,7 @@
 <text class="code end" x="188" y="152">triangle</text>
 <text class="n" x="18" y="174">error target</text>
 <text class="code end" x="188" y="174">0.2</text>
-<text class="n" x="18" y="196">colors c</text>
+<g data-tex="colors $c$" data-attrs="class=&quot;n&quot; x=&quot;18&quot; y=&quot;196&quot;"><text class="n" x="18.0" y="196" xml:space="preserve">colors </text><svg class="tex n" x="58.0" y="189.50" width="6.37" height="6.66" viewBox="0 -442 433 453" overflow="visible"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g><g><path d="M34 159Q34 268 120 355T306 442Q362 442 394 418T427 355Q427 326 408 306T360 285Q341 285 330 295T319 325T330 359T352 380T366 386H367Q367 388 361 392T340 400T306 404Q276 404 249 390Q228 381 206 359Q162 315 142 235T121 119Q121 73 147 50Q169 26 205 26H209Q321 26 394 111Q403 121 406 121Q410 121 419 112T429 98T420 83T391 55T346 25T282 0T202 -11Q127 -11 81 37T34 159Z"></path></g></g></g></svg></g><!--tex-->
 <text class="code end" x="188" y="196">4</text>
 <text class="n" x="18" y="218">samples ns</text>
 <text class="code end" x="188" y="218">41,447</text>
