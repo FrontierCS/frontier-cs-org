@@ -184,7 +184,7 @@ function drawECI() {
     if (e < 0) bar.style.transformOrigin = 'right center';   // a bar below Kimi K2.7 grows leftwards from 0
     // an interval below 0 is cut at the axis's 0 with no cap there (owner, 2026-10-17: the axis starts at 0); the tooltip keeps the full interval
     const lo0 = Math.max(lo, 0), wk = sv('path', {class:'ewhisk', d:`M${X(lo0)},${yc}H${X(hi)}${lo >= 0 ? `M${X(lo)},${yc - 7}v14` : ''}M${X(hi)},${yc - 7}v14`, fill:'none', stroke:'var(--ink)', 'stroke-width':1.5});
-    const val = sv('text', {class:'val halo', x:X(e), y:yc - bh / 2 - 6, fill:MTXT(m.id), 'text-anchor':'middle'}, fe(e));   // as many decimals as keep the models apart
+    const val = sv('text', {class:'val', x:X(e), y:yc - bh / 2 - 6, fill:MTXT(m.id), 'text-anchor':'middle'}, fe(e));   // as many decimals as keep the models apart
     svg.append(bar, wk, val);
     if (an) { mark(bar, 'a-bar', i * .07); mark(wk, 'a-fade', .55 + i * .07); mark(val, 'a-fade', .55 + i * .07); }
     pts.push({x:X(e), y:yc, mean:true, html:`<b>${esc(m.name)}</b><br>FCI <b>${fe(e)}</b><br>90% interval ${fe(lo)}–${fe(hi)}`});
@@ -310,9 +310,10 @@ function drawTTS(t) {
     gl.querySelectorAll('path').forEach(el => { const n = el.getTotalLength(); for (let l = 0; l <= n; l += 6) { const q = el.getPointAtLength(l); near.push({x:q.x - 2, y:q.y - 2, w:4, h:4}); } });
     tips.sort((a, b) => b.e[1] - a.e[1]).forEach(({m, e}) => { const both = boxes.concat(near), lg = LOGO[m.lab];
       const name = (lg ? '\u2003\u2002' : '') + m.name;   // names are never shortened, phones included; an em and an en space keep room for the lab's logo and a gap
-      const n0 = svg.childElementCount;
-      if (labelDot(svg, both, X(e[0]), Y(e[1]), name, fr, MTXT(m.id), false, true)) boxes.push(both[both.length - 1]);
-      else labelDot(svg, boxes, X(e[0]), Y(e[1]), name, fr, MTXT(m.id), false, true);
+      const n0 = svg.childElementCount, nb = both.length;
+      // off every line, on a leader if it must move further out (owner, 2026-10-18: no white outline lets a name sit on a line)
+      if (labelDot(svg, both, X(e[0]), Y(e[1]), name, fr, MTXT(m.id), false, true, true)) boxes.push(...both.slice(nb));
+      else labelDot(svg, boxes, X(e[0]), Y(e[1]), name, fr, MTXT(m.id), false, true, true);
       if (svg.childElementCount === n0) return;
       const lab = svg.lastElementChild, dim = !TTS_KEY.has(m.id);
       if (lg) {   // the lab's logo before the name, as on the pass rate bars (Qiuyang, 2026-10-17)
@@ -389,7 +390,14 @@ function drawLB() {
         pts.push({x:X(ms[k]), y:yc, html:`<b>${esc(MNAME[it.m])}</b><br>${esc(r.label)} · ${esc(r.sub)}<br><b>${sgn(ms[k])}</b> against the human reference`, mean:true});
       });
       const edge = X(Math.max(...ms)) + 10, right = edge + 34 > W;
-      svg.append(sv('text', {class:'val', x: right ? X(Math.min(...ms)) - 10 : edge, y:yc + 4.5, fill:'var(--ink-2)', 'text-anchor': right ? 'end' : 'start'}, sgn(Math.max(...ms))));
+      const bv = sv('text', {class:'val', x: right ? X(Math.min(...ms)) - 10 : edge, y:yc + 4.5, fill:'var(--ink-2)', 'text-anchor': right ? 'end' : 'start'}, sgn(Math.max(...ms)));
+      svg.append(bv);
+      // no white outline (owner, 2026-10-18): a value that would cross the dark 0 line goes left of the dots, or past the line
+      const bw = bv.getComputedTextLength(), bx = right ? X(Math.min(...ms)) - 10 - bw : edge;
+      if (bx < X(0) + 2 && bx + bw > X(0) - 2) {
+        if (X(Math.min(...ms)) - 10 - bw >= L) { bv.setAttribute('x', X(Math.min(...ms)) - 10); bv.setAttribute('text-anchor', 'end'); }
+        else { bv.setAttribute('x', X(0) + 4); bv.setAttribute('text-anchor', 'start'); }
+      }
       y0 += h; return;
     }
     r.items.forEach((it, k) => {
@@ -406,9 +414,12 @@ function drawLB() {
       });
       const dot = sv('circle', {cx:X(mu), cy:yc, r:8, fill:MCOL[it.m], stroke:'#fff', 'stroke-width':2});
       pts.push({x:X(mu), y:yc, html:`<b>${esc(MNAME[it.m])}</b><br>Mean <b>${sgn(mu)}</b> against the human reference`, mean:true});
-      // the mean sits above its own dot, with a white halo over the run dots
-      const val = sv('text', {class:'val halo', x:X(mu), y:yc - 15, fill:MTXT(it.m), 'text-anchor':'middle'}, sgn(mu));
+      // the mean sits above its own dot, clear of the run dots, with no white outline (owner, 2026-10-18); a value that
+      // would cross the dark 0 line moves along to the line's side its mean is on
+      const val = sv('text', {class:'val', x:X(mu), y:yc - 19, fill:MTXT(it.m), 'text-anchor':'middle'}, sgn(mu));
       svg.append(dot, val);
+      const vw = val.getComputedTextLength() / 2 + 3;
+      if (Math.abs(X(mu) - X(0)) < vw) { val.setAttribute('x', mu >= 0 ? X(0) + 3 : X(0) - 3); val.setAttribute('text-anchor', mu >= 0 ? 'start' : 'end'); }
       if (an) { mark(dot, 'a-pop', dm); mark(val, 'a-fade', dm + .15); }
     });
     y0 += h;

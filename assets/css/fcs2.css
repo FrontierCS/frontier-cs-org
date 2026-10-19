@@ -133,7 +133,6 @@ h2{font-weight:600; font-size:clamp(25px,2.4vw,30px); line-height:1.2; margin:0}
 @media (max-width:900px){ .how-why{grid-template-columns:1fr; grid-template-rows:none} .how-why li:last-child{grid-column:auto; grid-row:auto} }
 .res-scroll{position:relative; overflow-x:auto; -webkit-overflow-scrolling:touch}   /* positioned, so the hidden Pass/Fail words inside clip with the table */
 .res th{white-space:nowrap}
-.plot .halo{paint-order:stroke; stroke:#fff; stroke-width:4px; stroke-linejoin:round}
 table.res{width:100%; border-collapse:collapse; font-size:15px}
 .res th{text-align:right; font-weight:600; font-size:13px; color:var(--ink-2); padding:10px 12px; border-bottom:1px solid var(--ink-2); vertical-align:bottom}
 .res th:first-child,.res td:first-child{text-align:left; padding-left:0}
@@ -213,7 +212,7 @@ table.res{width:100%; border-collapse:collapse; font-size:15px}
 .cplot .pt{font-size:13px; font-weight:600; fill:var(--ink)}
 .cplot .tk{font-size:12px; fill:#3c4043}
 .cplot .tk.fam{fill:var(--ink); font-size:12.5px}
-.cplot .an{font-size:13px; fill:var(--ink); paint-order:stroke; stroke:#fff; stroke-width:4px; stroke-linejoin:round} .cplot .an.b{font-weight:600}
+.cplot .an{font-size:13px; fill:var(--ink)} .cplot .an.b{font-weight:600}
 .cplot .fbar{cursor:default}
 @media (max-width:560px){ .cplot .an{font-size:12px} .cplot .tk.fam{font-size:11.5px} }
 .ctip{position:absolute; z-index:5; pointer-events:none; background:#fff; border:1px solid var(--line-2); box-shadow:0 6px 18px rgba(32,33,36,.14); border-radius:6px; padding:10px 12px; font-size:13px; line-height:1.35; width:max-content; max-width:min(280px,82vw)}
