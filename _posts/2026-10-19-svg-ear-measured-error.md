@@ -151,7 +151,9 @@ Astra beat the human reference on speed on all twelve clips. Its clips took 728.
 
 Five checks fell short: LPIPS on two clips, SSIM on two and PSNR on one. No run was faster on average. Only GPT-6.1 Sol, with exact attention, came closer to the dense videos.
 
-<!-- TODO (needs a per-clip export; the site files hold means and counts): the brief says the misses are on two Wan clips, wan_2 and wan_5; that Astra runs at 0.78 to 0.80 times the reference's time on Wan and 0.94 on HunyuanVideo, against the 0.96 limit; and that its hunyuan_3 PSNR is 28.96 dB against 24.76. -->
+All five fell on two Wan clips. On Wan clip 2 it missed all three image scores, and on Wan clip 5 it missed LPIPS and SSIM. On the Wan clips it took 0.78 to 0.80 of the reference's time. On HunyuanVideo it took 0.94 to 0.95, close to the limit of 0.96. Away from those two clips it often beat the reference by a wide margin. On HunyuanVideo clip 3 its PSNR was 28.96 dB, against 24.76.
+
+<!-- Per-clip numbers: the platform's per-workload export of the leaderboard runs' final evidence (exports/metric-values-1018a, merged), final suite only. -->
 
 <!-- TODO Figure 4 (not drawn; see the report): each model's mean time per clip against its mean PSNR, with the human reference as a cross; GPT-6 Astra low and right, GPT-6.1 Sol high and right. -->
 
@@ -173,7 +175,7 @@ Its clips took 941.8 seconds on average, against 891.0, so it lost all twelve sp
 
 Sol beat the reference's PSNR on 11 clips, its LPIPS on 10 and its SSIM on 9. Exact attention missed six fidelity checks, and Astra's sparse attention missed five. Skipping work is not the only way to miss the bands.
 
-<!-- TODO (needs a per-clip export): the brief says Sol misses on the same two clips as Astra, wan_2 and wan_5. Sol misses SSIM on three clips, so its misses cover at least three clips. -->
+The misses fell where Astra's did. Exact attention missed all three image scores on Wan clip 2, and LPIPS and SSIM on Wan clip 5. These are the five checks Astra missed. Sol missed one more, SSIM on Wan clip 1. On those two clips, then, Astra's misses do not come from skipping work. Exact attention misses them too.
 
 The score makes a second point. It has no thresholds. It rewards fidelity, and speed against the dense run that made each target. A clip with perfect fidelity, no faster than that run, scores 25. Sol beat the time of the dense runs and kept its fidelity high. It scored 38.42, above the human reference's 33.9, and does not pass.
 
@@ -185,7 +187,7 @@ Gemini 4 Argon went back to Sparse VideoGen2. It computes the blocks with the mo
 
 It passed all twelve speed checks, at 833.0 seconds per clip on average. It lost on fidelity. It beat the reference's LPIPS on 4 of the 12 clips, and its PSNR and SSIM on 5. Its mean PSNR was 21.21 dB, against 21.67.
 
-<!-- TODO (needs a per-clip export): the brief says all four HunyuanVideo clips fail on fidelity. The counts above mean LPIPS misses on eight clips, so the misses reach at least four Wan clips too. -->
+Its misses covered all four HunyuanVideo clips, on every image score, and four of the eight Wan clips. On HunyuanVideo its PSNR fell below the reference's on every clip, while Astra's rose above it on every clip. The estimate of the dropped blocks is what the HunyuanVideo clips needed.
 
 Dropping the estimate did not buy the most speed. Astra's clips, estimates and all, took 728.6 seconds. Gemini 4 Argon's run scored 34.98.
 
