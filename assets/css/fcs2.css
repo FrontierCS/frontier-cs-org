@@ -451,6 +451,9 @@ a.pbtn:hover{border-color:var(--teal); color:var(--teal-d)}
 .fig2 .bad{fill:#c5221f} .fig2 .sbad{fill:none; stroke:#c5221f; stroke-width:1.5}
 .fig2 .result{fill:#f1f3f4}
 .fig2 .sm{font-size:11.5px} .fig2 .mid{text-anchor:middle} .fig2 .end{text-anchor:end}
+/* formulas: TeX, drawn by bin/fcs2_fig_tex.py as MathJax's glyphs in paths (Qiuyang, 2026-10-19: a proper math face);
+   a formula takes its line's colour */
+.fig2 .tex{color:var(--ink)} .fig2 .tex.n{color:var(--muted)} .fig2 .tex.ak{color:var(--a, #174ea6)}
 .rtab th.rv, .rtab td.rv{text-align:left}
 .rtab th.rs, .rtab td.rs{width:50%; text-align:left}
 .rtab .rb{position:relative; display:block; height:14px; margin-right:3.2em}   /* the margin holds the value past a full bar */
