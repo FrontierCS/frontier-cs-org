@@ -84,14 +84,6 @@
     ]
    }
   },
-  "Hacking Blind": {
-   "k27": {
-    "correctness": [
-     11,
-     11
-    ]
-   }
-  },
   "egg": {
    "k27": {
     "congruence_seconds": [
@@ -117,18 +109,6 @@
     "peak_memory_mib": [
      23,
      24
-    ]
-   }
-  },
-  "Spectre": {
-   "k27": {
-    "cost": [
-     0,
-     20
-    ],
-    "valid_cut": [
-     0,
-     20
     ]
    }
   },
@@ -209,26 +189,6 @@
     "transaction_path_accuracy": [
      4,
      6
-    ]
-   }
-  },
-  "Progent": {
-   "k27": {
-    "duration_seconds": [
-     44,
-     48
-    ],
-    "enforcement_seconds": [
-     44,
-     48
-    ],
-    "permitted_call_utility": [
-     48,
-     48
-    ],
-    "unauthorized_call_success_rate": [
-     48,
-     48
     ]
    }
   },
@@ -844,30 +804,6 @@
     ]
    }
   },
-  "Opal": {
-   "k27": {
-    "admissible_chunks": [
-     120,
-     120
-    ],
-    "admissible_recall": [
-     120,
-     120
-    ],
-    "oram_blocks_per_access": [
-     120,
-     120
-    ],
-    "retrieval_hit": [
-     120,
-     120
-    ],
-    "trace_shape_match": [
-     120,
-     120
-    ]
-   }
-  },
   "Diffusion Policy": {
    "k27": {
     "complete_workload_wall_seconds": [
@@ -885,22 +821,6 @@
     "mean_predict_action_seconds": [
      4,
      4
-    ]
-   }
-  },
-  "Adaptive attacks": {
-   "k27": {
-    "attack_bytes": [
-     3,
-     3
-    ],
-    "attack_success_rate": [
-     2,
-     3
-    ],
-    "successful_normalized_diversity": [
-     2,
-     3
     ]
    }
   },
