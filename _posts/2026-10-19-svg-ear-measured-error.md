@@ -108,13 +108,13 @@ The size of the budget comes from Sparse VideoGen2. For each query cluster, it c
 
 The 90% rule is the same for every head of every layer. Heads differ. Some attend to a few nearby tokens, and others spread over the whole clip. A share of estimated weight says little about how much error a head will make.
 
-Astra measures the error instead. Every few denoising steps it takes a small set of real queries as probes. It computes their exact attention and compares it with its sparse result. That gives each head a measured error. Each head then runs at the lowest density cap whose error stays within a bound. A head whose cap would come out too high runs dense attention.
+Astra measures the error instead. Every fourth denoising step, it takes 32 query tokens as probes, at equal spacing over the tokens in cluster order. It computes their exact attention over every key. It then rebuilds their output the sparse way, under three caps. Each query cluster may compute 12%, 25% or 50% of the keys.
 
-<!-- TODO (verify against Astra's patch, which is not in assets/patches/svg-ear.json): the brief gives "every 4 steps" and "32 probe queries"; confirm both and state them here. Confirm that the probes are query tokens, not cluster averages, and say how the bound and the caps are set. -->
+Each head runs at the lowest cap that passes a bound. The mean squared gap must stay under 0.0005 times the mean square of the exact output. A head that fails even at 50% runs dense attention until the next check.
 
-Astra's probes differ from the paper's in two ways. They are real queries, where the paper uses each query cluster's average. They measure the error of a whole head. The paper estimates error block by block, inside a budget set in advance.
+Inside its cap, a head ranks blocks by estimated weight, the older rule, not by error. It keeps blocks until they hold 98% of that weight or fill the cap. Astra moves the error check from blocks to heads. The paper checks each block with a cluster's average query, inside a budget fixed in advance. Astra checks each head with real queries, and lets that error set the budget.
 
-<!-- TODO Figure 3 (not drawn; see the report): Astra's loop for one head; every few steps, probes run exact and sparse attention, the gap sets the density cap, and a cap above the limit switches the head to dense. -->
+<!-- TODO Figure 3 (not drawn; see the report): Astra's loop for one head; every fourth step, 32 probes run exact attention and the sparse path under caps of 12%, 25% and 50%; the lowest cap within the bound wins, and a head that fails all three runs dense. -->
 
 ## A Term the Paper Leaves Out
 
@@ -122,28 +122,51 @@ Return to cluster B, and suppose the budget leaves no room to compute it. Its es
 
 A second-order expansion of each $$e^{s_j}$$ around $$\bar s$$ gives the size of the gap:
 
-$$\frac{1}{n} \sum_j e^{s_j} \approx e^{\bar s} \Big( 1 + \frac{\sigma^2}{2} \Big),$$
+$$\frac{1}{n} \sum_j e^{s_j} \approx e^{\bar s} \Big( 1 + \frac{\sigma^2}{2} \Big) \approx e^{\bar s + \sigma^2/2},$$
 
-where $$\sigma^2$$ is the variance of the query's scores over the cluster's keys. Since a score is linear in the key, $$\sigma^2 = q^\top \Sigma\, q / d$$, where $$\Sigma$$ is the covariance of the cluster's keys. B's two scores, 0 and 2, have variance 1. The corrected estimate for B is about 8.2, against the true 8.4.
+where $$\sigma^2$$ is the variance of the query's scores over the cluster's keys. The last form puts the fix inside the score. A kernel that already scores each centroid adds one term, and nothing else changes.
 
-SVG-EAR gives a skipped cluster the weight $$n\, e^{\bar s}$$, with no variance term [1]. Astra adds the term to every block it estimates. Two more runs found the same correction on their own, one by GPT-6.1 Sol and one by Claude Opus 5.5. Neither is a leaderboard run. The excerpts below show the term in Astra's code and in Sol's.
+In terms of the keys, $$\sigma^2 = q^\top \Sigma\, q / d$$, where $$\Sigma$$ is the covariance of the cluster's keys. Every run in this section keeps one variance per key coordinate, and ignores how coordinates move together:
 
-<!-- TODO (verify against the patches): which form each run uses, the factor 1 + σ²/2 or the exponent e^(σ²/2); how each computes σ² (full covariance, per-dimension variances or one variance per cluster); and whether either also corrects the averaged values. -->
+$$\sigma^2 \approx \frac{1}{d} \sum_{i=1}^{d} q_i^2 \operatorname{Var}(k_i).$$
+
+B's two scores, 0 and 2, have variance 1. The corrected estimate is about 9.0, against the true 8.4. It overshoots here, but it lands far closer than 5.4.
+
+SVG-EAR gives a skipped cluster the weight $$n\, e^{\bar s}$$, with no variance term [1]. Astra adds the term to every block it estimates, at a strength it sets per head. On the probes it tries the term at 0, ½, 1 and 1½ times its full size. It keeps the strength with the smallest error.
+
+Two runs off the leaderboard found the same term on their own. They come from a batch of exploration runs, which the leaderboard does not count. GPT-6.1 Sol's exploration run adds the full term to every estimated score, capped at 2. It scored 49.28 there, and it failed as well. Claude Opus 5.5's exploration run uses the same form at half strength, and on HunyuanVideo only. All three runs use the plain average of the values, with no correction.
 
 <div class="cs-pair" markdown="1">
 <div markdown="1">
-<p class="cs-cap">GPT-6 Astra, leaderboard run</p>
+<p class="cs-cap">GPT-6 Astra, leaderboard run: <code>svg/solver_extensions/adaptive.py</code>, lines 67 to 74</p>
 
-<!-- TODO: Astra leaderboard-run snippet. Its final patch is not in assets/patches/svg-ear.json, which holds Claude Opus 5.5's patch alone; export it first. -->
+```python
+group_scores = sampled_queries @ key_means.float().transpose(-2, -1) / dim**.5
+variance_scores = sampled_queries.square() @ key_vars.float().transpose(-2, -1) / (2 * dim)
+group_scores += col_sizes.clamp_min(1).float().log().unsqueeze(-2)
+tail_candidates = []
+for factor in (0., .5, 1., 1.5):
+    group_weights = (group_scores + factor * variance_scores - maximum).exp()
+    group_weights.masked_fill_(col_sizes.unsqueeze(-2) == 0, 0.)
+    tail_candidates.append(group_weights)
+```
 
 </div>
 <div markdown="1">
-<p class="cs-cap">GPT-6.1 Sol, a run outside the leaderboard</p>
+<p class="cs-cap">GPT-6.1 Sol, exploration run off the leaderboard: <code>svg/solver_extensions/clustered.py</code>, lines 85 to 89</p>
 
-<!-- TODO: Sol exploration-run snippet -->
+```python
+scores = tl.dot(queries, keys) * (dim ** -0.5)
+if corrected:
+    variances = tl.load(variance + (head_idx * key_clusters + key_idx[None, :]) * dim + channels[:, None],
+                        (key_idx[None, :] < key_clusters) & (channels[:, None] < dim), 0)
+    scores += 0.5 * tl.minimum(tl.dot(queries_squared, variances) / dim, 4.0)
+```
 
 </div>
 </div>
+
+In both, the new term is the squared query against the per-coordinate key variances, over $$2d$$. Astra's excerpt is the probe check, which tries four strengths for each head. Its kernel in <code>sparse.py</code> then applies the chosen strength. Sol's excerpt sits in its kernel and applies one strength everywhere.
 
 ## Results
 
@@ -157,19 +180,18 @@ All five fell on two Wan clips. On Wan clip 2 it missed all three image scores, 
 
 <!-- TODO Figure 4 (not drawn; see the report): each model's mean time per clip against its mean PSNR, with the human reference as a cross; GPT-6 Astra low and right, GPT-6.1 Sol high and right. -->
 
+Astra saves time outside the estimate too. Its dense steps and dense heads run on FlashInfer's dense kernel, the one Sol uses below. It reclusters the tokens every other step, with 12 k-means rounds at the start and 1 per step. The human reference runs 50 and 2.
+
 The task scored the run 48.59, the highest on this task, against 33.9 for the human reference. The run cost $77.24, the most of any run here.
 
-<!-- TODO: export GPT-6 Astra's final patch to assets/patches/cases/svg-ear-astra.json (bin/fcs2_patches_from_platform.py --export=DIR, as for the BBQ case study), then uncomment the three lines below.
 The patch below is the final submission, the code the hidden workloads scored.
+
 <div class="tsol taskpage cs-patch" data-patch data-model="GPT-6 Astra"><a href="{{ '/assets/patches/cases/svg-ear-astra.json' | relative_url }}" hidden></a></div>
 <script defer src="{{ '/assets/js/fcs2-patch.js' | relative_url }}"></script>
--->
 
 ## GPT-6.1 Sol: Exact Attention as a Yardstick
 
-GPT-6.1 Sol's leaderboard run ended with no sparse attention at all. Its final version computes every clip with exact attention, through a faster dense kernel.
-
-<!-- TODO (verify against Sol's leaderboard patch, not in the repo): that the final version is dense on every layer and step, and which kernel it calls; the brief says FlashAttention 3. -->
+GPT-6.1 Sol's leaderboard run ended with no sparse attention at all. Both of its processors return exact attention before any clustering. They call FlashInfer's dense kernel and ask first for its FlashAttention 3 backend. The sparse path is still in the files, behind a switch set to dense.
 
 Its clips took 941.8 seconds on average, against 891.0, so it lost all twelve speed checks. Its fidelity was the best of any run: PSNR 25.38 dB, SSIM 0.808 and LPIPS 0.1721. Its clips are not copies of the dense targets: an identical clip has infinite PSNR.
 
@@ -181,9 +203,7 @@ The score makes a second point. It has no thresholds. It rewards fidelity, and s
 
 ## Gemini 4 Argon: Skipping Without an Estimate
 
-Gemini 4 Argon went back to Sparse VideoGen2. It computes the blocks with the most weight and drops the rest, with no estimate. This is the first move of the toy example, where A's weight was lost.
-
-<!-- TODO (verify against Gemini 4 Argon's leaderboard patch, not in the repo): that it keeps no estimate of the dropped blocks. -->
+Gemini 4 Argon went back to Sparse VideoGen2. Its SVG-EAR processors only call the Sparse VideoGen2 processors they inherit from. Those compute the blocks with the most weight and drop the rest. The routine meant to merge in the estimate computes the chosen blocks and nothing more. This is the first move of the toy example, where A's weight was lost.
 
 It passed all twelve speed checks, at 833.0 seconds per clip on average. It lost on fidelity. It beat the reference's LPIPS on 4 of the 12 clips, and its PSNR and SSIM on 5. Its mean PSNR was 21.21 dB, against 21.67.
 
