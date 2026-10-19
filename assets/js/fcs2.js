@@ -714,7 +714,8 @@ function startPlay(tile) {
 }
 // The card tells a task in three panels that follow one another: the paper and, in one sentence, what the agent has to
 // do; which models passed (a tick) and which failed (a cross); and where the task ranks by difficulty among
-// all tasks (owner, 2026-10-13: the run curves said too little for the room they took).
+// all tasks (owner, 2026-10-13: the run curves said too little for the room they took). A task with no runs yet has the
+// first panel alone (Continuum, Qiuyang, 2026-10-18).
 // Icons for the kinds of metric a task is scored on (KEYM), each a path in a 14 px box centred on (x, y).
 const KEY_KIND = {Latency:'time', Throughput:'speed', Accuracy:'quality', Quality:'quality', 'Success rate':'quality', Reward:'quality',
   Memory:'size', Size:'size', Compression:'size', Communication:'size', Fairness:'balance', Coverage:'count'};
@@ -735,7 +736,7 @@ function wrapText(svg, str, width, fs, weight) {   // greedy line breaking by me
 }
 function showRun() {
   const p = play, s = p.tile.dataset.s, t = TASK_OF[s], svg = $('#mapsvg'), field = ART_FIELD[p.tile.dataset.k];
-  const PX = 18, top = p.y + 48, inner = p.w - 2 * PX, n = 3, panel = sv('g', {class:'pline'}), narrow = p.narrow;
+  const PX = 18, top = p.y + 48, inner = p.w - 2 * PX, n = p.runs.length ? 3 : 1, panel = sv('g', {class:'pline'}), narrow = p.narrow;
   const lines = (str, y, fs, weight, lh, max, op = 1) => { let L = wrapText(svg, str, inner, fs, weight);
     if (L.length > max) { L = L.slice(0, max); L[max - 1] = L[max - 1].replace(/[\s,;:.]*\S*$/, '') + '…'; }
     L.forEach((ln, i) => panel.append(sv('text', {x:p.x + PX, y:y + i * lh, 'font-size':fs, 'font-weight':weight, fill:'#fff', 'fill-opacity':op}, ln))); return y + L.length * lh; };
@@ -779,10 +780,10 @@ function showRun() {
         sv('text', {x:p.x + PX, y:sy + 26, 'font-size':12, fill:'#fff', 'fill-opacity':.85}, 'easier'), sv('text', {x:p.x + PX + inner, y:sy + 26, 'text-anchor':'end', 'font-size':12, fill:'#fff', 'fill-opacity':.85}, 'harder')); }
   }
   // which panel this is: three small dots at the bottom
-  for (let i = 0; i < n; i++) panel.append(sv('circle', {cx:p.x + p.w / 2 + (i - 1) * 14, cy:p.y + p.h - 16, r:3.2, fill:'#fff', 'fill-opacity':i === p.k ? 1 : .4}));
+  if (n > 1) for (let i = 0; i < n; i++) panel.append(sv('circle', {cx:p.x + p.w / 2 + (i - 1) * 14, cy:p.y + p.h - 16, r:3.2, fill:'#fff', 'fill-opacity':i === p.k ? 1 : .4}));
   p.card.querySelector('.pline')?.remove(); p.card.append(panel); p.who.textContent = '';
   if (!calm) panel.animate([{opacity:0, transform:'translateY(6px)'}, {opacity:1, transform:'none'}], {duration:280, easing:'cubic-bezier(.2,0,0,1)', fill:'both'});
-  p.t = setTimeout(() => {
+  if (n > 1) p.t = setTimeout(() => {
     const go = () => { if (play !== p) return; p.k = (p.k + 1) % n; showRun(); };
     if (calm) go(); else panel.animate([{opacity:1}, {opacity:0}], {duration:220, fill:'forwards'}).onfinish = go;
   }, p.k === 0 ? 2500 : 1800);   // owner, 2026-10-13: faster (was 4.2 s and 3.2 s, then 3.4 s and 2.6 s)

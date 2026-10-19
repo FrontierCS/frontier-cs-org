@@ -137,6 +137,7 @@ TASK = {
     'GPU DBSCAN Kernel Optimization': ('MLSys', 'dbscan kernel'),
     'GPU IVF-PQ Search Kernel Optimization': ('MLSys', 'ivf_pq kernel'),
     'GPU K-Means Kernel Optimization': ('MLSys', 'kmeans kernel'),
+    'GPU vLLM Serving Optimization': ('MLSys', 'Continuum'),   # shown as Continuum, in MLSys (Qiuyang, 2026-10-18)
     'Go1 Command-Conditioned Behavior': ('Robotics', 'MuJoCo Playground'),
     'Graph Mining Method Selection': ('Database', 'ScaleGPM'),
     'Hypergraph Core Numbers': ('HPC', 'Hygra'),
