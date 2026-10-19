@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="fig2" viewBox="0 0 760 300" role="img" aria-label="Left, what is given: one attention head of Qwen3-4B, with the keys K and values V of every token of a QuALITY article, a few sample queries, and a budget t for the head, a tenth of the article&#8217;s tokens overall. Right, what the agent writes: a small cache for the head in three steps. First, keep a few of the keys. Second, give each kept key a bias, so that together they draw the attention all the keys drew. Third, fit new values by least squares, so that for every sample query q, softmax of q C transposed plus beta, times C2, matches softmax of q K transposed, times V.">
+<defs><marker id="kvc-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arh" d="M0 0L10 5L0 10z"/></marker></defs>
+<rect class="given" x="0" y="0" width="262" height="300" rx="10"/>
+<text class="k" x="18" y="30">GIVEN</text>
+<text class="b" x="18" y="56">One attention head</text>
+<text class="code n" x="18" y="81">K</text>
+<rect class="chip" x="36" y="70" width="14" height="16" rx="3"/>
+<rect class="chip" x="53" y="70" width="14" height="16" rx="3"/>
+<rect class="chip" x="70" y="70" width="14" height="16" rx="3"/>
+<rect class="chip" x="87" y="70" width="14" height="16" rx="3"/>
+<rect class="chip" x="104" y="70" width="14" height="16" rx="3"/>
+<rect class="chip" x="121" y="70" width="14" height="16" rx="3"/>
+<rect class="chip" x="138" y="70" width="14" height="16" rx="3"/>
+<rect class="chip" x="155" y="70" width="14" height="16" rx="3"/>
+<rect class="chip" x="172" y="70" width="14" height="16" rx="3"/>
+<rect class="chip" x="189" y="70" width="14" height="16" rx="3"/>
+<rect class="chip" x="206" y="70" width="14" height="16" rx="3"/>
+<rect class="chip" x="223" y="70" width="14" height="16" rx="3"/>
+<text class="code n" x="18" y="103">V</text>
+<rect class="chip" x="36" y="92" width="14" height="16" rx="3"/>
+<rect class="chip" x="53" y="92" width="14" height="16" rx="3"/>
+<rect class="chip" x="70" y="92" width="14" height="16" rx="3"/>
+<rect class="chip" x="87" y="92" width="14" height="16" rx="3"/>
+<rect class="chip" x="104" y="92" width="14" height="16" rx="3"/>
+<rect class="chip" x="121" y="92" width="14" height="16" rx="3"/>
+<rect class="chip" x="138" y="92" width="14" height="16" rx="3"/>
+<rect class="chip" x="155" y="92" width="14" height="16" rx="3"/>
+<rect class="chip" x="172" y="92" width="14" height="16" rx="3"/>
+<rect class="chip" x="189" y="92" width="14" height="16" rx="3"/>
+<rect class="chip" x="206" y="92" width="14" height="16" rx="3"/>
+<rect class="chip" x="223" y="92" width="14" height="16" rx="3"/>
+<text class="n" x="18" y="132">a key and a value for every token</text>
+<text class="code n" x="18" y="163">q</text>
+<rect class="g3" x="36" y="152" width="14" height="16" rx="3"/>
+<rect class="g3" x="53" y="152" width="14" height="16" rx="3"/>
+<rect class="g3" x="70" y="152" width="14" height="16" rx="3"/>
+<text class="n" x="96" y="164">sample queries</text>
+<text class="b" x="18" y="200">A budget t for the head</text>
+<text class="n" x="18" y="218">a tenth of the tokens overall</text>
+<text x="18" y="254">Qwen3-4B answers questions</text>
+<text x="18" y="272">on QuALITY articles</text>
+<rect class="agent" x="278" y="0" width="482" height="300" rx="10"/>
+<text class="k ak" x="298" y="30">THE AGENT WRITES</text>
+<text class="h" x="298" y="53">A small cache that attends the same way</text>
+<circle class="chip" cx="307" cy="83.5" r="9"/><text class="sn ak" x="307" y="88" text-anchor="middle">1</text>
+<text x="324" y="88">Keep a few of the keys</text>
+<rect class="chip pad" x="298" y="100" width="14" height="16" rx="3"/>
+<rect class="chip pad" x="315" y="100" width="14" height="16" rx="3"/>
+<rect class="chip on" x="332" y="100" width="14" height="16" rx="3"/>
+<rect class="chip pad" x="349" y="100" width="14" height="16" rx="3"/>
+<rect class="chip pad" x="366" y="100" width="14" height="16" rx="3"/>
+<rect class="chip pad" x="383" y="100" width="14" height="16" rx="3"/>
+<rect class="chip pad" x="400" y="100" width="14" height="16" rx="3"/>
+<rect class="chip pad" x="417" y="100" width="14" height="16" rx="3"/>
+<rect class="chip pad" x="434" y="100" width="14" height="16" rx="3"/>
+<rect class="chip on" x="451" y="100" width="14" height="16" rx="3"/>
+<rect class="chip pad" x="468" y="100" width="14" height="16" rx="3"/>
+<rect class="chip pad" x="485" y="100" width="14" height="16" rx="3"/>
+<line class="ar" x1="512" y1="108" x2="540" y2="108" marker-end="url(#kvc-ar)"/>
+<rect class="chip on" x="548" y="100" width="14" height="16" rx="3"/>
+<rect class="chip on" x="565" y="100" width="14" height="16" rx="3"/>
+<text class="code n" x="590" y="112">C, at most t</text>
+<circle class="chip" cx="307" cy="147.5" r="9"/><text class="sn ak" x="307" y="152" text-anchor="middle">2</text>
+<text x="324" y="152">Give each kept key a bias β</text>
+<text class="n sm" x="298" y="178">all keys</text>
+<rect class="g3" x="400" y="170" width="150" height="7" rx="2"/>
+<text class="n sm" x="298" y="196">kept keys, with β</text>
+<rect class="fa" x="400" y="188" width="150" height="7" rx="2"/>
+<text class="n sm" x="562" y="187">the same total attention</text>
+<circle class="chip" cx="307" cy="227.5" r="9"/><text class="sn ak" x="307" y="232" text-anchor="middle">3</text>
+<text x="324" y="232">Fit new values C₂ by least squares</text>
+<rect class="chip on" x="298" y="244" width="300" height="34" rx="6"/>
+<text class="code mid" x="448" y="265.5">softmax(qCᵀ + β) C₂ ≈ softmax(qKᵀ) V</text>
+<text class="n" x="612" y="258">for every</text>
+<text class="n" x="612" y="276">sample query q</text>
+</svg>
