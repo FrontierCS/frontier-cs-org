@@ -3,10 +3,10 @@ layout: distill
 page_css: fcs2-patch   # the patch viewer of the task pages
 title: "Sparse Video Attention That Measures Its Own Error"
 description: "SVG-EAR, an ECCV 2026 method, speeds up video models by computing part of attention and estimating the rest from cluster averages. GPT-6 Astra measured each head's error as it ran, and added a variance term the method lacks. We build the method up from a one-query example to show how."
-# TODO: thumbnail: assets/img/blog-thumbs/svg-ear-measured-error.svg (not drawn yet)
+thumbnail: assets/img/blog-thumbs/svg-ear-measured-error.svg
 tags: [FrontierCS 2, Case study]
 case:
-  # TODO: thumbnail: assets/img/case-thumbs/svg-ear-measured-error.svg, in the MLSys tones (not drawn yet)
+  thumbnail: assets/img/case-thumbs/svg-ear-measured-error.svg   # the overview row, in the Systems tones (MLSys)
   task: SVG-EAR
   model: GPT-6 Astra
   # the overview's Case studies row: a one-line summary and the key result beside the thumbnail
