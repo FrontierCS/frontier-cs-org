@@ -77,11 +77,14 @@ _styles: >
   d-article .fig2 .arh { fill: #5f6368; }
   d-article .fig2 .tex { color: var(--ink); } d-article .fig2 .tex.n { color: var(--muted); } d-article .fig2 .tex.ak { color: var(--a); }
   /* two code excerpts side by side, one above the other on phones */
-  d-article .cs-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 28px 0; }
-  @media (max-width: 760px) { d-article .cs-pair { grid-template-columns: 1fr; } }
+  /* two code excerpts, one above the other at full width, so no line is cut off (Qiuyang, 2026-10-19: side by side was ugly) */
+  d-article .cs-pair { display: grid; gap: 24px; margin: 28px 0; }
   d-article .cs-pair > div { min-width: 0; }
-  d-article .cs-pair .cs-cap { font-size: 15px; font-weight: 600; line-height: 1.4; margin: 0 0 8px; }
-  d-article .cs-pair pre { overflow-x: auto; font-size: 12.5px; }
+  d-article .cs-pair .cs-cap { font-size: 13.5px; line-height: 1.45; color: var(--muted); margin: 0 0 6px; }
+  d-article .cs-pair .cs-cap b { color: var(--ink); font-weight: 600; }
+  d-article .cs-pair .cs-path { font-family: var(--font-code, monospace); font-size: 12.5px; }
+  d-article .cs-pair pre { overflow-x: auto; font-size: 13px; margin: 0; }
+  d-article .cs-pair .highlighter-rouge, d-article .cs-pair .highlight { margin: 0; }
   /* the patch viewer of the task pages (assets/css/fcs2-patch.css); the article's own p and h3 rules would set its
      model line and heading larger than a task page does */
   d-article .cs-patch { margin: 28px 0 8px; }
@@ -179,35 +182,41 @@ Two runs off the leaderboard found the same term on their own. They come from a 
 
 <div class="cs-pair" markdown="1">
 <div markdown="1">
-<p class="cs-cap">GPT-6 Astra, leaderboard run: <code>svg/solver_extensions/adaptive.py</code>, lines 67 to 74</p>
+<p class="cs-cap"><b>GPT-6 Astra</b>, leaderboard run · <span class="cs-path">svg/solver_extensions/adaptive.py</span>, lines 67–74</p>
 
 ```python
-group_scores = sampled_queries @ key_means.float().transpose(-2, -1) / dim**.5
-variance_scores = sampled_queries.square() @ key_vars.float().transpose(-2, -1) / (2 * dim)
+group_scores = (sampled_queries
+                @ key_means.float().transpose(-2, -1)) / dim**.5
+variance_scores = (sampled_queries.square()
+                   @ key_vars.float().transpose(-2, -1)) / (2 * dim)
 group_scores += col_sizes.clamp_min(1).float().log().unsqueeze(-2)
 tail_candidates = []
 for factor in (0., .5, 1., 1.5):
-    group_weights = (group_scores + factor * variance_scores - maximum).exp()
+    group_weights = (group_scores + factor * variance_scores
+                     - maximum).exp()
     group_weights.masked_fill_(col_sizes.unsqueeze(-2) == 0, 0.)
     tail_candidates.append(group_weights)
 ```
 
 </div>
 <div markdown="1">
-<p class="cs-cap">GPT-6.1 Sol, exploration run off the leaderboard: <code>svg/solver_extensions/clustered.py</code>, lines 85 to 89</p>
+<p class="cs-cap"><b>GPT-6.1 Sol</b>, exploration run off the leaderboard · <span class="cs-path">svg/solver_extensions/clustered.py</span>, lines 85–89</p>
 
 ```python
 scores = tl.dot(queries, keys) * (dim ** -0.5)
 if corrected:
-    variances = tl.load(variance + (head_idx * key_clusters + key_idx[None, :]) * dim + channels[:, None],
-                        (key_idx[None, :] < key_clusters) & (channels[:, None] < dim), 0)
-    scores += 0.5 * tl.minimum(tl.dot(queries_squared, variances) / dim, 4.0)
+    variances = tl.load(
+        variance + (head_idx * key_clusters + key_idx[None, :]) * dim
+                 + channels[:, None],
+        (key_idx[None, :] < key_clusters) & (channels[:, None] < dim), 0)
+    scores += 0.5 * tl.minimum(
+        tl.dot(queries_squared, variances) / dim, 4.0)
 ```
 
 </div>
 </div>
 
-In both, the new term is the squared query against the per-coordinate key variances, over $$2d$$. Astra's excerpt is the probe check, which tries four strengths for each head. Its kernel in <code>sparse.py</code> then applies the chosen strength. Sol's excerpt sits in its kernel and applies one strength everywhere.
+In both, the new term is the squared query against the per-coordinate key variances, over $$2d$$. Astra's excerpt is the probe check, which tries four strengths for each head. Its kernel in <code>sparse.py</code> then applies the chosen strength. Sol's excerpt sits in its kernel and applies one strength everywhere. Both excerpts are wrapped to fit the page; the code is otherwise as submitted.
 
 ## Results
 
