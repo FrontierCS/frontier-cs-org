@@ -564,6 +564,28 @@ Object.assign(ART, {
       g += Pa(`M${x + 74},${y + 11}H${x + 96}M${x + 154},${y + 11}H${x + 186}`, {stroke:i === 1 ? WHITE : s2, 'stroke-width':i === 1 ? 7 : 4, 'stroke-dasharray':i === 1 ? '' : '3 6'}); });
     return g;
   },
+  // KV Compaction: a long cache of keys, each bar its share of attention; a few are kept (white) and refitted into a small cache
+  'KV Compaction'(R, [bg, s1, s2]) {
+    const keep = [3, 9, 15], x = i => 22 + i * 14.4; let g = '';
+    for (let i = 0; i < 18; i++) { const h = 14 + R() * 30 + (keep.includes(i) ? 22 : 0);
+      g += Rc(x(i), 84 - h, 9, h, {rx:4, fill:keep.includes(i) ? WHITE : s1}); }
+    keep.forEach((i, j) => g += Pa(`M${x(i) + 4.5},90C${x(i) + 4.5},116 ${102 + j * 48},104 ${102 + j * 48},128`, {stroke:WHITE, 'stroke-width':4}));
+    g += Rc(84, 128, 132, 46, {rx:12, fill:s2, 'fill-opacity':.55});
+    for (let j = 0; j < 3; j++) g += Rc(90 + j * 48, 134, 24, 34, {rx:7, fill:WHITE});
+    return g;
+  },
+  // LRR: a regex as a chain of states. Left, the nested loops of (a+)+, which backtrack without end; right, the part at
+  // fault rewritten as one simple loop (white)
+  LRR(R, [bg, s1, s2]) {
+    const y = 128, L = [34, 76, 118], Rt = [190, 232, 274]; let g = Pa(`M${L[0]},${y}H${L[2]}`, {stroke:s1, 'stroke-width':5});
+    g += Pa(`M${L[2]},${y - 12}C${L[2]},${y - 104} ${L[0]},${y - 104} ${L[0]},${y - 12}`, {stroke:s1, 'stroke-width':7});
+    g += Pa(`M${L[2] - 4},${y - 12}C${L[2] - 4},${y - 62} ${L[1]},${y - 62} ${L[1]},${y - 12}`, {stroke:s2, 'stroke-width':6});
+    g += Pa(`M140,${y}H164M156,${y - 9}L166,${y}L156,${y + 9}`, {stroke:WHITE, 'stroke-width':5});
+    g += Pa(`M${Rt[0]},${y}H${Rt[2]}`, {stroke:WHITE, 'stroke-width':5});
+    g += Pa(`M${Rt[2]},${y - 12}C${Rt[2]},${y - 62} ${Rt[1]},${y - 62} ${Rt[1]},${y - 12}`, {stroke:WHITE, 'stroke-width':6});
+    L.forEach(x => g += C(x, y, 10, {fill:s2})); Rt.forEach(x => g += C(x, y, 10, {fill:WHITE}));
+    return g;
+  },
   // LeapQuant: the recurrent state of linear attention, quantized step by step without drifting (white)
   LeapQuant(R, [bg, s1, s2]) {
     let g = ''; for (let i = 0; i < 6; i++) { const x = 16 + i * 48; g += Rc(x, 34, 36, 64, {rx:8, fill:i === 5 ? WHITE : s1}); if (i < 5) g += Pa(`M${x + 38},66H${x + 46}`, {stroke:s1, 'stroke-width':5}); }
