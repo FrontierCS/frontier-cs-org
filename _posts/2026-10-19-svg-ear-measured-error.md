@@ -84,6 +84,7 @@ _styles: >
   d-article .cs-pair .cs-cap b { color: var(--ink); font-weight: 600; }
   d-article .cs-pair .cs-path { font-family: var(--font-code, monospace); font-size: 12.5px; }
   d-article .cs-pair pre { overflow-x: auto; font-size: 13px; margin: 0; }
+  d-article .cs-pair .highlighter-rouge, d-article .cs-pair .highlight { margin: 0; }
   /* the patch viewer of the task pages (assets/css/fcs2-patch.css); the article's own p and h3 rules would set its
      model line and heading larger than a task page does */
   d-article .cs-patch { margin: 28px 0 8px; }
