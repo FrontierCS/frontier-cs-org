@@ -7,7 +7,7 @@
 <rect class="g3" x="18" y="84" width="28" height="20"/>
 <text class="b mid" x="32.0" y="98.5">3</text>
 <rect class="g2" x="18" y="104" width="28" height="20"/>
-<text class="n mid" x="32.0" y="118.5">q</text>
+<g data-tex="$q$" data-attrs="class=&quot;n mid&quot; x=&quot;32.0&quot; y=&quot;118.5&quot;"><svg class="tex n" x="28.6" y="112.00" width="6.76" height="9.35" viewBox="0 -442 460 636" overflow="visible"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g><g><path d="M33 157Q33 258 109 349T280 441Q340 441 372 389Q373 390 377 395T388 406T404 418Q438 442 450 442Q454 442 457 439T460 434Q460 425 391 149Q320 -135 320 -139Q320 -147 365 -148H390Q396 -156 396 -157T393 -175Q389 -188 383 -194H370Q339 -192 262 -192Q234 -192 211 -192T174 -192T157 -193Q143 -193 143 -185Q143 -182 145 -170Q149 -154 152 -151T172 -148Q220 -148 230 -141Q238 -136 258 -53T279 32Q279 33 272 29Q224 -10 172 -10Q117 -10 75 30T33 157ZM352 326Q329 405 277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q233 26 290 98L298 109L352 326Z"></path></g></g></g></svg></g><!--tex-->
 <rect class="floor" x="18" y="124" width="28" height="20"/>
 <rect class="floor" x="18" y="144" width="28" height="20"/>
 <rect class="floor" x="18" y="164" width="28" height="20"/>
@@ -15,7 +15,7 @@
 <text class="mid" x="68.0" y="54">T2</text>
 <rect class="floor" x="54" y="64" width="28" height="20"/>
 <rect class="g2" x="54" y="84" width="28" height="20"/>
-<text class="n mid" x="68.0" y="98.5">q</text>
+<g data-tex="$q$" data-attrs="class=&quot;n mid&quot; x=&quot;68.0&quot; y=&quot;98.5&quot;"><svg class="tex n" x="64.6" y="92.00" width="6.76" height="9.35" viewBox="0 -442 460 636" overflow="visible"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g><g><path d="M33 157Q33 258 109 349T280 441Q340 441 372 389Q373 390 377 395T388 406T404 418Q438 442 450 442Q454 442 457 439T460 434Q460 425 391 149Q320 -135 320 -139Q320 -147 365 -148H390Q396 -156 396 -157T393 -175Q389 -188 383 -194H370Q339 -192 262 -192Q234 -192 211 -192T174 -192T157 -193Q143 -193 143 -185Q143 -182 145 -170Q149 -154 152 -151T172 -148Q220 -148 230 -141Q238 -136 258 -53T279 32Q279 33 272 29Q224 -10 172 -10Q117 -10 75 30T33 157ZM352 326Q329 405 277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q233 26 290 98L298 109L352 326Z"></path></g></g></g></svg></g><!--tex-->
 <rect class="g3" x="54" y="104" width="28" height="20"/>
 <text class="b mid" x="68.0" y="118.5">1</text>
 <rect class="floor" x="54" y="124" width="28" height="20"/>
@@ -27,7 +27,7 @@
 <rect class="floor" x="90" y="84" width="28" height="20"/>
 <rect class="floor" x="90" y="104" width="28" height="20"/>
 <rect class="g2" x="90" y="124" width="28" height="20"/>
-<text class="n mid" x="104.0" y="138.5">q</text>
+<g data-tex="$q$" data-attrs="class=&quot;n mid&quot; x=&quot;104.0&quot; y=&quot;138.5&quot;"><svg class="tex n" x="100.6" y="132.00" width="6.76" height="9.35" viewBox="0 -442 460 636" overflow="visible"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g><g><path d="M33 157Q33 258 109 349T280 441Q340 441 372 389Q373 390 377 395T388 406T404 418Q438 442 450 442Q454 442 457 439T460 434Q460 425 391 149Q320 -135 320 -139Q320 -147 365 -148H390Q396 -156 396 -157T393 -175Q389 -188 383 -194H370Q339 -192 262 -192Q234 -192 211 -192T174 -192T157 -193Q143 -193 143 -185Q143 -182 145 -170Q149 -154 152 -151T172 -148Q220 -148 230 -141Q238 -136 258 -53T279 32Q279 33 272 29Q224 -10 172 -10Q117 -10 75 30T33 157ZM352 326Q329 405 277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q233 26 290 98L298 109L352 326Z"></path></g></g></g></svg></g><!--tex-->
 <rect class="floor" x="90" y="144" width="28" height="20"/>
 <rect class="ln2 dash" x="90.65" y="144.65" width="26.7" height="18.7"/>
 <text class="n mid" x="104.0" y="158.5">5</text>
@@ -37,7 +37,7 @@
 <rect class="floor" x="126" y="64" width="28" height="20"/>
 <rect class="floor" x="126" y="84" width="28" height="20"/>
 <rect class="g2" x="126" y="104" width="28" height="20"/>
-<text class="n mid" x="140.0" y="118.5">q</text>
+<g data-tex="$q$" data-attrs="class=&quot;n mid&quot; x=&quot;140.0&quot; y=&quot;118.5&quot;"><svg class="tex n" x="136.6" y="112.00" width="6.76" height="9.35" viewBox="0 -442 460 636" overflow="visible"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g><g><path d="M33 157Q33 258 109 349T280 441Q340 441 372 389Q373 390 377 395T388 406T404 418Q438 442 450 442Q454 442 457 439T460 434Q460 425 391 149Q320 -135 320 -139Q320 -147 365 -148H390Q396 -156 396 -157T393 -175Q389 -188 383 -194H370Q339 -192 262 -192Q234 -192 211 -192T174 -192T157 -193Q143 -193 143 -185Q143 -182 145 -170Q149 -154 152 -151T172 -148Q220 -148 230 -141Q238 -136 258 -53T279 32Q279 33 272 29Q224 -10 172 -10Q117 -10 75 30T33 157ZM352 326Q329 405 277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q233 26 290 98L298 109L352 326Z"></path></g></g></g></svg></g><!--tex-->
 <rect class="g3" x="126" y="124" width="28" height="20"/>
 <text class="b mid" x="140.0" y="138.5">2</text>
 <rect class="floor" x="126" y="144" width="28" height="20"/>
@@ -50,11 +50,11 @@
 <rect class="g3" x="162" y="124" width="28" height="20"/>
 <text class="b mid" x="176.0" y="138.5">4</text>
 <rect class="g2" x="162" y="144" width="28" height="20"/>
-<text class="n mid" x="176.0" y="158.5">q</text>
+<g data-tex="$q$" data-attrs="class=&quot;n mid&quot; x=&quot;176.0&quot; y=&quot;158.5&quot;"><svg class="tex n" x="172.6" y="152.00" width="6.76" height="9.35" viewBox="0 -442 460 636" overflow="visible"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g><g><path d="M33 157Q33 258 109 349T280 441Q340 441 372 389Q373 390 377 395T388 406T404 418Q438 442 450 442Q454 442 457 439T460 434Q460 425 391 149Q320 -135 320 -139Q320 -147 365 -148H390Q396 -156 396 -157T393 -175Q389 -188 383 -194H370Q339 -192 262 -192Q234 -192 211 -192T174 -192T157 -193Q143 -193 143 -185Q143 -182 145 -170Q149 -154 152 -151T172 -148Q220 -148 230 -141Q238 -136 258 -53T279 32Q279 33 272 29Q224 -10 172 -10Q117 -10 75 30T33 157ZM352 326Q329 405 277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q233 26 290 98L298 109L352 326Z"></path></g></g></g></svg></g><!--tex-->
 <rect class="floor" x="162" y="164" width="28" height="20"/>
 <rect class="floor" x="162" y="184" width="28" height="20"/>
 <rect class="g2" x="18" y="220" width="28" height="20"/>
-<text class="n mid" x="32.0" y="234.5">q</text>
+<g data-tex="$q$" data-attrs="class=&quot;n mid&quot; x=&quot;32.0&quot; y=&quot;234.5&quot;"><svg class="tex n" x="28.6" y="228.00" width="6.76" height="9.35" viewBox="0 -442 460 636" overflow="visible"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g><g><path d="M33 157Q33 258 109 349T280 441Q340 441 372 389Q373 390 377 395T388 406T404 418Q438 442 450 442Q454 442 457 439T460 434Q460 425 391 149Q320 -135 320 -139Q320 -147 365 -148H390Q396 -156 396 -157T393 -175Q389 -188 383 -194H370Q339 -192 262 -192Q234 -192 211 -192T174 -192T157 -193Q143 -193 143 -185Q143 -182 145 -170Q149 -154 152 -151T172 -148Q220 -148 230 -141Q238 -136 258 -53T279 32Q279 33 272 29Q224 -10 172 -10Q117 -10 75 30T33 157ZM352 326Q329 405 277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q233 26 290 98L298 109L352 326Z"></path></g></g></g></svg></g><!--tex-->
 <text class="n" x="56" y="234.5">the query’s own bucket</text>
 <rect class="g3" x="18" y="248" width="28" height="20"/>
 <text class="b mid" x="32.0" y="262.5">1</text>
@@ -101,7 +101,7 @@
 <text class="code" x="592" y="162">4</text>
 <text class="n" x="464" y="183">vectors checked</text>
 <text class="code" x="592" y="183">231 of 6,000</text>
-<text class="n" x="464" y="204">approx. ratio c</text>
+<g data-tex="approx. ratio $c$" data-attrs="class=&quot;n&quot; x=&quot;464&quot; y=&quot;204&quot;"><text class="n" x="464.0" y="204" xml:space="preserve">approx. ratio </text><svg class="tex n" x="544.0" y="197.50" width="6.37" height="6.66" viewBox="0 -442 433 453" overflow="visible"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g><g><path d="M34 159Q34 268 120 355T306 442Q362 442 394 418T427 355Q427 326 408 306T360 285Q341 285 330 295T319 325T330 359T352 380T366 386H367Q367 388 361 392T340 400T306 404Q276 404 249 390Q228 381 206 359Q162 315 142 235T121 119Q121 73 147 50Q169 26 205 26H209Q321 26 394 111Q403 121 406 121Q410 121 419 112T429 98T420 83T391 55T346 25T282 0T202 -11Q127 -11 81 37T34 159Z"></path></g></g></g></svg></g><!--tex-->
 <text class="code" x="592" y="204">0.8</text>
 <circle class="chip" cx="461" cy="237.5" r="9"/><text class="sn ak" x="461" y="242" text-anchor="middle">2</text>
 <text x="478" y="242">Stop, or probe on</text>
