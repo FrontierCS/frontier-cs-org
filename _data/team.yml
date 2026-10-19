@@ -59,6 +59,7 @@ fcs2:
     - {name: Qizheng Zhang, affil: [Stanford University], url: "https://alex-q-z.github.io/"}
     - {name: Kaiyuan Liu, affil: [University of Washington]}
     - {name: Wenyuan Huang, affil: [University of Wisconsin-Madison], url: "https://whuang369.com/"}
+    - {name: Sherry Ruan, affil: [Stanford University]}
     - {name: Shu Liu, affil: [UC Berkeley], url: "https://shulynnliu.com/"}
     - {name: Dacheng Li, affil: [UC Berkeley]}
     - {name: Zerui Cheng, affil: [Princeton University]}
@@ -80,6 +81,9 @@ fcs2:
     - {name: Hanchen Li, affil: [UC Berkeley], url: "https://hanchenli.github.io/"}
   advisors:
     - {name: Ofir Press, affil: []}
+    - {name: Natasha Jaques, affil: [University of Washington]}
+    - {name: Jiantao Jiao, affil: [NVIDIA]}
+    - {name: Kunle Olukotun, affil: [Stanford University]}
     - {name: Karthik R. Narasimhan, affil: [Princeton University]}
     - {name: Koushik Sen, affil: [UC Berkeley]}
     - {name: Ion Stoica, affil: [UC Berkeley]}
