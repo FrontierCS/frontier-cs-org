@@ -29,7 +29,7 @@ final score counts by how far above the human reference r_t it is when the run p
 the median reference_score over the task's runs; 0 or less: REF_DEFAULT's value, else the task has none), in units of
 the task's score spread, at least the median spread over tasks: y = (score - r_t) / unit_t, unit_t = max(sd_t, c), sd_t
 the sd of the task's final scores strictly between 0 and 100 (all of them when fewer than 3), c the median sd_t over the
-tasks with a reference. A run that does not pass contributes its metric groups and its margin: how far short it fell, or, above r_t, only that it got there, P(y' >= 0), its metrics not confirming more (rule E, Qiuyang, 2026-10-16). Tasks in OFF_FIT_DOMAINS (none since 2026-10-20; Security from 2026-10-16 until then) are left out of every fit too. A run the model's provider refused (feedback_json.refusal: no final submission came) is left out of every fit, FCI, FDI and test-time scaling alike; the page still lists it (Qiuyang, 2026-10-16). The final score comes from the same
+tasks with a reference. A run that does not pass contributes its metric groups and its margin: how far short it fell, or, above r_t, only that it got there, P(y' >= 0), its metrics not confirming more (rule E, Qiuyang, 2026-10-16). Tasks in OFF_FIT_DOMAINS (none since 2026-10-20; Security from 2026-10-16 until then) are left out of every fit too. A run the model's provider refused (feedback_json.refusal: no final submission came) counts in every fit as a failure, as it does in the pass rate (Qiuyang, 2026-10-20; from 2026-10-16 until then it was left out). LEAVE_OUT_REFUSALS restores the old rule. The final score comes from the same
 measurements as the metrics, so a run's metric groups and its margin share one run effect u ~ N(0, SIGMA_U^2). With
 theta_m the model's strength in logits (prior N(0, 1/LAM), LAM = 0.35 as in the site's in-browser TDIFF), a run's
 likelihood is the integral over u, by Gauss-Hermite quadrature (64 nodes; 24 stall Newton near SIGMA_U = 3.7), of prod_j
@@ -105,11 +105,9 @@ TIE_EPS = 0                    # a final score within TIE_EPS of the human refer
 # (run_01M4RVT5V4D3SR83YXW0B4EYP6, run_01M4HGFJEHVPJN04RVH9WEPYV1; Qiuyang, 2026-10-15); Continuum, whose judge reports
 # none, as the highest of the three runs of the human reference alone whose measurements set its judge's fixed targets
 # (0.06, 4.63 and 9.61, on earlier task versions; run_01M571D9453PAMSRP918SV4G58; Qiuyang, 2026-10-20: "用最高分吧")
+LEAVE_OUT_REFUSALS = False   # Qiuyang, 2026-10-20: refused runs count in FCI, FDI and test-time scaling (left out from 2026-10-16)
 OFF_FIT_DOMAINS = set()   # none since 2026-10-20 (Qiuyang: FCI and FDI cover all 48 tasks); Security was off from 2026-10-16 until its tasks were fixed
-# KV Compaction and Progent score their human reference 0 by definition, and their judges report that 0, which reads as
-# "none" above: KV Compaction's score is 0 at a ratio of 1 to the reference (judge/gate.py, score_from_ratio), and Progent's
-# remap (scheme R) gives 1 - 1 = 0 for the reference itself (Qiuyang, 2026-10-20: the pages must show the human reference)
-REF_DEFAULT = {'Structured LWE': 100, 'ParButterfly': 30.51, 'RegionsSort': 50.26, 'Continuum': 9.61, 'KV Compaction': 0, 'Progent': 0}
+REF_DEFAULT = {'Structured LWE': 100, 'ParButterfly': 30.51, 'RegionsSort': 50.26, 'Continuum': 9.61}
 
 # database display name -> (domain folder, paper short name or None)
 TASK = {
@@ -601,7 +599,7 @@ def scaling(db, tasks, hyp, theta0):
     metric groups and its margin; a run still going is scored as a timeout at B (notyet): no group, a final score of 0.
     Each curve is checked to never fall."""
     info = {r: (c, t) for r, c, t, s, fj in db.execute('''select r.id, cd.name, t.name, r.display_score, r.feedback_json from cells ce
-        join runs r on r.id = ce.run_id join candidates cd on cd.id = ce.candidate_id join tasks t on t.id = ce.task_id''') if s is not None and c not in HIDDEN and not refused(fj) and TASK[t][0] not in OFF_FIT_DOMAINS}
+        join runs r on r.id = ce.run_id join candidates cd on cd.id = ce.candidate_id join tasks t on t.id = ce.task_id''') if s is not None and c not in HIDDEN and not (LEAVE_OUT_REFUSALS and refused(fj)) and TASK[t][0] not in OFF_FIT_DOMAINS}
     pts = {(r, sid): (tt, ot) for r, sid, tt, ot in db.execute('select run_id, submission_id, total_tokens, output_tokens from score_points')}
     end = {}   # a run's spend at its end: usd() at its last submission with a score point, 0 if none
     for r, sid in db.execute('select run_id, id from submissions order by run_id, ordinal'):
@@ -760,9 +758,9 @@ when = datetime.fromisoformat(generated[:19])
 models = [MODEL[c] for c in MODEL if c not in HIDDEN]
 fit_rows = db.execute('''select c.name, t.name, r.display_score, r.display_verdict, r.feedback_json from cells ce
   join runs r on r.id = ce.run_id join candidates c on c.id = ce.candidate_id join tasks t on t.id = ce.task_id''').fetchall()
-# a run the model's provider refused (no final submission) says nothing about the model's ability on the task: it is left
-# out of FCI and FDI, though the page still lists it (Qiuyang, 2026-10-16)
-fit_rows = [x for x in fit_rows if not refused(x[4]) and TASK[x[1]][0] not in OFF_FIT_DOMAINS]
+# a run the model's provider refused (no final submission) counts as a failure in FCI and FDI, as in the pass rate
+# (Qiuyang, 2026-10-20); LEAVE_OUT_REFUSALS restores the 2026-10-16 rule that left it out
+fit_rows = [x for x in fit_rows if not (LEAVE_OUT_REFUSALS and refused(x[4])) and TASK[x[1]][0] not in OFF_FIT_DOMAINS]
 obs, task_ref = fit_data(fit_rows)
 E, THETA, theta0, MT, dfit, dll, dstarts, UNIT0, nskip = joint_fit(obs, task_ref, passby())
 TFIT, DIFF, METRIC, MGROUPS, DIFF_FIT = task_fits(MT, dfit, theta0, UNIT0)
