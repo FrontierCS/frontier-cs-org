@@ -119,6 +119,54 @@ REFERENCE = {'run_01M5B6757V0VMSXB5QZGAWXB6C': 40.635, 'run_01M5970STDD1FKW0ECD8
              'run_01M5B3Q2GAQQA222W6DRZDP0R7': 60.6278, 'run_01M5BGMM8NF591Z8ZPT5MMF1VD': 60.6278,
              'run_01M5BPACVQ0VFV9S4N37Y5H4QZ': 60.6278, 'run_01M5B3Z6EHETQBZF3GSPQJJZGN': 60.6278,
              'run_01M5BMR4VSNRK7GCBTE729E9E5': 60.6278}
+# Development scores that replace the platform's, by verification: KV Compaction's and Progent's train submissions,
+# rescored with the same formulas as their finals above (the evaluation monitor, 2026-10-21:
+# reports/rescore-kv-progent-train-20261021.json; Qiuyang approved the formulas). Evaluations that failed at the time had no
+# score then and have none here; they still count 0. Progent's development suites are smaller than its final suite, so its
+# development scores can exceed its final ones.
+TRAIN = {'verification_01M59D1KBE7X37J6RAZ70V52F8': 61.1975, 'verification_01M59S4HN8ZF22QFYZRGJRCK6D': 50.8707,
+         'verification_01M59TFAHKKSW3HX68X08W0Q54': 49.9, 'verification_01M59VNT98GPY40J3SPVAR65XY': 52.3666,
+         'verification_01M59VPRBYP47B6198R5CJBQHF': 59.6994, 'verification_01M5A4QD0YXC70V9A7BCFZE5V9': 54.8356,
+         'verification_01M5A5SAT0CH6RR6N6J0Z38626': 55.6001, 'verification_01M5A6BEKCKA9J8RQRRCQTQDVY': 53.1462,
+         'verification_01M5A6ZTDPBYSWAV1BC5FH4WHH': 53.9241, 'verification_01M5A7J8QCYNBGHV7XK11445D3': 52.4657,
+         'verification_01M5BA05HJ5JXMG52AH06QQB12': 71.4225, 'verification_01M5BBSVJBP7DYB51V7KX33C3K': 71.6475,
+         'verification_01M5BDBF5FZQTG926QY512DDGA': 80.535, 'verification_01M5BEGDASJ0NN916HJQQ9EAS7': 80.2175,
+         'verification_01M5AZPWWGXGV1QT83JWJSQ8FN': 52.6267, 'verification_01M5B18C7DR72ZMP45GZ5QX9WJ': 55.7536,
+         'verification_01M5BBKNRC1MGV2MC4XQ977ERY': 55.1275, 'verification_01M5BCSCF6RVYGZPJJ7JK25B77': 56.6573,
+         'verification_01M5BDW35S3QNWY11SEP56E77A': 54.7343, 'verification_01M5BKJEDE4ZZMBB836WXXDZC5': 32.8547,
+         'verification_01M5BMBC34AT9YDN8ZXHNYH17P': 52.3302, 'verification_01M5BMYJ89WVY6WZQ09WDGP92F': 54.0525,
+         'verification_01M5BNGXQ7DTV4NE0C93QNPX37': 53.05, 'verification_01M5BP34EKBH6F8BQKJYAAM6GD': 53.345,
+         'verification_01M5BVVQPCT62HFBHP14W0ESG8': 54.3325, 'verification_01M5BXE0XA39MFE376HDFRRPK9': 58.01,
+         'verification_01M5BHV6JBNKXWR3VVBD7P9JB3': 46.7941, 'verification_01M5BPPG57NYQT7DNQ4ZZ59YPF': 45.3335,
+         'verification_01M5BR5M3N5RCYHWV07K5C5T4T': 46.7915, 'verification_01M5BS10402B7S4VZK5S4ZT91N': 46.5539,
+         'verification_01M5BT11T209PTPNCAEYRM623Q': 60.7359, 'verification_01M5BTQEC1RG6CSM27A96AMSCM': 59.8088,
+         'verification_01M5BH6HMGJKTDFKH6323Z6H5M': 46.2005, 'verification_01M5BS4Q12NW3RMBJK2RDE2261': 48.3257,
+         'verification_01M5BWTCVB5ZBFZW82CWCES7JA': 48.3134, 'verification_01M5BPZRHQD0MH6HCX46NTSGSZ': 63.0248,
+         'verification_01M5BS3TWPXY6J9NWMJRTEC26J': 60.7959, 'verification_01M5BVM9PA2VZNQWD84C8GGQWM': 58.8972,
+         'verification_01M5BWDDCBJNABTRPZZ8EPQ0WN': 61.6511, 'verification_01M5BX1K2GNX113PN955P1VM2Y': 66.292,
+         'verification_01M5BXT4HG85FAA5V4N8DXYEWE': 66.2511, 'verification_01M5BYEYVB4D9YE9PVSPTKKYAF': 71.1002,
+         'verification_01M5BZA331XT3SE88S9AD4JHE7': 66.7901, 'verification_01M5B44QAQYAGE7PKHH5XHV57A': 52.3916,
+         'verification_01M5B4PSJGXQNRSF8BKVT5G8CD': 52.7401, 'verification_01M5B58CXPXAFV0DWH06AYHM0P': 55.2921,
+         'verification_01M5B5ZG5WCBDM80PJY8PZHPCA': 51.261, 'verification_01M5B73CJV3MMHMK7PQQKKBZAQ': 55.9311,
+         'verification_01M5B81HVTFV6TA5P7HY9N3J68': 58.9441, 'verification_01M5BFD7MXM4RDSH38MJZ7MGG7': 55.6271,
+         'verification_01M5BH7NHVWRSF58CGK471Q04R': 58.5929, 'verification_01M5BAJ08PAF5BQGVYSWZ4PB5B': 62.6745,
+         'verification_01M5B3YJAMCKEFK320HBA6RSPQ': 51.1882, 'verification_01M5B5P7JS1WJRGYGY34FN5DSK': 48.1974,
+         'verification_01M5B6KETDR08739SSTP3GBBVS': 53.9417, 'verification_01M5BA865RP094ZDJBCGHEH618': 0.0,
+         'verification_01M5BAQHWVVDSP56N6CKCHG1A5': 53.5476, 'verification_01M5BENDNWMBY72XVBXPVW4W8R': 53.1527,
+         'verification_01M5BFQ2JFK4Z7HC8EYRSYK1CQ': 55.3606, 'verification_01M5BKT4S19DR38AZG3TC4XHVE': 50.5726,
+         'verification_01M5BXPGEZPP8D4RSFH60RCPQA': 48.0909, 'verification_01M5C2PPBVVGSCKECAYNDFG0WM': 46.6898,
+         'verification_01M5C3PVT62CWWY3RE2H10AXQK': 51.488, 'verification_01M5C561ADXNAZ0EPK9Q4RK20G': 47.3868,
+         'verification_01M5BQKXS4213YRGHA6QTPG24C': 41.6615, 'verification_01M5BSC6JH1JVZY1SG0Y2F9AYA': 44.0513,
+         'verification_01M5BV2R97P3RRB7H6C8ATTT5H': 54.1767, 'verification_01M5BXJXY4AH9T98T4A65G91V4': 56.9397,
+         'verification_01M5C0SN68M80QD33DSZQHJC19': 57.1524, 'verification_01M5C517VHMDXKV670QP7XNKGJ': 57.1704,
+         'verification_01M5BQJHA9GDNYMDTBQHP437B7': 58.1269, 'verification_01M5BRT0ASMZW02EHPZ6QHJSNS': 59.8786,
+         'verification_01M5BV7ZNS1CJG5MZGFD3G17DB': 64.406, 'verification_01M5BW190829G7BMVWK8JK74NX': 62.983,
+         'verification_01M5BWS5J3R254VQSGGKFASDDE': 64.962, 'verification_01M5BYQJ7VG77D9NBMKK5G83CJ': 62.2323,
+         'verification_01M5BQ1VG8X9YMP21F71V98FTQ': 0.0, 'verification_01M5BQX6GGZN4DWZGKBD452D4E': 39.0847,
+         'verification_01M5BXB8Y7SSKKK9HF9QA7DTNZ': 49.4566, 'verification_01M5BZRM30G7SYZ0362DJ06FA4': 53.4738,
+         'verification_01M5BQF4F9V9VTQP15NS5FFN47': 0.0, 'verification_01M5C1NH2A2CQT8B5ZDJ8VK9ER': 0.0,
+         'verification_01M5C3KBC1FNK4JVA0TFC0P9JN': 0.0, 'verification_01M5C42XK2BSJBXM90WRG85YGE': 0.0,
+         'verification_01M5BY8V5VHG2FZ2Y921MFXSW6': 55.1433, 'verification_01M5C27FWHFWQ36CW4MA14X3S3': 59.5979}
 rids = [(c, RERUN.get((c, i['task_name']), i['run_id'])) for c, v in items.items() for i in v if i.get('run_id') and i['task_name'] not in OFF_SITE]
 with ThreadPoolExecutor(16) as ex:
     pulled = list(ex.map(lambda cr: (cr[0], get('runs/' + cr[1]), get(f'runs/{cr[1]}/events?limit=500')), rids))
@@ -175,6 +223,7 @@ create table score_points(run_id text, submission_id text, score real, total_tok
 db.execute('insert into release values (?)', (datetime.now(timezone.utc).isoformat(),))
 for n, c in enumerate(items): db.execute('insert into candidates values (?,?,?)', (c, c, n))
 tasks = {}
+used = set()   # TRAIN entries that met their verification
 for c, r, events in pulled:
     tasks.setdefault(r['task_id'], r['task_name'])
     start, end = (ts(r[k]) if r.get(k) else None for k in ('started_at', 'finished_at'))
@@ -193,10 +242,12 @@ for c, r, events in pulled:
         if e['kind'] != 'VERIFIER_TRAIN_COMPLETED' or not (start and end): continue
         p = e['payload']; frac = min(1, max(0, (ts(e['occurred_at']) - start) / max(end - start, 1)))
         db.execute('insert into submissions values (?,?,?,?,?)', (r['id'], p['verification_id'], 'train', p['payload_id'], n)); n += 1
-        db.execute('insert into score_points values (?,?,?,?,null)', (r['id'], p['verification_id'], p.get('raw_score') or 0, units(usd * frac)))
+        if p['verification_id'] in TRAIN: used.add(p['verification_id'])
+        db.execute('insert into score_points values (?,?,?,?,null)', (r['id'], p['verification_id'], TRAIN.get(p['verification_id'], p.get('raw_score') or 0), units(usd * frac)))
     if r['score'] is not None and usd:
         db.execute('insert into submissions values (?,?,?,?,?)', (r['id'], 'final', 'final', 'final:' + r['id'], n))
-        db.execute('insert into score_points values (?,?,?,?,null)', (r['id'], 'final', r['score'], units(usd)))
+        db.execute('insert into score_points values (?,?,?,?,null)', (r['id'], 'final', SCORE.get(r['id'], r['score']), units(usd)))
 for n, (t, name) in enumerate(sorted(tasks.items(), key=lambda kv: kv[1])): db.execute('insert into tasks values (?,?,?)', (t, name, n))
+assert used == set(TRAIN), f'{len(set(TRAIN) - used)} rescored development scores met no verification'
 db.commit()
 for c, v in items.items(): print(f"{c}: {sum(map(done, v))} scored of {len(v)} (evaluation {evs[c]['id']})")
