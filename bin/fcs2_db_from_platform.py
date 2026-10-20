@@ -60,16 +60,20 @@ items = {c: get('evaluations/' + e['id'])['items'] for c, e in evs.items()}
 done = lambda i: i['score'] is not None or i['run_state'] == 'TIMED_OUT'   # a timeout is a result: it scores 0
 items = {c: v for c, v in items.items() if sum(map(done, v)) >= MIN}
 # Tasks whose runs are not collected. Still being built, so listed on the site with no runs and left out of FCI, FDI and
-# every total (Qiuyang, 2026-10-18: "vllm这题先不加入"; 2026-10-19: Progent, its formal runs half rerun on its new version):
-# vLLM (shown as Continuum) and Progent, under its new name and its old one. Off the site (Qiuyang, 2026-10-19: Security
-# keeps only Progent and LRR): the other four Security tasks.
-OFF_SITE = {'GPU vLLM Serving Optimization', 'Privilege Control for Tool-Using LLM Agents', 'Argument-aware runtime privilege control',
+# every total (Qiuyang, 2026-10-19: Progent, its formal runs half rerun on its new version, and KV Compaction, its formal
+# runs under way): Progent, under its new name and its old one, and KV Cache Compaction. Off the site (Qiuyang, 2026-10-19:
+# Security keeps only Progent and LRR): the other four Security tasks. vLLM (shown as Continuum) was here until its runs on
+# its sixth version were final (Qiuyang, 2026-10-19: "VLLM这个题ready了").
+OFF_SITE = {'Privilege Control for Tool-Using LLM Agents', 'Argument-aware runtime privilege control', 'KV Cache Compaction',
             'Adaptive Robustness Evaluation for Prompt-Injection Defense', 'BROP: Hacking Blind — Return-Oriented Programming Without Binary Knowledge',
             'Enclave-Resident Admissible-Set Filter', 'Safe Abstract Trace-Cut — Coupled Optimization'}
 # A run that stands in for the formal evaluation's run of a task, keyed by (candidate, task): a rerun on the task's current
 # version that ran in an evaluation of its own. Gemini 4's Sparse Video Attention Policy follows the task's new version
 # (cfg-e01e1a2f6173) as every other model's does (Qiuyang, 2026-10-18); its first try there died at start-up and was rerun.
 RERUN = {('pi · Gemini 4', 'Sparse Video Attention Policy'): 'run_01M56053RVYXEC4EZTF9RWM8RK'}
+# Runs that ended with no score and that Qiuyang judged the candidate's own failure: they score 0 and fail, as a timeout does.
+# Kimi K3's vLLM run: the agent exited without a final submission, and it is not retried (Qiuyang, 2026-10-19).
+ZERO = {'run_01M5A2T1WJSCR64W2ZP34T8KHV'}
 rids = [(c, RERUN.get((c, i['task_name']), i['run_id'])) for c, v in items.items() for i in v if i.get('run_id') and i['task_name'] not in OFF_SITE]
 with ThreadPoolExecutor(16) as ex:
     pulled = list(ex.map(lambda cr: (cr[0], get('runs/' + cr[1]), get(f'runs/{cr[1]}/events?limit=500')), rids))
@@ -128,7 +132,8 @@ for c, r, events in pulled:
     priv = (r.get('metrics') or {}).get('private') or {}
     fb = {'reference_score': priv.get('reference_score'), 'checks': [{'label': k} for k in (priv.get('beat_spec_progress') or {})]}
     if (r.get('adjudication') or {}).get('cause') == 'provider_refusal_no_final': fb['refusal'] = True   # the model's provider refused and no final came
-    db.execute('insert into runs values (?,?,?,?,?,?)', (r['id'], 0.0 if r['score'] is None and r['state'] == 'TIMED_OUT' else r['score'], r['state'], r['verdict'], end - start if start and end else None, json.dumps(fb)))
+    zero = r['score'] is None and (r['state'] == 'TIMED_OUT' or r['id'] in ZERO)
+    db.execute('insert into runs values (?,?,?,?,?,?)', (r['id'], 0.0 if zero else r['score'], r['state'], 'FAIL' if zero and r['id'] in ZERO else r['verdict'], end - start if start and end else None, json.dumps(fb)))
     db.execute('insert into cells values (?,?,?)', (r['id'], c, r['task_id']))
     n = 0
     for e in events:
