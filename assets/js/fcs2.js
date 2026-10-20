@@ -165,7 +165,7 @@ function drawECI() {
   // the axis holds 0 and every whisker, on a grid of about six steps (four on phones) whatever the scale's unit
   const bot = 0, top = Math.max(...MODELS.map(m => ECI[m.id][2])), step = eciStep(top - bot, narrow ? 4 : 6);   // the axis starts at 0, Kimi K2.7 (owner, 2026-10-17)
   const xmin = Math.floor(bot / step) * step, xmax = Math.ceil(top / step) * step;
-  const H = T + order.length * lane + B, an = animates(svg), bh = narrow ? 24 : 28;   // bars near half the lane (owner, 2026-10-14: 18 px read too thin)
+  const H = T + order.length * lane + B, an = animates(svg), bh = Math.min(narrow ? 24 : 28, Math.floor(lane * .62));   // bars near half the lane (owner, 2026-10-14: 18 px read too thin)
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
   const X = v => L + (v - xmin) / (xmax - xmin) * (W - L - R);
   for (let i = 0, v = xmin; v <= xmax + step / 2; v = xmin + ++i * step) {   // the 0 line, Kimi K2.7, is darker when the axis runs below it
@@ -249,7 +249,7 @@ function ttsPlay(run) {
 function drawTTS(t) {
   const svg = $('#ttssvg'), W = Math.max(300, $('#ttsplot').clientWidth), narrow = W < 560;
   if (t == null) { const run = ++ttsRun; t = 1; if (animates(svg)) { t = 0; svg.addEventListener('shown', () => ttsPlay(run), {once:true}); } }
-  const L = 34, R = narrow ? 12 : 110, T = 12, B = 46, H = CHART_H.tts || (narrow ? 420 : 380);   // room on the right for the end labels; a taller phone chart so they spread (owner, 2026-10-17: labels, no legend)
+  const L = 34, R = CHART_H.ttsR || (narrow ? 12 : 110), T = 12, B = 46, H = CHART_H.tts || (narrow ? 420 : 380);   // room on the right for the end labels; a taller phone chart so they spread (owner, 2026-10-17: labels, no legend)
   const all = TTSM.flatMap(m => ttsCurve(m.id));   // the y axis holds every model, so showing one moves it not
   const vis = TTSM.filter(m => ttsOn.has(m.id)).flatMap(m => ttsCurve(m.id)), xs = (vis.length ? vis : all).map(p => p[0]);   // the x axis spans the shown curves (owner, 2026-10-16)
   const x0 = Math.log10(Math.min(...xs)) - .15, x1 = Math.log10(Math.max(...xs));

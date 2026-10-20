@@ -57,6 +57,7 @@ CSS = """
 .tcard.side .tc-note{position:absolute; left:48px; right:48px; bottom:20px; margin:0}
 .tcard .plot text{font-size:14px}
 .tcard .plot .lab{font-size:15px}
+.tcard #pcsvg .lab{font-size:13.5px}   /* the price card's dots crowd at the right: smaller names keep each beside its own dot */
 .tcard .tip{display:none}
 .tcard .legend{font-size:14px; margin-top:6px}
 .tcard .papers{height:100%; width:100%}
@@ -104,6 +105,7 @@ window.audit = () => {
     if (a.e.contains(b.e) || b.e.contains(a.e)) continue;
     const ox = Math.min(a.r, b.r) - Math.max(a.l, b.l), oy = Math.min(a.b, b.b) - Math.max(a.t, b.t);
     if (ox > 1 && oy > 2) bad.push(`overlap: "${a.e.textContent.slice(0, 24)}" / "${b.e.textContent.slice(0, 24)}"`); }
+  const pc = c.querySelector('#pcsvg'); if (pc && pc.querySelectorAll('text.lab').length < MODELS.length) bad.push(`price card: ${MODELS.length - pc.querySelectorAll('text.lab').length} dots without a name`);
   c.querySelectorAll('#lbsvg, #ecisvg').forEach(svg => {
     // the row's mark: the mean dot (mean score chart) or the bar (FCI chart)
     const dots = [...svg.querySelectorAll('circle, rect.ebar')].map(d => d.getBoundingClientRect()).filter(r => r.width >= 11);
@@ -160,10 +162,17 @@ OVERVIEW = {
       const longest = t => MODELS.map(m => TRAJ.filter(r => r[1] === t.s && r[0] === m.id).sort((a, b) => valid(b).length - valid(a).length)[0]).filter(r => r && valid(r).length >= 15);
       const gain = r => Math.max(...r[6].map(q => q[1])) - valid(r)[0][1], better = t => longest(t).filter(r => gain(r) >= 10).length;
       const subs = t => longest(t).reduce((a, r) => a + r[6].length, 0);
-      const t = TASKS.filter(t => longest(t).length >= 4).sort((a, b) => better(b) - better(a) || subs(b) - subs(a))[0], runs = longest(t), n = runs.reduce((a, r) => a + r[6].length, 0), k = AREA_OF[t.d].k;
-      console.assert(runs.length >= 4, 'run card: too few models', t.s, runs.length);
+      // three lines only (owner, 2026-10-20: fewer lines, but good-looking): the task's biggest climbs whose colours stay apart,
+      // each at least 60 degrees of hue from the others (a near-black or grey colour counts as its own hue)
+      const hue = id => { const h = getComputedStyle(document.documentElement).getPropertyValue(`--m-${id}`).trim().replace('#', ''), [r, g, b] = [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16) / 255);
+        const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn; if (d < .15) return -1;
+        const x = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; return (x * 60 + 360) % 360; };
+      const apart = (a, b) => { const x = hue(a), y = hue(b); if (x < 0 || y < 0) return (x < 0) !== (y < 0); const d = Math.abs(x - y); return Math.min(d, 360 - d) >= 60; };
+      const three = t => longest(t).sort((a, b) => gain(b) - gain(a)).reduce((out, r) => (out.length < 3 && out.every(o => apart(o[0], r[0])) ? [...out, r] : out), []);
+      const t = TASKS.filter(t => three(t).length >= 3).sort((a, b) => three(b).reduce((x, r) => x + gain(r), 0) - three(a).reduce((x, r) => x + gain(r), 0))[0], runs = three(t), n = runs.reduce((a, r) => a + r[6].length, 0), k = AREA_OF[t.d].k;
+      console.assert(runs.length === 3, 'run card: fewer than three lines', t.s, runs.length);
       const v = card('side', 'Agents do not solve research in one shot.',
-        `${runs.length} models, ${n} submissions on ${esc(t.s)}. Every dot is a try.`, '');
+        `Three runs on ${esc(t.s)}, ${n} submissions. Every dot is a try.`, '');
       const W = 470, H = 360, svgNS = 'http://www.w3.org/2000/svg', col = id => getComputedStyle(document.documentElement).getPropertyValue(`--m-${id}`).trim();
       v.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="display:block; font-family:'Hanken Grotesk'"></svg>`;
       const svg = v.querySelector('svg');
@@ -198,7 +207,7 @@ OVERVIEW = {
     }""",
     # pass rate against cost: the overview's chart
     '03-pass-cost': """() => {
-      const v = card('stack', 'Pass rate vs. price',
+      const v = card('stack', 'Pass rate vs. cost per run',
         'One dot per model.',
         'A pass beats the human reference on every metric of every hidden workload.');
       fit(v, 'pc'); v.append(document.getElementById('pcplot')); drawPassCost();
@@ -209,7 +218,11 @@ OVERVIEW = {
       const v = card('stack', 'Score against the human reference',   // owner, 2026-10-14: the overview's mean score is the difference
         'One dot per run, the large dot the mean of each model.',
         '');   /* the axis title already says what the score is */
-      CHART_H.lbLane = Math.floor((v.clientHeight - 54) / MODELS.length); v.append(document.getElementById('lbplot')); drawLB(); oneLine(document.getElementById('lbsvg')); sideVals(document.getElementById('lbsvg'));
+      CHART_H.lbLane = Math.floor((v.clientHeight - 54) / MODELS.length); v.append(document.getElementById('lbplot')); drawLB(); oneLine(document.getElementById('lbsvg'));
+      // each model's mean sits at the end of its name column, off the dots, which would hide it (owner, 2026-10-20)
+      const lsvg = document.getElementById('lbsvg'), x0 = Math.min(...[...lsvg.querySelectorAll('line')].map(l => +l.getAttribute('x1')).filter(x => x > 40));
+      lsvg.querySelectorAll('text.val').forEach(t => { const m = t.previousElementSibling, yc = m && m.tagName === 'circle' ? +m.getAttribute('cy') : null;
+        if (yc != null) { t.setAttribute('x', (x0 - 12).toFixed(1)); t.setAttribute('y', (yc + 5).toFixed(1)); t.setAttribute('text-anchor', 'end'); } });
     }""",
     # FCI: the overview's chart; the line under the headline names the model with the highest FCI and its value (the
     # human reference has no FCI on the pass-based scale, so the old count of models above it is gone; Qiuyang, 2026-10-14)
@@ -226,7 +239,7 @@ OVERVIEW = {
       const v = card('stack', 'FCI vs. budget per run',
         'A run that ended within the budget counts what it beat; one still going counts as beating nothing.',
         'One curve per lab, its model with the highest FCI, as on the site.');
-      fit(v, 'tts', 62); v.append(document.getElementById('ttsplot')); drawTTS();   // the chart names its curves; it has no legend since 2026-10-17
+      fit(v, 'tts', 8); CHART_H.ttsR = 250; v.append(document.getElementById('ttsplot')); drawTTS();   // the chart names its curves; it has no legend since 2026-10-17
     }""",
     # the private set (owner, 2026-10-10: a separate set of unreleased tasks; no count on the card): task illustrations
     # blurred past recognition, each under a white lock, in the closing card's grid
@@ -243,7 +256,7 @@ OVERVIEW = {
     # where to look: a sample of task illustrations
     '08-explore': """() => {
       const v = card('side', `Explore all ${TASKS.length} tasks`,
-        'Each with its paper and the runs of every model.', '');
+        'Each built from a published paper.', '');
       const pick = AREAS.flatMap(a => TASKS.filter(t => a.d.includes(t.d)).slice(0, 2).map(t => [t, a.k])).slice(0, 12);
       const cols = 3, gw = 470, gap = 6, tw = (gw - gap * (cols - 1)) / cols, th = tw / 1.5;
       v.style.display = 'grid'; v.style.gridTemplateColumns = `repeat(${cols}, ${tw}px)`; v.style.gap = `${gap}px`; v.style.alignContent = 'center';
