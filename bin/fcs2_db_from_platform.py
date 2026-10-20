@@ -74,8 +74,9 @@ OFF_SITE = {'Argument-aware runtime privilege control', 'KV Cache Compaction',
 # (cfg-e01e1a2f6173) as every other model's does (Qiuyang, 2026-10-18); its first try there died at start-up and was rerun.
 RERUN = {('pi · Gemini 4', 'Sparse Video Attention Policy'): 'run_01M56053RVYXEC4EZTF9RWM8RK'}
 # Runs that ended with no score and that Qiuyang judged the candidate's own failure: they score 0 and fail, as a timeout does.
-# Kimi K3's vLLM run: the agent exited without a final submission, and it is not retried (Qiuyang, 2026-10-19).
-ZERO = {'run_01M5A2T1WJSCR64W2ZP34T8KHV'}
+# Kimi K3's vLLM run: the agent exited without a final submission, and it is not retried (Qiuyang, 2026-10-19). Kimi K3's
+# LRR run: it ended FAILED with no score and no adjudication cause (Qiuyang, 2026-10-20: "就是0").
+ZERO = {'run_01M5A2T1WJSCR64W2ZP34T8KHV', 'run_01M5C2J5QNEPEYAWMQY3HD7MF4'}
 # Scores that replace the platform's, by run. Progent's verifier zeroes a suite on one breached episode, so its scores fell
 # on 100, 75, 72.73 and 50; once its formal runs were final they were rescored from each run's kept per-suite metrics
 # (Qiuyang, 2026-10-20, scheme R): per suite, max(0, 1 - breach rate / the reference's breach rate) times
