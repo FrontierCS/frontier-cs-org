@@ -902,5 +902,104 @@
     0.0848
    ]
   }
+ },
+ "_dev": "Development submissions of the leaderboard runs of GPT-6 Astra and GPT-6.1 Sol, in order: minutes since the agent's first model request, and the development-suite score (4 clips; 0 where the judge reported that its GPU worker failed). final: when the final patch was saved, and its score on the hidden suite. From each run's GET-only export (submissions.json feedback.score; evidence.tar.zst payloads), exports/svg-ear-case-20261019.",
+ "dev": {
+  "astra": {
+   "subs": [
+    [
+     3.5,
+     51.05
+    ],
+    [
+     34.2,
+     39.16
+    ],
+    [
+     69.1,
+     0.0
+    ],
+    [
+     96.5,
+     25.64
+    ],
+    [
+     129.6,
+     0.0
+    ],
+    [
+     156.2,
+     0.0
+    ],
+    [
+     177.8,
+     0.0
+    ],
+    [
+     197.2,
+     33.61
+    ],
+    [
+     233.0,
+     65.62
+    ],
+    [
+     265.0,
+     70.85
+    ]
+   ],
+   "final": [
+    293.9,
+    48.59
+   ]
+  },
+  "sol": {
+   "subs": [
+    [
+     2.8,
+     0.0
+    ],
+    [
+     10.9,
+     0.0
+    ],
+    [
+     20.0,
+     20.32
+    ],
+    [
+     57.8,
+     0.0
+    ],
+    [
+     66.1,
+     5.72
+    ],
+    [
+     95.4,
+     40.78
+    ],
+    [
+     124.4,
+     34.93
+    ],
+    [
+     178.6,
+     53.16
+    ],
+    [
+     206.9,
+     25.27
+    ],
+    [
+     240.8,
+     0.0
+    ]
+   ],
+   "final": [
+    205.2,
+    38.42
+   ]
+  }
  }
 }

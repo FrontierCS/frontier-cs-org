@@ -736,39 +736,44 @@ def svgear_checks_all(narrow):
              + '. Each grid has a row per measure, time, PSNR, SSIM and LPIPS, and a column per hidden clip, eight from Wan 2.1 then four from HunyuanVideo.')
     return f'<svg class="{"narrow" if narrow else "wide"}" viewBox="0 0 {W} {H:.0f}" role="img" aria-label="{label}">{g}</svg>'
 
-def svgear_run(m, narrow, note=None):
-    """SVG-EAR case study: each development submission of one run, its development score against the cost so far, and
-    the final score at the cost of the whole run; the human reference's final score as a dashed line. A development
-    score of 0 is a submission the judge could not score. note: (submission index, text) written beside one dot."""
-    run = next(r for r in site_const('TRAJ') if r[0] == m and r[1] == 'SVG-EAR')
+# Names on a run's development chart: (submission index, text, dx, dy, anchor), wide then narrow
+SVGEAR_DEV_LABELS = {
+    'astra': {False: [(0, 'Dense attention', -4, -12, 'start'), (8, 'Budget measured per head', -10, 4.5, 'end'),
+                      (9, 'Term strength per head', 0, -14, 'end')],
+              True: [(0, 'Dense', -4, -12, 'start'), (8, 'Measured budget', -9, 4.5, 'end'), (9, 'Per-head term', 0, -14, 'end')]},
+    'sol': {False: [(6, 'Sparse', 0, 22, 'middle'), (7, 'Dense, saved as final', 0, -14, 'middle'), (8, 'Sparse', 10, 4.5, 'start')],
+            True: [(6, 'Sparse', 0, 22, 'middle'), (7, 'Dense, saved', 0, -14, 'middle'), (8, 'Sparse', 10, 4.5, 'start')]}}
+
+def svgear_dev(m, narrow):
+    """SVG-EAR case study: each development submission of one leaderboard run, its development score against the hours
+    since the agent started, and the final score on the hidden clips at the time the final patch was saved. A development
+    score of 0 is a version the judge's GPU worker failed on. No line for the human reference: its 33.9 is a score on the
+    twelve hidden clips, the development scores are on four other clips."""
+    run = svgear_clips()['dev'][m]
     name, col = site_models()[m]; TXT = mtxt(col)
-    ref, final, cost, dev = site_const('REF')['SVG-EAR'], run[2], run[4], run[6]
+    dev, (ft, final) = run['subs'], run['final']
     W, H = (360, 300) if narrow else (760, 300)
     L, R, T, B = 40, 14 if narrow else 20, 24, 48
-    step = 20 if cost > 40 else 2
-    xmax, ymax = step * math.ceil(cost / step), 80
-    X = lambda v: L + v / xmax * (W - L - R); Y = lambda v: T + (1 - v / ymax) * (H - T - B)
+    xmax, ymax = 5, 80
+    X = lambda v: L + v / 60 / xmax * (W - L - R); Y = lambda v: T + (1 - v / ymax) * (H - T - B)
     t = chart_text(); g = ''
     for v in range(0, ymax + 1, 20):
         g += f'<line x1="{L}" x2="{W - R}" y1="{Y(v):.1f}" y2="{Y(v):.1f}" stroke="var(--grid)"/>' + t(L - 8, Y(v) + 4, v, anchor='end')
-    for v in range(0, xmax + 1, step * (2 if narrow else 1)):
-        g += f'<line x1="{X(v):.1f}" x2="{X(v):.1f}" y1="{T}" y2="{H - B}" stroke="var(--grid)"/>' + t(X(v), H - B + 20, f'${v}', anchor='middle')
-    g += t(L + (W - L - R) / 2, H - 6, 'Cost of the run so far in US$', 'ax', 'middle')
-    g += f'<line x1="{L}" x2="{W - R}" y1="{Y(ref):.1f}" y2="{Y(ref):.1f}" stroke="var(--ink-2)" stroke-width="1.2" stroke-dasharray="4 4"/>'
-    g += t(L + 4, Y(ref) + 16, f'Human reference {ref:.1f}', 'lab')
-    pts = [(X(c), Y(sc)) for c, sc in dev]
+    for v in range(0, xmax + 1):
+        g += f'<line x1="{X(60 * v):.1f}" x2="{X(60 * v):.1f}" y1="{T}" y2="{H - B}" stroke="var(--grid)"/>' + t(X(60 * v), H - B + 20, f'{v} h', anchor='middle')
+    g += t(L + (W - L - R) / 2, H - 6, 'Time since the agent started' if narrow else 'Time since the agent started, in hours', 'ax', 'middle')
+    pts = [(X(mn), Y(sc)) for mn, sc in dev]
     g += f'<polyline points="{" ".join(f"{x:.1f},{y:.1f}" for x, y in pts)}" fill="none" stroke="{col}" stroke-width="2" stroke-linejoin="round"/>'
-    fx, fy = X(cost), Y(final)
-    g += f'<line x1="{pts[-1][0]:.1f}" y1="{pts[-1][1]:.1f}" x2="{fx:.1f}" y2="{fy:.1f}" stroke="{col}" stroke-width="1.5" stroke-dasharray="3 3"/>'
     g += ''.join(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="4.5" fill="{col}" stroke="#fff" stroke-width="1.5"/>' for x, y in pts)
+    fx, fy = X(ft), Y(final)
+    k = max(i for i, (mn, _) in enumerate(dev) if mn <= ft)   # the version saved as final is the last one before it
+    g += f'<line x1="{pts[k][0]:.1f}" y1="{pts[k][1]:.1f}" x2="{fx:.1f}" y2="{fy:.1f}" stroke="{col}" stroke-width="1.5" stroke-dasharray="3 3"/>'
     g += f'<circle cx="{fx:.1f}" cy="{fy:.1f}" r="7.5" fill="{col}" stroke="#fff" stroke-width="2"/>'
-    g += t(fx, fy - 14, f'Final score {final:.1f}', 'lab', 'end', TXT)
-    if note:
-        k, text = note; x, y = pts[k]
-        g += t(x, y - 12, text, 'lab', 'middle', TXT)
-    label = (f'{name} on SVG-EAR: {len(dev)} development submissions score '
-             + ', '.join(f'{sc:.1f}' for _, sc in dev) + f' as the run spends ${dev[0][0]:.2f} to ${dev[-1][0]:.2f}; '
-             f'the final score is {final:.1f} at ${cost:.2f}; the human reference scores {ref:.1f}.')
+    g += t(fx + 12, fy + 4.5, f'Final {final:.1f}', 'lab', 'start', TXT) if m == 'sol' else t(fx - 12, fy + 4.5, f'Final {final:.1f}', 'lab', 'end', TXT)
+    for i, text, dx, dy, anchor in SVGEAR_DEV_LABELS[m][narrow]:
+        g += t(pts[i][0] + dx, pts[i][1] + dy, text, 'lab', anchor, TXT)
+    label = (f'{name} on SVG-EAR: development scores ' + ', '.join(f'{sc:.1f} at {mn:.0f} minutes' for mn, sc in dev)
+             + f'; the final patch, saved at {ft:.0f} minutes, scores {final:.1f} on the hidden clips.')
     return f'<svg class="{"narrow" if narrow else "wide"}" viewBox="0 0 {W} {H}" role="img" aria-label="{label}">{g}</svg>'
 
 def svgear_checks_legend():
@@ -779,7 +784,9 @@ SVGEAR_CHECKS = lambda run: lambda: svgear_checks(run, False) + svgear_checks(ru
 INLINE = {'2026-10-19-svg-ear-measured-error.md': {'svgear-time-psnr': lambda: svgear_time_psnr(False) + svgear_time_psnr(True),
                                                  'svgear-checks-all': lambda: svgear_checks_all(False) + svgear_checks_all(True) + svgear_checks_legend(),
                                                  **{f'svgear-checks-{m}': SVGEAR_CHECKS(m) for m in ('astra', 'opus', 'gemini', 'sol')},
-                                                 'svgear-checks-sol-explore': SVGEAR_CHECKS('explore:sol')},
+                                                 'svgear-checks-sol-explore': SVGEAR_CHECKS('explore:sol'),
+                                                 'svgear-dev-astra': lambda: svgear_dev('astra', False) + svgear_dev('astra', True),
+                                                 'svgear-dev-sol': lambda: svgear_dev('sol', False) + svgear_dev('sol', True)},
           '2026-10-18-bbq-two-faster-clocks.md': {'bbq-speed': lambda: bbq_speed(False) + bbq_speed(True) + bbq_two_models_legend(),
                                                 'bbq-area': lambda: bbq_area(False) + bbq_area(True),
                                                 'bbq-runs': lambda: bbq_runs(False) + bbq_runs(True) + bbq_two_models_legend(),
