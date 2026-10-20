@@ -860,6 +860,18 @@
     ]
    }
   },
+  "Progent": {
+   "k27": {
+    "attack_success_rate": [
+     1,
+     4
+    ],
+    "utility_under_attack": [
+     2,
+     4
+    ]
+   }
+  },
   "ParButterfly": {
    "k27": {
     "butterfly_count": [

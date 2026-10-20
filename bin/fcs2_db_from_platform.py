@@ -59,25 +59,42 @@ for e in sorted(evaluations(), key=lambda e: e['created_at']):
 items = {c: get('evaluations/' + e['id'])['items'] for c, e in evs.items()}
 done = lambda i: i['score'] is not None or i['run_state'] == 'TIMED_OUT'   # a timeout is a result: it scores 0
 items = {c: v for c, v in items.items() if sum(map(done, v)) >= MIN}
-# Tasks whose runs are not collected. Still being built, so listed on the site with no runs and left out of FCI, FDI and
-# every total (Qiuyang, 2026-10-19: Progent, its formal runs half rerun on its new version, and KV Compaction, its formal
-# runs under way): Progent, under its new name and its old one, and KV Cache Compaction. Off the site (Qiuyang, 2026-10-19:
-# Security keeps only Progent and LRR): the other four Security tasks. vLLM (shown as Continuum) was here until its runs on
-# its sixth version were final (Qiuyang, 2026-10-19: "VLLM这个题ready了").
-OFF_SITE = {'Privilege Control for Tool-Using LLM Agents', 'Argument-aware runtime privilege control', 'KV Cache Compaction',
+# Tasks whose runs are not collected. Off the site (Qiuyang, 2026-10-19: Security keeps only Progent and LRR): the other four
+# Security tasks, and Progent's old name. Tasks still being built were here too, listed on the site with no runs and left out of
+# FCI, FDI and every total, until their runs were final: vLLM, shown as Continuum (Qiuyang, 2026-10-19: "VLLM这个题ready了"),
+# Progent (its 13 formal runs final and rescored, 2026-10-20, SCORE below) and KV Cache Compaction (Qiuyang, 2026-10-20: Opus's
+# rejudged run accepted, RERUN below). LRR (Localized Regex Repair) was never here: its formal runs are collected as they land
+# (Qiuyang, 2026-10-20: "LRR可以先不管gemini").
+OFF_SITE = {'Argument-aware runtime privilege control',
             'Adaptive Robustness Evaluation for Prompt-Injection Defense', 'BROP: Hacking Blind — Return-Oriented Programming Without Binary Knowledge',
             'Enclave-Resident Admissible-Set Filter', 'Safe Abstract Trace-Cut — Coupled Optimization'}
 # A run that stands in for the formal evaluation's run of a task, keyed by (candidate, task): a rerun on the task's current
 # version that ran in an evaluation of its own. Gemini 4's Sparse Video Attention Policy follows the task's new version
 # (cfg-e01e1a2f6173) as every other model's does (Qiuyang, 2026-10-18); its first try there died at start-up and was rerun.
-RERUN = {('pi · Gemini 4', 'Sparse Video Attention Policy'): 'run_01M56053RVYXEC4EZTF9RWM8RK'}
+# Claude Opus 5.5's KV Cache Compaction is its selected-final rejudge in the same evaluation (61.55, FAIL); the evaluation's item
+# points at a later attempt with no score (Qiuyang, 2026-10-20: accepted).
+RERUN = {('pi · Gemini 4', 'Sparse Video Attention Policy'): 'run_01M56053RVYXEC4EZTF9RWM8RK',
+         ('Claude Code · Opus 5.5 (Subscription, max effort)', 'KV Cache Compaction'): 'run_01M5BMPCS19PVWJRAGZSF9ED8P'}
 # Runs that ended with no score and that Qiuyang judged the candidate's own failure: they score 0 and fail, as a timeout does.
-# Kimi K3's vLLM run: the agent exited without a final submission, and it is not retried (Qiuyang, 2026-10-19).
-ZERO = {'run_01M5A2T1WJSCR64W2ZP34T8KHV'}
+# Kimi K3's vLLM run: the agent exited without a final submission, and it is not retried (Qiuyang, 2026-10-19). Kimi K3's
+# LRR run: it ended FAILED with no score and no adjudication cause (Qiuyang, 2026-10-20: "就是0").
+ZERO = {'run_01M5A2T1WJSCR64W2ZP34T8KHV', 'run_01M5C2J5QNEPEYAWMQY3HD7MF4'}
+# Scores that replace the platform's, by run. Progent's verifier zeroes a suite on one breached episode, so its scores fell
+# on 100, 75, 72.73 and 50; once its formal runs were final they were rescored from each run's kept per-suite metrics
+# (Qiuyang, 2026-10-20, scheme R): per suite, max(0, 1 - breach rate / the reference's breach rate) times
+# min(1, utility under attack / the reference's), and 100 times the mean over the four suites. Verdicts are unchanged: all 13
+# fail. Computed by the evaluation monitor (reports/progent-remap-R-20261020.json); every run is its formal evaluation's.
+SCORE = {'run_01M59RP96FT226RGXVGBP05MGT': 92.6471, 'run_01M5970STDD1FKW0ECD8Q2XD28': 91.1765, 'run_01M5AM6HJ0RDC319S3659NYS5J': 91.6043,
+         'run_01M5B71VP4ZTTXEDZTSJRWHCF2': 95.7391, 'run_01M5A0BA07T7WEQS9K0PTCR7TT': 76.4966, 'run_01M59KZ1ASYHPCSNM1GF2C360N': 83.9277,
+         'run_01M5A0ECGVTSPMT687NJQKGCXA': 75.9733, 'run_01M5972EXRM8BNEA6192D4WPMJ': 83.0455, 'run_01M59M7AQSZ72Q1M636KB5H5H6': 84.5674,
+         'run_01M5BK617HDNV0WQTAD3NCN4FV': 90.8374, 'run_01M5AZ52W78HS5FPKF2HZ30ZMG': 94.2308, 'run_01M5BPM6CGT9G16Z0KKXDV1192': 85.2452,
+         'run_01M5B6757V0VMSXB5QZGAWXB6C': 95.3191}
 rids = [(c, RERUN.get((c, i['task_name']), i['run_id'])) for c, v in items.items() for i in v if i.get('run_id') and i['task_name'] not in OFF_SITE]
 with ThreadPoolExecutor(16) as ex:
     pulled = list(ex.map(lambda cr: (cr[0], get('runs/' + cr[1]), get(f'runs/{cr[1]}/events?limit=500')), rids))
 assert all(r['candidate_version_id'] == evs[c]['candidate_version_id'] for c, r, _ in pulled if r['id'] in RERUN.values()), 'a rerun of another candidate version'
+assert set(SCORE) <= {r['id'] for _, r, _ in pulled}, 'a rescored run is no longer its formal evaluation\'s'
+assert all(r['verdict'] == 'FAIL' for _, r, _ in pulled if r['id'] in SCORE), 'a rescored run no longer fails'
 
 # Claude Code usage with tokens but no cost (a run without the CLI's final result): price the four token kinds at the
 # rates implied by the runs that report both, per model (least squares; the CLI's cost is linear in them).
@@ -133,7 +150,7 @@ for c, r, events in pulled:
     fb = {'reference_score': priv.get('reference_score'), 'checks': [{'label': k} for k in (priv.get('beat_spec_progress') or {})]}
     if (r.get('adjudication') or {}).get('cause') == 'provider_refusal_no_final': fb['refusal'] = True   # the model's provider refused and no final came
     zero = r['score'] is None and (r['state'] == 'TIMED_OUT' or r['id'] in ZERO)
-    db.execute('insert into runs values (?,?,?,?,?,?)', (r['id'], 0.0 if zero else r['score'], r['state'], 'FAIL' if zero and r['id'] in ZERO else r['verdict'], end - start if start and end else None, json.dumps(fb)))
+    db.execute('insert into runs values (?,?,?,?,?,?)', (r['id'], SCORE.get(r['id'], 0.0 if zero else r['score']), r['state'], 'FAIL' if zero and r['id'] in ZERO else r['verdict'], end - start if start and end else None, json.dumps(fb)))
     db.execute('insert into cells values (?,?,?)', (r['id'], c, r['task_id']))
     n = 0
     for e in events:
