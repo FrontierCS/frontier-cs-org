@@ -59,20 +59,22 @@ for e in sorted(evaluations(), key=lambda e: e['created_at']):
 items = {c: get('evaluations/' + e['id'])['items'] for c, e in evs.items()}
 done = lambda i: i['score'] is not None or i['run_state'] == 'TIMED_OUT'   # a timeout is a result: it scores 0
 items = {c: v for c, v in items.items() if sum(map(done, v)) >= MIN}
-# Tasks whose runs are not collected. Still being built, so listed on the site with no runs and left out of FCI, FDI and
-# every total: KV Cache Compaction (Qiuyang, 2026-10-19: its formal runs under way) and Progent's old name. Off
-# the site (Qiuyang, 2026-10-19: Security keeps only Progent and LRR): the other four Security tasks. vLLM (shown as
-# Continuum) was here until its runs on its sixth version were final (Qiuyang, 2026-10-19: "VLLM这个题ready了"), and Progent
-# until its 13 formal runs were final and rescored (2026-10-20, SCORE below). LRR (Localized Regex Repair) was never here:
-# its formal runs began on 2026-10-20 and are collected as they land, Gemini 4's not yet among them (Qiuyang, 2026-10-20:
-# "LRR可以先不管gemini").
-OFF_SITE = {'Argument-aware runtime privilege control', 'KV Cache Compaction',
+# Tasks whose runs are not collected. Off the site (Qiuyang, 2026-10-19: Security keeps only Progent and LRR): the other four
+# Security tasks, and Progent's old name. Tasks still being built were here too, listed on the site with no runs and left out of
+# FCI, FDI and every total, until their runs were final: vLLM, shown as Continuum (Qiuyang, 2026-10-19: "VLLM这个题ready了"),
+# Progent (its 13 formal runs final and rescored, 2026-10-20, SCORE below) and KV Cache Compaction (Qiuyang, 2026-10-20: Opus's
+# rejudged run accepted, RERUN below). LRR (Localized Regex Repair) was never here: its formal runs are collected as they land
+# (Qiuyang, 2026-10-20: "LRR可以先不管gemini").
+OFF_SITE = {'Argument-aware runtime privilege control',
             'Adaptive Robustness Evaluation for Prompt-Injection Defense', 'BROP: Hacking Blind — Return-Oriented Programming Without Binary Knowledge',
             'Enclave-Resident Admissible-Set Filter', 'Safe Abstract Trace-Cut — Coupled Optimization'}
 # A run that stands in for the formal evaluation's run of a task, keyed by (candidate, task): a rerun on the task's current
 # version that ran in an evaluation of its own. Gemini 4's Sparse Video Attention Policy follows the task's new version
 # (cfg-e01e1a2f6173) as every other model's does (Qiuyang, 2026-10-18); its first try there died at start-up and was rerun.
-RERUN = {('pi · Gemini 4', 'Sparse Video Attention Policy'): 'run_01M56053RVYXEC4EZTF9RWM8RK'}
+# Claude Opus 5.5's KV Cache Compaction is its selected-final rejudge in the same evaluation (61.55, FAIL); the evaluation's item
+# points at a later attempt with no score (Qiuyang, 2026-10-20: accepted).
+RERUN = {('pi · Gemini 4', 'Sparse Video Attention Policy'): 'run_01M56053RVYXEC4EZTF9RWM8RK',
+         ('Claude Code · Opus 5.5 (Subscription, max effort)', 'KV Cache Compaction'): 'run_01M5BMPCS19PVWJRAGZSF9ED8P'}
 # Runs that ended with no score and that Qiuyang judged the candidate's own failure: they score 0 and fail, as a timeout does.
 # Kimi K3's vLLM run: the agent exited without a final submission, and it is not retried (Qiuyang, 2026-10-19). Kimi K3's
 # LRR run: it ended FAILED with no score and no adjudication cause (Qiuyang, 2026-10-20: "就是0").

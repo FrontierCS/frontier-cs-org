@@ -144,6 +144,7 @@ TASK = {
     'Join-Tree Rewriting': ('Database', 'Yannakakis'),
     'KAMI FP64 Block GEMM — trusted batched harness adaptation': ('Arch', 'KAMI'),
     'Latent Objective Recovery': ('Machine Learning', 'LeJEPA'),
+    'KV Cache Compaction': ('Machine Learning', 'KV Compaction'),   # on the site from 2026-10-20 (Qiuyang)
     'Learned Transformer Layer Mapping': ('Machine Learning', 'DyT'),
     'Localized Regex Repair': ('Security', 'LRR'),   # its formal runs from 2026-10-20, before Gemini 4's (Qiuyang: "LRR可以先不管gemini")
     'MetaOpt Combined-TE Gap Search': ('Network', 'MetaOpt'),
