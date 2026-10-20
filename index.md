@@ -213,6 +213,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
 </section>
 </div>
 </div>
+<aside class="poweredby" aria-label="Sponsor"><span>Powered by</span><a href="https://modal.com/" target="_blank" rel="noopener noreferrer"><img src="{{ 'assets/img/sponsors/modal.svg' | relative_url }}" alt="Modal" width="104" height="20"></a></aside>
 <script defer src="{{ '/assets/js/fcs2-data.js' | relative_url }}"></script>
 <script defer src="{{ '/assets/js/fcs2-checks.js' | relative_url }}"></script>
 <script defer src="{{ '/assets/js/fcs2-art.js' | relative_url }}"></script>
