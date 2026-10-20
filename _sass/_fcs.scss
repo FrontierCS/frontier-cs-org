@@ -1766,6 +1766,14 @@ section.journal.team-sec.team-top { padding-top: clamp(56px, 6vw, 72px); }
 .sponsor-row a.partner.harbor { font-family: var(--font-code); font-weight: 500; font-size: 25px; letter-spacing: 0; }   /* Harbor's own mark is its name in a monospace face */
 .sponsor-row a.partner { display: flex; align-items: center; gap: 10px; font-size: 24px; font-weight: 600; letter-spacing: -.01em; color: var(--ink); }
 .sponsor-row a { display: block; transition: opacity .15s; }
+/* Modal, the lead sponsor (owner, 2026-10-20): its logo at 1.5 times the others' height on a row of its own, with one
+   line on what it gives; the other sponsors follow under "Also supported by" */
+.sponsor-lead { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 28px; margin: 20px 0 0; }
+.sponsor-lead img { height: 45px; width: auto; display: block; }
+.sponsor-lead a { display: block; transition: opacity .15s; } .sponsor-lead a:hover { opacity: .7; }
+.sponsor-lead p { margin: 0; font-size: 16px; color: var(--ink-2); }
+.sponsor-sub { margin: 32px 0 0; font-size: 14px; font-weight: 500; color: var(--ink-3); }
+.sponsor-sub + .sponsor-row { margin-top: 14px; } .sponsor-sub + .sponsor-row.even { margin-top: 10px; }
 .sponsor-row a:hover { opacity: .7; }
 /* Team page: partners and sponsors on the institutions' grid, one logo centred in each equal cell */
 .sponsor-row.even { display: grid; grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)); gap: 40px 28px; margin-top: 24px; }
@@ -1782,6 +1790,7 @@ section.journal.team-sec.team-top { padding-top: clamp(56px, 6vw, 72px); }
   .logo-wall img { height: var(--h-sm, 27px); }   /* 3/4 of --h, set beside it in team.md: the production minifier breaks calc(var(--h) ...) */
   .sponsor-row img.laude { height: 38px; }
   .sponsor-row img.modal { height: 26px; }
+  .sponsor-lead img { height: 39px; }
 }
 .sec-intro a { text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--rule); }
 
