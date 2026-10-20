@@ -102,9 +102,11 @@ DEC = max(0, int(np.ceil(2 - np.log10(PASS_UNIT) - 1e-9)))   # decimals of FCI p
 TIE_EPS = 0                    # a final score within TIE_EPS of the human reference is half a win; 0: only an exact tie
 # the human reference (by short name) where the database has none: Structured LWE by Qiuyang's decision (2026-10-14);
 # ParButterfly and RegionsSort as measured in runs of the human reference alone on the runs' task version
-# (run_01M4RVT5V4D3SR83YXW0B4EYP6, run_01M4HGFJEHVPJN04RVH9WEPYV1; Qiuyang, 2026-10-15)
+# (run_01M4RVT5V4D3SR83YXW0B4EYP6, run_01M4HGFJEHVPJN04RVH9WEPYV1; Qiuyang, 2026-10-15); Continuum, whose judge reports
+# none, as the highest of the three runs of the human reference alone whose measurements set its judge's fixed targets
+# (0.06, 4.63 and 9.61, on earlier task versions; run_01M571D9453PAMSRP918SV4G58; Qiuyang, 2026-10-20: "用最高分吧")
 OFF_FIT_DOMAINS = {'Security'}   # Qiuyang, 2026-10-16: off FCI, FDI and test-time scaling until their tasks are fixed; the pages still list their runs
-REF_DEFAULT = {'Structured LWE': 100, 'ParButterfly': 30.51, 'RegionsSort': 50.26}
+REF_DEFAULT = {'Structured LWE': 100, 'ParButterfly': 30.51, 'RegionsSort': 50.26, 'Continuum': 9.61}
 
 # database display name -> (domain folder, paper short name or None)
 TASK = {
