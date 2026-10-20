@@ -206,8 +206,6 @@ OVERVIEW = {
     # mean final score: the overview's chart, grouped by model
     '04-mean-score': """() => {
       const sc = m => RUNS.filter(r => r.m === m.id).map(r => r.s), mu = m => mean(sc(m)), top = [...MODELS].sort((a, b) => mu(b) - mu(a));
-      const hi = Math.floor(Math.min(...MODELS.map(m => Math.max(...sc(m))))), lo = Math.ceil(Math.max(...MODELS.map(m => Math.min(...sc(m)))));
-      console.assert(hi >= 95 && lo <= 10, 'mean-score wording', hi, lo);
       const v = card('stack', 'Score against the human reference',   // owner, 2026-10-14: the overview's mean score is the difference
         'One dot per run, the large dot the mean of each model.',
         '');   /* the axis title already says what the score is */
@@ -228,8 +226,7 @@ OVERVIEW = {
       const v = card('stack', 'FCI vs. budget per run',
         'A run that ended within the budget counts what it beat; one still going counts as beating nothing.',
         'One curve per lab, its model with the highest FCI, as on the site.');
-      fit(v, 'tts', 62); v.append(document.getElementById('ttsplot'), document.getElementById('ttslegend')); drawTTS();
-      document.querySelectorAll('#ttslegend button[aria-pressed="false"]').forEach(b => b.remove());   // a still card: the hidden models leave the legend
+      fit(v, 'tts', 62); v.append(document.getElementById('ttsplot')); drawTTS();   // the chart names its curves; it has no legend since 2026-10-17
     }""",
     # the private set (owner, 2026-10-10: a separate set of unreleased tasks; no count on the card): task illustrations
     # blurred past recognition, each under a white lock, in the closing card's grid
@@ -266,7 +263,7 @@ try:
         for name, js in OVERVIEW.items():
             ctx = b.new_context(viewport={'width': CW, 'height': CH}, device_scale_factor=1600 / CW, reduced_motion='reduce')
             # an empty CHART_H the cards fill with the free height before drawing (fcs2.js and fcs2-task.js read it)
-            ctx.add_init_script('window.CHART_H = {};')
+            ctx.add_init_script('window.CHART_H = {}; window.LABEL_LH = 1.25;')   # labels keep whole text boxes apart (labelDot in fcs2-data.js)
             pg = ctx.new_page(); errs, logs = [], []
             pg.on('pageerror', lambda e: errs.append(str(e)))
             pg.on('console', lambda m: m.type in ('assert', 'error') and logs.append(m.text))

@@ -265,7 +265,10 @@ function labelDot(svg, boxes, cx, cy, name, frame, fill, bold, whole, far) {   /
       spots.push([cx + r * c, y + 4.5, c > .3 ? 'start' : c < -.3 ? 'end' : 'middle']); }
     for (let dy = -160; dy <= 160; dy += 8) spots.push([frame.r - 1, cy + dy + 4.5, 'end'], [frame.l + 1, cy + dy + 4.5, 'start']);
   }
-  const box = ([x, y, an]) => ({x:an === 'start' ? x : an === 'end' ? x - w : x - w / 2, y:y - 11, w, h:14});   // the glyphs' own height, so a label can sit beside its dot in a tight cluster
+  // a label's box is its glyphs' height (14 px on the page), so a label can sit beside its dot in a tight cluster; the share
+  // cards set labels larger and ask for whole text boxes apart (window.LABEL_LH, bin/fcs2_thread_cards.py)
+  const lh = Math.max(14, (parseFloat(getComputedStyle(lab).fontSize) || 14) * (window.LABEL_LH || 0));
+  const box = ([x, y, an]) => ({x:an === 'start' ? x : an === 'end' ? x - w : x - w / 2, y:y - lh * 11 / 14, w, h:lh});
   const hit = q => boxes.some(o => q.x < o.x + o.w && o.x < q.x + q.w && q.y < o.y + o.h && o.y < q.y + q.h) || q.x < frame.l || q.x + q.w > frame.r || q.y < frame.t || q.y + q.h > frame.b;
   const tight = !whole && /^\S+ (\S+ \d[\d.]*)$/.exec(name), forms = tight ? [name, tight[1]] : [name];
   // a far spot's leader runs from the dot's edge to the label box's nearest point; far spots are tried shortest leader
