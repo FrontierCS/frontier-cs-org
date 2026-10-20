@@ -106,7 +106,10 @@ TIE_EPS = 0                    # a final score within TIE_EPS of the human refer
 # none, as the highest of the three runs of the human reference alone whose measurements set its judge's fixed targets
 # (0.06, 4.63 and 9.61, on earlier task versions; run_01M571D9453PAMSRP918SV4G58; Qiuyang, 2026-10-20: "用最高分吧")
 OFF_FIT_DOMAINS = set()   # none since 2026-10-20 (Qiuyang: FCI and FDI cover all 48 tasks); Security was off from 2026-10-16 until its tasks were fixed
-REF_DEFAULT = {'Structured LWE': 100, 'ParButterfly': 30.51, 'RegionsSort': 50.26, 'Continuum': 9.61}
+# KV Compaction and Progent score their human reference 0 by definition, and their judges report that 0, which reads as
+# "none" above: KV Compaction's score is 0 at a ratio of 1 to the reference (judge/gate.py, score_from_ratio), and Progent's
+# remap (scheme R) gives 1 - 1 = 0 for the reference itself (Qiuyang, 2026-10-20: the pages must show the human reference)
+REF_DEFAULT = {'Structured LWE': 100, 'ParButterfly': 30.51, 'RegionsSort': 50.26, 'Continuum': 9.61, 'KV Compaction': 0, 'Progent': 0}
 
 # database display name -> (domain folder, paper short name or None)
 TASK = {
