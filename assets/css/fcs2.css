@@ -519,24 +519,33 @@ a.pbtn:hover{border-color:var(--teal); color:var(--teal-d)}
 
 /* "Powered by" and the sponsors' marks, Modal first, in a bar fixed to the bottom of the FrontierCS 2 page, as RSI Bench
    shows Modal (Qiuyang, 2026-10-19: Modal asked to be more prominent; the other sponsors join it, in the Sponsors
-   section's order and at its relative sizes). The page leaves as much room below the footer, so the bar never covers its
-   last line. On phones the words go and the four marks shrink to fit one row. No env() inside calc(): Sass and the site's
-   minifier both break it, so the safe-area inset is a padding and a spacer of its own. */
-.poweredby{position:fixed; left:0; right:0; bottom:0; z-index:30; display:flex; align-items:center; justify-content:center; gap:28px;
-  padding:0 16px env(safe-area-inset-bottom,0px); background:rgba(255,255,255,.9); border-top:1px solid var(--line);
+   section's order). The marks' words line up (Qiuyang): each mark is sized so its capitals (Kaggle's k and l, Laude's
+   LAUDE) stand as tall as Modal's M, and lowered by the part of the image below its words' baseline, so every word and
+   "Powered by" share one baseline. The fractions were measured on the image files: cap height and baseline as a share of
+   the image's height, Modal .71 and .84, Kaggle .745 and .745, Laude .51 and .53, Scale .795 and .8925. The page leaves as
+   much room below the footer as the bar is tall, so the bar never covers the footer's last line. On phones the words go
+   and the marks shrink by a fifth to fit one row. No env() inside calc(): Sass and the site's minifier both break it, so
+   the safe-area inset is a padding and a spacer of its own. */
+.poweredby{position:fixed; left:0; right:0; bottom:0; z-index:30; display:flex; align-items:baseline; justify-content:center; gap:28px;
+  padding:5px 16px env(safe-area-inset-bottom,0px); background:rgba(255,255,255,.9); border-top:1px solid var(--line);
   -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px)}
-.poweredby span{margin:8px -14px 8px 0; font-size:14px; line-height:20px; color:var(--muted); white-space:nowrap}
-.poweredby a{display:block; margin:8px 0; transition:opacity .15s}
+.poweredby span, .poweredby a{display:block; font-size:14px; line-height:20px; padding-bottom:4px}
+.poweredby span{margin-right:-14px; color:var(--muted); white-space:nowrap}
+.poweredby a{transition:opacity .15s}
 .poweredby a:hover{opacity:.75}
-.poweredby img{display:block; width:auto; height:20px}
-.poweredby img.kaggle{height:24px} .poweredby img.laude{height:28px} .poweredby img.scale{height:17px}
-body:has(.poweredby){padding-bottom:45px}
+.poweredby img{display:inline-block; width:auto; height:20px; vertical-align:-3.2px}
+.poweredby img.kaggle{height:19.1px; vertical-align:-4.9px}
+.poweredby img.laude{height:27.8px; vertical-align:-13.1px}
+.poweredby img.scale{height:17.9px; vertical-align:-1.9px}
+body:has(.poweredby){padding-bottom:40px}   /* the bar's height, without the safe-area inset */
 body:has(.poweredby)::after{content:""; display:block; height:env(safe-area-inset-bottom,0px)}
 @media (max-width:560px){
-  .poweredby{gap:18px}
+  .poweredby{gap:18px; padding-top:3px}
   .poweredby span{display:none}
-  .poweredby a{margin:7px 0}
-  .poweredby img{height:16px} .poweredby img.kaggle{height:19px} .poweredby img.laude{height:22px} .poweredby img.scale{height:14px}
-  body:has(.poweredby){padding-bottom:37px}
+  .poweredby img{height:16px; vertical-align:-2.6px}
+  .poweredby img.kaggle{height:15.2px; vertical-align:-3.9px}
+  .poweredby img.laude{height:22.3px; vertical-align:-10.5px}
+  .poweredby img.scale{height:14.3px; vertical-align:-1.5px}
+  body:has(.poweredby){padding-bottom:34px}
 }
 @media print{.poweredby, body:has(.poweredby)::after{display:none} body:has(.poweredby){padding-bottom:0}}
