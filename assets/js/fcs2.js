@@ -715,7 +715,7 @@ function startPlay(tile) {
 // The card tells a task in three panels that follow one another: the paper and, in one sentence, what the agent has to
 // do; which models passed (a tick) and which failed (a cross); and where the task ranks by difficulty among
 // all tasks (owner, 2026-10-13: the run curves said too little for the room they took). A task with no runs yet has the
-// first panel alone (Continuum, Qiuyang, 2026-10-18).
+// first panel alone (KV Compaction, LRR and Progent, Qiuyang, 2026-10-19).
 // Icons for the kinds of metric a task is scored on (KEYM), each a path in a 14 px box centred on (x, y).
 const KEY_KIND = {Latency:'time', Throughput:'speed', Accuracy:'quality', Quality:'quality', 'Success rate':'quality', Reward:'quality',
   Memory:'size', Size:'size', Compression:'size', Communication:'size', Fairness:'balance', Coverage:'count'};

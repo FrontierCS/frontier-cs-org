@@ -836,6 +836,30 @@
     ]
    }
   },
+  "Continuum": {
+   "k27": {
+    "correctness": [
+     4,
+     4
+    ],
+    "p90": [
+     0,
+     4
+    ],
+    "p95": [
+     0,
+     4
+    ],
+    "p99": [
+     0,
+     4
+    ],
+    "paired_timing": [
+     0,
+     4
+    ]
+   }
+  },
   "ParButterfly": {
    "k27": {
     "butterfly_count": [
