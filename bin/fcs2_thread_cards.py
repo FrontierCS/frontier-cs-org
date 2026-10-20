@@ -142,16 +142,24 @@ OVERVIEW = {
       w.innerHTML = `<div style="position:absolute; left:50%; top:50%; transform-style:preserve-3d; transform:rotateX(50deg) rotateZ(-32deg)">${pages}</div>`;
       c.append(w); hd.parentElement.style.zIndex = 1;
     }""",
-    # the evolution card is gone (owner, 2026-10-20: '这个卡片删掉吧'); the thread runs cover, price, score, FCI, scaling, private, explore
+    # the evolution card is gone (owner, 2026-10-20: '这个卡片删掉吧'); the thread runs cover, pass rate, price, score, FCI, scaling, private, explore
+    # pass rate by model: the leaderboard's first chart, one bar per model with its lab's logo and harness (owner, 2026-10-20:
+    # the bar chart added on 2026-10-16 had no card); the line under the headline names the model with the highest pass rate
+    '02-pass-rate': """() => {
+      const top = [...MODELS].sort((a, b) => passPct(b) - passPct(a))[0];
+      const v = card('stack', 'Pass rate', `${top.name} passes ${Math.round(passPct(top))}% of its runs.`,
+        'A pass beats the human reference on every metric of every hidden workload.');
+      CHART_H.fcibFlat = true; CHART_H.fcib = Math.floor(v.clientHeight - 150); v.append(document.getElementById('fcibplot')); drawPassBars();   // upright names and harnesses, as on a desktop page
+    }""",
     # pass rate against cost: the overview's chart
-    '02-pass-cost': """() => {
+    '03-pass-cost': """() => {
       const v = card('stack', 'Pass rate vs. cost per run',
         'One dot per model.',
         'A pass beats the human reference on every metric of every hidden workload.');
       fit(v, 'pc'); v.append(document.getElementById('pcplot')); drawPassCost();
     }""",
     # mean final score: the overview's chart, grouped by model
-    '03-mean-score': """() => {
+    '04-mean-score': """() => {
       const sc = m => RUNS.filter(r => r.m === m.id).map(r => r.s), mu = m => mean(sc(m)), top = [...MODELS].sort((a, b) => mu(b) - mu(a));
       const v = card('stack', 'Score against the human reference',   // owner, 2026-10-14: the overview's mean score is the difference
         'One dot per run, the large dot the mean of each model.',
@@ -165,7 +173,7 @@ OVERVIEW = {
     }""",
     # FCI: the overview's chart; the line under the headline names the model with the highest FCI and its value (the
     # human reference has no FCI on the pass-based scale, so the old count of models above it is gone; Qiuyang, 2026-10-14)
-    '04-fci': """() => {
+    '05-fci': """() => {
       const top = RANKED[0];
       console.assert(fe(ECI[top.id][0]) !== fe(ECI[RANKED[1].id][0]), 'FCI wording: a tie at the top', top.id, RANKED[1].id);
       const v = card('stack', 'FCI (FrontierCS Capabilities Index)',   // owner, 2026-10-13: the index's name as the headline
@@ -174,7 +182,7 @@ OVERVIEW = {
       CHART_H.eciLane = Math.floor((v.clientHeight - 60) / MODELS.length); v.append(document.getElementById('eciplot')); drawECI(); oneLine(document.getElementById('ecisvg')); sideVals(document.getElementById('ecisvg'));
     }""",
     # test-time scaling: the overview's chart
-    '05-scaling': """() => {
+    '06-scaling': """() => {
       const v = card('stack', 'FCI vs. budget per run',
         'A run that ended within the budget counts what it beat; one still going counts as beating nothing.',
         'One curve per lab, its model with the highest FCI, as on the site.');
@@ -182,7 +190,7 @@ OVERVIEW = {
     }""",
     # the private set (owner, 2026-10-10: a separate set of unreleased tasks; no count on the card): task illustrations
     # blurred past recognition, each under a white lock, in the closing card's grid
-    '06-private': """() => {
+    '07-private': """() => {
       const v = card('side', 'Plus a private set.', 'Tasks we do not release.', '');
       const all = AREAS.flatMap(a => TASKS.filter(t => a.d.includes(t.d)).map(t => [t, a.k])), pick = Array.from({length:12}, (_, i) => all[Math.floor((i + .5) * all.length / 12)]);
       const cols = 3, gw = 470, gap = 6, tw = (gw - gap * (cols - 1)) / cols, th = tw / 1.5;
@@ -193,7 +201,7 @@ OVERVIEW = {
           <div style="position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:38px; height:38px; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center; box-shadow:0 1px 4px rgba(32,33,36,.2)">${lock}</div></div>`).join('');
     }""",
     # where to look: a sample of task illustrations
-    '07-explore': """() => {
+    '08-explore': """() => {
       const v = card('side', `Explore all ${TASKS.length} tasks`,
         'Each built from a published paper.', '');
       const pick = AREAS.flatMap(a => TASKS.filter(t => a.d.includes(t.d)).slice(0, 2).map(t => [t, a.k])).slice(0, 12);

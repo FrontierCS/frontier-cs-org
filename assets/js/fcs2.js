@@ -113,7 +113,7 @@ function drawPassBars() {
   // second style (owner, 2026-10-16): the value large in the middle of its bar, the logo on a light tile, and under it the
   // name and, in grey, the harness, both upright and wrapped to the column; where the columns are too narrow for upright
   // names (phones), the name alone, slanted
-  const R = 4, T = 10, band0 = (W - 8) / order.length, flat = band0 >= 72, fs = flat ? 14 : 11, ang = 55, cos = Math.cos(ang * Math.PI / 180);
+  const R = 4, T = 10, band0 = (W - 8) / order.length, flat = CHART_H.fcibFlat || band0 >= 72,   /* fcibFlat: the share card keeps the upright names */ fs = flat ? 14 : 11, ang = 55, cos = Math.cos(ang * Math.PI / 180);
   const wrap = (txt, size, maxw) => txt.split(' ').reduce((ls, w) => { const l = ls[ls.length - 1]; if (l && measure(l + ' ' + w, size) <= maxw) ls[ls.length - 1] = l + ' ' + w; else ls.push(w); return ls; }, []);
   const tile = flat ? 34 : 22, lead = fs * 1.3;
   let L = 4, B;
