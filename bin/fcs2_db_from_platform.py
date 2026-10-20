@@ -85,38 +85,40 @@ COMPLETED = {'run_01M5BMPCS19PVWJRAGZSF9ED8P'}
 # Scores that replace the platform's, by run: KV Compaction and Progent, rescored on absolute scales from each run's own
 # final-verification measurements (Qiuyang, 2026-10-21; no run was re-executed, verdicts unchanged, all fail). They replace
 # the platform's relative scores, which pinned the human reference at 0, and Progent's scheme-R remap of 2026-10-20.
-# KV Compaction: per article, (correct / questions) x r / (1 + r), where in time mode r = (reference seconds / candidate
-# seconds) x min(1, reference bytes / candidate bytes), bytes and seconds swapped in bytes mode; 100 x the mean over the 24
-# articles. Runs with no scored final stay 0. Progent: per suite, utility under attack x (1 - breached / attacked); 100 x the
-# mean over the 4 suites. Values and per-suite detail: reports/rescore-kv-progent-20261021.json (the evaluation monitor).
-SCORE = {'run_01M5B71VP4ZTTXEDZTSJRWHCF2': 48.7175, 'run_01M5B6757V0VMSXB5QZGAWXB6C': 56.8798,
-         'run_01M5AZ52W78HS5FPKF2HZ30ZMG': 50.4422, 'run_01M59RP96FT226RGXVGBP05MGT': 55.3904,
-         'run_01M5AM6HJ0RDC319S3659NYS5J': 44.7325, 'run_01M5970STDD1FKW0ECD8Q2XD28': 55.7482,
-         'run_01M5BK617HDNV0WQTAD3NCN4FV': 47.5928, 'run_01M5BPM6CGT9G16Z0KKXDV1192': 49.4521,
-         'run_01M59M7AQSZ72Q1M636KB5H5H6': 46.535, 'run_01M59KZ1ASYHPCSNM1GF2C360N': 36.8325,
-         'run_01M5972EXRM8BNEA6192D4WPMJ': 43.169, 'run_01M5A0BA07T7WEQS9K0PTCR7TT': 36.1468,
-         'run_01M5A0ECGVTSPMT687NJQKGCXA': 43.6441, 'run_01M5BMPCS19PVWJRAGZSF9ED8P': 70.378,
-         'run_01M5B3M1E5MSE78KE480G6HARS': 64.0486, 'run_01M5BP6WGY6VJ137N8KBKYJ6ST': 65.593,
-         'run_01M5BGJMS0CVMZQN2KBE6JY8P2': 60.8677, 'run_01M5BPFMHBVMKV3TBTB5HW2XD2': 58.9275,
-         'run_01M5B3Q2GAQQA222W6DRZDP0R7': 53.0684, 'run_01M5BGMM8NF591Z8ZPT5MMF1VD': 48.4109,
-         'run_01M5BPACVQ0VFV9S4N37Y5H4QZ': 43.0439, 'run_01M5B3Z6EHETQBZF3GSPQJJZGN': 38.464,
-         'run_01M5BMR4VSNRK7GCBTE729E9E5': 32.1802, 'run_01M5BPC4T5EBT3A9MG03Q9N88V': 0.0,
+# KV Compaction (the formula Qiuyang chose): per article, accuracy x (0.75 + 0.25 e), accuracy = correct / questions and
+# e = clip(0.5 + log10(r) / 6, 0, 1), where in time mode r = (reference seconds / candidate seconds) x min(1, reference bytes /
+# candidate bytes), bytes and seconds swapped in bytes mode; 100 x the mean over the 24 articles. Accuracy dominates and
+# efficiency is a bounded bonus. Runs with no scored final stay 0. Progent: per suite, utility under attack x (1 - breached /
+# attacked); 100 x the mean over the 4 suites. Values and detail: reports/rescore-kv-progent-20261021.json (the evaluation
+# monitor).
+SCORE = {'run_01M5B6757V0VMSXB5QZGAWXB6C': 56.8798, 'run_01M5970STDD1FKW0ECD8Q2XD28': 55.7482,
+         'run_01M59RP96FT226RGXVGBP05MGT': 55.3904, 'run_01M5AZ52W78HS5FPKF2HZ30ZMG': 50.4422,
+         'run_01M5BPM6CGT9G16Z0KKXDV1192': 49.4521, 'run_01M5B71VP4ZTTXEDZTSJRWHCF2': 48.7175,
+         'run_01M5BK617HDNV0WQTAD3NCN4FV': 47.5928, 'run_01M59M7AQSZ72Q1M636KB5H5H6': 46.535,
+         'run_01M5AM6HJ0RDC319S3659NYS5J': 44.7325, 'run_01M5A0ECGVTSPMT687NJQKGCXA': 43.6441,
+         'run_01M5972EXRM8BNEA6192D4WPMJ': 43.169, 'run_01M59KZ1ASYHPCSNM1GF2C360N': 36.8325,
+         'run_01M5A0BA07T7WEQS9K0PTCR7TT': 36.1468, 'run_01M5BMPCS19PVWJRAGZSF9ED8P': 68.1994,
+         'run_01M5BP6WGY6VJ137N8KBKYJ6ST': 63.7368, 'run_01M5B3M1E5MSE78KE480G6HARS': 61.8734,
+         'run_01M5BGJMS0CVMZQN2KBE6JY8P2': 59.0941, 'run_01M5BPFMHBVMKV3TBTB5HW2XD2': 56.8701,
+         'run_01M5B3Q2GAQQA222W6DRZDP0R7': 51.7117, 'run_01M5BGMM8NF591Z8ZPT5MMF1VD': 46.8766,
+         'run_01M5BPACVQ0VFV9S4N37Y5H4QZ': 46.9225, 'run_01M5B3Z6EHETQBZF3GSPQJJZGN': 52.2678,
+         'run_01M5BMR4VSNRK7GCBTE729E9E5': 52.5936, 'run_01M5BPC4T5EBT3A9MG03Q9N88V': 0.0,
          'run_01M5BP8MTSK6ZWWNTGY2SPW5BX': 0.0, 'run_01M5BMSWSWFN9RFSZMBHQ2M7PQ': 0.0}
-# The human reference's score on the same scales, measured in each run (KV Compaction's frozen captures give 34.64 in every
-# run; Progent's reference policy is measured live, 38.9 to 41.8); the site shows the median over the task's runs, as for
-# every task. The platform reports 0 for both, its relative scale.
-REFERENCE = {'run_01M5B71VP4ZTTXEDZTSJRWHCF2': 41.1292, 'run_01M5B6757V0VMSXB5QZGAWXB6C': 40.635,
-             'run_01M5AZ52W78HS5FPKF2HZ30ZMG': 40.9445, 'run_01M59RP96FT226RGXVGBP05MGT': 39.8665,
-             'run_01M5AM6HJ0RDC319S3659NYS5J': 40.2264, 'run_01M5970STDD1FKW0ECD8Q2XD28': 40.2956,
-             'run_01M5BK617HDNV0WQTAD3NCN4FV': 40.4349, 'run_01M5BPM6CGT9G16Z0KKXDV1192': 41.0416,
-             'run_01M59M7AQSZ72Q1M636KB5H5H6': 40.3874, 'run_01M59KZ1ASYHPCSNM1GF2C360N': 38.8663,
-             'run_01M5972EXRM8BNEA6192D4WPMJ': 41.3253, 'run_01M5A0BA07T7WEQS9K0PTCR7TT': 41.7748,
-             'run_01M5A0ECGVTSPMT687NJQKGCXA': 39.1359, 'run_01M5BMPCS19PVWJRAGZSF9ED8P': 34.6445,
-             'run_01M5B3M1E5MSE78KE480G6HARS': 34.6445, 'run_01M5BP6WGY6VJ137N8KBKYJ6ST': 34.6445,
-             'run_01M5BGJMS0CVMZQN2KBE6JY8P2': 34.6445, 'run_01M5BPFMHBVMKV3TBTB5HW2XD2': 34.6445,
-             'run_01M5B3Q2GAQQA222W6DRZDP0R7': 34.6445, 'run_01M5BGMM8NF591Z8ZPT5MMF1VD': 34.6445,
-             'run_01M5BPACVQ0VFV9S4N37Y5H4QZ': 34.6445, 'run_01M5B3Z6EHETQBZF3GSPQJJZGN': 34.6445,
-             'run_01M5BMR4VSNRK7GCBTE729E9E5': 34.6445}
+# The human reference's score on the same scales, measured in each run (KV Compaction's frozen captures give 60.63 in every
+# run, 87.5 x its mean accuracy; Progent's reference policy is measured live, 38.9 to 41.8); the site shows the median over the
+# task's runs, as for every task. The platform reports 0 for both, its relative scale.
+REFERENCE = {'run_01M5B6757V0VMSXB5QZGAWXB6C': 40.635, 'run_01M5970STDD1FKW0ECD8Q2XD28': 40.2956,
+             'run_01M59RP96FT226RGXVGBP05MGT': 39.8665, 'run_01M5AZ52W78HS5FPKF2HZ30ZMG': 40.9445,
+             'run_01M5BPM6CGT9G16Z0KKXDV1192': 41.0416, 'run_01M5B71VP4ZTTXEDZTSJRWHCF2': 41.1292,
+             'run_01M5BK617HDNV0WQTAD3NCN4FV': 40.4349, 'run_01M59M7AQSZ72Q1M636KB5H5H6': 40.3874,
+             'run_01M5AM6HJ0RDC319S3659NYS5J': 40.2264, 'run_01M5A0ECGVTSPMT687NJQKGCXA': 39.1359,
+             'run_01M5972EXRM8BNEA6192D4WPMJ': 41.3253, 'run_01M59KZ1ASYHPCSNM1GF2C360N': 38.8663,
+             'run_01M5A0BA07T7WEQS9K0PTCR7TT': 41.7748, 'run_01M5BMPCS19PVWJRAGZSF9ED8P': 60.6278,
+             'run_01M5BP6WGY6VJ137N8KBKYJ6ST': 60.6278, 'run_01M5B3M1E5MSE78KE480G6HARS': 60.6278,
+             'run_01M5BGJMS0CVMZQN2KBE6JY8P2': 60.6278, 'run_01M5BPFMHBVMKV3TBTB5HW2XD2': 60.6278,
+             'run_01M5B3Q2GAQQA222W6DRZDP0R7': 60.6278, 'run_01M5BGMM8NF591Z8ZPT5MMF1VD': 60.6278,
+             'run_01M5BPACVQ0VFV9S4N37Y5H4QZ': 60.6278, 'run_01M5B3Z6EHETQBZF3GSPQJJZGN': 60.6278,
+             'run_01M5BMR4VSNRK7GCBTE729E9E5': 60.6278}
 rids = [(c, RERUN.get((c, i['task_name']), i['run_id'])) for c, v in items.items() for i in v if i.get('run_id') and i['task_name'] not in OFF_SITE]
 with ThreadPoolExecutor(16) as ex:
     pulled = list(ex.map(lambda cr: (cr[0], get('runs/' + cr[1]), get(f'runs/{cr[1]}/events?limit=500')), rids))
