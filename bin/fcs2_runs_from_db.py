@@ -29,7 +29,7 @@ final score counts by how far above the human reference r_t it is when the run p
 the median reference_score over the task's runs; 0 or less: REF_DEFAULT's value, else the task has none), in units of
 the task's score spread, at least the median spread over tasks: y = (score - r_t) / unit_t, unit_t = max(sd_t, c), sd_t
 the sd of the task's final scores strictly between 0 and 100 (all of them when fewer than 3), c the median sd_t over the
-tasks with a reference. A run that does not pass contributes its metric groups and its margin: how far short it fell, or, above r_t, only that it got there, P(y' >= 0), its metrics not confirming more (rule E, Qiuyang, 2026-10-16). Tasks in OFF_FIT_DOMAINS (Security, until its tasks are fixed) are left out of every fit too. A run the model's provider refused (feedback_json.refusal: no final submission came) is left out of every fit, FCI, FDI and test-time scaling alike; the page still lists it (Qiuyang, 2026-10-16). The final score comes from the same
+tasks with a reference. A run that does not pass contributes its metric groups and its margin: how far short it fell, or, above r_t, only that it got there, P(y' >= 0), its metrics not confirming more (rule E, Qiuyang, 2026-10-16). Tasks in OFF_FIT_DOMAINS (none since 2026-10-20; Security from 2026-10-16 until then) are left out of every fit too. A run the model's provider refused (feedback_json.refusal: no final submission came) is left out of every fit, FCI, FDI and test-time scaling alike; the page still lists it (Qiuyang, 2026-10-16). The final score comes from the same
 measurements as the metrics, so a run's metric groups and its margin share one run effect u ~ N(0, SIGMA_U^2). With
 theta_m the model's strength in logits (prior N(0, 1/LAM), LAM = 0.35 as in the site's in-browser TDIFF), a run's
 likelihood is the integral over u, by Gauss-Hermite quadrature (64 nodes; 24 stall Newton near SIGMA_U = 3.7), of prod_j
@@ -105,7 +105,7 @@ TIE_EPS = 0                    # a final score within TIE_EPS of the human refer
 # (run_01M4RVT5V4D3SR83YXW0B4EYP6, run_01M4HGFJEHVPJN04RVH9WEPYV1; Qiuyang, 2026-10-15); Continuum, whose judge reports
 # none, as the highest of the three runs of the human reference alone whose measurements set its judge's fixed targets
 # (0.06, 4.63 and 9.61, on earlier task versions; run_01M571D9453PAMSRP918SV4G58; Qiuyang, 2026-10-20: "用最高分吧")
-OFF_FIT_DOMAINS = {'Security'}   # Qiuyang, 2026-10-16: off FCI, FDI and test-time scaling until their tasks are fixed; the pages still list their runs
+OFF_FIT_DOMAINS = set()   # none since 2026-10-20 (Qiuyang: FCI and FDI cover all 48 tasks); Security was off from 2026-10-16 until its tasks were fixed
 REF_DEFAULT = {'Structured LWE': 100, 'ParButterfly': 30.51, 'RegionsSort': 50.26, 'Continuum': 9.61}
 
 # database display name -> (domain folder, paper short name or None)
