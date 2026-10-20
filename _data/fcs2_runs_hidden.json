@@ -1,6 +1,6 @@
 {
  "note": "Runs of models kept off the site (HIDDEN in bin/fcs2_runs_from_db.py), in the columns of RUNS in assets/js/fcs2-data.js. Timeouts score 0; unscored runs are left out. Not shown on any page.",
- "generated_at": "2026-10-20T19:18:19.722249+00:00",
+ "generated_at": "2026-10-20T21:08:15.356706+00:00",
  "models": {
   "k27": "Kimi K2.7"
  },
@@ -40,6 +40,7 @@
   ["k27", "HPC", "RegionsSort", 44.73, 0],
   ["k27", "Database", "Yannakakis", 12.21, 0],
   ["k27", "Architecture", "KAMI", 15.56, 0],
+  ["k27", "Machine Learning", "KV Compaction", 0.0, 0],
   ["k27", "Machine Learning", "LeJEPA", 96.14, 0],
   ["k27", "Machine Learning", "DyT", 0.0, 0],
   ["k27", "Security", "LRR", 0.0, 0],
