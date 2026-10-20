@@ -640,7 +640,146 @@ def svgear_time_psnr(narrow):
         + f'; {models[SVGEAR_OFF][0]} {off[0]:,.1f} s and {off[1]:.2f} dB, off the chart; the human reference {ref[0]:,.1f} s and {ref[1]:.2f} dB.')
     return f'<svg class="{"narrow" if narrow else "wide"}" viewBox="0 0 {W} {H}" role="img" aria-label="{label}">{g}</svg>'
 
-INLINE = {'2026-10-19-svg-ear-measured-error.md': {'svgear-time-psnr': lambda: svgear_time_psnr(False) + svgear_time_psnr(True)},
+# SVG-EAR case study, the 48 checks of a run: four measures on each of twelve hidden clips, eight from Wan 2.1 and four
+# from HunyuanVideo, each against the human reference on the same clip (bin/svgear_clips.json, with its source). A check
+# passes when time <= 0.96 x the reference's, PSNR >= the reference's - 0.25 dB, SSIM >= - 0.01 and LPIPS <= + 0.005.
+SVGEAR_MEASURES = [('e2e_latency_seconds', 'Time'), ('psnr_db', 'PSNR'), ('ssim', 'SSIM'), ('lpips', 'LPIPS')]
+SVGEAR_PASS, SVGEAR_MISS = '#d3e3fd', '#0842a0'   # the site's --mint and --teal-d, the post's Systems blues (Qiuyang: no red and green)
+
+def svgear_clips():
+    import json
+    return json.load(open(os.path.join(SITE, 'bin', 'svgear_clips.json')))
+
+def svgear_past_bar(k, c, r):
+    """How far a value lies past its check's bar, in the measure's own unit (time as a share of the reference's); a miss
+    is above 0."""
+    return {'e2e_latency_seconds': c / r - .96, 'psnr_db': r - .25 - c, 'ssim': r - .01 - c, 'lpips': c - r - .005}[k]
+
+def svgear_miss_text(k, c, r):
+    """A missed check, written in its cell: the time as a multiple of the reference's (the bar is 0.96x), or how far the
+    image score falls short of its bar."""
+    s = svgear_past_bar(k, c, r)
+    f = f'{s:.4f}' if s < .001 else f'{s:.3f}'   # three decimals, four where three would round to 0.001
+    return {'e2e_latency_seconds': f'{c / r:.2f}×', 'psnr_db': f'−{s:.2f}', 'ssim': f'−{f}', 'lpips': f'+{f}'}[k]
+
+def svgear_checks(run, narrow):
+    """SVG-EAR case study: one run's 48 checks, a green cell for a pass and a red one for a miss, with how far the miss
+    falls short written in it. Wide, a row per measure and a column per clip; narrow, a row per clip."""
+    d = svgear_clips(); ref = d['ref']
+    vals = d['explore'][run[8:]] if run.startswith('explore:') else d['runs'][run]   # 'explore:sol', an exploration run
+    t = chart_text(); g = ''
+    misses = []
+    if not narrow:
+        W, L, GAP, T, RP = 760, 64, 12, 44, 36
+        P = (W - L - GAP) / 12
+        cx = lambda i: L + i * P + (GAP if i >= 8 else 0)
+        g += t(cx(0), 14, 'Wan 2.1', 'ax') + t(cx(8), 14, 'HunyuanVideo', 'ax')
+        for i in range(12):
+            g += t(cx(i) + (P - 4) / 2, 34, i + 1 if i < 8 else i - 7, anchor='middle')
+        cells = [(r, i, cx(i), T + r * RP, P - 4, RP - 4) for r in range(4) for i in range(12)]
+        for r, (_, name) in enumerate(SVGEAR_MEASURES):
+            g += t(0, T + r * RP + (RP - 4) / 2 + 4.5, name, 'lab')
+        H = T + 4 * RP - 4
+    else:
+        W, L, RP, T = 360, 64, 26, 30
+        P = (W - L) / 4
+        rows = [('Wan 2.1', None)] + [(f'Clip {i + 1}', i) for i in range(8)] + [('HunyuanVideo', None)] + [(f'Clip {i - 7}', i) for i in range(8, 12)]
+        for r, (_, name) in enumerate(SVGEAR_MEASURES):
+            g += t(L + r * P + (P - 4) / 2, 16, name, 'lab', 'middle')
+        y, cells = T, []
+        for label, i in rows:
+            if i is None:
+                g += t(0, y + 16, label, 'ax'); y += 24; continue
+            g += t(0, y + (RP - 4) / 2 + 4.5, label)
+            cells += [(r, i, L + r * P, y, P - 4, RP - 4) for r in range(4)]
+            y += RP
+        H = y - 4
+    for r, i, x, y, w, h in cells:
+        k = SVGEAR_MEASURES[r][0]; c, rv = vals[k][i], ref[k][i]
+        miss = svgear_past_bar(k, c, rv) > 0
+        g += f'<rect x="{x:.1f}" y="{y:.1f}" width="{w:.1f}" height="{h:.1f}" rx="3" fill="{SVGEAR_MISS if miss else SVGEAR_PASS}"/>'
+        if miss:
+            g += f'<text x="{x + w / 2:.1f}" y="{y + h / 2 + 4:.1f}" text-anchor="middle" style="fill:#fff;font-size:11.5px;font-weight:600">{svgear_miss_text(k, c, rv)}</text>'
+            misses.append(f'{SVGEAR_MEASURES[r][1]} on {"Wan 2.1" if i < 8 else "HunyuanVideo"} clip {i + 1 if i < 8 else i - 7} {svgear_miss_text(k, c, rv)}')
+    label = (f'{48 - len(misses)} of 48 checks passed. ' + ('Missed: ' + '; '.join(misses) + '.' if misses else 'None missed.'))
+    return f'<svg class="{"narrow" if narrow else "wide"}" viewBox="0 0 {W} {H:.0f}" role="img" aria-label="{label}">{g}</svg>'
+
+def svgear_checks_all(narrow):
+    """SVG-EAR case study: the 48 checks of every leaderboard run, one small grid per model, most checks passed first;
+    a row per measure and a column per clip, Wan 2.1 then HunyuanVideo."""
+    models, d = site_models(), svgear_clips()
+    score = {r[0]: r[3] for r in site_const('RUNS') if r[2] == 'SVG-EAR'}
+    ref = d['ref']
+    passed = {m: sum(svgear_past_bar(k, v[k][i], ref[k][i]) <= 0 for k, _ in SVGEAR_MEASURES for i in range(12)) for m, v in d['runs'].items()}
+    order = sorted(passed, key=lambda m: (-passed[m], -score[m]))
+    W, L, COLS, PG, GAP, CP, HD, RG = (360, 44, 2, 14, 4, 11, 36, 18) if narrow else (760, 50, 3, 22, 6, 14, 22, 20)
+    PW = (W - L - (COLS - 1) * PG) / COLS
+    P = (PW - GAP) / 12
+    PH = HD + 4 * CP
+    t = chart_text(); g = ''
+    for n, m in enumerate(order):
+        col, row = n % COLS, n // COLS
+        x0, y0 = L + col * (PW + PG), row * (PH + RG)
+        name, mc = models[m]
+        g += t(x0, y0 + 13, name, 'lab', 'start', mtxt(mc))   # the count under the name on phones, beside it otherwise
+        g += t(x0, y0 + 29, f'{passed[m]} of 48') if narrow else t(x0 + PW, y0 + 13, f'{passed[m]} of 48', 'val', 'end')
+        if col == 0:
+            for r, (_, lab) in enumerate(SVGEAR_MEASURES):
+                g += t(0, y0 + HD + r * CP + CP / 2 + 2.5, lab, 'sm')
+        for r, (k, _) in enumerate(SVGEAR_MEASURES):
+            for i in range(12):
+                miss = svgear_past_bar(k, d['runs'][m][k][i], ref[k][i]) > 0
+                g += (f'<rect x="{x0 + i * P + (GAP if i >= 8 else 0):.1f}" y="{y0 + HD + r * CP:.1f}" width="{P - 2:.1f}" height="{CP - 2}" '
+                      f'rx="1.5" fill="{SVGEAR_MISS if miss else SVGEAR_PASS}"/>')
+    H = math.ceil(len(order) / COLS) * (PH + RG) - RG
+    label = ('Checks passed of 48 on SVG-EAR, by model: ' + ', '.join(f'{models[m][0]} {passed[m]}' for m in order)
+             + '. Each grid has a row per measure, time, PSNR, SSIM and LPIPS, and a column per hidden clip, eight from Wan 2.1 then four from HunyuanVideo.')
+    return f'<svg class="{"narrow" if narrow else "wide"}" viewBox="0 0 {W} {H:.0f}" role="img" aria-label="{label}">{g}</svg>'
+
+def svgear_run(m, narrow, note=None):
+    """SVG-EAR case study: each development submission of one run, its development score against the cost so far, and
+    the final score at the cost of the whole run; the human reference's final score as a dashed line. A development
+    score of 0 is a submission the judge could not score. note: (submission index, text) written beside one dot."""
+    run = next(r for r in site_const('TRAJ') if r[0] == m and r[1] == 'SVG-EAR')
+    name, col = site_models()[m]; TXT = mtxt(col)
+    ref, final, cost, dev = site_const('REF')['SVG-EAR'], run[2], run[4], run[6]
+    W, H = (360, 300) if narrow else (760, 300)
+    L, R, T, B = 40, 14 if narrow else 20, 24, 48
+    step = 20 if cost > 40 else 2
+    xmax, ymax = step * math.ceil(cost / step), 80
+    X = lambda v: L + v / xmax * (W - L - R); Y = lambda v: T + (1 - v / ymax) * (H - T - B)
+    t = chart_text(); g = ''
+    for v in range(0, ymax + 1, 20):
+        g += f'<line x1="{L}" x2="{W - R}" y1="{Y(v):.1f}" y2="{Y(v):.1f}" stroke="var(--grid)"/>' + t(L - 8, Y(v) + 4, v, anchor='end')
+    for v in range(0, xmax + 1, step * (2 if narrow else 1)):
+        g += f'<line x1="{X(v):.1f}" x2="{X(v):.1f}" y1="{T}" y2="{H - B}" stroke="var(--grid)"/>' + t(X(v), H - B + 20, f'${v}', anchor='middle')
+    g += t(L + (W - L - R) / 2, H - 6, 'Cost of the run so far in US$', 'ax', 'middle')
+    g += f'<line x1="{L}" x2="{W - R}" y1="{Y(ref):.1f}" y2="{Y(ref):.1f}" stroke="var(--ink-2)" stroke-width="1.2" stroke-dasharray="4 4"/>'
+    g += t(L + 4, Y(ref) + 16, f'Human reference {ref:.1f}', 'lab')
+    pts = [(X(c), Y(sc)) for c, sc in dev]
+    g += f'<polyline points="{" ".join(f"{x:.1f},{y:.1f}" for x, y in pts)}" fill="none" stroke="{col}" stroke-width="2" stroke-linejoin="round"/>'
+    fx, fy = X(cost), Y(final)
+    g += f'<line x1="{pts[-1][0]:.1f}" y1="{pts[-1][1]:.1f}" x2="{fx:.1f}" y2="{fy:.1f}" stroke="{col}" stroke-width="1.5" stroke-dasharray="3 3"/>'
+    g += ''.join(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="4.5" fill="{col}" stroke="#fff" stroke-width="1.5"/>' for x, y in pts)
+    g += f'<circle cx="{fx:.1f}" cy="{fy:.1f}" r="7.5" fill="{col}" stroke="#fff" stroke-width="2"/>'
+    g += t(fx, fy - 14, f'Final score {final:.1f}', 'lab', 'end', TXT)
+    if note:
+        k, text = note; x, y = pts[k]
+        g += t(x, y - 12, text, 'lab', 'middle', TXT)
+    label = (f'{name} on SVG-EAR: {len(dev)} development submissions score '
+             + ', '.join(f'{sc:.1f}' for _, sc in dev) + f' as the run spends ${dev[0][0]:.2f} to ${dev[-1][0]:.2f}; '
+             f'the final score is {final:.1f} at ${cost:.2f}; the human reference scores {ref:.1f}.')
+    return f'<svg class="{"narrow" if narrow else "wide"}" viewBox="0 0 {W} {H}" role="img" aria-label="{label}">{g}</svg>'
+
+def svgear_checks_legend():
+    return (f'<div class="legend"><span><i class="sq" style="background:{SVGEAR_PASS}"></i>Check passed</span>'
+            f'<span><i class="sq" style="background:{SVGEAR_MISS}"></i>Check missed</span></div>')
+
+SVGEAR_CHECKS = lambda run: lambda: svgear_checks(run, False) + svgear_checks(run, True) + svgear_checks_legend()
+INLINE = {'2026-10-19-svg-ear-measured-error.md': {'svgear-time-psnr': lambda: svgear_time_psnr(False) + svgear_time_psnr(True),
+                                                 'svgear-checks-all': lambda: svgear_checks_all(False) + svgear_checks_all(True) + svgear_checks_legend(),
+                                                 **{f'svgear-checks-{m}': SVGEAR_CHECKS(m) for m in ('astra', 'opus', 'gemini', 'sol')},
+                                                 'svgear-checks-sol-explore': SVGEAR_CHECKS('explore:sol')},
           '2026-10-18-bbq-two-faster-clocks.md': {'bbq-speed': lambda: bbq_speed(False) + bbq_speed(True) + bbq_two_models_legend(),
                                                 'bbq-area': lambda: bbq_area(False) + bbq_area(True),
                                                 'bbq-runs': lambda: bbq_runs(False) + bbq_runs(True) + bbq_two_models_legend(),
