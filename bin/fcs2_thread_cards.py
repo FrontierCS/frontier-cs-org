@@ -159,20 +159,25 @@ OVERVIEW = {
     # the 10th percentile of the plotted points, so the climb and the plateau fill the tile.
     '02-run': """() => {
       const valid = r => r[6].filter(q => q[1] > 0);
-      const longest = t => MODELS.map(m => TRAJ.filter(r => r[1] === t.s && r[0] === m.id).sort((a, b) => valid(b).length - valid(a).length)[0]).filter(r => r && valid(r).length >= 15);
-      const gain = r => Math.max(...r[6].map(q => q[1])) - valid(r)[0][1], better = t => longest(t).filter(r => gain(r) >= 10).length;
-      const subs = t => longest(t).reduce((a, r) => a + r[6].length, 0);
-      // three lines only (owner, 2026-10-20: fewer lines, but good-looking): the task's biggest climbs whose colours stay apart,
-      // each at least 60 degrees of hue from the others (a near-black or grey colour counts as its own hue)
-      const hue = id => { const h = getComputedStyle(document.documentElement).getPropertyValue(`--m-${id}`).trim().replace('#', ''), [r, g, b] = [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16) / 255);
-        const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn; if (d < .15) return -1;
-        const x = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; return (x * 60 + 360) % 360; };
-      const apart = (a, b) => { const x = hue(a), y = hue(b); if (x < 0 || y < 0) return (x < 0) !== (y < 0); const d = Math.abs(x - y); return Math.min(d, 360 - d) >= 60; };
-      const three = t => longest(t).sort((a, b) => gain(b) - gain(a)).reduce((out, r) => (out.length < 3 && out.every(o => apart(o[0], r[0])) ? [...out, r] : out), []);
-      const t = TASKS.filter(t => three(t).length >= 3).sort((a, b) => three(b).reduce((x, r) => x + gain(r), 0) - three(a).reduce((x, r) => x + gain(r), 0))[0], runs = three(t), n = runs.reduce((a, r) => a + r[6].length, 0), k = AREA_OF[t.d].k;
-      console.assert(runs.length === 3, 'run card: fewer than three lines', t.s, runs.length);
+      const gain = r => Math.max(...r[6].map(q => q[1])) - valid(r)[0][1];
+      // three lines, one per lab: OpenAI, Anthropic and Google (owner, 2026-10-20: four labs first, then "换OAG" when the four
+      // could not end apart); their colours (OpenAI's black, Claude's clay, Google's green) stay apart. Every combination
+      // of one run per lab is scored: runs of 4+ valid submissions that climb at least once, each starting within its first
+      // four submissions (no line appears halfway across); first the combinations whose ends sit 8%+ of the plotted range
+      // apart (no two lines finish on top of each other), then the largest total climb (a tall climb fills the tile), then
+      // the most climbing steps.
+      const steps = r => { let b = -1, k = 0; r[6].forEach(([, x]) => { if (x > 0 && x > b + .5) { if (b >= 0) k++; b = x; } }); return k; };
+      const LABS = ['OpenAI', 'Anthropic', 'Google'], fv = r => r[6].findIndex(q => q[1] > 0), top = r => Math.max(...r[6].map(q => q[1]));
+      const runsOf = (t, lab) => TRAJ.filter(r => r[1] === t.s && MODELS.find(m => m.id === r[0]).lab === lab && valid(r).length >= 4 && steps(r) >= 1 && fv(r) <= 3);
+      const combos = t => LABS.reduce((acc, l) => acc.flatMap(c => runsOf(t, l).map(r => [...c, r])), [[]]).filter(c => c.length === LABS.length);
+      const apartEnds = c => { const lo = Math.min(...c.map(r => top(r) - gain(r))), rng = Math.max(1, Math.max(...c.map(top)) - lo);
+        return c.every((a, i) => c.slice(i + 1).every(b => Math.abs(top(a) - top(b)) >= .08 * rng)); };
+      const score = c => [+apartEnds(c), c.reduce((x, r) => x + gain(r), 0), c.reduce((x, r) => x + steps(r), 0)];
+      const win = TASKS.flatMap(t => combos(t).map(c => [t, c])).sort((a, b) => { const x = score(a[1]), y = score(b[1]); return y[0] - x[0] || y[1] - x[1] || y[2] - x[2]; })[0];
+      const t = win[0], runs = win[1], n = runs.reduce((a, r) => a + r[6].length, 0), k = AREA_OF[t.d].k;
+      console.assert(runs.length === 3, 'run card: not three lines', t.s, runs.length);
       const v = card('side', 'Agents do not solve research in one shot.',
-        `Three runs on ${esc(t.s)}, ${n} submissions. Every dot is a try.`, '');
+        `Three labs on ${esc(t.name)}, ${n} submissions. Every dot is a try.`, '');
       const W = 470, H = 360, svgNS = 'http://www.w3.org/2000/svg', col = id => getComputedStyle(document.documentElement).getPropertyValue(`--m-${id}`).trim();
       v.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="display:block; font-family:'Hanken Grotesk'"></svg>`;
       const svg = v.querySelector('svg');
@@ -186,19 +191,25 @@ OVERVIEW = {
       const PL = 24, PR = 24, PT = 34, PB = 52, N = Math.max(...runs.map(r => r[6].length));
       const X = i => PL + (i - 1) / (N - 1) * (W - PL - PR), Y = s => PT + (1 - (s - lo) / (hi - lo)) * (H - PT - PB);
       let g = `<defs><clipPath id="rc"><rect width="${W}" height="${H}" rx="12"/></clipPath><clipPath id="band"><rect x="0" y="0" width="${W}" height="${H - PB + 8}"/></clipPath></defs><g clip-path="url(#rc)">${taskArt(t.s, k).replace('<svg class="art"', `<svg width="${W}" height="${H}" preserveAspectRatio="xMidYMid slice"`)}
-        <rect width="${W}" height="${H}" fill="#fff" opacity=".84"/></g><text x="${W - 20}" y="${H - 18}" text-anchor="end" fill="${AINK[k]}" font-size="19" font-weight="600">${esc(t.s)}</text>`;
+        <rect width="${W}" height="${H}" fill="#fff" opacity=".84"/></g><text x="${W - 20}" y="${H - 18}" text-anchor="end" fill="${AINK[k]}" font-size="19" font-weight="600">${esc(t.name)}</text>`;   // the name the site shows (FlashLib KNN, not knn kernel)
       const ends = [];
       runs.forEach(r => { const c = col(r[0]); let b = -1, d = '', dots = '';
         r[6].forEach(([, s], i) => { if (i < first(r)) return; b = Math.max(b, s); const x = X(i + 1).toFixed(1), y = Y(b).toFixed(1);
           d += i > first(r) ? `H${x}V${y}` : `M${x},${y}`; dots += `<circle cx="${x}" cy="${y}" r="3.2" fill="${c}" stroke="#fff" stroke-width="1.1"/>`; });
         g += `<g clip-path="url(#band)"><path d="${d}" fill="none" stroke="${c}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>${dots}</g>`;
-        ends.push({m:r[0], c, x:X(r[6].length), y:Y(b) - 10}); });
+        let f = r[6].length - 1; while (f > first(r) && r[6][f - 1][1] <= b && Math.max(...r[6].slice(0, f).map(q => q[1])) >= b) f--;   // where its last plateau begins
+        ends.push({m:r[0], c, x:X(r[6].length), x0:X(f + 1), y:Y(b) - 10}); });
       // each name right-aligned to its line's end, just above it; a name that would touch another moves up (or down) in 2 px steps
       const placed = [], hit = (a, b) => a.x - a.w - 8 < b.x + 8 && b.x - b.w - 8 < a.x + 8 && Math.abs(a.y - b.y) < 21;
-      ends.sort((a, b) => a.y - b.y).forEach(e => { e.w = meas(MNAME[e.m]);
-        for (let dy = 0; dy < 200; dy += 2) { const dn = {...e, y:e.y + dy}, up = {...e, y:e.y - dy};
-          if (!placed.some(p => hit(up, p)) && up.y > 18) { e.y = up.y; break; }
-          if (!placed.some(p => hit(dn, p)) && dn.y < H - 44) { e.y = dn.y; break; } }
+      // a name also keeps off the other lines' last plateaus, so it never covers another model's line
+      const flats = ends.map(e => ({m:e.m, x0:e.x0, x1:e.x, y:e.y + 10}));
+      const onLine = q => flats.some(f => f.m !== q.m && q.x - q.w - 8 < f.x1 && f.x0 < q.x + 8 && f.y > q.y - 16 && f.y < q.y + 6);
+      ends.sort((a, b) => a.y - b.y).forEach(e => { e.w = meas(MNAME[e.m]); e.x = Math.max(e.x, e.w + 16);   // a short run's name stays inside the tile
+        const free = q => !placed.some(p => hit(q, p)) && !onLine(q) && q.y > 18 && q.y < H - 44;
+        const below = {...e, y:e.y + 34};   // under its own line's end, when the space above is taken
+        if (free(e)) {} else if (free(below)) e.y = below.y;
+        else for (let dy = 2; dy < 200; dy += 2) { const dn = {...e, y:e.y + dy}, up = {...e, y:e.y - dy};
+          if (free(up)) { e.y = up.y; break; } if (free(dn)) { e.y = dn.y; break; } }
         placed.push(e);
         // a white chip under the name, as on the task map, so lines and dots behind it do not show through
         g += `<rect x="${(e.x - e.w - 7).toFixed(1)}" y="${(e.y - 14).toFixed(1)}" width="${(e.w + 14).toFixed(1)}" height="19" rx="9.5" fill="#fff" opacity=".94"/>`
@@ -218,11 +229,12 @@ OVERVIEW = {
       const v = card('stack', 'Score against the human reference',   // owner, 2026-10-14: the overview's mean score is the difference
         'One dot per run, the large dot the mean of each model.',
         '');   /* the axis title already says what the score is */
-      CHART_H.lbLane = Math.floor((v.clientHeight - 54) / MODELS.length); v.append(document.getElementById('lbplot')); drawLB(); oneLine(document.getElementById('lbsvg'));
-      // each model's mean sits at the end of its name column, off the dots, which would hide it (owner, 2026-10-20)
-      const lsvg = document.getElementById('lbsvg'), x0 = Math.min(...[...lsvg.querySelectorAll('line')].map(l => +l.getAttribute('x1')).filter(x => x > 40));
+      CHART_H.lbLane = Math.floor((v.clientHeight - 54) / MODELS.length); CHART_H.lbR = 76; v.append(document.getElementById('lbplot')); drawLB(); oneLine(document.getElementById('lbsvg'));
+      // each model's mean as text in a column right of the plot, level with its row and off the dots, which would hide it
+      // (owner, 2026-10-20: the score card keeps its score text)
+      const lsvg = document.getElementById('lbsvg'), xr = Math.max(...[...lsvg.querySelectorAll('line')].map(l => +l.getAttribute('x2')));
       lsvg.querySelectorAll('text.val').forEach(t => { const m = t.previousElementSibling, yc = m && m.tagName === 'circle' ? +m.getAttribute('cy') : null;
-        if (yc != null) { t.setAttribute('x', (x0 - 12).toFixed(1)); t.setAttribute('y', (yc + 5).toFixed(1)); t.setAttribute('text-anchor', 'end'); } });
+        if (yc != null) { t.setAttribute('x', (xr + 14).toFixed(1)); t.setAttribute('y', (yc + 5).toFixed(1)); t.setAttribute('text-anchor', 'start'); t.style.fontWeight = 600; } });
     }""",
     # FCI: the overview's chart; the line under the headline names the model with the highest FCI and its value (the
     # human reference has no FCI on the pass-based scale, so the old count of models above it is gone; Qiuyang, 2026-10-14)
@@ -239,7 +251,7 @@ OVERVIEW = {
       const v = card('stack', 'FCI vs. budget per run',
         'A run that ended within the budget counts what it beat; one still going counts as beating nothing.',
         'One curve per lab, its model with the highest FCI, as on the site.');
-      fit(v, 'tts', 8); CHART_H.ttsR = 250; v.append(document.getElementById('ttsplot')); drawTTS();   // the chart names its curves; it has no legend since 2026-10-17
+      fit(v, 'tts', 8); CHART_H.ttsR = 150; v.append(document.getElementById('ttsplot')); drawTTS();   // the chart names its curves; it has no legend since 2026-10-17
     }""",
     # the private set (owner, 2026-10-10: a separate set of unreleased tasks; no count on the card): task illustrations
     # blurred past recognition, each under a white lock, in the closing card's grid

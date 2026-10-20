@@ -355,7 +355,7 @@ function drawLB() {
   }
   rows.sort((a, b) => b.best - a.best);
   const svg = $('#lbsvg'), box = $('#lbplot'), W = Math.max(300, box.clientWidth), narrow = W < 560;
-  const L = narrow ? (group === 'model' ? nameCol(svg) : 112) : 190, R = 34, T = 8, B = 46;
+  const L = narrow ? (group === 'model' ? nameCol(svg) : 112) : 190, R = CHART_H.lbR || 34, T = 8, B = 46;
   const lane = group === 'model' ? (CHART_H.lbLane || (narrow ? 64 : 76)) : 30;
   const rowH = () => lane;
   const H = T + rows.reduce((a, r) => a + rowH(r), 0) + B, an = animates(svg) && group === 'model';
