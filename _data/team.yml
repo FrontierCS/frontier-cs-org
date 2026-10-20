@@ -81,7 +81,6 @@ fcs2:
     - {name: Hanchen Li, affil: [UC Berkeley], url: "https://hanchenli.github.io/"}
   advisors:
     - {name: Ofir Press, affil: []}
-    - {name: Natasha Jaques, affil: [University of Washington]}
     - {name: Jiantao Jiao, affil: [NVIDIA]}
     - {name: Kunle Olukotun, affil: [Stanford University]}
     - {name: Karthik R. Narasimhan, affil: [Princeton University]}
