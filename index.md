@@ -188,8 +188,12 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
 
 <section class="sec" id="sponsors">
   <h2>Sponsors</h2>
+  <div class="sponsor-lead">   <!-- Modal leads, larger and on its own row, as in the paper's acknowledgments (owner, 2026-10-20) -->
+    <a href="https://modal.com/" target="_blank" rel="noopener noreferrer"><img src="{{ 'assets/img/sponsors/modal.svg' | relative_url }}" alt="Modal"></a>
+    <p>Our lead sponsor, providing the compute for FrontierCS 2.</p>
+  </div>
+  <p class="sponsor-sub">Also supported by</p>
   <ul class="sponsor-row">
-    <li><a href="https://modal.com/" target="_blank" rel="noopener noreferrer"><img src="{{ 'assets/img/sponsors/modal.svg' | relative_url }}" class="modal" alt="Modal"></a></li>
     <li><a href="https://www.kaggle.com/" target="_blank" rel="noopener noreferrer"><img src="{{ 'assets/img/partners/kaggle.svg' | relative_url }}" class="kaggle" alt="Kaggle"></a></li>
     <li><a href="https://www.laude.org/" target="_blank" rel="noopener noreferrer"><img src="{{ 'assets/img/sponsors/laude-institute-wordmark.png' | relative_url }}" class="laude" alt="Laude Institute"></a></li>
     <li><a href="https://scale.com/" target="_blank" rel="noopener noreferrer"><img src="{{ 'assets/img/sponsors/scale.svg' | relative_url }}" class="scale" alt="Scale AI"></a></li>
@@ -213,12 +217,6 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
 </section>
 </div>
 </div>
-<aside class="poweredby" aria-label="Sponsors"><span>Powered by</span>
-  <a href="https://modal.com/" target="_blank" rel="noopener noreferrer"><img src="{{ 'assets/img/sponsors/modal.svg' | relative_url }}" class="modal" alt="Modal" width="104" height="20"></a>
-  <a href="https://www.kaggle.com/" target="_blank" rel="noopener noreferrer"><img src="{{ 'assets/img/partners/kaggle.svg' | relative_url }}" class="kaggle" alt="Kaggle" width="49" height="19"></a>
-  <a href="https://www.laude.org/" target="_blank" rel="noopener noreferrer"><img src="{{ 'assets/img/sponsors/laude-institute-wordmark.png' | relative_url }}" class="laude" alt="Laude Institute" width="83" height="28"></a>
-  <a href="https://scale.com/" target="_blank" rel="noopener noreferrer"><img src="{{ 'assets/img/sponsors/scale.svg' | relative_url }}" class="scale" alt="Scale AI" width="94" height="18"></a>
-</aside>
 <script defer src="{{ '/assets/js/fcs2-data.js' | relative_url }}"></script>
 <script defer src="{{ '/assets/js/fcs2-checks.js' | relative_url }}"></script>
 <script defer src="{{ '/assets/js/fcs2-art.js' | relative_url }}"></script>
