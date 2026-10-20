@@ -120,6 +120,7 @@ TASK = {
     'Register-aware Branch Prediction': ('Arch', 'RUNLTS'),
     'Approximate-MIPS Query Stopping': ('Database', None),
     'Privilege Control for Tool-Using LLM Agents': ('Security', 'Progent'),   # renamed on the platform 2026-10-19 (was 'Argument-aware runtime privilege control')
+    'Localized Regex Repair': ('Security', 'LRR'),
     'BBQ bitmap traversal': ('Network', 'BBQ'),
     'Batch Local Counting': ('Database', 'SCOPE'),
     'Bounded EVM Path Prediction': ('Database', 'Seer'),
