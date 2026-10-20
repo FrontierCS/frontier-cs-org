@@ -82,16 +82,41 @@ ZERO = {'run_01M5A2T1WJSCR64W2ZP34T8KHV', 'run_01M5C2J5QNEPEYAWMQY3HD7MF4'}
 # Runs the platform marks FAILED whose selected final was rejudged and accepted: they completed, so the site shows no failure
 # for them. Claude Opus 5.5's KV Cache Compaction (61.55; Qiuyang, 2026-10-20: "kebab上的opus kv compaction信息是否不对").
 COMPLETED = {'run_01M5BMPCS19PVWJRAGZSF9ED8P'}
-# Scores that replace the platform's, by run. Progent's verifier zeroes a suite on one breached episode, so its scores fell
-# on 100, 75, 72.73 and 50; once its formal runs were final they were rescored from each run's kept per-suite metrics
-# (Qiuyang, 2026-10-20, scheme R): per suite, max(0, 1 - breach rate / the reference's breach rate) times
-# min(1, utility under attack / the reference's), and 100 times the mean over the four suites. Verdicts are unchanged: all 13
-# fail. Computed by the evaluation monitor (reports/progent-remap-R-20261020.json); every run is its formal evaluation's.
-SCORE = {'run_01M59RP96FT226RGXVGBP05MGT': 92.6471, 'run_01M5970STDD1FKW0ECD8Q2XD28': 91.1765, 'run_01M5AM6HJ0RDC319S3659NYS5J': 91.6043,
-         'run_01M5B71VP4ZTTXEDZTSJRWHCF2': 95.7391, 'run_01M5A0BA07T7WEQS9K0PTCR7TT': 76.4966, 'run_01M59KZ1ASYHPCSNM1GF2C360N': 83.9277,
-         'run_01M5A0ECGVTSPMT687NJQKGCXA': 75.9733, 'run_01M5972EXRM8BNEA6192D4WPMJ': 83.0455, 'run_01M59M7AQSZ72Q1M636KB5H5H6': 84.5674,
-         'run_01M5BK617HDNV0WQTAD3NCN4FV': 90.8374, 'run_01M5AZ52W78HS5FPKF2HZ30ZMG': 94.2308, 'run_01M5BPM6CGT9G16Z0KKXDV1192': 85.2452,
-         'run_01M5B6757V0VMSXB5QZGAWXB6C': 95.3191}
+# Scores that replace the platform's, by run: KV Compaction and Progent, rescored on absolute scales from each run's own
+# final-verification measurements (Qiuyang, 2026-10-21; no run was re-executed, verdicts unchanged, all fail). They replace
+# the platform's relative scores, which pinned the human reference at 0, and Progent's scheme-R remap of 2026-10-20.
+# KV Compaction: per article, (correct / questions) x r / (1 + r), where in time mode r = (reference seconds / candidate
+# seconds) x min(1, reference bytes / candidate bytes), bytes and seconds swapped in bytes mode; 100 x the mean over the 24
+# articles. Runs with no scored final stay 0. Progent: per suite, utility under attack x (1 - breached / attacked); 100 x the
+# mean over the 4 suites. Values and per-suite detail: reports/rescore-kv-progent-20261021.json (the evaluation monitor).
+SCORE = {'run_01M5B71VP4ZTTXEDZTSJRWHCF2': 48.7175, 'run_01M5B6757V0VMSXB5QZGAWXB6C': 56.8798,
+         'run_01M5AZ52W78HS5FPKF2HZ30ZMG': 50.4422, 'run_01M59RP96FT226RGXVGBP05MGT': 55.3904,
+         'run_01M5AM6HJ0RDC319S3659NYS5J': 44.7325, 'run_01M5970STDD1FKW0ECD8Q2XD28': 55.7482,
+         'run_01M5BK617HDNV0WQTAD3NCN4FV': 47.5928, 'run_01M5BPM6CGT9G16Z0KKXDV1192': 49.4521,
+         'run_01M59M7AQSZ72Q1M636KB5H5H6': 46.535, 'run_01M59KZ1ASYHPCSNM1GF2C360N': 36.8325,
+         'run_01M5972EXRM8BNEA6192D4WPMJ': 43.169, 'run_01M5A0BA07T7WEQS9K0PTCR7TT': 36.1468,
+         'run_01M5A0ECGVTSPMT687NJQKGCXA': 43.6441, 'run_01M5BMPCS19PVWJRAGZSF9ED8P': 70.378,
+         'run_01M5B3M1E5MSE78KE480G6HARS': 64.0486, 'run_01M5BP6WGY6VJ137N8KBKYJ6ST': 65.593,
+         'run_01M5BGJMS0CVMZQN2KBE6JY8P2': 60.8677, 'run_01M5BPFMHBVMKV3TBTB5HW2XD2': 58.9275,
+         'run_01M5B3Q2GAQQA222W6DRZDP0R7': 53.0684, 'run_01M5BGMM8NF591Z8ZPT5MMF1VD': 48.4109,
+         'run_01M5BPACVQ0VFV9S4N37Y5H4QZ': 43.0439, 'run_01M5B3Z6EHETQBZF3GSPQJJZGN': 38.464,
+         'run_01M5BMR4VSNRK7GCBTE729E9E5': 32.1802, 'run_01M5BPC4T5EBT3A9MG03Q9N88V': 0.0,
+         'run_01M5BP8MTSK6ZWWNTGY2SPW5BX': 0.0, 'run_01M5BMSWSWFN9RFSZMBHQ2M7PQ': 0.0}
+# The human reference's score on the same scales, measured in each run (KV Compaction's frozen captures give 34.64 in every
+# run; Progent's reference policy is measured live, 38.9 to 41.8); the site shows the median over the task's runs, as for
+# every task. The platform reports 0 for both, its relative scale.
+REFERENCE = {'run_01M5B71VP4ZTTXEDZTSJRWHCF2': 41.1292, 'run_01M5B6757V0VMSXB5QZGAWXB6C': 40.635,
+             'run_01M5AZ52W78HS5FPKF2HZ30ZMG': 40.9445, 'run_01M59RP96FT226RGXVGBP05MGT': 39.8665,
+             'run_01M5AM6HJ0RDC319S3659NYS5J': 40.2264, 'run_01M5970STDD1FKW0ECD8Q2XD28': 40.2956,
+             'run_01M5BK617HDNV0WQTAD3NCN4FV': 40.4349, 'run_01M5BPM6CGT9G16Z0KKXDV1192': 41.0416,
+             'run_01M59M7AQSZ72Q1M636KB5H5H6': 40.3874, 'run_01M59KZ1ASYHPCSNM1GF2C360N': 38.8663,
+             'run_01M5972EXRM8BNEA6192D4WPMJ': 41.3253, 'run_01M5A0BA07T7WEQS9K0PTCR7TT': 41.7748,
+             'run_01M5A0ECGVTSPMT687NJQKGCXA': 39.1359, 'run_01M5BMPCS19PVWJRAGZSF9ED8P': 34.6445,
+             'run_01M5B3M1E5MSE78KE480G6HARS': 34.6445, 'run_01M5BP6WGY6VJ137N8KBKYJ6ST': 34.6445,
+             'run_01M5BGJMS0CVMZQN2KBE6JY8P2': 34.6445, 'run_01M5BPFMHBVMKV3TBTB5HW2XD2': 34.6445,
+             'run_01M5B3Q2GAQQA222W6DRZDP0R7': 34.6445, 'run_01M5BGMM8NF591Z8ZPT5MMF1VD': 34.6445,
+             'run_01M5BPACVQ0VFV9S4N37Y5H4QZ': 34.6445, 'run_01M5B3Z6EHETQBZF3GSPQJJZGN': 34.6445,
+             'run_01M5BMR4VSNRK7GCBTE729E9E5': 34.6445}
 rids = [(c, RERUN.get((c, i['task_name']), i['run_id'])) for c, v in items.items() for i in v if i.get('run_id') and i['task_name'] not in OFF_SITE]
 with ThreadPoolExecutor(16) as ex:
     pulled = list(ex.map(lambda cr: (cr[0], get('runs/' + cr[1]), get(f'runs/{cr[1]}/events?limit=500')), rids))
@@ -156,7 +181,7 @@ for c, r, events in pulled:
     usd = sum(k.get('estimated_cost_usd') or 0 for k in usage) or agent or sum(k.get('total_tokens') or 0 for k in usage) * (CACHE[c] or 0) / 1e6
     units = lambda x: x * 1e6
     priv = (r.get('metrics') or {}).get('private') or {}
-    fb = {'reference_score': priv.get('reference_score'), 'checks': [{'label': k} for k in (priv.get('beat_spec_progress') or {})]}
+    fb = {'reference_score': REFERENCE.get(r['id'], priv.get('reference_score')), 'checks': [{'label': k} for k in (priv.get('beat_spec_progress') or {})]}
     if (r.get('adjudication') or {}).get('cause') == 'provider_refusal_no_final': fb['refusal'] = True   # the model's provider refused and no final came
     zero = r['score'] is None and (r['state'] == 'TIMED_OUT' or r['id'] in ZERO)
     db.execute('insert into runs values (?,?,?,?,?,?)', (r['id'], SCORE.get(r['id'], 0.0 if zero else r['score']), 'COMPLETED' if r['id'] in COMPLETED else r['state'], 'FAIL' if zero and r['id'] in ZERO else r['verdict'], end - start if start and end else None, json.dumps(fb)))
