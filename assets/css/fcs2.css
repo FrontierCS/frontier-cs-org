@@ -516,3 +516,27 @@ a.pbtn:hover{border-color:var(--teal); color:var(--teal-d)}
 .anim.pre .a-wipe{transform:scaleX(0)}
 .anim .a-draw{stroke-dasharray:1; stroke-dashoffset:0; transition:stroke-dashoffset .9s cubic-bezier(.5,0,.3,1) var(--d,0s)}
 .anim.pre .a-draw{stroke-dashoffset:1}
+
+/* "Powered by" and the sponsors' marks, Modal first, in a bar fixed to the bottom of the FrontierCS 2 page, as RSI Bench
+   shows Modal (Qiuyang, 2026-10-19: Modal asked to be more prominent; the other sponsors join it, in the Sponsors
+   section's order and at its relative sizes). The page leaves as much room below the footer, so the bar never covers its
+   last line. On phones the words go and the four marks shrink to fit one row. No env() inside calc(): Sass and the site's
+   minifier both break it, so the safe-area inset is a padding and a spacer of its own. */
+.poweredby{position:fixed; left:0; right:0; bottom:0; z-index:30; display:flex; align-items:center; justify-content:center; gap:28px;
+  padding:0 16px env(safe-area-inset-bottom,0px); background:rgba(255,255,255,.9); border-top:1px solid var(--line);
+  -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px)}
+.poweredby span{margin:8px -14px 8px 0; font-size:14px; line-height:20px; color:var(--muted); white-space:nowrap}
+.poweredby a{display:block; margin:8px 0; transition:opacity .15s}
+.poweredby a:hover{opacity:.75}
+.poweredby img{display:block; width:auto; height:20px}
+.poweredby img.kaggle{height:24px} .poweredby img.laude{height:28px} .poweredby img.scale{height:17px}
+body:has(.poweredby){padding-bottom:45px}
+body:has(.poweredby)::after{content:""; display:block; height:env(safe-area-inset-bottom,0px)}
+@media (max-width:560px){
+  .poweredby{gap:18px}
+  .poweredby span{display:none}
+  .poweredby a{margin:7px 0}
+  .poweredby img{height:16px} .poweredby img.kaggle{height:19px} .poweredby img.laude{height:22px} .poweredby img.scale{height:14px}
+  body:has(.poweredby){padding-bottom:37px}
+}
+@media print{.poweredby, body:has(.poweredby)::after{display:none} body:has(.poweredby){padding-bottom:0}}
