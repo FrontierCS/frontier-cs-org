@@ -1762,6 +1762,7 @@ section.journal.team-sec.team-top { padding-top: clamp(56px, 6vw, 72px); }
 .sponsor-row img.modal { height: 30px; }
 .sponsor-row img.scale { height: 26px; }   /* Scale AI's wordmark, from scale.com's own SVG (owner, 2026-10-17) */
 .sponsor-row img.openrsi { height: 34px; } .sponsor-row img.yukon { height: 26px; }
+.sponsor-row img.xcamp { height: 34px; }   /* X-Camp Academy's own mark, x-camp.academy/icons/logo.svg; last among the partners (Qiuyang, 2026-10-20) */
 .sponsor-row img.kaggle { height: 36px; }   /* Kaggle's wordmark, from kaggle.com's own SVG; first among the partners and second among the sponsors, after Modal (owner, 2026-10-19) */
 .sponsor-row a.partner.harbor { font-family: var(--font-code); font-weight: 500; font-size: 25px; letter-spacing: 0; }   /* Harbor's own mark is its name in a monospace face */
 .sponsor-row a.partner { display: flex; align-items: center; gap: 10px; font-size: 24px; font-weight: 600; letter-spacing: -.01em; color: var(--ink); }
