@@ -20,6 +20,12 @@ date_display: "October 19, 2026"
 authors:
   - name: FrontierCS 2 Team
 
+checked_by:
+  - name: Haocheng Xi
+    url: "https://haochengxi.github.io/"
+    affiliations:
+      name: UC Berkeley
+
 toc:
   - name: The Task
   - name: Why the Baseline Is Strong
