@@ -19,7 +19,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
   <h1>FrontierCS 2: A Benchmark for Computer Science R&amp;D</h1>
   <p class="lead">FrontierCS 2 evaluates AI agents on their ability to do CS research. Each task removes the key contribution of a paper from the code released with it. An agent passes a task only if its implementation beats the original one on all metrics of our hidden workloads.</p>
 
-  <div class="links"><a class="pill lg" id="paperlink" aria-disabled="true">Paper (coming soon)</a></div>
+  <div class="links"><a class="pill lg" id="paperlink" aria-disabled="true">Paper (coming soon)</a><a class="pill lg" href="https://github.com/FrontierCS/FrontierCS-2" target="_blank" rel="noopener">Code</a></div>
   <a id="taskbase" href="{{ '/task/' | relative_url }}" hidden></a>
   </div>
   <div class="papers" id="papers" aria-hidden="true"><div class="pplane" id="pplane"></div></div>
