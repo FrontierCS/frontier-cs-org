@@ -79,6 +79,9 @@ RERUN = {('pi · Gemini 4', 'Sparse Video Attention Policy'): 'run_01M56053RVYXE
 # Kimi K3's vLLM run: the agent exited without a final submission, and it is not retried (Qiuyang, 2026-10-19). Kimi K3's
 # LRR run: it ended FAILED with no score and no adjudication cause (Qiuyang, 2026-10-20: "就是0").
 ZERO = {'run_01M5A2T1WJSCR64W2ZP34T8KHV', 'run_01M5C2J5QNEPEYAWMQY3HD7MF4'}
+# Runs the platform marks FAILED whose selected final was rejudged and accepted: they completed, so the site shows no failure
+# for them. Claude Opus 5.5's KV Cache Compaction (61.55; Qiuyang, 2026-10-20: "kebab上的opus kv compaction信息是否不对").
+COMPLETED = {'run_01M5BMPCS19PVWJRAGZSF9ED8P'}
 # Scores that replace the platform's, by run. Progent's verifier zeroes a suite on one breached episode, so its scores fell
 # on 100, 75, 72.73 and 50; once its formal runs were final they were rescored from each run's kept per-suite metrics
 # (Qiuyang, 2026-10-20, scheme R): per suite, max(0, 1 - breach rate / the reference's breach rate) times
@@ -128,6 +131,12 @@ def agent_usd(c, r):
     if u.get('estimated_cost_usd'): return u['estimated_cost_usd']
     return float(max(0, RATE[c] @ [u.get(k) or 0 for k in KINDS])) if u and c in RATE else 0
 
+# A refresh without --claude-usage loses the Opus 5.5 costs recovered from saved traces (2026-10-20: two snapshots
+# dropped them, and five Opus runs lost their cost; restored from exports/opus-usage/opus55-usage-recovered.json). Stop
+# instead, unless every Claude Code run has usage of its own.
+noclaude = [r['id'] for c, r, _ in pulled if c.startswith('Claude Code') and not agent_usd(c, r) and not any(k.get('estimated_cost_usd') or k.get('total_tokens') for k in (r.get('model_usage') or {}).get('keys', []))]
+if noclaude and not RECOVERED:
+    sys.exit(f'{len(noclaude)} Claude Code runs have no usage: pass --claude-usage=<opus55-usage-recovered.json> ({", ".join(noclaude[:5])} ...)')
 if os.path.exists(sys.argv[1]): os.remove(sys.argv[1])
 db = sqlite3.connect(sys.argv[1])
 db.executescript('''create table release(generated_at text);
@@ -150,7 +159,7 @@ for c, r, events in pulled:
     fb = {'reference_score': priv.get('reference_score'), 'checks': [{'label': k} for k in (priv.get('beat_spec_progress') or {})]}
     if (r.get('adjudication') or {}).get('cause') == 'provider_refusal_no_final': fb['refusal'] = True   # the model's provider refused and no final came
     zero = r['score'] is None and (r['state'] == 'TIMED_OUT' or r['id'] in ZERO)
-    db.execute('insert into runs values (?,?,?,?,?,?)', (r['id'], SCORE.get(r['id'], 0.0 if zero else r['score']), r['state'], 'FAIL' if zero and r['id'] in ZERO else r['verdict'], end - start if start and end else None, json.dumps(fb)))
+    db.execute('insert into runs values (?,?,?,?,?,?)', (r['id'], SCORE.get(r['id'], 0.0 if zero else r['score']), 'COMPLETED' if r['id'] in COMPLETED else r['state'], 'FAIL' if zero and r['id'] in ZERO else r['verdict'], end - start if start and end else None, json.dumps(fb)))
     db.execute('insert into cells values (?,?,?)', (r['id'], c, r['task_id']))
     n = 0
     for e in events:

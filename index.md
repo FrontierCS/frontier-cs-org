@@ -91,7 +91,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
             <p class="how-step"><span>4</span>One fit for models and tasks</p>
             <div class="how-eq">\[ \beta_g \sim \mathcal{N}(h_t + \Delta,\ \tau^2) \]</div>
             <div class="how-eq">\[ \mathrm{FCI}_m = 10\,(\theta_m - \theta_{\text{Kimi K2.7}}) \]</div>
-            <p>A task’s metrics sit near its human level, so its metrics and its final scores inform each other. All strengths, difficulties and levels are fitted at once; the few constants left, \(a\), \(\Delta\), \(\tau\), \(\sigma\) and the spread of \(u_r\), take the values under which the results are most likely. FCI is strength in points: Kimi K2.7 sits at 0, and a model 10 points higher has \(e \approx 2.7\) times the odds of beating any metric. The 90% intervals come from refitting on the tasks drawn again with replacement, 500 times. A run whose model provider refused the task is left out, and so, for now, are the Security tasks.</p>
+            <p>A task’s metrics sit near its human level, so its metrics and its final scores inform each other. All strengths, difficulties and levels are fitted at once; the few constants left, \(a\), \(\Delta\), \(\tau\), \(\sigma\) and the spread of \(u_r\), take the values under which the results are most likely. FCI is strength in points: Kimi K2.7 sits at 0, and a model 10 points higher has \(e \approx 2.7\) times the odds of beating any metric. The 90% intervals come from refitting on the tasks drawn again with replacement, 500 times. A run whose model provider refused the task is left out.</p>
           </div>
         </div>
         <p class="how-step"><span>5</span>Why FCI</p>

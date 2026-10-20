@@ -40,11 +40,19 @@ def write(out):
                                        'passby': part(lambda m: m in hid)}, ensure_ascii=False, indent=1) + '\n')
 
 
+# Counts for runs whose platform record has no metrics, by run: Claude Opus 5.5's KV Compaction is a selected-final rejudge
+# (run_01M5C4AXWSCXAY5BBMFQHGZNF5, verification_01M5C4FE21CK8CPD92KG84YVZR) whose evidence keeps only these counts (the
+# evaluation monitor, 2026-10-20: 22 of 24 articles beat the reference)
+PROGRESS = {'run_01M5BMPCS19PVWJRAGZSF9ED8P': {'compact_cache_bytes': {'passed': 24, 'total': 24},
+                                              'compaction_seconds': {'passed': 24, 'total': 24},
+                                              'qa_correct': {'passed': 22, 'total': 24}}}
+
+
 def one(cell):
     rid, cand, task = cell
     if cand not in MODEL or task not in TASK: return None
     m = json.load(urllib.request.urlopen(API + 'runs/' + rid, timeout=60)).get('metrics') or {}
-    prog = ((m.get('private') or {}).get('beat_spec_progress')) or {}
+    prog = PROGRESS.get(rid) or ((m.get('private') or {}).get('beat_spec_progress')) or {}
     return TASK[task][1] or task.split(' — ')[0], MODEL[cand][0], {k: [v.get('passed', 0), v.get('total', 0)] for k, v in prog.items()}
 
 
