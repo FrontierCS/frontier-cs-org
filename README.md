@@ -61,7 +61,7 @@ These files are written by hand:
 - **Security tasks** are left out of FCI, FDI and test-time scaling until their tasks are fixed (`OFF_FIT_DOMAINS` in the converter). Their pages still list every run.
 - **Refusals**: a run whose model provider refused, so that no final submission came (the platform's adjudication cause `provider_refusal_no_final`), is left out of FCI, FDI and test-time scaling. The task page still lists it as a failed run.
 - **Test-time scaling**: a model's FCI with every run stopped at a budget in US$. A run that has ended within the budget counts what it achieved; a run still going counts as if it timed out at the budget (every metric group unbeaten, a final score of 0), so a curve never falls. The chart shows only each lab's model with the highest FCI (owner, 2026-10-16). Task difficulties stay as in the leaderboard fit, so at full budget it is the model's FCI.
-- **Cost**: how each model's cost is estimated is stated on the site under "How is cost estimated?".
+- **Cost**: how each model's cost is estimated is in the paper (Appendix B, Cost estimates); the site's FAQ no longer carries it (owner, 2026-10-20).
 
 ## Images for sharing
 
