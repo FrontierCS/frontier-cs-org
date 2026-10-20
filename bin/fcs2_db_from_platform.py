@@ -128,6 +128,12 @@ def agent_usd(c, r):
     if u.get('estimated_cost_usd'): return u['estimated_cost_usd']
     return float(max(0, RATE[c] @ [u.get(k) or 0 for k in KINDS])) if u and c in RATE else 0
 
+# A refresh without --claude-usage loses the Opus 5.5 costs recovered from saved traces (2026-10-20: two snapshots
+# dropped them, and five Opus runs lost their cost; restored from exports/opus-usage/opus55-usage-recovered.json). Stop
+# instead, unless every Claude Code run has usage of its own.
+noclaude = [r['id'] for c, r, _ in pulled if c.startswith('Claude Code') and not agent_usd(c, r) and not any(k.get('estimated_cost_usd') or k.get('total_tokens') for k in (r.get('model_usage') or {}).get('keys', []))]
+if noclaude and not RECOVERED:
+    sys.exit(f'{len(noclaude)} Claude Code runs have no usage: pass --claude-usage=<opus55-usage-recovered.json> ({", ".join(noclaude[:5])} ...)')
 if os.path.exists(sys.argv[1]): os.remove(sys.argv[1])
 db = sqlite3.connect(sys.argv[1])
 db.executescript('''create table release(generated_at text);
