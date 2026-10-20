@@ -63,7 +63,9 @@ items = {c: v for c, v in items.items() if sum(map(done, v)) >= MIN}
 # every total: KV Cache Compaction (Qiuyang, 2026-10-19: its formal runs under way) and Progent's old name. Off
 # the site (Qiuyang, 2026-10-19: Security keeps only Progent and LRR): the other four Security tasks. vLLM (shown as
 # Continuum) was here until its runs on its sixth version were final (Qiuyang, 2026-10-19: "VLLM这个题ready了"), and Progent
-# until its 13 formal runs were final and rescored (2026-10-20, SCORE below).
+# until its 13 formal runs were final and rescored (2026-10-20, SCORE below). LRR (Localized Regex Repair) was never here:
+# its formal runs began on 2026-10-20 and are collected as they land, Gemini 4's not yet among them (Qiuyang, 2026-10-20:
+# "LRR可以先不管gemini").
 OFF_SITE = {'Argument-aware runtime privilege control', 'KV Cache Compaction',
             'Adaptive Robustness Evaluation for Prompt-Injection Defense', 'BROP: Hacking Blind — Return-Oriented Programming Without Binary Knowledge',
             'Enclave-Resident Admissible-Set Filter', 'Safe Abstract Trace-Cut — Coupled Optimization'}
