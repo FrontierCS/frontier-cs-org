@@ -41,7 +41,7 @@ function drawPage() {
   const parts = NEWDESC(t.s) ? DESC[t.s].split(/\s*¶\s*/) : [];
   const lead = parts.length ? `<section class="tabout">${parts.map((p, i) => `<div><h3>${['The idea', 'What the agent writes', 'How it is judged'][i] || ''}</h3><p>${esc(p)}</p></div>`).join('')}</section>`
     : DESC[t.s] ? `<details class="fold tdet"${goal ? '' : ' open'}><summary><h3>Task details</h3></summary><p>${esc(DESC[t.s])}</p></details>` : '';
-  // a task with no runs is one still being built (fcs2-data.js): Continuum, KV Compaction, LRR, Progent (Qiuyang, 2026-10-19)
+  // a task with no runs is one still being built (fcs2-data.js): KV Compaction, LRR, Progent (Qiuyang, 2026-10-19)
   if (!runs.length) { $('#tbody').innerHTML = lead + '<p class="tbd">This task is still being built. Its runs will show here, and count toward FCI and FDI, once it is ready.</p>'; texAbout(); loadFig(t); drawPager(t); scrollTo(0, 0); return; }
   const ref = REF[t.s], ms = new Set(runs.map(r => r[0])), np = new Set(runs.filter(r => r[3]).map(r => r[0])).size;
   const best = runs.reduce((a, r) => r[2] > a[2] ? r : a);
@@ -197,7 +197,8 @@ function drawResults() {
     return `<td class="mc ${beat ? 'cy' : 'cn'}" title="${tip}"><b>${num(v)}</b><span class="mbar"><i class="y" style="width:${beat ? 100 : 0}%"></i></span></td>`; };
   const wref = (m, w) => { const W = st[m].w[w] || {}; return W.ref == null ? '<td class="mc e">—</td>'
     : `<td class="mc"><b>${num(W.ref)}</b>${W.margin != null ? `<span class="mg">${sign(m)}${num(W.margin)}</span>` : ''}</td>`; };
-  // the metrics first, then the final score and the cost (owner, 2026-10-15)
+  // the metrics first, then the final score and the cost (owner, 2026-10-15); a run the platform has no cost for shows a
+  // dash, not $0.00 (Gemini 4 Argon's Continuum run: its gateway reported no usage)
   const whead = (m, w) => { const h = metricHead(m, st[m]), u = / \([^)]*\)$/.exec(h);   // the metric, then on its own line the workload and unit
     return `${esc(u ? h.slice(0, u.index) : h)}<br><span class="nw">${esc(WN[w])}${u ? esc(u[0]) : ''}`; };
   const head = split
@@ -212,7 +213,7 @@ function drawResults() {
         + `<td class="rs">${ref != null ? bar(ref, '') : ''}</td><td class="rc"></td></tr>` : '')
     + [...runs].sort((p, q) => q[2] - p[2]).map(r => `<tr><td>${r[3] ? TICK : CROSS}<span class="full">${esc(MNAME[r[0]])}</span><span class="short">${esc(short[r[0]])}</span></td>`
       + (split ? ms.map(m => wl.map(w => wcell(r, m, w)).join('')).join('') : ms.map((m, i) => cell(r, m, i)).join(''))
-      + `<td class="rs">${bar(r[2], `background:${MCOL[r[0]]}`)}</td><td class="rc">$${r[4].toFixed(2)}</td></tr>`).join('')
+      + `<td class="rs">${bar(r[2], `background:${MCOL[r[0]]}`)}</td>${r[4] > 0 ? `<td class="rc">$${r[4].toFixed(2)}</td>` : '<td class="rc e" title="The platform recorded no cost for this run">—</td>'}</tr>`).join('')
     + '</tbody>';
   typeset($('#rtbl'));
 }
