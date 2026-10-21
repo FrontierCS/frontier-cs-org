@@ -121,7 +121,7 @@ TASK = {
     'Register-aware Branch Prediction': ('Arch', 'RUNLTS'),
     'Approximate-MIPS Query Stopping': ('Database', None),
     'Privilege Control for Tool-Using LLM Agents': ('Security', 'Progent'),   # renamed on the platform 2026-10-19 (was 'Argument-aware runtime privilege control')
-    'Localized Regex Repair': ('Security', 'LRR'),
+    'Localized Regex Repair': ('Security', 'LRR'),   # its formal runs from 2026-10-20 (Qiuyang)
     'BBQ bitmap traversal': ('Network', 'BBQ'),
     'Batch Local Counting': ('Database', 'SCOPE'),
     'Bounded EVM Path Prediction': ('Database', 'Seer'),
@@ -148,7 +148,6 @@ TASK = {
     'Latent Objective Recovery': ('Machine Learning', 'LeJEPA'),
     'KV Cache Compaction': ('Machine Learning', 'KV Compaction'),   # on the site from 2026-10-20 (Qiuyang)
     'Learned Transformer Layer Mapping': ('Machine Learning', 'DyT'),
-    'Localized Regex Repair': ('Security', 'LRR'),   # its formal runs from 2026-10-20, before Gemini 4's (Qiuyang: "LRR可以先不管gemini")
     'MetaOpt Combined-TE Gap Search': ('Network', 'MetaOpt'),
     'Multi-turn Trajectory Batches': ('Machine Learning', 'RAGEN'),
     'OCR Distillation Trajectory Sampling': ('Machine Learning', None),
