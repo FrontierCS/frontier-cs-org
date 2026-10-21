@@ -852,7 +852,8 @@ function drawPapers() {
 }
 drawPapers();
 
-/* The private set (owner, 2026-10-10: a separate set of tasks that is not released; no count): task illustrations blurred
+/* The private set (owner, 2026-10-10: a separate set of tasks that is not released; since 2026-10-20 the section's text
+   says it has more than 100 tasks, to be announced, Qiuyang; the picture shows no count): task illustrations blurred
    past recognition, each under a lock, the same picture as the private-set post card. Decorative for assistive technology. */
 (() => { const all = AREAS.flatMap(a => TASKS.filter(t => a.d.includes(t.d)).map(t => [t, a.k]));
   const lock = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.2" fill="#3c4043"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="#3c4043" stroke-width="2.2" stroke-linecap="round"/></svg>';

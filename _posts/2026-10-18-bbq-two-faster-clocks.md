@@ -19,6 +19,11 @@ date_display: "October 18, 2026"
 
 authors:
   - name: FrontierCS 2 Team
+checked_by:
+  - name: Siddhant Ray
+    url: "https://computerscience.uchicago.edu/people/siddhant-ray"
+    affiliations:
+      name: University of Chicago
 
 toc:
   - name: The Task

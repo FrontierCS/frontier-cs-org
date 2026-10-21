@@ -22,7 +22,8 @@ institutions:
   - {name: MIT, logo: mit.png, h: 38}
 
 # fcs2: authors of "FrontierCS 2: A Benchmark for Computer Science R&D", in the order of the paper's author page
-#   (fcs2-overleaf main.tex, 2026-10-17): the six equal contributors, the other contributors, then the advisors.
+#   (fcs2-overleaf main.tex, 2026-10-17; advisors as of 2026-10-20, with Matei Zaharia): the six equal contributors, the
+#   other contributors, then the advisors.
 #   Homepages are reused from the other papers' entries where the name matches. Shown first and unfolded (owner, 2026-10-17).
 fcs2:
   title: "FrontierCS 2: A Benchmark for Computer Science R&D"
@@ -84,10 +85,11 @@ fcs2:
     - {name: Jiantao Jiao, affil: [NVIDIA]}
     - {name: Kunle Olukotun, affil: [Stanford University]}
     - {name: Karthik R. Narasimhan, affil: [Princeton University]}
-    - {name: Koushik Sen, affil: [UC Berkeley]}
-    - {name: Ion Stoica, affil: [UC Berkeley]}
     - {name: Jingbo Shang, affil: [UCSD], url: "https://shangjingbo1226.github.io/"}
+    - {name: Koushik Sen, affil: [UC Berkeley]}
+    - {name: Matei Zaharia, affil: [UC Berkeley]}
     - {name: Alex Dimakis, affil: [UC Berkeley]}
+    - {name: Ion Stoica, affil: [UC Berkeley]}
     - {name: Joseph E. Gonzalez, affil: [UC Berkeley], url: "https://people.eecs.berkeley.edu/~jegonzal/"}
     - {name: Alvin Cheung, affil: [UC Berkeley], url: "https://people.eecs.berkeley.edu/~akcheung/"}
 
