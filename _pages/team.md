@@ -16,7 +16,7 @@ permalink: /team/
   {%- assign t2 = site.data.team.fcs2 %}
   <div class="team-fold team-open">   <!-- the newest project first, not folded (owner, 2026-10-17) -->
     <h3 class="team-group">FrontierCS 2 <span>{{ t2.venue }} · {{ t2.contributors.size | plus: t2.advisors.size }} authors</span></h3>
-    <p class="team-note"><a href="{{ '/' | relative_url }}">{{ t2.title }}</a>, in paper order.</p>
+    <p class="team-note"><a href="{{ t2.url }}" target="_blank" rel="noopener noreferrer">{{ t2.title }}</a>, in paper order.</p>
     <h4 class="team-sub">Contributors <span>{{ t2.contributors.size }}</span></h4>
     <ul class="team-grid">
       {%- for p in t2.contributors %}{% include team_person.html p=p eq="Equal contribution" %}{% endfor %}
