@@ -17,6 +17,14 @@ permalink: /paper/
   <div class="page">
     <div class="paper-list">
       <article class="paper-row">
+        <a class="paper-pg" href="https://arxiv.org/abs/2610.29932" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img src="{{ '/assets/img/fcs1-papers/2610.29932.jpg' | relative_url }}" alt="" width="440" height="570" loading="lazy"></a>
+        <div>
+          <div class="post-meta"><span class="venue plain">arXiv 2026</span></div>
+          <h2 class="post-title"><a href="https://arxiv.org/abs/2610.29932" target="_blank" rel="noopener noreferrer">FrontierCS 2: A Benchmark for Computer Science R&amp;D</a></h2>
+          <p class="post-desc">48 open-ended tasks, each built by deleting the key contribution of a computer science paper from its released code.</p>
+        </div>
+      </article>
+      <article class="paper-row">
         <a class="paper-pg" href="https://arxiv.org/abs/2512.15699" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img src="{{ '/assets/img/fcs1-papers/2512.15699.jpg' | relative_url }}" alt="" width="440" height="570" loading="lazy"></a>
         <div>
           <div class="post-meta"><span class="venue">ICML 2026</span></div>
@@ -66,6 +74,9 @@ permalink: /paper/
     <h2 class="built-h">Built on FrontierCS</h2>
     <p class="built-lede">Research that uses the FrontierCS benchmarks.</p>
     <div class="built">
+      <div class="built-grp"><h3>Open source</h3><ul>
+        <li><a href="https://github.com/Human-Agent-Society/reef" target="_blank" rel="noopener noreferrer">Reef: Infrastructure for Continually Self-Improving Agents</a><span class="au">Human-Agent-Society &middot; <span data-gh-stars="Human-Agent-Society/reef">7.7k</span> stars</span><p>Connects agent inference, feedback, learning and versioned delivery. Its Guidance-TTT recipe runs FrontierCS Polyomino Packing with the FrontierCS judge.</p></li>
+      </ul></div>
       <div class="built-grp"><h3>Post-training</h3><ul>
         <li><a href="https://arxiv.org/abs/2606.29082" target="_blank" rel="noopener noreferrer">Evolution Fine-Tuning: Learning to Discover Across 371 Optimization Tasks</a><span class="au">Lee et al.</span><p>Turns evolutionary search runs into training data; nearly half of its 371 tasks derive from FrontierCS. On held-out problems its 9B model averages 46.01, against 32.46 for the base model.</p></li>
         <li><a href="https://arxiv.org/abs/2609.38288" target="_blank" rel="noopener noreferrer">AREX-2: Advancing Self-Improving Agents through Long-Horizon Reflective Tasks</a><span class="au">Qian et al.</span><p>Trains a 27B agent on long trajectories in which it keeps improving its own solution. On 188 FrontierCS tasks it scores 70.7, 16.0 points above the strongest open-weight baseline.</p></li>

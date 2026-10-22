@@ -1701,6 +1701,7 @@ section.journal.built-sec { padding-top: 0; }
 .built-grp a { font-size: 15.5px; font-weight: 500; color: var(--ink); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--rule); }
 .built-grp a:hover { color: var(--accent-hover); text-decoration-color: currentColor; }
 .built-grp .au { margin-left: 8px; font-size: 13px; color: var(--ink-3); white-space: nowrap; }
+.built-grp .au [data-gh-stars] { color: var(--accent); font-weight: 600; }
 .built-grp p { margin: 3px 0 0; font-size: 14px; line-height: 1.5; color: var(--ink-2); }
 
 /* sections separated by space, not full-width rules (Epoch) */

@@ -93,4 +93,16 @@
       if (current) setActive(current);
     }, { passive: true });
   }
+
+  // GitHub star counts: the page ships a recent count; refresh it from the API when reachable.
+  document.querySelectorAll('[data-gh-stars]').forEach(function (el) {
+    fetch('https://api.github.com/repos/' + el.getAttribute('data-gh-stars'))
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        if (!d || typeof d.stargazers_count !== 'number') return;
+        var n = d.stargazers_count;
+        el.textContent = n >= 1000 ? (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k' : String(n);
+      })
+      .catch(function () {});
+  });
 })();
