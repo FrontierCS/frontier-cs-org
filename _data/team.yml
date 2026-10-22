@@ -27,7 +27,8 @@ institutions:
 #   Homepages are reused from the other papers' entries where the name matches. Shown first and unfolded (owner, 2026-10-17).
 fcs2:
   title: "FrontierCS 2: A Benchmark for Computer Science R&D"
-  venue: 2026
+  url: "https://arxiv.org/abs/2610.29932"
+  venue: "arXiv, October 2026"
   contributors:
     - {name: Qiuyang Mang, affil: [UC Berkeley], eq: true, url: "https://joyemang33.github.io"}
     - {name: Wenhao Chai, affil: [Princeton University], eq: true, url: "https://wenhaochai.com/"}
