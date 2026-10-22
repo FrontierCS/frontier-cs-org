@@ -32,6 +32,12 @@ h2{font-weight:600; font-size:clamp(25px,2.4vw,30px); line-height:1.2; margin:0}
 .field svg{flex:none; color:var(--muted)}
 .links{display:flex; flex-wrap:wrap; gap:10px; margin-top:26px}
 .pill[aria-disabled="true"]{opacity:.6; cursor:default; pointer-events:none}
+/* overview links: four logos on equal tiles with a 10 px corner, no labels (owner, 2026-10-22) */
+.hlinks{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; max-width:560px}
+.hb{display:flex; align-items:center; justify-content:center; gap:6px; height:56px; padding:0 12px; border-radius:10px; background:#f0f4f9; transition:background .15s}
+.hb:hover{background:#e3e9f2}
+.hb img{display:block; width:auto}
+@media (max-width:640px){ .hlinks{grid-template-columns:1fr 1fr} }
 /* overview: the papers' first pages on a tilted, drifting wall, then the task map */
 .hero{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:24px 40px; align-items:center}
 @media (max-width:1000px){ .hero{grid-template-columns:1fr} }
