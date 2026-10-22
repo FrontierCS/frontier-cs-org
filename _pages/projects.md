@@ -74,6 +74,9 @@ permalink: /paper/
     <h2 class="built-h">Built on FrontierCS</h2>
     <p class="built-lede">Research that uses the FrontierCS benchmarks.</p>
     <div class="built">
+      <div class="built-grp"><h3>Open source</h3><ul>
+        <li><a href="https://github.com/Human-Agent-Society/reef" target="_blank" rel="noopener noreferrer">Reef: Infrastructure for Continually Self-Improving Agents</a><span class="au">Human-Agent-Society &middot; <span data-gh-stars="Human-Agent-Society/reef">7.7k</span> stars</span><p>Connects agent inference, feedback, learning and versioned delivery. Its Guidance-TTT recipe runs FrontierCS Polyomino Packing with the FrontierCS judge.</p></li>
+      </ul></div>
       <div class="built-grp"><h3>Post-training</h3><ul>
         <li><a href="https://arxiv.org/abs/2606.29082" target="_blank" rel="noopener noreferrer">Evolution Fine-Tuning: Learning to Discover Across 371 Optimization Tasks</a><span class="au">Lee et al.</span><p>Turns evolutionary search runs into training data; nearly half of its 371 tasks derive from FrontierCS. On held-out problems its 9B model averages 46.01, against 32.46 for the base model.</p></li>
         <li><a href="https://arxiv.org/abs/2609.38288" target="_blank" rel="noopener noreferrer">AREX-2: Advancing Self-Improving Agents through Long-Horizon Reflective Tasks</a><span class="au">Qian et al.</span><p>Trains a 27B agent on long trajectories in which it keeps improving its own solution. On 188 FrontierCS tasks it scores 70.7, 16.0 points above the strongest open-weight baseline.</p></li>
@@ -96,9 +99,6 @@ permalink: /paper/
       </ul></div>
       <div class="built-grp"><h3>Evaluation infra</h3><ul>
         <li><a href="https://arxiv.org/abs/2609.04298" target="_blank" rel="noopener noreferrer">Harbor Adapters and Harbor-Index: Infrastructure and a Curated Meta-Dataset for Large-Scale Agentic Evaluation</a><span class="au">Shi et al.</span><p>Ports benchmarks to one agent-evaluation format and checks each port against the original. Its catalog has a verified adapter for the FrontierCS algorithmic problems, checked on 10 of the 172.</p></li>
-      </ul></div>
-      <div class="built-grp"><h3>Open source</h3><ul>
-        <li><a href="https://github.com/Human-Agent-Society/reef" target="_blank" rel="noopener noreferrer">Reef: Infrastructure for Continually Self-Improving Agents</a><span class="au">Human-Agent-Society</span><p>Connects agent inference, feedback, learning and versioned delivery. Its Guidance-TTT recipe runs FrontierCS Polyomino Packing with the FrontierCS judge.</p></li>
       </ul></div>
     </div>
   </div>
