@@ -97,6 +97,9 @@ permalink: /paper/
       <div class="built-grp"><h3>Evaluation infra</h3><ul>
         <li><a href="https://arxiv.org/abs/2609.04298" target="_blank" rel="noopener noreferrer">Harbor Adapters and Harbor-Index: Infrastructure and a Curated Meta-Dataset for Large-Scale Agentic Evaluation</a><span class="au">Shi et al.</span><p>Ports benchmarks to one agent-evaluation format and checks each port against the original. Its catalog has a verified adapter for the FrontierCS algorithmic problems, checked on 10 of the 172.</p></li>
       </ul></div>
+      <div class="built-grp"><h3>Open source</h3><ul>
+        <li><a href="https://github.com/Human-Agent-Society/reef" target="_blank" rel="noopener noreferrer">Reef: Infrastructure for Continually Self-Improving Agents</a><span class="au">Human-Agent-Society</span><p>Connects agent inference, feedback, learning and versioned delivery. Its Guidance-TTT recipe runs FrontierCS Polyomino Packing with the FrontierCS judge.</p></li>
+      </ul></div>
     </div>
   </div>
 </section>
