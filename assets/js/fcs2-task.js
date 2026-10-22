@@ -113,7 +113,7 @@ const WORKLOAD_NAME = {'CREST':{w0:'Vim 5.7', w1:'sed 3.02'}};
    run]. The header names the metric with its unit and says which way is better; a first row gives the human
    reference; each model cell is the run's mean, coloured by its count, with the count and the reference's mean in that
    run as its tooltip. */
-const PERCENT = new Set(['attack_success_rate', 'utility_under_attack']);
+const PERCENT = {Progent:['attack_success_rate', 'utility_under_attack'], Continuum:['correctness']};   // per task: metrics that are shares
 const UNIT = {ms:'ms', seconds:'s', ns:'ns', us:'µs', minutes:'min', bytes:'bytes', bits:'bits', mflops:'MFLOP/s', mib:'MiB', pct:'%', db:'dB'};
 const NAMED = /(?<!\\)\(([^()]*)\)\s*$/;   // a unit in the label's closing parentheses, not TeX's \( \)
 const metricHead = (m, s, e = 0, uo) => { const label = metric(m), named = NAMED.exec(label);   // a label that already names its unit keeps it
@@ -164,7 +164,7 @@ function drawResults() {
   // (Qiuyang, 2026-10-15)
   const FAM = [{s:1, ms:1e-3, 'µs':1e-6, ns:1e-9}, {GiB:2 ** 30, MiB:2 ** 20, KiB:1024, bytes:1, bits:1 / 8}];
   const colScale = (m, s) => { if (!s || split) return {k:1, e:0};
-    if (PERCENT.has(m)) return {k:100, e:0, u:'%'};   // shares of episodes read as percent (Qiuyang, 2026-10-22: 89.3 ×10⁻³ read as 89)
+    if ((PERCENT[t.s] || []).includes(m)) return {k:100, e:0, u:'%'};   // shares read as percent (Qiuyang, 2026-10-22: 89.3 ×10⁻³ read as 89; Continuum's correct counts out of 48 and 155)
     const named = NAMED.exec(metric(m)), u0 = named ? named[1] : UNIT[(/_([a-z]+)$/.exec(m) || [])[1]] || s.unit;
     const vals = [s.ref, ...Object.values(s.by).map(x => x[0])].filter(v => v != null && v !== 0).map(Math.abs);
     if (!vals.length) return {k:1, e:0};
