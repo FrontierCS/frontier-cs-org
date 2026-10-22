@@ -45,7 +45,10 @@ def write(out):
 # evaluation monitor, 2026-10-20: 22 of 24 articles beat the reference)
 PROGRESS = {'run_01M5BMPCS19PVWJRAGZSF9ED8P': {'compact_cache_bytes': {'passed': 24, 'total': 24},
                                               'compaction_seconds': {'passed': 24, 'total': 24},
-                                              'qa_correct': {'passed': 22, 'total': 24}}}
+                                              'qa_correct': {'passed': 22, 'total': 24}},
+            # Gemini 4 Argon's Polygon: its final evaluation failed with a ReferenceFailure; these are the selected-final rejudge's
+            'run_01M4YAV50Q717NGG917XBQH5FR': {'refuted_pair': {'passed': 21, 'total': 21},
+                                              'wall_time_seconds': {'passed': 19, 'total': 21}}}
 
 
 def one(cell):

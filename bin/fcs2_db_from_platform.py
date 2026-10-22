@@ -2,6 +2,7 @@
 """Build the sqlite.db that bin/fcs2_runs_from_db.py reads, straight from the evaluation platform's read-only API.
 
 usage: python3 bin/fcs2_db_from_platform.py out.db [--api=http://127.0.0.1:18080/api/v1/] [--min-scored=40] [--claude-usage=recovered.json]
+       [--trace-usage=fcs2-trace-usage-recovered-20261022.json]
 
 Takes every formal evaluation of the full task set (47 tasks or more) that is not archived and has at least --min-scored scored runs (one per model;
 the newest wins), and writes the tables the converter queries: release, candidates, tasks, cells, runs, submissions,
@@ -199,6 +200,10 @@ for a in sys.argv[2:]:
             else:
                 known = (x['known_output_tokens'] * OPUS_RATE[0] + x['cache_read_input_tokens'] * OPUS_RATE[1] + x['cache_creation_input_tokens'] * OPUS_RATE[2]) / 1e6
                 RECOVERED[x['run_id']] = known * x['estimated_total_tokens'] / x['known_total_tokens']
+# --trace-usage=FILE: costs computed from the released traces for runs the platform has no usage for (Qiuyang, 2026-10-22).
+for a in sys.argv[2:]:
+    if a.startswith('--trace-usage='):
+        for x in json.load(open(a[14:]))['runs']: RECOVERED[x['run_id']] = x['estimated_cost_usd']
 
 def agent_usd(c, r):
     if r['id'] in RECOVERED: return RECOVERED[r['id']]
