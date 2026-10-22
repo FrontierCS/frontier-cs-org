@@ -17,6 +17,14 @@ permalink: /paper/
   <div class="page">
     <div class="paper-list">
       <article class="paper-row">
+        <a class="paper-pg" href="https://arxiv.org/abs/2610.29932" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img src="{{ '/assets/img/fcs1-papers/2610.29932.jpg' | relative_url }}" alt="" width="440" height="570" loading="lazy"></a>
+        <div>
+          <div class="post-meta"><span class="venue plain">arXiv 2026</span></div>
+          <h2 class="post-title"><a href="https://arxiv.org/abs/2610.29932" target="_blank" rel="noopener noreferrer">FrontierCS 2: A Benchmark for Computer Science R&amp;D</a></h2>
+          <p class="post-desc">48 open-ended tasks, each built by deleting the key contribution of a computer science paper from its released code.</p>
+        </div>
+      </article>
+      <article class="paper-row">
         <a class="paper-pg" href="https://arxiv.org/abs/2512.15699" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true"><img src="{{ '/assets/img/fcs1-papers/2512.15699.jpg' | relative_url }}" alt="" width="440" height="570" loading="lazy"></a>
         <div>
           <div class="post-meta"><span class="venue">ICML 2026</span></div>
