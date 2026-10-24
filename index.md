@@ -197,6 +197,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
     <li><a href="https://www.kaggle.com/" target="_blank" rel="noopener noreferrer"><img src="{{ 'assets/img/partners/kaggle.svg' | relative_url }}" class="kaggle" alt="Kaggle"></a></li>
     <li><a href="https://www.laude.org/" target="_blank" rel="noopener noreferrer"><img src="{{ 'assets/img/sponsors/laude-institute-wordmark.png' | relative_url }}" class="laude" alt="Laude Institute"></a></li>
     <li><a href="https://scale.com/" target="_blank" rel="noopener noreferrer"><img src="{{ 'assets/img/sponsors/scale.svg' | relative_url }}" class="scale" alt="Scale AI"></a></li>
+    <li><a href="https://snorkel.ai/" target="_blank" rel="noopener noreferrer"><img src="{{ 'assets/img/sponsors/snorkel.svg' | relative_url }}" class="snorkel" alt="Snorkel AI"></a></li>
   </ul>
 </section>
 
