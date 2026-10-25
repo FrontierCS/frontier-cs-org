@@ -173,6 +173,9 @@ MODEL = {
     'Kimi K2.7 Code': ('k27', 'Kimi K2.7', 'Kimi K2.7', 'Kimi Code', 'Kimi'),   # shown as Kimi K2.7 (owner, 2026-10-14)
     'Qwen 3.8 Max Code': ('qwen', 'Qwen 3.8 Max', 'Qwen 3.8 Max', '', 'Qwen'),   # shown without 'Code' (owner, 2026-10-09)
     'DeepSeek V4.1 Flash (DSH)': ('ds', 'DeepSeek V4.1 Flash', 'DeepSeek V4.1 Flash', 'DeepSeek Harness', 'DeepSeek'),   # DSH, DeepSeek's open-source agent harness (Qiuyang, 2026-10-14)
+    # deepseek-v4.1-flash-1017 via OpenRouter (fp8 providers), reasoning effort max, on DeepSeek Harness 0.2.0-rc.2 with the
+    # same overlay as DeepSeek V4.1 Flash; formal evaluation eval_01M5QR7T4F49NGYJQMS5WR45BH (Qiuyang, 2026-10-24)
+    'DeepSeek Harness (deepseek-v4.1-flash-1017)': ('ds1017', 'DeepSeek V4.1 Flash 1017', 'DeepSeek V4.1 Flash 1017', 'DeepSeek Harness', 'DeepSeek'),
     'GLM 5.3 (ZCode)': ('glm', 'GLM 5.3', 'GLM 5.3', 'ZCode', 'Z.ai'),
     'Claude Code · Opus 5.5 (Subscription, max effort)': ('opus', 'Claude Opus 5.5', 'Opus 5.5', 'Claude Code', 'Anthropic'),
     'Muse Code · Muse Wonder 1.0': ('wonder', 'Muse Wonder 1.0', 'Muse Wonder 1.0', 'Muse Code', 'Meta'),
@@ -538,8 +541,11 @@ SCALE_BOOT, SCALE_POINTS = 100, 32
 # US$ per million tokens, list prices found 2026-10-09: (output, cache read).
 # DeepSeek is its off-peak rate (peak hours double it). Sources: eesel.ai and yottalabs.ai (GPT-6 Astra, GPT-6.1 Sol, Kimi K3,
 # DeepSeek), anotherwrapper.com and QwenCloud (Qwen implicit cache), pricepertoken.com (GLM), anotherwrapper.com (Muse output). Muse lists no cache price; its cache read is the $0.15 that the preview's LiteLLM gateway charged (owner, 2026-10-09).
+# DeepSeek V4.1 Flash 1017 is Crusoe's fp8 rate, measured 2026-10-25: OpenRouter routed 7,999 of the 8,238 requests of its campaign
+# there and billed each at 0.29 uncached input, 1.2 output, 0.007 cache read (InferenceNet and Makora took the rest); its
+# runs' US$ are what OpenRouter billed (bin/fcs2_db_from_platform.py --run-cost), so this price only describes the model.
 PRICE = {'astra': (50.00, 1.00), 'sol': (10.00, 0.10), 'k3': (15.00, 0.30), 'qwen': (6.00, 0.25),
-         'ds': (0.60, 0.003), 'glm': (4.40, 0.26), 'muse': (4.25, 0.15)}
+         'ds': (0.60, 0.003), 'glm': (4.40, 0.26), 'muse': (4.25, 0.15), 'ds1017': (1.20, 0.007)}
 
 
 def usd(m, total, output):

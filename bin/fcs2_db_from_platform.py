@@ -2,7 +2,15 @@
 """Build the sqlite.db that bin/fcs2_runs_from_db.py reads, straight from the evaluation platform's read-only API.
 
 usage: python3 bin/fcs2_db_from_platform.py out.db [--api=http://127.0.0.1:18080/api/v1/] [--min-scored=40] [--claude-usage=recovered.json]
-       [--trace-usage=fcs2-trace-usage-recovered-20261022.json]
+       [--trace-usage=fcs2-trace-usage-recovered-20261022.json] [--run-cost=ds1017-tokens.json] [--only='candidate name']
+
+--only collects one candidate's evaluation, for a platform that does not hold the others (since 2026-10-24 the evaluations
+of the first 13 models are on no platform): add the result to the site's snapshot with bin/fcs2_db_add_snapshot.py. The
+checks that the override tables below still meet their runs then cover only that candidate's runs.
+--run-cost=FILE: a run's US$ as its model provider billed it, which replaces every estimate below: JSON whose "rows" give
+run_id and openrouter_actual_usd (DeepSeek V4.1 Flash 1017: ~/fcs2-ops/cost/ds1017-tokens.json, the cost OpenRouter
+returned for each request, from the gateway's spend logs, plus OpenRouter's own record for the 19 requests the gateway
+logged without it; the gateway's estimate misses those, and it has no usage at all for the Progent run).
 
 Takes every formal evaluation of the full task set (47 tasks or more) that is not archived and has at least --min-scored scored runs (one per model;
 the newest wins), and writes the tables the converter queries: release, candidates, tasks, cells, runs, submissions,
@@ -25,10 +33,11 @@ import json, sqlite3, sys, urllib.request, os
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 
-API, MIN = 'http://127.0.0.1:18080/api/v1/', 40
+API, MIN, ONLY = 'http://127.0.0.1:18080/api/v1/', 40, None
 for a in sys.argv[2:]:
     if a.startswith('--api='): API = a[6:]
     if a.startswith('--min-scored='): MIN = int(a[13:])
+    if a.startswith('--only='): ONLY = a[7:]
 # cache-read US$ per million tokens, as PRICE in the converter, keyed by the platform's candidate name
 CACHE = {'GPT-6 Astra': 1.00, 'GPT-6.1 Sol': 0.10, 'Kimi K3 (Modal)': 0.30, 'DeepSeek V4.1 Flash (DSH)': 0.003, 'Muse Code - Muse Spark 1.3': 0.15, 'GLM 5.3 (ZCode)': 0.26,
          'Claude Code · Opus 5.5 (Subscription, max effort)': None, 'Kimi K2.7 Code': None, 'Muse Code · Muse Wonder 1.0': None,
@@ -36,7 +45,10 @@ CACHE = {'GPT-6 Astra': 1.00, 'GPT-6.1 Sol': 0.10, 'Kimi K3 (Modal)': 0.30, 'Dee
          'Qwen Code CLI · Qwen 3.8 Max': 0.25,   # the same model on Qwen Code (Qiuyang, 2026-10-14)
          'GLM 5.3 Flash (ZCode)': 0.03,
          'pi · Gemini 4': None,                  # its gateway reports the cost of every run (Qiuyang, 2026-10-16)          # list cached-input rate, eesel.ai's GLM-5.3-Flash pricing write-up, found 2026-10-13   # None: run on a subscription, the platform reports no usage
-         'Step Code - Step 5 Preview': None}     # so does its gateway (Qiuyang, 2026-10-17)
+         'Step Code - Step 5 Preview': None,     # so does its gateway (Qiuyang, 2026-10-17)
+         # DeepSeek V4.1 Flash 1017 (2026-10-25): its runs' costs come from --run-cost; this is Crusoe's fp8 cache-read
+         # rate, the provider OpenRouter routed 7,999 of the 8,238 requests of its campaign to (output 1.2, uncached input 0.29)
+         'DeepSeek Harness (deepseek-v4.1-flash-1017)': 0.007}
 
 
 def get(path):
@@ -56,7 +68,7 @@ def evaluations():
         if not cursor: return out
 
 for e in sorted(evaluations(), key=lambda e: e['created_at']):
-    if e['is_formal'] and e['total_runs'] >= 47 and not e['archived_at'] and e['candidate_name'] in CACHE: evs[e['candidate_name']] = e
+    if e['is_formal'] and e['total_runs'] >= 47 and not e['archived_at'] and e['candidate_name'] in CACHE and ONLY in (None, e['candidate_name']): evs[e['candidate_name']] = e
 items = {c: get('evaluations/' + e['id'])['items'] for c, e in evs.items()}
 done = lambda i: i['score'] is not None or i['run_state'] == 'TIMED_OUT'   # a timeout is a result: it scores 0
 items = {c: v for c, v in items.items() if sum(map(done, v)) >= MIN}
@@ -79,7 +91,15 @@ RERUN = {('pi · Gemini 4', 'Sparse Video Attention Policy'): 'run_01M56053RVYXE
 # Runs that ended with no score and that Qiuyang judged the candidate's own failure: they score 0 and fail, as a timeout does.
 # Kimi K3's vLLM run: the agent exited without a final submission, and it is not retried (Qiuyang, 2026-10-19). Kimi K3's
 # LRR run: it ended FAILED with no score and no adjudication cause (Qiuyang, 2026-10-20: "就是0").
-ZERO = {'run_01M5A2T1WJSCR64W2ZP34T8KHV', 'run_01M5C2J5QNEPEYAWMQY3HD7MF4'}
+# DeepSeek V4.1 Flash 1017 (eval_01M5QR7T4F49NGYJQMS5WR45BH; Qiuyang, 2026-10-24: a run that never submitted a final stays
+# 0/FAIL, no checkpoint is judged in its place): Residual State Advancement and BABBLE, the agent container OOM-killed within
+# the task's memory limit (exit 137); Continuum, the model wrote its last tool call as malformed DSML text, so the harness
+# ended with no final; EVM State Checkpoints and Glenside, the agent filled the task's 8 GiB workspace and was evicted;
+# MuJoCo Playground, the model's own code sent SIGTERM to every process whose command line matched, the harness included.
+# Evidence per run: ~/fcs2-ops/ds1017/dispositions.json (the evaluation monitor).
+ZERO = {'run_01M5A2T1WJSCR64W2ZP34T8KHV', 'run_01M5C2J5QNEPEYAWMQY3HD7MF4',
+        'run_01M5QR7T4M65RY0VAYMQDN6TP2', 'run_01M5QR7T4PJ4ZR9KSZN1X28WC7', 'run_01M5QR7T4N5K0QKQSCH6PXW660',
+        'run_01M5QR7T4MKQYAT9R6AE36HH2B', 'run_01M5QR7T4P9BAF9GZ9NPSQAGM7', 'run_01M5QR7T4PE4CXY3CM4Y95WE31'}
 # Runs the platform marks FAILED whose selected final was rejudged and accepted: they completed, so the site shows no failure
 # for them. Claude Opus 5.5's KV Cache Compaction (61.55; Qiuyang, 2026-10-20: "kebab上的opus kv compaction信息是否不对").
 COMPLETED = {'run_01M5BMPCS19PVWJRAGZSF9ED8P'}
@@ -91,7 +111,10 @@ COMPLETED = {'run_01M5BMPCS19PVWJRAGZSF9ED8P'}
 # candidate bytes), bytes and seconds swapped in bytes mode; 100 x the mean over the 24 articles. Accuracy dominates and
 # efficiency is a bounded bonus. Runs with no scored final stay 0. Progent: per suite, utility under attack x (1 - breached /
 # attacked); 100 x the mean over the 4 suites. Values and detail: reports/rescore-kv-progent-20261021.json (the evaluation
-# monitor).
+# monitor). DeepSeek V4.1 Flash 1017's KV Compaction (run_01M5QR7T4N2JSP0D7T2W3MC749, 61.9873) and Progent
+# (run_01M5QR7T4QP75TZWX1A8XGFRYE, 49.3222), and their references and development scores below, by the same formulas from each
+# run's final and train evidence (2026-10-25; the formulas reproduce the 2026-10-21 values of DeepSeek V4.1 Flash's and GLM 5.3's
+# released runs to the fourth decimal); both still fail.
 SCORE = {'run_01M5B6757V0VMSXB5QZGAWXB6C': 56.8798, 'run_01M5970STDD1FKW0ECD8Q2XD28': 55.7482,
          'run_01M59RP96FT226RGXVGBP05MGT': 55.3904, 'run_01M5AZ52W78HS5FPKF2HZ30ZMG': 50.4422,
          'run_01M5BPM6CGT9G16Z0KKXDV1192': 49.4521, 'run_01M5B71VP4ZTTXEDZTSJRWHCF2': 48.7175,
@@ -104,7 +127,8 @@ SCORE = {'run_01M5B6757V0VMSXB5QZGAWXB6C': 56.8798, 'run_01M5970STDD1FKW0ECD8Q2X
          'run_01M5B3Q2GAQQA222W6DRZDP0R7': 51.7117, 'run_01M5BGMM8NF591Z8ZPT5MMF1VD': 46.8766,
          'run_01M5BPACVQ0VFV9S4N37Y5H4QZ': 46.9225, 'run_01M5B3Z6EHETQBZF3GSPQJJZGN': 52.2678,
          'run_01M5BMR4VSNRK7GCBTE729E9E5': 52.5936, 'run_01M5BPC4T5EBT3A9MG03Q9N88V': 0.0,
-         'run_01M5BP8MTSK6ZWWNTGY2SPW5BX': 0.0, 'run_01M5BMSWSWFN9RFSZMBHQ2M7PQ': 0.0}
+         'run_01M5BP8MTSK6ZWWNTGY2SPW5BX': 0.0, 'run_01M5BMSWSWFN9RFSZMBHQ2M7PQ': 0.0,
+         'run_01M5QR7T4N2JSP0D7T2W3MC749': 61.9873, 'run_01M5QR7T4QP75TZWX1A8XGFRYE': 49.3222}
 # The human reference's score on the same scales, measured in each run (KV Compaction's frozen captures give 60.63 in every
 # run, 87.5 x its mean accuracy; Progent's reference policy is measured live, 38.9 to 41.8); the site shows the median over the
 # task's runs, as for every task. The platform reports 0 for both, its relative scale.
@@ -119,7 +143,8 @@ REFERENCE = {'run_01M5B6757V0VMSXB5QZGAWXB6C': 40.635, 'run_01M5970STDD1FKW0ECD8
              'run_01M5BGJMS0CVMZQN2KBE6JY8P2': 60.6278, 'run_01M5BPFMHBVMKV3TBTB5HW2XD2': 60.6278,
              'run_01M5B3Q2GAQQA222W6DRZDP0R7': 60.6278, 'run_01M5BGMM8NF591Z8ZPT5MMF1VD': 60.6278,
              'run_01M5BPACVQ0VFV9S4N37Y5H4QZ': 60.6278, 'run_01M5B3Z6EHETQBZF3GSPQJJZGN': 60.6278,
-             'run_01M5BMR4VSNRK7GCBTE729E9E5': 60.6278}
+             'run_01M5BMR4VSNRK7GCBTE729E9E5': 60.6278,
+             'run_01M5QR7T4N2JSP0D7T2W3MC749': 60.6278, 'run_01M5QR7T4QP75TZWX1A8XGFRYE': 39.5199}
 # Development scores that replace the platform's, by verification: KV Compaction's and Progent's train submissions,
 # rescored with the same formulas as their finals above (the evaluation monitor, 2026-10-21:
 # reports/rescore-kv-progent-train-20261021.json; Qiuyang approved the formulas). Evaluations that failed at the time had no
@@ -167,12 +192,22 @@ TRAIN = {'verification_01M59D1KBE7X37J6RAZ70V52F8': 61.1975, 'verification_01M59
          'verification_01M5BXB8Y7SSKKK9HF9QA7DTNZ': 49.4566, 'verification_01M5BZRM30G7SYZ0362DJ06FA4': 53.4738,
          'verification_01M5BQF4F9V9VTQP15NS5FFN47': 0.0, 'verification_01M5C1NH2A2CQT8B5ZDJ8VK9ER': 0.0,
          'verification_01M5C3KBC1FNK4JVA0TFC0P9JN': 0.0, 'verification_01M5C42XK2BSJBXM90WRG85YGE': 0.0,
-         'verification_01M5BY8V5VHG2FZ2Y921MFXSW6': 55.1433, 'verification_01M5C27FWHFWQ36CW4MA14X3S3': 59.5979}
+         'verification_01M5BY8V5VHG2FZ2Y921MFXSW6': 55.1433, 'verification_01M5C27FWHFWQ36CW4MA14X3S3': 59.5979,
+         # DeepSeek V4.1 Flash 1017's (2026-10-25): KV Compaction, then Progent
+         'verification_01M5R0KBD3J1A7GMF6GC8F5Z61': 50.6754, 'verification_01M5R4HJC04YAVHW4Y2PQNRXFC': 53.2471,
+         'verification_01M5R6F0HKKMRP4N7M7W8PQEQB': 57.0905, 'verification_01M5R79S65FEWJNYBK7PJR1HMM': 60.94,
+         'verification_01M5R85RYE4832TXGSRP56360T': 58.024, 'verification_01M5R8XD0KW4HPHB62GEQFHCQA': 65.4983,
+         'verification_01M5R9SHX74F0865K3WTB5ZYV0': 51.6925, 'verification_01M5R8YED816C29J513T3X469F': 50.36,
+         'verification_01M5RAPV2VK6JRBGG67RRMBS19': 59.4675, 'verification_01M5RBJNNK6Q6G4F4N0EZ2RAVZ': 58.3875}
 rids = [(c, RERUN.get((c, i['task_name']), i['run_id'])) for c, v in items.items() for i in v if i.get('run_id') and i['task_name'] not in OFF_SITE]
 with ThreadPoolExecutor(16) as ex:
     pulled = list(ex.map(lambda cr: (cr[0], get('runs/' + cr[1]), get(f'runs/{cr[1]}/events?limit=500')), rids))
 assert all(r['candidate_version_id'] == evs[c]['candidate_version_id'] for c, r, _ in pulled if r['id'] in RERUN.values()), 'a rerun of another candidate version'
-assert set(SCORE) <= {r['id'] for _, r, _ in pulled}, 'a rescored run is no longer its formal evaluation\'s'
+ids = {r['id'] for _, r, _ in pulled}
+if ONLY:   # the tables' other runs belong to candidates not collected: every rescored run collected has all its development scores
+    assert all(e['payload']['verification_id'] in TRAIN for _, r, ev in pulled if r['id'] in SCORE for e in ev
+               if e['kind'] == 'VERIFIER_TRAIN_COMPLETED' and e['payload'].get('raw_score') is not None), 'a rescored run\'s development score is not rescored'
+else: assert set(SCORE) <= ids, 'a rescored run is no longer its formal evaluation\'s'
 assert all(r['verdict'] == 'FAIL' for _, r, _ in pulled if r['id'] in SCORE), 'a rescored run no longer fails'
 
 # Claude Code usage with tokens but no cost (a run without the CLI's final result): price the four token kinds at the
@@ -205,6 +240,11 @@ for a in sys.argv[2:]:
     if a.startswith('--trace-usage='):
         for x in json.load(open(a[14:]))['runs']: RECOVERED[x['run_id']] = x['estimated_cost_usd']
 
+RUN_COST = {}
+for a in sys.argv[2:]:
+    if a.startswith('--run-cost='): RUN_COST.update({x['run_id']: x['openrouter_actual_usd'] for x in json.load(open(a[11:]))['rows'] if x.get('run_id')})
+
+
 def agent_usd(c, r):
     if r['id'] in RECOVERED: return RECOVERED[r['id']]
     u = claude(r)
@@ -234,7 +274,7 @@ for c, r, events in pulled:
     start, end = (ts(r[k]) if r.get(k) else None for k in ('started_at', 'finished_at'))
     usage = (r.get('model_usage') or {}).get('keys', [])
     agent = agent_usd(c, r)   # Claude Code reports its own usage
-    usd = sum(k.get('estimated_cost_usd') or 0 for k in usage) or agent or sum(k.get('total_tokens') or 0 for k in usage) * (CACHE[c] or 0) / 1e6
+    usd = RUN_COST.get(r['id']) or sum(k.get('estimated_cost_usd') or 0 for k in usage) or agent or sum(k.get('total_tokens') or 0 for k in usage) * (CACHE[c] or 0) / 1e6
     units = lambda x: x * 1e6
     priv = (r.get('metrics') or {}).get('private') or {}
     fb = {'reference_score': REFERENCE.get(r['id'], priv.get('reference_score')), 'checks': [{'label': k} for k in (priv.get('beat_spec_progress') or {})]}
@@ -253,6 +293,6 @@ for c, r, events in pulled:
         db.execute('insert into submissions values (?,?,?,?,?)', (r['id'], 'final', 'final', 'final:' + r['id'], n))
         db.execute('insert into score_points values (?,?,?,?,null)', (r['id'], 'final', SCORE.get(r['id'], r['score']), units(usd)))
 for n, (t, name) in enumerate(sorted(tasks.items(), key=lambda kv: kv[1])): db.execute('insert into tasks values (?,?,?)', (t, name, n))
-assert used == set(TRAIN), f'{len(set(TRAIN) - used)} rescored development scores met no verification'
+assert ONLY or used == set(TRAIN), f'{len(set(TRAIN) - used)} rescored development scores met no verification'
 db.commit()
 for c, v in items.items(): print(f"{c}: {sum(map(done, v))} scored of {len(v)} (evaluation {evs[c]['id']})")
