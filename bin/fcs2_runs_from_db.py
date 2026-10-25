@@ -185,8 +185,8 @@ MODEL = {
     'pi · Gemini 4': ('gemini', 'Gemini 4 Argon', 'Gemini 4 Argon', 'Pi', 'Google'),   # on the Pi agent harness (Qiuyang, 2026-10-16); shown as Gemini 4 Argon (owner, 2026-10-16)
     # gemini-4-argon (thinking level high) on Google's Antigravity CLI (agy); formal evaluation eval_01M5RHJYJ0Z12JB8D3R4YCG9M2 (42
     # tasks) plus the six CPU tasks of eval_01M5R40BHHJHRTSNBV7FB6P6JV (Qiuyang, 2026-10-25). A model of its own on the site,
-    # next to Gemini 4 Argon on Pi.
-    'Antigravity CLI agy (gemini-4-argon)': ('gemini-agy', 'Gemini 4 Argon (agy)', 'Gemini 4 Argon (agy)', 'Antigravity CLI', 'Google'),
+    # next to Gemini 4 Argon on Pi; shown as Gemini 4 Argon on Antigravity (owner, 2026-10-25: "agy肯定是antigravity").
+    'Antigravity CLI agy (gemini-4-argon)': ('gemini-agy', 'Gemini 4 Argon', 'Gemini 4 Argon', 'Antigravity', 'Google'),
     'Step Code - Step 5 Preview': ('step', 'Step 5 Preview', 'Step 5 Preview', 'Step Code', 'StepFun'),   # on StepFun's Step Code agent (Qiuyang, 2026-10-17)
 }
 
