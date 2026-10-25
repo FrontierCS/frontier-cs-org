@@ -289,9 +289,12 @@ for c, r, events in pulled:
         db.execute('insert into submissions values (?,?,?,?,?)', (r['id'], p['verification_id'], 'train', p['payload_id'], n)); n += 1
         if p['verification_id'] in TRAIN: used.add(p['verification_id'])
         db.execute('insert into score_points values (?,?,?,?,null)', (r['id'], p['verification_id'], TRAIN.get(p['verification_id'], p.get('raw_score') or 0), units(usd * frac)))
-    if r['score'] is not None and usd:
+    # The run's whole spend sits on its end point. A run with no final score has none, so its spend shows only up to its
+    # last development submission, except a run billed through --run-cost: it keeps its whole spend, scoring 0 (Qiuyang,
+    # 2026-10-25, for DeepSeek V4.1 Flash 1017 only; the other models' runs stay as they are).
+    if (r['score'] is not None or r['id'] in RUN_COST) and usd:
         db.execute('insert into submissions values (?,?,?,?,?)', (r['id'], 'final', 'final', 'final:' + r['id'], n))
-        db.execute('insert into score_points values (?,?,?,?,null)', (r['id'], 'final', SCORE.get(r['id'], r['score']), units(usd)))
+        db.execute('insert into score_points values (?,?,?,?,null)', (r['id'], 'final', SCORE.get(r['id'], 0.0 if r['score'] is None else r['score']), units(usd)))
 for n, (t, name) in enumerate(sorted(tasks.items(), key=lambda kv: kv[1])): db.execute('insert into tasks values (?,?,?)', (t, name, n))
 assert ONLY or used == set(TRAIN), f'{len(set(TRAIN) - used)} rescored development scores met no verification'
 db.commit()
