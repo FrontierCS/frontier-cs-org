@@ -446,12 +446,13 @@ function drawTable() {
    the section's domain filter and search pick, in its order, hardest first to begin with (Qiuyang); one column per model in FCI order. A cell
    holds one square per metric the task checks: dark when the run's final submission beat the human reference on every hidden
    workload, grey when it did not, so a run passes when all its squares are dark. The counts are PASSBY's (fcs2-checks.js),
-   summed per metric as the converter sums them. A run that failed or was refused (STATE) takes that colour on all its squares;
+   summed per metric as the converter sums them. A run that failed or was refused (STATE) takes that colour on all its squares,
+   and its tooltip says why where the evaluation recorded it (STATE_WHY, e.g. out of memory);
    a run that timed out shows its metrics like any other (Qiuyang: no timeout state). A task's squares keep one order in every column, the metric the most runs beat first. */
 const KSTATE = {failed:['fa', 'Run failed', 'The run failed'],
   refused:['rf', 'Refused by the model provider', 'The model provider refused the task: left out of FCI and FDI'], unscored:['un', 'Not scored yet', 'Not scored yet']};
 function drawKebab(ts) {
-  const st = typeof STATE === 'undefined' ? {} : STATE, used = new Set();
+  const st = typeof STATE === 'undefined' ? {} : STATE, why = typeof STATE_WHY === 'undefined' ? {} : STATE_WHY, used = new Set();
   const tasks = ts.filter(t => RAN.has(t));
   const cells = [];
   const body = tasks.map(t => {
@@ -471,7 +472,8 @@ function drawKebab(ts) {
       const k = stems.filter(j => won(m.id, j)).length, n = stems.length;
       let html = `<b>${esc(m.name)}</b><br>${esc(NAME(t))}<br>`;
       // a failed run shows the platform's final score, 0 for most but not all (Qiuyang, 2026-10-16)
-      if (s) { used.add(s); html += KSTATE[s][2] + (s === 'failed' && run ? `<br>Final score ${f1(run.s)}` : ''); }
+      if (s) { const w = (why[t] || {})[m.id]; used.add(s);
+        html += KSTATE[s][2] + (w ? `<br>${esc(w)}` : '') + (s === 'failed' && run ? `<br>Final score ${f1(run.s)}` : ''); }
       else html += (k === n ? `<b>Passes</b>: beats ${n === 1 ? 'its one metric' : `all ${n} metrics`}` : `Beats ${k} of ${n} metric${n === 1 ? '' : 's'}`)
         + `<br>Final score ${f1(run.s)}${REF[t] != null ? `, human reference ${f1(REF[t])}` : ''}`;
       cells.push(html);
