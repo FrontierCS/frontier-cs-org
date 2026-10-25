@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """Per run and metric, on how many hidden workloads the final submission beat the authors' code: assets/js/fcs2-checks.js.
 
-usage: python3 bin/fcs2_checks_from_platform.py platform.db [--api=http://127.0.0.1:18080/api/v1/]
+usage: python3 bin/fcs2_checks_from_platform.py platform.db [--api=http://127.0.0.1:18080/api/v1/] [--only='candidate name']
+
+--only fetches one candidate's runs and keeps every other entry of the current files, for a platform that does not hold
+the other candidates' runs (see --only in bin/fcs2_db_from_platform.py).
 
 Read-only on the platform API. The runs are the ones in the database bin/fcs2_db_from_platform.py built, so the counts
 belong to the same runs as the site's scores; names go through the TASK and MODEL maps of bin/fcs2_runs_from_db.py. The
@@ -17,6 +20,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 API = next((a.split('=', 1)[1] for a in sys.argv[2:] if a.startswith('--api=')), 'http://127.0.0.1:18080/api/v1/')
+ONLY = next((a.split('=', 1)[1] for a in sys.argv[2:] if a.startswith('--only=')), None)
 src = ast.parse((ROOT / 'bin' / 'fcs2_runs_from_db.py').read_text())
 lit = {}
 for n in src.body:   # the first, literal assignment of each (MODEL is narrowed later in that script)
@@ -62,8 +66,14 @@ def one(cell):
 if __name__ == '__main__':
     db = sqlite3.connect(sys.argv[1])
     cells = db.execute('select ce.run_id, c.name, t.name from cells ce join candidates c on c.id = ce.candidate_id join tasks t on t.id = ce.task_id').fetchall()
-    with ThreadPoolExecutor(8) as ex: got = [g for g in ex.map(one, cells) if g]
     out = {}
+    if ONLY:   # the current entries, the shown ones then the hidden ones, in their order; this candidate's are replaced
+        import re
+        shown = json.loads(re.search(r'^const PASSBY = (.*);$', PATH.read_text(), re.M).group(1))
+        for part in (shown, json.loads(HIDDEN_PATH.read_text())['passby']):
+            for t, by in part.items(): out.setdefault(t, {}).update({m: v for m, v in by.items() if m != MODEL[ONLY][0]})
+        cells = [c for c in cells if c[1] == ONLY]
+    with ThreadPoolExecutor(8) as ex: got = [g for g in ex.map(one, cells) if g]
     for task, mid, prog in got:
         if prog: out.setdefault(task, {})[mid] = prog
     write(out)

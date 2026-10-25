@@ -42,16 +42,17 @@
      Kimi and GLM took Google red and pink to stay apart from the other blues.
      Both Meta models take Meta's blue (owner, 2026-10-16; before, Muse Spark 1.3 took a teal).
      Gemini 4 Argon takes Google's green, #34A853 (Qiuyang, 2026-10-16). Step 5 Preview takes StepFun's AA colour, #00F5E7
-     (Qiuyang, 2026-10-17). */
-  --m-astra: #1f1f1f; --m-sol: #1f1f1f; --m-k3: #047afe; --m-muse: #0089f4; --m-qwen: #ff7018; --m-ds: #2243e6; --m-glm: #1c7ff8; --m-opus: #cc785c; --m-wonder: #0089f4; --m-glmf: #1c7ff8; --m-gemini: #34a853; --m-step: #00f5e7;
+     (Qiuyang, 2026-10-17). DeepSeek V4.1 Flash 1017 takes DeepSeek's colour, as DeepSeek V4.1 Flash does (2026-10-25). */
+  --m-astra: #1f1f1f; --m-sol: #1f1f1f; --m-k3: #047afe; --m-muse: #0089f4; --m-qwen: #ff7018; --m-ds: #2243e6; --m-glm: #1c7ff8; --m-opus: #cc785c; --m-wonder: #0089f4; --m-glmf: #1c7ff8; --m-gemini: #34a853; --m-step: #00f5e7; --m-ds1017: #2243e6;
   --fail: #bdc1c6;
   --sans: 'Hanken Grotesk', 'Helvetica Neue', Arial, sans-serif;
 }
 /* On a task's page every model takes its own shade, its lab's hue give or take 14 degrees, every pair at least 15.1 apart
    in CIEDE2000: a task's chart crowds the dots, and models sharing their lab's colour could not be told apart there (27 of
    49 task charts had two same-family dots under 40 px apart). The overview keeps each lab's colour (Qiuyang and owner,
-   2026-10-16). */
-.taskpage { --m-sol: #5f6368; --m-k3: #016c98; --m-muse: #00a2cc; --m-ds: #271ae5; --m-glm: #054594; --m-wonder: #008fff; --m-glmf: #3963f9; }
+   2026-10-16). DeepSeek V4.1 Flash 1017 takes Google's purple #a142f4: DeepSeek's hue plus 13 degrees, 16.0 from the nearest
+   colour here (GLM 5.3 Flash's), and 4.6:1 on white (2026-10-25). */
+.taskpage { --m-sol: #5f6368; --m-k3: #016c98; --m-muse: #00a2cc; --m-ds: #271ae5; --m-glm: #054594; --m-wonder: #008fff; --m-glmf: #3963f9; --m-ds1017: #a142f4; }
 
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; overflow-x: clip; }
