@@ -46,12 +46,11 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
        Progent, Claude Code logged model_refusal_fallback to claude-opus-4-8 for the rest of the session (in LWE Opus 5.5 was
        refused once and went on as Opus 5.5, so LWE is not listed). Gemini 4 Argon in Antigravity (HF gemini-agy): a refused
        request is retried (17 refusals in 6 runs); Structured LWE was refused 6 times in a minute and ended on "Retries
-       remaining: 0"; in CREST the 5 refused compaction summaries were kept cut short; 7 sessions ended 22 to 54 min after the
-       agent said it was waiting for a background task, with no further model call -->
+       remaining: 0"; in CREST the 5 refused compaction summaries were kept cut short -->
   <details class="fold note" id="refusals">
     <summary>Refusals and harness faults</summary>
     <p>Gemini 4 Argon (Pi): in 10 of its 48 runs, the content filter of the model provider refused a request and Pi ended the run.</p>
-    <p>Gemini 4 Argon (Antigravity): refused requests are retried. In Structured LWE the retries ran out and the run ended, and in CREST refused context summaries were kept cut short. In 7 runs the session ended while the agent waited for a background task.</p>
+    <p>Gemini 4 Argon (Antigravity): refused requests are retried. In Structured LWE the retries ran out and the run ended, and in CREST refused context summaries were kept cut short.</p>
     <p>Claude Opus 5.5 (Claude Code): in Progent, a refusal switched the rest of the run to Claude Opus 4.8.</p>
   </details>
   <figure class="chart" style="margin:56px 0 0">   <!-- the gap of the blocks around it, so it does not run into the bars' footer (owner, 2026-10-16) -->
