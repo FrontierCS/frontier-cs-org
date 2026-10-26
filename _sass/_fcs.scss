@@ -1807,6 +1807,13 @@ section.journal.team-sec.team-top { padding-top: clamp(56px, 6vw, 72px); }
 .fold summary::after{content:""; flex:none; width:14px; height:14px; background:linear-gradient(currentColor,currentColor) center/14px 1.6px no-repeat, linear-gradient(currentColor,currentColor) center/1.6px 14px no-repeat; transition:background-size .2s}
 .fold[open] summary::after{background-size:14px 1.6px, 1.6px 0}
 .fold[open] summary{margin-bottom:14px}
+/* a note under a chart: the fold in the chart foot's small grey type, with a smaller plus (owner, 2026-10-26) */
+.fold.note{margin-top:10px; font-size:13px; color:var(--muted-2)}
+.fold.note summary{gap:6px}
+.fold.note summary::after{width:9px; height:9px; background-size:9px 1.3px, 1.3px 9px}
+.fold.note[open] summary::after{background-size:9px 1.3px, 1.3px 0}
+.fold.note[open] summary{margin-bottom:6px}
+.fold.note p{margin:0; line-height:1.5}
 /* the list scrolls in its own box with a scroll bar of the page's own (owner, 2026-10-14: the browser's bar looked
    undesigned): a 2 px grey rail the height of the list and a rounded thumb on it, grey 500, grey 800 and wider on hover or
    while dragged; a click on the rail jumps there. The foot fades until the last row. Hidden when the list fits. */

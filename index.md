@@ -41,6 +41,12 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
     <div class="plot" id="fcibplot"><svg id="fcibsvg" role="img" aria-label="Pass rate (beat reference) by model"></svg><div class="tip" id="fcibtip" hidden></div></div>
     <div class="cfoot">{% include chart_logo.html %}</div>   <!-- the bars keep their FrontierCS row (owner, 2026-10-16, on #89) -->
   </figure>
+  <!-- a short folded note in small type under the bars (owner, 2026-10-26): in 10 Gemini 4 Argon runs in Pi the provider
+       refused a request (finish_reason content_filter) and Pi, which does not retry, ended the run -->
+  <details class="fold note" id="argon-refusals">
+    <summary>Gemini 4 Argon (Pi): provider refusals in 10 tasks</summary>
+    <p>In 10 of its 48 runs, the content filter of the model provider refused a request and Pi ended the run.</p>
+  </details>
   <figure class="chart" style="margin:56px 0 0">   <!-- the gap of the blocks around it, so it does not run into the bars' footer (owner, 2026-10-16) -->
     <div class="chead"><span>Pass rate (beat reference)</span></div>
     <div class="plot" id="pcplot"><svg id="pcsvg" role="img" aria-label="Pass rate (beat reference) against cost per run"></svg><div class="tip" id="pctip" hidden></div></div>
