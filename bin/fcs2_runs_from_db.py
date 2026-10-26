@@ -183,6 +183,10 @@ MODEL = {
     'Qwen Code CLI · Qwen 3.8 Max': ('qwen', 'Qwen 3.8 Max', 'Qwen 3.8 Max', 'Qwen Code', 'Qwen'),   # re-run on Qwen Code (Qiuyang, 2026-10-14)
     'GLM 5.3 Flash (ZCode)': ('glmf', 'GLM 5.3 Flash', 'GLM 5.3 Flash', 'ZCode', 'Z.ai'),
     'pi · Gemini 4': ('gemini', 'Gemini 4 Argon', 'Gemini 4 Argon', 'Pi', 'Google'),   # on the Pi agent harness (Qiuyang, 2026-10-16); shown as Gemini 4 Argon (owner, 2026-10-16)
+    # gemini-4-argon (thinking level high) on Google's Antigravity CLI (agy); formal evaluation eval_01M5RHJYJ0Z12JB8D3R4YCG9M2 (42
+    # tasks) plus the six CPU tasks of eval_01M5R40BHHJHRTSNBV7FB6P6JV (Qiuyang, 2026-10-25). A model of its own on the site,
+    # next to Gemini 4 Argon on Pi; shown as Gemini 4 Argon on Antigravity (owner, 2026-10-25: "agy肯定是antigravity").
+    'Antigravity CLI agy (gemini-4-argon)': ('gemini-agy', 'Gemini 4 Argon', 'Gemini 4 Argon', 'Antigravity', 'Google'),
     'Step Code - Step 5 Preview': ('step', 'Step 5 Preview', 'Step 5 Preview', 'Step Code', 'StepFun'),   # on StepFun's Step Code agent (Qiuyang, 2026-10-17)
 }
 
@@ -734,14 +738,17 @@ def run_states(db):
     overview's kebab, which shows it in place of the run's metrics: 'failed' from the run's state (it scores 0), 'refused'
     where the model's provider refused the task (left out of the fits), 'unscored' for a run not yet scored. A run that timed
     out shows its metrics like any other (Qiuyang, 2026-10-16: no timeout state). A run that completed with a score but no
-    verdict, so no metrics either (Step 5 Preview's Egg run, scored 0), is 'failed' too: the site counts it a fail with 0."""
-    out = defaultdict(dict)
+    verdict, so no metrics either (Step 5 Preview's Egg run, scored 0), is 'failed' too: the site counts it a fail with 0.
+    Also, in the same shape, why such a run ended so, where bin/fcs2_db_from_platform.py recorded it (feedback_json.why, its
+    WHY table), for the kebab's tooltip."""
+    out, why = defaultdict(dict), defaultdict(dict)
     for c, t, st, s, v, fj in db.execute('''select c.name, t.name, r.state, r.display_score, r.display_verdict, r.feedback_json from cells ce
       join runs r on r.id = ce.run_id join candidates c on c.id = ce.candidate_id join tasks t on t.id = ce.task_id'''):
         if c in HIDDEN: continue
         k = 'refused' if refused(fj) else 'unscored' if s is None else 'failed' if st == 'FAILED' or (st == 'COMPLETED' and v is None) else None
         if k: out[TASK[t][1] or t.split(' — ')[0]][MODEL[c][0]] = k
-    return dict(sorted(out.items()))
+        if k and fj and json.loads(fj).get('why'): why[TASK[t][1] or t.split(' — ')[0]][MODEL[c][0]] = json.loads(fj)['why']
+    return dict(sorted(out.items())), dict(sorted(why.items()))
 
 
 def descriptions():
@@ -777,7 +784,7 @@ PROG = {short(t): [round(float(on_scale(g, theta0)), DEC), round(k / PASS_UNIT, 
 SC, CO = scaling(db, MT, dfit, theta0), cost(db)
 REF = task_reference(db)
 CHECKS = task_checks(db)
-STATE = run_states(db)
+STATE, STATE_WHY = run_states(db)
 eci_js = {MODEL[c][0]: list(E[c]) for c in MODEL if c not in HIDDEN}
 zero = MODEL[PASS_ZERO][1]
 # no task or model may drop out of the fits in an update, but for the domains held off them (OFF_FIT_DOMAINS)
@@ -809,6 +816,7 @@ block = (f'// One entry per scored run in the preview results database of {when:
          f"// The FCI and FDI model's shared parameters, by Laplace marginal likelihood over all tasks: sigma_u, the sd of a run's effect on its metrics and its margin; a, the margin's slope per logit of strength; delta and tau, the mean and sd of a metric's difficulty above the task's beat-the-human level (sigma_u, delta and tau in FCI points); s_e, the margin's sd in units of the score spread; c, the smallest spread unit, in score points.\nconst DIFF_FIT = {json.dumps(DIFF_FIT)};\n"
          f"// Per task: the metrics its judge checks and the number of hidden final workloads; a run passes only when every check passes on every final workload.\nconst CHECKS = {json.dumps(CHECKS, ensure_ascii=False, separators=(',', ':'))};\n"
          f"// Per task and model, how a run ended when it was not an ordinary evaluation: failed (it scores 0), refused (the model's provider refused the task; left out of FCI and FDI), unscored (not yet scored).\nconst STATE = {json.dumps(STATE, ensure_ascii=False, separators=(',', ':'))};\n"
+         f"// Per task and model, why a run in STATE ended so, where the evaluation recorded it (the kebab's tooltip).\nconst STATE_WHY = {json.dumps(STATE_WHY, ensure_ascii=False, separators=(',', ':'))};\n"
          f"// Task descriptions from the paper repo (bin/fcs2_descriptions.tsv).\nconst DESC = {json.dumps(descriptions(), ensure_ascii=False)};\n")
 js = open(js_path, encoding='utf-8').read()   # read late: the fits above take a while
 BEGIN, END = '// BEGIN converter block (bin/fcs2_runs_from_db.py writes everything up to END)\n', '// END converter block\n'
@@ -839,7 +847,7 @@ for a in sys.argv[2:]:
                'task_difficulty_columns': ['difficulty', 'lo90', 'hi90', 'passes', 'wins', 'runs'], 'task_difficulty': DIFF,
                'difficulty_fit': DIFF_FIT, 'progress_curve_columns': ['g', 'k', 'f'], 'progress_curve': PROG, 'metric_difficulty_columns': ['difficulty', 'lo90', 'hi90', 'passes', 'group'], 'metric_difficulty': METRIC,
                'metric_groups': MGROUPS, 'group_difficulty': GROUPS,
-               'task_checks': CHECKS, 'run_state': STATE,
+               'task_checks': CHECKS, 'run_state': STATE, 'run_state_why': STATE_WHY,
                'feci_score_columns': ['eci', 'lo90', 'hi90'], 'feci_score': {MODEL[c][0]: list(S[c][:3]) for c in MODEL if c not in HIDDEN},
                'feci_score_anchors': {'reference': HUMAN_VALUE, PASS_ZERO: PASS_ZERO_VALUE}, 'feci_score_boot_kept': nboot,
                'feci_score_boot_dropped': nbad, 'feci_score_pinned_task': pinned, 'feci_score_reference_tasks': S['reference'][3],

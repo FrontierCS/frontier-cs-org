@@ -271,7 +271,10 @@ function drawScore() {
   order.forEach(r => {
     const [cx, cy] = at(r), m = MODELS.find(x => x.id === r[0]), lead = front.includes(r);
     svg.append(sv('circle', {cx, cy, r:lead ? 7.5 : 5, fill:MCOL[r[0]], stroke:'#fff', 'stroke-width':2}));
-    labelDot(svg, boxes, cx, cy, narrow ? m.short : m.name, {l:L, r:W, t:T, b:H - B}, MTXT(r[0]), lead);
+    // far, on wide screens: a name with no free spot beside its dot sits further out on a thin grey leader rather than being
+    // dropped (a crowded chart dropped Gemini 4 Argon · Antigravity on Yannakakis, CKKS and Differentiable Population
+    // Statistics); phones keep dropping such names, as leaders would crowd their narrow plot
+    labelDot(svg, boxes, cx, cy, narrow ? m.short : m.name, {l:L, r:W, t:T, b:H - B}, MTXT(r[0]), lead, false, !narrow);
     pts.push({x:cx, y:cy, mean:true, html:`<b>${esc(m.name)}</b><br>Final score <b>${f1(r[2])}</b>, ${r[3] ? 'passes' : 'does not pass'}<br>${money(r[4])}`});
   });
   attachTip(svg, W, H, pts, $('#sctip'));

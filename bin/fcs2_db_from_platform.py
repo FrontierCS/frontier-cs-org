@@ -10,7 +10,9 @@ checks that the override tables below still meet their runs then cover only that
 --run-cost=FILE: a run's US$ as its model provider billed it, which replaces every estimate below: JSON whose "rows" give
 run_id and openrouter_actual_usd (DeepSeek V4.1 Flash 1017: ~/fcs2-ops/cost/ds1017-tokens.json, the cost OpenRouter
 returned for each request, from the gateway's spend logs, plus OpenRouter's own record for the 19 requests the gateway
-logged without it; the gateway's estimate misses those, and it has no usage at all for the Progent run).
+logged without it; the gateway's estimate misses those, and it has no usage at all for the Progent run), or run_id and
+usd (Gemini 4 Argon on agy: ~/fcs2-ops/cost/gemini-agy-spend.json, the gateway's spend log summed per run, which also
+covers the four runs whose platform record has no usage). Repeatable.
 
 Takes every formal evaluation of the full task set (47 tasks or more) that is not archived and has at least --min-scored scored runs (one per model;
 the newest wins), and writes the tables the converter queries: release, candidates, tasks, cells, runs, submissions,
@@ -48,7 +50,14 @@ CACHE = {'GPT-6 Astra': 1.00, 'GPT-6.1 Sol': 0.10, 'Kimi K3 (Modal)': 0.30, 'Dee
          'Step Code - Step 5 Preview': None,     # so does its gateway (Qiuyang, 2026-10-17)
          # DeepSeek V4.1 Flash 1017 (2026-10-25): its runs' costs come from --run-cost; this is Crusoe's fp8 cache-read
          # rate, the provider OpenRouter routed 7,999 of the 8,238 requests of its campaign to (output 1.2, uncached input 0.29)
-         'DeepSeek Harness (deepseek-v4.1-flash-1017)': 0.007}
+         'DeepSeek Harness (deepseek-v4.1-flash-1017)': 0.007,
+         # Gemini 4 Argon on the Antigravity CLI (2026-10-25): its gateway reports the cost of every run, and --run-cost gives
+         # the four its platform record lacks
+         'Antigravity CLI agy (gemini-4-argon)': None}
+# A candidate whose formal run of the task set spans several evaluations, collected as one: Gemini 4 Argon on agy ran six
+# CPU tasks first in a batch of their own and the other 42 in its formal evaluation; together they are its 48 (Qiuyang,
+# 2026-10-25). The first evaluation listed is the formal one.
+EVALUATIONS = {'Antigravity CLI agy (gemini-4-argon)': ('eval_01M5RHJYJ0Z12JB8D3R4YCG9M2', 'eval_01M5R40BHHJHRTSNBV7FB6P6JV')}
 
 
 def get(path):
@@ -70,6 +79,12 @@ def evaluations():
 for e in sorted(evaluations(), key=lambda e: e['created_at']):
     if e['is_formal'] and e['total_runs'] >= 47 and not e['archived_at'] and e['candidate_name'] in CACHE and ONLY in (None, e['candidate_name']): evs[e['candidate_name']] = e
 items = {c: get('evaluations/' + e['id'])['items'] for c, e in evs.items()}
+for c, ids in EVALUATIONS.items():
+    if ONLY not in (None, c): continue
+    got = [get('evaluations/' + i) for i in ids]
+    assert got[0]['is_formal'] and not any(g['archived_at'] for g in got) and len({g['candidate_version_id'] for g in got}) == 1, f'{c}: evaluations {ids}'
+    evs[c], items[c] = got[0], [i for g in got for i in g['items']]
+    assert len({i['task_name'] for i in items[c]}) == len(items[c]), f'{c}: a task in two of {ids}'
 done = lambda i: i['score'] is not None or i['run_state'] == 'TIMED_OUT'   # a timeout is a result: it scores 0
 items = {c: v for c, v in items.items() if sum(map(done, v)) >= MIN}
 # Tasks whose runs are not collected. Off the site (Qiuyang, 2026-10-19: Security keeps only Progent and LRR): the other four
@@ -86,8 +101,17 @@ OFF_SITE = {'Argument-aware runtime privilege control',
 # (cfg-e01e1a2f6173) as every other model's does (Qiuyang, 2026-10-18); its first try there died at start-up and was rerun.
 # Claude Opus 5.5's KV Cache Compaction is its selected-final rejudge in the same evaluation (61.55, FAIL); the evaluation's item
 # points at a later attempt with no score (Qiuyang, 2026-10-20: accepted).
+# Gemini 4 Argon on agy's Robust Image Tokenizer: the agent stored a final (checkpoint-3) and the platform selected it, but
+# its final evaluation found the verifier GPU quota used up; a FINAL-only recovery evaluation judged that stored final on the
+# same task version (73.52, PASS), and it counts as the formal result (Qiuyang, 2026-10-25). ORIGIN below gives the run the
+# agent worked in.
 RERUN = {('pi · Gemini 4', 'Sparse Video Attention Policy'): 'run_01M56053RVYXEC4EZTF9RWM8RK',
-         ('Claude Code · Opus 5.5 (Subscription, max effort)', 'KV Cache Compaction'): 'run_01M5BMPCS19PVWJRAGZSF9ED8P'}
+         ('Claude Code · Opus 5.5 (Subscription, max effort)', 'KV Cache Compaction'): 'run_01M5BMPCS19PVWJRAGZSF9ED8P',
+         ('Antigravity CLI agy (gemini-4-argon)', 'Robust Image Tokenizer'): 'run_01M5SC18YDXQDSN33H4N4CR39K'}
+# A run that only judged another run's stored final (a FINAL-only recovery, on a candidate of its own that runs no agent):
+# its score, verdict, reference and checks are the cell's; its wall time, spend and development scores are the original
+# run's, given here.
+ORIGIN = {'run_01M5SC18YDXQDSN33H4N4CR39K': 'run_01M5RHJYJ7N3JMSRHSR3PBXW9C'}
 # Runs that ended with no score and that Qiuyang judged the candidate's own failure: they score 0 and fail, as a timeout does.
 # Kimi K3's vLLM run: the agent exited without a final submission, and it is not retried (Qiuyang, 2026-10-19). Kimi K3's
 # LRR run: it ended FAILED with no score and no adjudication cause (Qiuyang, 2026-10-20: "就是0").
@@ -97,9 +121,21 @@ RERUN = {('pi · Gemini 4', 'Sparse Video Attention Policy'): 'run_01M56053RVYXE
 # ended with no final; EVM State Checkpoints and Glenside, the agent filled the task's 8 GiB workspace and was evicted;
 # MuJoCo Playground, the model's own code sent SIGTERM to every process whose command line matched, the harness included.
 # Evidence per run: ~/fcs2-ops/ds1017/dispositions.json (the evaluation monitor).
+# Gemini 4 Argon on agy's KV Cache Compaction: the model answered with plain text instead of a tool call, so agy ended the
+# session after one turn with no final (eval_01M5RHJYJ0Z12JB8D3R4YCG9M2; same rule, 2026-10-25).
 ZERO = {'run_01M5A2T1WJSCR64W2ZP34T8KHV', 'run_01M5C2J5QNEPEYAWMQY3HD7MF4',
         'run_01M5QR7T4M65RY0VAYMQDN6TP2', 'run_01M5QR7T4PJ4ZR9KSZN1X28WC7', 'run_01M5QR7T4N5K0QKQSCH6PXW660',
-        'run_01M5QR7T4MKQYAT9R6AE36HH2B', 'run_01M5QR7T4P9BAF9GZ9NPSQAGM7', 'run_01M5QR7T4PE4CXY3CM4Y95WE31'}
+        'run_01M5QR7T4MKQYAT9R6AE36HH2B', 'run_01M5QR7T4P9BAF9GZ9NPSQAGM7', 'run_01M5QR7T4PE4CXY3CM4Y95WE31',
+        'run_01M5RHJYJ60FQPMFRZZ4HGZC0Q'}
+# Why a run in ZERO ended without a final, as the overview's kebab says it (from the evaluation monitor's disposition of
+# each run, ~/fcs2-ops/ds1017/dispositions.json).
+WHY = {'run_01M5QR7T4M65RY0VAYMQDN6TP2': 'Out of memory (exit 137)',            # within the task's 16 GiB limit
+       'run_01M5QR7T4PJ4ZR9KSZN1X28WC7': 'Out of memory (exit 137)',            # within the task's 8 GiB limit
+       'run_01M5QR7T4N5K0QKQSCH6PXW660': 'Malformed tool calls, no final',      # its last tool call was malformed DSML text
+       'run_01M5QR7T4MKQYAT9R6AE36HH2B': 'Workspace over 8 GiB, evicted',
+       'run_01M5QR7T4P9BAF9GZ9NPSQAGM7': 'Workspace over 8 GiB, evicted',
+       'run_01M5QR7T4PE4CXY3CM4Y95WE31': 'Killed its own harness, no final',    # its code sent SIGTERM to matching processes
+       'run_01M5RHJYJ60FQPMFRZZ4HGZC0Q': 'Ended without a final (text-only turn)'}
 # Runs the platform marks FAILED whose selected final was rejudged and accepted: they completed, so the site shows no failure
 # for them. Claude Opus 5.5's KV Cache Compaction (61.55; Qiuyang, 2026-10-20: "kebab上的opus kv compaction信息是否不对").
 COMPLETED = {'run_01M5BMPCS19PVWJRAGZSF9ED8P'}
@@ -114,7 +150,9 @@ COMPLETED = {'run_01M5BMPCS19PVWJRAGZSF9ED8P'}
 # monitor). DeepSeek V4.1 Flash 1017's KV Compaction (run_01M5QR7T4N2JSP0D7T2W3MC749, 61.9873) and Progent
 # (run_01M5QR7T4QP75TZWX1A8XGFRYE, 49.3222), and their references and development scores below, by the same formulas from each
 # run's final and train evidence (2026-10-25; the formulas reproduce the 2026-10-21 values of DeepSeek V4.1 Flash's and GLM 5.3's
-# released runs to the fourth decimal); both still fail.
+# released runs to the fourth decimal); both still fail. Gemini 4 Argon on agy's Progent (run_01M5RHJYJ8CC2Y5BMAWWEHNM5A,
+# 56.2725, reference 40.033) and its two development scores, by the same formula (2026-10-25, ~/fcs2-ops/site-gemini-agy/
+# rescore.py, which reproduces DeepSeek V4.1 Flash 1017's values above exactly); it passes, as the platform judged it.
 SCORE = {'run_01M5B6757V0VMSXB5QZGAWXB6C': 56.8798, 'run_01M5970STDD1FKW0ECD8Q2XD28': 55.7482,
          'run_01M59RP96FT226RGXVGBP05MGT': 55.3904, 'run_01M5AZ52W78HS5FPKF2HZ30ZMG': 50.4422,
          'run_01M5BPM6CGT9G16Z0KKXDV1192': 49.4521, 'run_01M5B71VP4ZTTXEDZTSJRWHCF2': 48.7175,
@@ -128,7 +166,8 @@ SCORE = {'run_01M5B6757V0VMSXB5QZGAWXB6C': 56.8798, 'run_01M5970STDD1FKW0ECD8Q2X
          'run_01M5BPACVQ0VFV9S4N37Y5H4QZ': 46.9225, 'run_01M5B3Z6EHETQBZF3GSPQJJZGN': 52.2678,
          'run_01M5BMR4VSNRK7GCBTE729E9E5': 52.5936, 'run_01M5BPC4T5EBT3A9MG03Q9N88V': 0.0,
          'run_01M5BP8MTSK6ZWWNTGY2SPW5BX': 0.0, 'run_01M5BMSWSWFN9RFSZMBHQ2M7PQ': 0.0,
-         'run_01M5QR7T4N2JSP0D7T2W3MC749': 61.9873, 'run_01M5QR7T4QP75TZWX1A8XGFRYE': 49.3222}
+         'run_01M5QR7T4N2JSP0D7T2W3MC749': 61.9873, 'run_01M5QR7T4QP75TZWX1A8XGFRYE': 49.3222,
+         'run_01M5RHJYJ8CC2Y5BMAWWEHNM5A': 56.2725}
 # The human reference's score on the same scales, measured in each run (KV Compaction's frozen captures give 60.63 in every
 # run, 87.5 x its mean accuracy; Progent's reference policy is measured live, 38.9 to 41.8); the site shows the median over the
 # task's runs, as for every task. The platform reports 0 for both, its relative scale.
@@ -144,7 +183,8 @@ REFERENCE = {'run_01M5B6757V0VMSXB5QZGAWXB6C': 40.635, 'run_01M5970STDD1FKW0ECD8
              'run_01M5B3Q2GAQQA222W6DRZDP0R7': 60.6278, 'run_01M5BGMM8NF591Z8ZPT5MMF1VD': 60.6278,
              'run_01M5BPACVQ0VFV9S4N37Y5H4QZ': 60.6278, 'run_01M5B3Z6EHETQBZF3GSPQJJZGN': 60.6278,
              'run_01M5BMR4VSNRK7GCBTE729E9E5': 60.6278,
-             'run_01M5QR7T4N2JSP0D7T2W3MC749': 60.6278, 'run_01M5QR7T4QP75TZWX1A8XGFRYE': 39.5199}
+             'run_01M5QR7T4N2JSP0D7T2W3MC749': 60.6278, 'run_01M5QR7T4QP75TZWX1A8XGFRYE': 39.5199,
+             'run_01M5RHJYJ8CC2Y5BMAWWEHNM5A': 40.033}
 # Development scores that replace the platform's, by verification: KV Compaction's and Progent's train submissions,
 # rescored with the same formulas as their finals above (the evaluation monitor, 2026-10-21:
 # reports/rescore-kv-progent-train-20261021.json; Qiuyang approved the formulas). Evaluations that failed at the time had no
@@ -198,17 +238,23 @@ TRAIN = {'verification_01M59D1KBE7X37J6RAZ70V52F8': 61.1975, 'verification_01M59
          'verification_01M5R6F0HKKMRP4N7M7W8PQEQB': 57.0905, 'verification_01M5R79S65FEWJNYBK7PJR1HMM': 60.94,
          'verification_01M5R85RYE4832TXGSRP56360T': 58.024, 'verification_01M5R8XD0KW4HPHB62GEQFHCQA': 65.4983,
          'verification_01M5R9SHX74F0865K3WTB5ZYV0': 51.6925, 'verification_01M5R8YED816C29J513T3X469F': 50.36,
-         'verification_01M5RAPV2VK6JRBGG67RRMBS19': 59.4675, 'verification_01M5RBJNNK6Q6G4F4N0EZ2RAVZ': 58.3875}
+         'verification_01M5RAPV2VK6JRBGG67RRMBS19': 59.4675, 'verification_01M5RBJNNK6Q6G4F4N0EZ2RAVZ': 58.3875,
+         # Gemini 4 Argon on agy's (2026-10-25): Progent
+         'verification_01M5S0BNTSEDZ4TCBAJM7VP1BE': 58.8025, 'verification_01M5S3CRKZWWA7W44CHYK204MG': 59.365}
+# The rescored runs the platform judged PASS: the rescore changes the score only, never the verdict.
+SCORE_PASS = {'run_01M5RHJYJ8CC2Y5BMAWWEHNM5A'}
 rids = [(c, RERUN.get((c, i['task_name']), i['run_id'])) for c, v in items.items() for i in v if i.get('run_id') and i['task_name'] not in OFF_SITE]
 with ThreadPoolExecutor(16) as ex:
-    pulled = list(ex.map(lambda cr: (cr[0], get('runs/' + cr[1]), get(f'runs/{cr[1]}/events?limit=500')), rids))
-assert all(r['candidate_version_id'] == evs[c]['candidate_version_id'] for c, r, _ in pulled if r['id'] in RERUN.values()), 'a rerun of another candidate version'
+    pulled = list(ex.map(lambda cr: (cr[0], get('runs/' + cr[1]), get(f'runs/{ORIGIN.get(cr[1], cr[1])}/events?limit=500')), rids))
+    origin = dict(ex.map(lambda r: (r, get('runs/' + ORIGIN[r])), [r for _, r in rids if r in ORIGIN]))
+assert all((origin[r['id']] if r['id'] in ORIGIN else r)['candidate_version_id'] == evs[c]['candidate_version_id'] for c, r, _ in pulled if r['id'] in RERUN.values()), 'a rerun of another candidate version'
+assert all(origin[r['id']]['task_version_id'] == r['task_version_id'] for _, r, _ in pulled if r['id'] in ORIGIN), 'a recovery on another task version'
 ids = {r['id'] for _, r, _ in pulled}
 if ONLY:   # the tables' other runs belong to candidates not collected: every rescored run collected has all its development scores
     assert all(e['payload']['verification_id'] in TRAIN for _, r, ev in pulled if r['id'] in SCORE for e in ev
                if e['kind'] == 'VERIFIER_TRAIN_COMPLETED' and e['payload'].get('raw_score') is not None), 'a rescored run\'s development score is not rescored'
 else: assert set(SCORE) <= ids, 'a rescored run is no longer its formal evaluation\'s'
-assert all(r['verdict'] == 'FAIL' for _, r, _ in pulled if r['id'] in SCORE), 'a rescored run no longer fails'
+assert all(r['verdict'] == ('PASS' if r['id'] in SCORE_PASS else 'FAIL') for _, r, _ in pulled if r['id'] in SCORE), 'a rescored run\'s verdict changed'
 
 # Claude Code usage with tokens but no cost (a run without the CLI's final result): price the four token kinds at the
 # rates implied by the runs that report both, per model (least squares; the CLI's cost is linear in them).
@@ -242,7 +288,7 @@ for a in sys.argv[2:]:
 
 RUN_COST = {}
 for a in sys.argv[2:]:
-    if a.startswith('--run-cost='): RUN_COST.update({x['run_id']: x['openrouter_actual_usd'] for x in json.load(open(a[11:]))['rows'] if x.get('run_id')})
+    if a.startswith('--run-cost='): RUN_COST.update({x['run_id']: x['openrouter_actual_usd'] if 'openrouter_actual_usd' in x else x['usd'] for x in json.load(open(a[11:]))['rows'] if x.get('run_id')})
 
 
 def agent_usd(c, r):
@@ -271,14 +317,16 @@ tasks = {}
 used = set()   # TRAIN entries that met their verification
 for c, r, events in pulled:
     tasks.setdefault(r['task_id'], r['task_name'])
-    start, end = (ts(r[k]) if r.get(k) else None for k in ('started_at', 'finished_at'))
-    usage = (r.get('model_usage') or {}).get('keys', [])
-    agent = agent_usd(c, r)   # Claude Code reports its own usage
-    usd = RUN_COST.get(r['id']) or sum(k.get('estimated_cost_usd') or 0 for k in usage) or agent or sum(k.get('total_tokens') or 0 for k in usage) * (CACHE[c] or 0) / 1e6
+    o = origin.get(r['id'], r)   # the run the agent worked in: its time, spend and development scores
+    start, end = (ts(o[k]) if o.get(k) else None for k in ('started_at', 'finished_at'))
+    usage = (o.get('model_usage') or {}).get('keys', [])
+    agent = agent_usd(c, o)   # Claude Code reports its own usage
+    usd = RUN_COST.get(o['id']) or sum(k.get('estimated_cost_usd') or 0 for k in usage) or agent or sum(k.get('total_tokens') or 0 for k in usage) * (CACHE[c] or 0) / 1e6
     units = lambda x: x * 1e6
     priv = (r.get('metrics') or {}).get('private') or {}
     fb = {'reference_score': REFERENCE.get(r['id'], priv.get('reference_score')), 'checks': [{'label': k} for k in (priv.get('beat_spec_progress') or {})]}
     if (r.get('adjudication') or {}).get('cause') == 'provider_refusal_no_final': fb['refusal'] = True   # the model's provider refused and no final came
+    if r['id'] in WHY: fb['why'] = WHY[r['id']]
     zero = r['score'] is None and (r['state'] == 'TIMED_OUT' or r['id'] in ZERO)
     db.execute('insert into runs values (?,?,?,?,?,?)', (r['id'], SCORE.get(r['id'], 0.0 if zero else r['score']), 'COMPLETED' if r['id'] in COMPLETED else r['state'], 'FAIL' if zero and r['id'] in ZERO else r['verdict'], end - start if start and end else None, json.dumps(fb)))
     db.execute('insert into cells values (?,?,?)', (r['id'], c, r['task_id']))
@@ -292,10 +340,10 @@ for c, r, events in pulled:
     # The run's whole spend sits on its end point. A run with no final score has none, so its spend shows only up to its
     # last development submission, except a run billed through --run-cost: it keeps its whole spend, scoring 0 (Qiuyang,
     # 2026-10-25, for DeepSeek V4.1 Flash 1017 only; the other models' runs stay as they are).
-    if (r['score'] is not None or r['id'] in RUN_COST) and usd:
+    if (r['score'] is not None or o['id'] in RUN_COST) and usd:
         db.execute('insert into submissions values (?,?,?,?,?)', (r['id'], 'final', 'final', 'final:' + r['id'], n))
         db.execute('insert into score_points values (?,?,?,?,null)', (r['id'], 'final', SCORE.get(r['id'], 0.0 if r['score'] is None else r['score']), units(usd)))
 for n, (t, name) in enumerate(sorted(tasks.items(), key=lambda kv: kv[1])): db.execute('insert into tasks values (?,?,?)', (t, name, n))
 assert ONLY or used == set(TRAIN), f'{len(set(TRAIN) - used)} rescored development scores met no verification'
 db.commit()
-for c, v in items.items(): print(f"{c}: {sum(map(done, v))} scored of {len(v)} (evaluation {evs[c]['id']})")
+for c, v in items.items(): print(f"{c}: {sum(map(done, v))} scored of {len(v)} (evaluation {', '.join(EVALUATIONS.get(c, [evs[c]['id']]))})")

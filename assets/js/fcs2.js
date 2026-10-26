@@ -94,7 +94,7 @@ function drawPassCost() {
 }
 
 /* On phones the model column is as wide as the longest model name, so every name shows in full (owner: "DeepSeek V4.1 Flash", not cut). */
-const nameCol = svg => { svg.replaceChildren(); const w = Math.max(...MODELS.map(m => { const t = sv('text', {class:'lab', x:-999, y:-999}, m.short); svg.append(t); return t.getComputedTextLength(); })); svg.replaceChildren(); return Math.max(112, Math.ceil(w) + 12); };
+const nameCol = svg => { svg.replaceChildren(); const w = Math.max(...MODELS.map(m => { const t = sv('text', {class:'lab', x:-999, y:-999}, m.baseShort); svg.append(t); return t.getComputedTextLength(); })); svg.replaceChildren(); return Math.max(112, Math.ceil(w) + 12); };
 
 /* Pass rate as bars, first in the leaderboard (owner, 2026-10-16, after Artificial Analysis's index charts): one column per
    model, highest first, in the model's colour with rounded top corners; the pass rate as a whole number in the middle of
@@ -118,7 +118,7 @@ function drawPassBars() {
   const tile = flat ? 34 : 22, lead = fs * 1.3;
   let L = 4, B;
   if (flat) {
-    const lines = order.map(m => [wrap(m.name, fs, band0 - 8), m.h ? wrap(`(${m.h})`, fs - 1, band0 - 8) : []]);
+    const lines = order.map(m => [wrap(m.base, fs, band0 - 8), m.h ? wrap(`(${m.h})`, fs - 1, band0 - 8) : []]);
     order.forEach((m, k) => { m._nl = lines[k]; });
     B = 14 + tile + 12 + Math.max(...lines.map(([a, b]) => a.length + b.length)) * lead + 6;
   } else {
@@ -152,7 +152,7 @@ function drawPassBars() {
       svg.append(sv('text', {class:'lab', x:cx + fs * .35, y:ny, 'font-size':fs, 'text-anchor':'end', transform:`rotate(${-ang} ${cx + fs * .35} ${ny})`}, m.short));
     }
     if (an) { mark(bar, 'a-rise', i * .05); mark(vtx, 'a-fade', .5 + i * .05); }
-    pts.push({x:cx, y, box:[cx - band / 2, cx + band / 2, T, H], html:`<b>${esc(m.name)}</b>${m.h ? ` · ${esc(m.h)}` : ''}<br>Pass rate <b>${f1(e)}%</b>`});   // the whole column, bar, logo and name, shows the tooltip
+    pts.push({x:cx, y, box:[cx - band / 2, cx + band / 2, T, H], html:`<b>${esc(m.base)}</b>${m.h ? ` · ${esc(m.h)}` : ''}<br>Pass rate <b>${f1(e)}%</b>`});   // the whole column, bar, logo and name, shows the tooltip
   });
   attachTip(svg, W, H, pts, $('#fcibtip'));
 }
@@ -178,7 +178,7 @@ function drawECI() {
   order.forEach((m, i) => {
     const [e, lo, hi] = ECI[m.id], y0 = T + i * lane, yc = y0 + lane / 2;
     if (i) svg.append(sv('line', {x1:0, x2:W - R, y1:y0, y2:y0, stroke:'var(--line)', 'stroke-width':1}));
-    svg.append(sv('text', {class:'lab', x:0, y:yc + (m.h ? -3 : 4)}, narrow ? m.short : m.name));
+    svg.append(sv('text', {class:'lab', x:0, y:yc + (m.h ? -3 : 4)}, narrow ? m.baseShort : m.base));
     if (m.h) svg.append(sv('text', {x:0, y:yc + 14, 'font-size':12}, m.h));
     const bar = sv('rect', {class:'ebar', x:Math.min(X(0), X(e)), y:yc - bh / 2, width:Math.abs(X(e) - X(0)), height:bh, fill:MCOL[m.id], 'data-m':m.id});
     if (e < 0) bar.style.transformOrigin = 'right center';   // a bar below Kimi K2.7 grows leftwards from 0
@@ -345,7 +345,7 @@ function drawLB() {
   $('#lblegend').hidden = group === 'model';
   let rows;
   if (group === 'model') {
-    rows = MODELS.map(m => ({label:m.name, short:m.short, sub:m.h, items:[{m:m.id, runs:runs.filter(r => r.m === m.id)}]})).filter(r => r.items[0].runs.length);
+    rows = MODELS.map(m => ({label:m.base, short:m.baseShort, sub:m.h, items:[{m:m.id, runs:runs.filter(r => r.m === m.id)}]})).filter(r => r.items[0].runs.length);
     rows.forEach(r => r.best = mean(r.items[0].runs.map(x => x.s)));
   } else {
     // one line per task, one dot per model: the model's mean over its runs on that task
@@ -446,12 +446,13 @@ function drawTable() {
    the section's domain filter and search pick, in its order, hardest first to begin with (Qiuyang); one column per model in FCI order. A cell
    holds one square per metric the task checks: dark when the run's final submission beat the human reference on every hidden
    workload, grey when it did not, so a run passes when all its squares are dark. The counts are PASSBY's (fcs2-checks.js),
-   summed per metric as the converter sums them. A run that failed or was refused (STATE) takes that colour on all its squares;
+   summed per metric as the converter sums them. A run that failed or was refused (STATE) takes that colour on all its squares,
+   and its tooltip says why where the evaluation recorded it (STATE_WHY, e.g. out of memory);
    a run that timed out shows its metrics like any other (Qiuyang: no timeout state). A task's squares keep one order in every column, the metric the most runs beat first. */
 const KSTATE = {failed:['fa', 'Run failed', 'The run failed'],
   refused:['rf', 'Refused by the model provider', 'The model provider refused the task: left out of FCI and FDI'], unscored:['un', 'Not scored yet', 'Not scored yet']};
 function drawKebab(ts) {
-  const st = typeof STATE === 'undefined' ? {} : STATE, used = new Set();
+  const st = typeof STATE === 'undefined' ? {} : STATE, why = typeof STATE_WHY === 'undefined' ? {} : STATE_WHY, used = new Set();
   const tasks = ts.filter(t => RAN.has(t));
   const cells = [];
   const body = tasks.map(t => {
@@ -471,7 +472,8 @@ function drawKebab(ts) {
       const k = stems.filter(j => won(m.id, j)).length, n = stems.length;
       let html = `<b>${esc(m.name)}</b><br>${esc(NAME(t))}<br>`;
       // a failed run shows the platform's final score, 0 for most but not all (Qiuyang, 2026-10-16)
-      if (s) { used.add(s); html += KSTATE[s][2] + (s === 'failed' && run ? `<br>Final score ${f1(run.s)}` : ''); }
+      if (s) { const w = (why[t] || {})[m.id]; used.add(s);
+        html += KSTATE[s][2] + (w ? `<br>${esc(w)}` : '') + (s === 'failed' && run ? `<br>Final score ${f1(run.s)}` : ''); }
       else html += (k === n ? `<b>Passes</b>: beats ${n === 1 ? 'its one metric' : `all ${n} metrics`}` : `Beats ${k} of ${n} metric${n === 1 ? '' : 's'}`)
         + `<br>Final score ${f1(run.s)}${REF[t] != null ? `, human reference ${f1(REF[t])}` : ''}`;
       cells.push(html);

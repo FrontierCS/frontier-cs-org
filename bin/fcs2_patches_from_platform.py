@@ -3,6 +3,7 @@
 
 usage: python3 bin/fcs2_patches_from_platform.py [out_dir] [--api=http://127.0.0.1:18080/api/v1/] [--models=opus,astra|all]
        python3 bin/fcs2_patches_from_platform.py --export=DIR --out=FILE
+       python3 bin/fcs2_patches_from_platform.py --release=DIR [out_dir] [--models=opus] [--tasks=slug,...]
 
 Read-only on the platform API. The evaluations are the ones bin/fcs2_db_from_platform.py takes (formal, 47 runs or more,
 not archived, latest per model), named through the TASK and MODEL maps of bin/fcs2_runs_from_db.py. For each run the patch
@@ -14,6 +15,11 @@ earlier versions, so the site shows one model's patches until the runs settle; -
 --export=DIR reads one run's final submission that Codex exported from the platform instead (Qiuyang, 2026-10-17: patches
 go through Codex): DIR/solution.patch, DIR/run-before.json and DIR/default-submission.json. It writes FILE in the same
 format, one run, for a page outside the task pages (a case study).
+--release=DIR takes the patches from the public release (the Hugging Face dataset FrontierCS2/FrontierCS-2-runs) instead,
+for runs no platform holds any more (since 2026-10-24): DIR/metadata/formal-results.json and DIR/patches/<task>/<model>.patch;
+each patch is checked against the run table's patch_sha256. --tasks= limits it to some release task slugs. Added
+2026-10-26 for the three tasks whose Opus patches were never exported (KV Compaction, LRR, Progent); it reproduces the
+existing CREST file's patch byte for byte.
 """
 import ast, io, json, pathlib, re, subprocess, sys, tarfile, urllib.request
 from concurrent.futures import ThreadPoolExecutor
@@ -88,6 +94,28 @@ if EXPORT:
     out.write_text(json.dumps({'task': key, 'generated_at': datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%MZ'), 'runs': {mid: rec}},
                               ensure_ascii=False, separators=(',', ':')))
     print(f"{out}: {key}, {mid}, {len(rec['files'])} files, +{rec['add']} -{rec['del']}, {rec['bytes']} bytes")
+    sys.exit()
+
+RELEASE = next((a.split('=', 1)[1] for a in sys.argv[1:] if a.startswith('--release=')), None)
+if RELEASE:
+    import hashlib
+    rel = pathlib.Path(RELEASE); res = json.loads((rel / 'metadata' / 'formal-results.json').read_text())
+    only = set(next((a.split('=', 1)[1] for a in sys.argv[1:] if a.startswith('--tasks=')), '').split(',')) - {''}
+    key_of = {}   # release task slug -> the converter's short name, by the run's candidate-independent task name
+    for t in res['tasks']:
+        alias = {'vllm_llm_serving_optimization': 'Continuum', 'progent_privilege_control': 'Progent', 'fast_kv_compaction': 'KV Compaction', 'lrr': 'LRR'}
+        key_of[t['task']] = t['site_task_name'] or alias[t['task']]
+    stamp = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%MZ'); by = {}
+    for r in res['runs']:
+        if r['model_id'] not in WANT.split(',') and WANT != 'all' or (only and r['task'] not in only) or not r.get('patch_path'): continue
+        raw = (rel / r['patch_path']).read_bytes()
+        assert 'sha256:' + hashlib.sha256(raw).hexdigest() == r['patch_sha256'], f"{r['patch_path']}: sha256 differs from the run table"
+        rec = record({'run': r['run_id'], 'verdict': r.get('verdict'), 'score': r.get('score')}, 'Final submission', raw.decode('utf-8', 'replace'))
+        by.setdefault(key_of[r['task']], {})[r['model_id']] = rec
+    OUT.mkdir(parents=True, exist_ok=True)
+    for key, runs in by.items():
+        (OUT / f'{slug(key)}.json').write_text(json.dumps({'task': key, 'generated_at': stamp, 'runs': runs}, ensure_ascii=False, separators=(',', ':')))
+        print(f'{OUT / (slug(key) + ".json")}: {", ".join(runs)}')
     sys.exit()
 
 evs = {}
