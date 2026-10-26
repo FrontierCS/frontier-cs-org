@@ -29,6 +29,7 @@ Guidance for Claude Code when working in this repository. `README.md` describes 
 The FrontierCS 2 overview (`index.md`) sets the design; match it everywhere.
 
 - Type is Hanken Grotesk; colours are Google Material tones. A model's colour is its `--m-<id>` in `_sass/_fcs.scss`, nothing else.
+- Every model takes its lab's brand colour, and models of one lab share it (owner, 2026-10-26). Never invent another shade or a second colour to tell two models or two harnesses apart; their names tell them apart.
 - Links are underlined text or pills. Never use arrow characters (← → ‹ › ↗) as links or separators; breadcrumbs use "/".
 - Draw checkboxes, radios and menus in Material 3 style; never leave the browser's default. The task filter's checkboxes and the mean-score settings' radios share one look.
 - The same kind of element looks the same on every page.
