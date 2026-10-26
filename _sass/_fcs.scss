@@ -1814,6 +1814,7 @@ section.journal.team-sec.team-top { padding-top: clamp(56px, 6vw, 72px); }
 .fold.note[open] summary::after{background-size:9px 1.3px, 1.3px 0}
 .fold.note[open] summary{margin-bottom:6px}
 .fold.note p{margin:0; line-height:1.5}
+.fold.note p + p{margin-top:4px}
 /* the list scrolls in its own box with a scroll bar of the page's own (owner, 2026-10-14: the browser's bar looked
    undesigned): a 2 px grey rail the height of the list and a rounded thumb on it, grey 500, grey 800 and wider on hover or
    while dragged; a click on the rail jumps there. The foot fades until the last row. Hidden when the list fits. */
