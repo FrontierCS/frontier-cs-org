@@ -94,7 +94,7 @@ function drawPassCost() {
 }
 
 /* On phones the model column is as wide as the longest model name, so every name shows in full (owner: "DeepSeek V4.1 Flash", not cut). */
-const nameCol = svg => { svg.replaceChildren(); const w = Math.max(...MODELS.map(m => { const t = sv('text', {class:'lab', x:-999, y:-999}, m.short); svg.append(t); return t.getComputedTextLength(); })); svg.replaceChildren(); return Math.max(112, Math.ceil(w) + 12); };
+const nameCol = svg => { svg.replaceChildren(); const w = Math.max(...MODELS.map(m => { const t = sv('text', {class:'lab', x:-999, y:-999}, m.baseShort); svg.append(t); return t.getComputedTextLength(); })); svg.replaceChildren(); return Math.max(112, Math.ceil(w) + 12); };
 
 /* Pass rate as bars, first in the leaderboard (owner, 2026-10-16, after Artificial Analysis's index charts): one column per
    model, highest first, in the model's colour with rounded top corners; the pass rate as a whole number in the middle of
@@ -118,7 +118,7 @@ function drawPassBars() {
   const tile = flat ? 34 : 22, lead = fs * 1.3;
   let L = 4, B;
   if (flat) {
-    const lines = order.map(m => [wrap(m.name, fs, band0 - 8), m.h ? wrap(`(${m.h})`, fs - 1, band0 - 8) : []]);
+    const lines = order.map(m => [wrap(m.base, fs, band0 - 8), m.h ? wrap(`(${m.h})`, fs - 1, band0 - 8) : []]);
     order.forEach((m, k) => { m._nl = lines[k]; });
     B = 14 + tile + 12 + Math.max(...lines.map(([a, b]) => a.length + b.length)) * lead + 6;
   } else {
@@ -152,7 +152,7 @@ function drawPassBars() {
       svg.append(sv('text', {class:'lab', x:cx + fs * .35, y:ny, 'font-size':fs, 'text-anchor':'end', transform:`rotate(${-ang} ${cx + fs * .35} ${ny})`}, m.short));
     }
     if (an) { mark(bar, 'a-rise', i * .05); mark(vtx, 'a-fade', .5 + i * .05); }
-    pts.push({x:cx, y, box:[cx - band / 2, cx + band / 2, T, H], html:`<b>${esc(m.name)}</b>${m.h ? ` · ${esc(m.h)}` : ''}<br>Pass rate <b>${f1(e)}%</b>`});   // the whole column, bar, logo and name, shows the tooltip
+    pts.push({x:cx, y, box:[cx - band / 2, cx + band / 2, T, H], html:`<b>${esc(m.base)}</b>${m.h ? ` · ${esc(m.h)}` : ''}<br>Pass rate <b>${f1(e)}%</b>`});   // the whole column, bar, logo and name, shows the tooltip
   });
   attachTip(svg, W, H, pts, $('#fcibtip'));
 }
@@ -178,7 +178,7 @@ function drawECI() {
   order.forEach((m, i) => {
     const [e, lo, hi] = ECI[m.id], y0 = T + i * lane, yc = y0 + lane / 2;
     if (i) svg.append(sv('line', {x1:0, x2:W - R, y1:y0, y2:y0, stroke:'var(--line)', 'stroke-width':1}));
-    svg.append(sv('text', {class:'lab', x:0, y:yc + (m.h ? -3 : 4)}, narrow ? m.short : m.name));
+    svg.append(sv('text', {class:'lab', x:0, y:yc + (m.h ? -3 : 4)}, narrow ? m.baseShort : m.base));
     if (m.h) svg.append(sv('text', {x:0, y:yc + 14, 'font-size':12}, m.h));
     const bar = sv('rect', {class:'ebar', x:Math.min(X(0), X(e)), y:yc - bh / 2, width:Math.abs(X(e) - X(0)), height:bh, fill:MCOL[m.id], 'data-m':m.id});
     if (e < 0) bar.style.transformOrigin = 'right center';   // a bar below Kimi K2.7 grows leftwards from 0
@@ -345,7 +345,7 @@ function drawLB() {
   $('#lblegend').hidden = group === 'model';
   let rows;
   if (group === 'model') {
-    rows = MODELS.map(m => ({label:m.name, short:m.short, sub:m.h, items:[{m:m.id, runs:runs.filter(r => r.m === m.id)}]})).filter(r => r.items[0].runs.length);
+    rows = MODELS.map(m => ({label:m.base, short:m.baseShort, sub:m.h, items:[{m:m.id, runs:runs.filter(r => r.m === m.id)}]})).filter(r => r.items[0].runs.length);
     rows.forEach(r => r.best = mean(r.items[0].runs.map(x => x.s)));
   } else {
     // one line per task, one dot per model: the model's mean over its runs on that task
