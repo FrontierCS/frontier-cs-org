@@ -173,6 +173,9 @@ MODEL = {
     'GPT-6.1 Terra': ('terra', 'GPT-6.1 Terra', 'GPT-6.1 Terra', 'Codex CLI', 'OpenAI'),
     'Muse Code - Muse Spark 1.3': ('muse', 'Muse Spark 1.3', 'Muse Spark 1.3', 'Muse Code', 'Meta'),
     'Kimi K3 (Modal)': ('k3', 'Kimi K3', 'Kimi K3', 'Kimi Code', 'Kimi'),
+    # kimi-k3.1-pro, effort max, on Kimi Code 2.3.3 through Kimi's own API; formal evaluation eval_01M5WW43VC4JPD9RXBDHF86TMW
+    # (2026-10-26; owner, 2026-10-27: add it with GPT-6.1 Terra)
+    'Kimi Code (kimi-k3.1-pro)': ('k31', 'Kimi K3.1 Pro', 'Kimi K3.1 Pro', 'Kimi Code', 'Kimi'),
     'Kimi K2.7 Code': ('k27', 'Kimi K2.7', 'Kimi K2.7', 'Kimi Code', 'Kimi'),   # shown as Kimi K2.7 (owner, 2026-10-14)
     'Qwen 3.8 Max Code': ('qwen', 'Qwen 3.8 Max', 'Qwen 3.8 Max', '', 'Qwen'),   # shown without 'Code' (owner, 2026-10-09)
     'DeepSeek V4.1 Flash (DSH)': ('ds', 'DeepSeek V4.1 Flash', 'DeepSeek V4.1 Flash', 'DeepSeek Harness', 'DeepSeek'),   # DSH, DeepSeek's open-source agent harness (Qiuyang, 2026-10-14)
@@ -552,9 +555,11 @@ SCALE_BOOT, SCALE_POINTS = 100, 32
 # there and billed each at 0.29 uncached input, 1.2 output, 0.007 cache read (InferenceNet and Makora took the rest); its
 # runs' US$ are what OpenRouter billed (bin/fcs2_db_from_platform.py --run-cost), so this price only describes the model.
 # GPT-6.1 Terra is OpenAI's list price (output 5.00, cached input 0.05, uncached input 1.00); its runs' US$ are its evidence's
-# token usage at that price (--run-cost), so this price, too, only describes the model.
+# token usage at that price (--run-cost), so this price, too, only describes the model. So is Kimi K3.1 Pro's: Kimi's list price
+# (platform.kimi.ai, 2026-10-27: output 10.00, cached input 0.20, input and 5-minute cache writes 2.00).
 PRICE = {'astra': (50.00, 1.00), 'sol': (10.00, 0.10), 'k3': (15.00, 0.30), 'qwen': (6.00, 0.25),
-         'ds': (0.60, 0.003), 'glm': (4.40, 0.26), 'muse': (4.25, 0.15), 'ds1017': (1.20, 0.007), 'terra': (5.00, 0.05)}
+         'ds': (0.60, 0.003), 'glm': (4.40, 0.26), 'muse': (4.25, 0.15), 'ds1017': (1.20, 0.007), 'terra': (5.00, 0.05),
+         'k31': (10.00, 0.20)}
 
 
 def usd(m, total, output):
