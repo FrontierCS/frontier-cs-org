@@ -168,6 +168,9 @@ short = lambda t: TASK[t][1] or t.split(' — ')[0]   # database task name -> th
 MODEL = {
     'GPT-6 Astra': ('astra', 'GPT-6 Astra', 'GPT-6 Astra', 'Codex CLI', 'OpenAI'),
     'GPT-6.1 Sol': ('sol', 'GPT-6.1 Sol', 'GPT-6.1 Sol', 'Codex CLI', 'OpenAI'),
+    # gpt-6.1-terra, reasoning xhigh, on Codex 0.162.1 with GPT-6.1 Sol's formal overlay, through OpenAI's own API; formal
+    # evaluation eval_01M5WSAM2PTAH1J7WQJBM762KE (2026-10-26)
+    'GPT-6.1 Terra': ('terra', 'GPT-6.1 Terra', 'GPT-6.1 Terra', 'Codex CLI', 'OpenAI'),
     'Muse Code - Muse Spark 1.3': ('muse', 'Muse Spark 1.3', 'Muse Spark 1.3', 'Muse Code', 'Meta'),
     'Kimi K3 (Modal)': ('k3', 'Kimi K3', 'Kimi K3', 'Kimi Code', 'Kimi'),
     'Kimi K2.7 Code': ('k27', 'Kimi K2.7', 'Kimi K2.7', 'Kimi Code', 'Kimi'),   # shown as Kimi K2.7 (owner, 2026-10-14)
@@ -548,8 +551,10 @@ SCALE_BOOT, SCALE_POINTS = 100, 32
 # DeepSeek V4.1 Flash 1017 is Crusoe's fp8 rate, measured 2026-10-25: OpenRouter routed 7,999 of the 8,238 requests of its campaign
 # there and billed each at 0.29 uncached input, 1.2 output, 0.007 cache read (InferenceNet and Makora took the rest); its
 # runs' US$ are what OpenRouter billed (bin/fcs2_db_from_platform.py --run-cost), so this price only describes the model.
+# GPT-6.1 Terra is OpenAI's list price (output 5.00, cached input 0.05, uncached input 1.00); its runs' US$ are its evidence's
+# token usage at that price (--run-cost), so this price, too, only describes the model.
 PRICE = {'astra': (50.00, 1.00), 'sol': (10.00, 0.10), 'k3': (15.00, 0.30), 'qwen': (6.00, 0.25),
-         'ds': (0.60, 0.003), 'glm': (4.40, 0.26), 'muse': (4.25, 0.15), 'ds1017': (1.20, 0.007)}
+         'ds': (0.60, 0.003), 'glm': (4.40, 0.26), 'muse': (4.25, 0.15), 'ds1017': (1.20, 0.007), 'terra': (5.00, 0.05)}
 
 
 def usd(m, total, output):

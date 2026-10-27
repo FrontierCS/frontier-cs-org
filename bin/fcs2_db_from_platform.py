@@ -12,7 +12,9 @@ run_id and openrouter_actual_usd (DeepSeek V4.1 Flash 1017: ~/fcs2-ops/cost/ds10
 returned for each request, from the gateway's spend logs, plus OpenRouter's own record for the 19 requests the gateway
 logged without it; the gateway's estimate misses those, and it has no usage at all for the Progent run), or run_id and
 usd (Gemini 4 Argon on agy: ~/fcs2-ops/cost/gemini-agy-spend.json, the gateway's spend log summed per run, which also
-covers the four runs whose platform record has no usage). Repeatable.
+covers the four runs whose platform record has no usage; GPT-6.1 Terra: ~/fcs2-ops/cost/terra-tokens.json, the token usage
+of every agent request in the run's evidence at OpenAI's list price, as it was billed by OpenAI directly and has no
+gateway estimate). Repeatable.
 
 Takes every formal evaluation of the full task set (47 tasks or more) that is not archived and has at least --min-scored scored runs (one per model;
 the newest wins), and writes the tables the converter queries: release, candidates, tasks, cells, runs, submissions,
@@ -53,7 +55,10 @@ CACHE = {'GPT-6 Astra': 1.00, 'GPT-6.1 Sol': 0.10, 'Kimi K3 (Modal)': 0.30, 'Dee
          'DeepSeek Harness (deepseek-v4.1-flash-1017)': 0.007,
          # Gemini 4 Argon on the Antigravity CLI (2026-10-25): its gateway reports the cost of every run, and --run-cost gives
          # the four its platform record lacks
-         'Antigravity CLI agy (gemini-4-argon)': None}
+         'Antigravity CLI agy (gemini-4-argon)': None,
+         # GPT-6.1 Terra on Codex 0.162.1, reasoning xhigh, official OpenAI API (2026-10-26): its runs' costs come from
+         # --run-cost (OpenAI bills it directly, the platform estimates US$0); this is OpenAI's cached-input rate for it
+         'GPT-6.1 Terra': 0.05}
 # A candidate whose formal run of the task set spans several evaluations, collected as one: Gemini 4 Argon on agy ran six
 # CPU tasks first in a batch of their own and the other 42 in its formal evaluation; together they are its 48 (Qiuyang,
 # 2026-10-25). The first evaluation listed is the formal one.
@@ -153,6 +158,11 @@ COMPLETED = {'run_01M5BMPCS19PVWJRAGZSF9ED8P'}
 # released runs to the fourth decimal); both still fail. Gemini 4 Argon on agy's Progent (run_01M5RHJYJ8CC2Y5BMAWWEHNM5A,
 # 56.2725, reference 40.033) and its two development scores, by the same formula (2026-10-25, ~/fcs2-ops/site-gemini-agy/
 # rescore.py, which reproduces DeepSeek V4.1 Flash 1017's values above exactly); it passes, as the platform judged it.
+# GPT-6.1 Terra's KV Compaction (run_01M5WSAM360SH8XJMCPBXXSNEM, 50.3647, reference 60.6278, and its seven scored development
+# submissions) and Progent (run_01M5WSAM37K6GZP7FYGDJR0G47, 26.7725, reference 37.6631; its one development submission failed
+# and has no score), by the same formulas from each run's own final and train measurements (2026-10-27,
+# ~/fcs2-ops/site-terra/rescore.py; KV reads paired_workload_metrics, the task version's name for the measurements); both
+# fail, as the platform judged them.
 SCORE = {'run_01M5B6757V0VMSXB5QZGAWXB6C': 56.8798, 'run_01M5970STDD1FKW0ECD8Q2XD28': 55.7482,
          'run_01M59RP96FT226RGXVGBP05MGT': 55.3904, 'run_01M5AZ52W78HS5FPKF2HZ30ZMG': 50.4422,
          'run_01M5BPM6CGT9G16Z0KKXDV1192': 49.4521, 'run_01M5B71VP4ZTTXEDZTSJRWHCF2': 48.7175,
@@ -167,7 +177,8 @@ SCORE = {'run_01M5B6757V0VMSXB5QZGAWXB6C': 56.8798, 'run_01M5970STDD1FKW0ECD8Q2X
          'run_01M5BMR4VSNRK7GCBTE729E9E5': 52.5936, 'run_01M5BPC4T5EBT3A9MG03Q9N88V': 0.0,
          'run_01M5BP8MTSK6ZWWNTGY2SPW5BX': 0.0, 'run_01M5BMSWSWFN9RFSZMBHQ2M7PQ': 0.0,
          'run_01M5QR7T4N2JSP0D7T2W3MC749': 61.9873, 'run_01M5QR7T4QP75TZWX1A8XGFRYE': 49.3222,
-         'run_01M5RHJYJ8CC2Y5BMAWWEHNM5A': 56.2725}
+         'run_01M5RHJYJ8CC2Y5BMAWWEHNM5A': 56.2725,
+         'run_01M5WSAM360SH8XJMCPBXXSNEM': 50.3647, 'run_01M5WSAM37K6GZP7FYGDJR0G47': 26.7725}
 # The human reference's score on the same scales, measured in each run (KV Compaction's frozen captures give 60.63 in every
 # run, 87.5 x its mean accuracy; Progent's reference policy is measured live, 38.9 to 41.8); the site shows the median over the
 # task's runs, as for every task. The platform reports 0 for both, its relative scale.
@@ -184,7 +195,8 @@ REFERENCE = {'run_01M5B6757V0VMSXB5QZGAWXB6C': 40.635, 'run_01M5970STDD1FKW0ECD8
              'run_01M5BPACVQ0VFV9S4N37Y5H4QZ': 60.6278, 'run_01M5B3Z6EHETQBZF3GSPQJJZGN': 60.6278,
              'run_01M5BMR4VSNRK7GCBTE729E9E5': 60.6278,
              'run_01M5QR7T4N2JSP0D7T2W3MC749': 60.6278, 'run_01M5QR7T4QP75TZWX1A8XGFRYE': 39.5199,
-             'run_01M5RHJYJ8CC2Y5BMAWWEHNM5A': 40.033}
+             'run_01M5RHJYJ8CC2Y5BMAWWEHNM5A': 40.033,
+             'run_01M5WSAM360SH8XJMCPBXXSNEM': 60.6278, 'run_01M5WSAM37K6GZP7FYGDJR0G47': 37.6631}
 # Development scores that replace the platform's, by verification: KV Compaction's and Progent's train submissions,
 # rescored with the same formulas as their finals above (the evaluation monitor, 2026-10-21:
 # reports/rescore-kv-progent-train-20261021.json; Qiuyang approved the formulas). Evaluations that failed at the time had no
@@ -240,7 +252,12 @@ TRAIN = {'verification_01M59D1KBE7X37J6RAZ70V52F8': 61.1975, 'verification_01M59
          'verification_01M5R9SHX74F0865K3WTB5ZYV0': 51.6925, 'verification_01M5R8YED816C29J513T3X469F': 50.36,
          'verification_01M5RAPV2VK6JRBGG67RRMBS19': 59.4675, 'verification_01M5RBJNNK6Q6G4F4N0EZ2RAVZ': 58.3875,
          # Gemini 4 Argon on agy's (2026-10-25): Progent
-         'verification_01M5S0BNTSEDZ4TCBAJM7VP1BE': 58.8025, 'verification_01M5S3CRKZWWA7W44CHYK204MG': 59.365}
+         'verification_01M5S0BNTSEDZ4TCBAJM7VP1BE': 58.8025, 'verification_01M5S3CRKZWWA7W44CHYK204MG': 59.365,
+         # GPT-6.1 Terra's (2026-10-27): KV Compaction
+         'verification_01M5WSSWGGM5YKQD207C54HM47': 44.3583, 'verification_01M5WTDSQZ8W2W5NG6W6XVD76C': 42.6851,
+         'verification_01M5WV02C8C198VK23RRHTZXHD': 41.4058, 'verification_01M5WVM8YF7JKHA8D6N3CF3AJ7': 48.9485,
+         'verification_01M5WW7B79BJ5Q1XTXMXZ1AZVF': 51.0075, 'verification_01M5WWSX5VF9T01N0V21TK90D7': 52.2608,
+         'verification_01M5WXHMGBGHMQ1G0RHFTDAE05': 55.1489}
 # The rescored runs the platform judged PASS: the rescore changes the score only, never the verdict.
 SCORE_PASS = {'run_01M5RHJYJ8CC2Y5BMAWWEHNM5A'}
 rids = [(c, RERUN.get((c, i['task_name']), i['run_id'])) for c, v in items.items() for i in v if i.get('run_id') and i['task_name'] not in OFF_SITE]
