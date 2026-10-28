@@ -32,7 +32,7 @@ or, with Docker, `./bin/docker_run.sh` (http://localhost:8080). A production bui
 ## Branches and deployment
 
 - `main` is the live site. A push to `main` runs `.github/workflows/deploy.yml`, which builds the site and publishes it to the `gh-pages` branch; `CNAME` serves it at frontier-cs.org.
-- `redesign` is the working branch for the current version of the site. Open pull requests against `redesign`, one topic per pull request, with a preview and what you checked (desktop and a 390 px phone width).
+- Start each change on a new branch from `main` and open a pull request against `main`, one topic per pull request, with a preview and what you checked (desktop and a 390 px phone width).
 
 ## FrontierCS 2 data
 
