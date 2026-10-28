@@ -4,11 +4,11 @@ Guidance for coding agents (Codex and others) when working in this repository. `
 
 ## Workflow
 
-- Work on `redesign`. `main` is the live site: never push to it. Never force-push any branch.
+- Start each change on a new branch from `main`. `main` is the live site: never push to it. Never force-push any branch.
 - Fetch before every edit and before every push; collaborators push to the same branches. If the branch moved, merge it in first.
 - One change per commit. The message says what changed and why, and credits who asked for it (for example "(owner)").
-- Open pull requests against `redesign`, one topic each. The body states what changed, what you checked, and a preview link. Do not merge a pull request unless the owner asks.
-- To fix a conflicting pull request, add commits to its branch (revert what is not wanted, merge `redesign` in, resolve) and push without force.
+- Open pull requests against `main`, one topic each. The body states what changed, what you checked, and a preview link. Do not merge a pull request unless the owner asks.
+- To fix a conflicting pull request, add commits to its branch (revert what is not wanted, merge `main` in, resolve) and push without force.
 
 ## Build and check
 
@@ -35,7 +35,7 @@ The FrontierCS 2 overview (`index.md`) sets the design; match it everywhere.
 - Subtract. Do not add a second way to do the same thing, and do not add grey notes that repeat a chart title, a legend or the questions.
 - Charts follow Epoch AI's grammar: a light grid, labels on the marks, the source note and wordmark under the chart. Model names are never shortened.
 - No white halo or outline behind any text (owner, 2026-10-18). Where a label would cover a line or mark, move it or give it a thin grey leader line; never a white box.
-- The test-time scaling chart (`#scaling` in `index.md`, `drawTTS` in `assets/js/fcs2.js` and its rules in `assets/css/fcs2.css`) changes only through a pull request that Qiuyang approves; do not change it on `redesign` directly.
+- The test-time scaling chart (`#scaling` in `index.md`, `drawTTS` in `assets/js/fcs2.js` and its rules in `assets/css/fcs2.css`) changes only through a pull request that Qiuyang approves.
 - Task diagrams (`assets/img/fcs2-tasks/<slug>.svg`) use only the `fig2` classes in `assets/css/fcs2.css`: what is given on grey, the agent's part on its domain's tone, 760 wide, no frame, and no text outside its region.
 - Formulas, and the variables and symbols of a formula, are TeX in task diagrams as on the pages, never a plain or code face with Unicode sub- and superscripts (Qiuyang, 2026-10-19). Code, names and labels that are not math, and plain numbers such as a size 45 × 80, keep their face. In a diagram, write the math between `$` signs in a `<text>` line and run `bin/fcs2_fig_tex.py` on the file; it draws it as MathJax's TeX glyphs, as the pages' own formulas are.
 
