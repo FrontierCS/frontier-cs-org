@@ -184,6 +184,9 @@ MODEL = {
     'DeepSeek Harness (deepseek-v4.1-flash-1017)': ('ds1017', 'DeepSeek V4.1 Flash 1017', 'DeepSeek V4.1 Flash 1017', 'DeepSeek Harness', 'DeepSeek'),
     'GLM 5.3 (ZCode)': ('glm', 'GLM 5.3', 'GLM 5.3', 'ZCode', 'Z.ai'),
     'Claude Code · Opus 5.5 (Subscription, max effort)': ('opus', 'Claude Opus 5.5', 'Opus 5.5', 'Claude Code', 'Anthropic'),
+    # claude-fable-5-1, effort max, on Claude Code 2.1.296 (128k output cap) with a Claude subscription; formal evaluation
+    # eval_01M5VAJHMRE1PZRN6NKP0G24RZ (2026-10-25). Its runs' US$ is what Claude Code reports for itself, as Claude Opus 5.5's
+    'Claude Code · Fable 5.1 (Subscription)': ('fable', 'Claude Fable 5.1', 'Fable 5.1', 'Claude Code', 'Anthropic'),
     'Muse Code · Muse Wonder 1.0': ('wonder', 'Muse Wonder 1.0', 'Muse Wonder 1.0', 'Muse Code', 'Meta'),
     'Codex · Qwen 3.8 Max': ('qwen', 'Qwen 3.8 Max', 'Qwen 3.8 Max', 'Codex CLI', 'Qwen'),
     'Qwen Code CLI · Qwen 3.8 Max': ('qwen', 'Qwen 3.8 Max', 'Qwen 3.8 Max', 'Qwen Code', 'Qwen'),   # re-run on Qwen Code (Qiuyang, 2026-10-14)
