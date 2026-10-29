@@ -1,6 +1,6 @@
 {
  "note": "Runs of models kept off the site (HIDDEN in bin/fcs2_runs_from_db.py), in the columns of RUNS in assets/js/fcs2-data.js. Timeouts score 0; unscored runs are left out. Not shown on any page.",
- "generated_at": "2026-10-28T21:36:37.828463+00:00",
+ "generated_at": "2026-10-29T01:24:23.891798+00:00",
  "models": {
   "k27": "Kimi K2.7"
  },

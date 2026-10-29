@@ -17,7 +17,8 @@ of every agent request in the run's evidence at OpenAI's list price, as it was b
 gateway estimate; Kimi K3.1 Pro: ~/fcs2-ops/cost/k31-tokens.json, the same from its evidence at Kimi's list price;
 Claude Fable 5.1: ~/fcs2-ops/cost/fable-tokens.json, the cost Claude Code reports for itself in the result event of the
 run's evidence trace, or, for a run whose trace has no result event, the trace's token usage at the rates those reports
-imply). Repeatable.
+imply; Gemini 4 Carbon on agy: ~/fcs2-ops/cost/carbon-tokens.json, the gateway's token counts per run at Gemini 4 Argon's
+prices, as no public carbon-g price exists). Repeatable.
 
 Takes every formal evaluation of the full task set (47 tasks or more) that is not archived and has at least --min-scored scored runs (one per model;
 the newest wins), and writes the tables the converter queries: release, candidates, tasks, cells, runs, submissions,
@@ -67,7 +68,10 @@ CACHE = {'GPT-6 Astra': 1.00, 'GPT-6.1 Sol': 0.10, 'Kimi K3 (Modal)': 0.30, 'Dee
          'Kimi Code (kimi-k3.1-pro)': 0.20,
          # Claude Fable 5.1 on Claude Code 2.1.296, effort max, Claude subscription (2026-10-25): its runs' costs come from
          # --run-cost (the cost Claude Code reports for itself, from each run's evidence), as Claude Opus 5.5's from its CLI
-         'Claude Code · Fable 5.1 (Subscription)': None}
+         'Claude Code · Fable 5.1 (Subscription)': None,
+         # Gemini 4 Carbon (carbon-g) on the Antigravity CLI (2026-10-27): its runs' costs come from --run-cost, its gateway
+         # token counts at Gemini 4 Argon's prices (no public carbon-g price)
+         'Antigravity CLI agy (carbon-g)': None}
 # A candidate whose formal run of the task set spans several evaluations, collected as one: Gemini 4 Argon on agy ran six
 # CPU tasks first in a batch of their own and the other 42 in its formal evaluation; together they are its 48 (Qiuyang,
 # 2026-10-25). The first evaluation listed is the formal one.
@@ -127,18 +131,25 @@ OFF_SITE = {'Argument-aware runtime privilege control',
 # needs a whole 64-CPU node, never started (verifier_startup_timeout, the run FAILED with no score); a FINAL-only recovery
 # judged that stored final on the same task version (64.40, PASS), and it counts as the formal result (owner, 2026-10-26:
 # ~/fcs2-ops/fable51/dispositions.json).
+# Gemini 4 Carbon's Learned Transformer Layer Mapping (DyT), Robust Image Tokenizer and Future Video Sampling: the same, after
+# verifier_gpu_error on the final evaluation (70.00 PASS, 73.79 FAIL, 78.53 FAIL).
 RERUN = {('pi · Gemini 4', 'Sparse Video Attention Policy'): 'run_01M56053RVYXEC4EZTF9RWM8RK',
          ('Claude Code · Opus 5.5 (Subscription, max effort)', 'KV Cache Compaction'): 'run_01M5BMPCS19PVWJRAGZSF9ED8P',
          ('Antigravity CLI agy (gemini-4-argon)', 'Robust Image Tokenizer'): 'run_01M5SC18YDXQDSN33H4N4CR39K',
          ('Kimi Code (kimi-k3.1-pro)', 'Learned Transformer Layer Mapping'): 'run_01M5XMEAPJQ4WQMDT3P0V9WSNN',
          ('Kimi Code (kimi-k3.1-pro)', 'Localized Regex Repair'): 'run_01M5XMEF4254K0SF10T5XNER5H',
-         ('Claude Code · Fable 5.1 (Subscription)', 'Fixed-Length Clustered Sparse Multiplication'): 'run_01M5XF64559G0EM66DV9KETQX9'}
+         ('Claude Code · Fable 5.1 (Subscription)', 'Fixed-Length Clustered Sparse Multiplication'): 'run_01M5XF64559G0EM66DV9KETQX9',
+         ('Antigravity CLI agy (carbon-g)', 'Learned Transformer Layer Mapping'): 'run_01M60AP334JAY550WYY3AFV3R0',
+         ('Antigravity CLI agy (carbon-g)', 'Robust Image Tokenizer'): 'run_01M6263SD4KAQ8TT2RDH80Q77J',
+         ('Antigravity CLI agy (carbon-g)', 'Future Video Sampling'): 'run_01M6268V2F85C6C9KTA4CSG1K9'}
 # A run that only judged another run's stored final (a FINAL-only recovery, on a candidate of its own that runs no agent):
 # its score, verdict, reference and checks are the cell's; its wall time, spend and development scores are the original
 # run's, given here.
 ORIGIN = {'run_01M5SC18YDXQDSN33H4N4CR39K': 'run_01M5RHJYJ7N3JMSRHSR3PBXW9C',
           'run_01M5XMEAPJQ4WQMDT3P0V9WSNN': 'run_01M5WW43VKCX28S8T9ZZ5FZCEM', 'run_01M5XMEF4254K0SF10T5XNER5H': 'run_01M5WW43VNG86BDMKB8DWKBQWE',
-          'run_01M5XF64559G0EM66DV9KETQX9': 'run_01M5VAJHMZ2T9FX5Y34ZDJ36ET'}
+          'run_01M5XF64559G0EM66DV9KETQX9': 'run_01M5VAJHMZ2T9FX5Y34ZDJ36ET',
+          'run_01M60AP334JAY550WYY3AFV3R0': 'run_01M5ZHWA8RAXQNJCSQ1KJ5QTSW', 'run_01M6263SD4KAQ8TT2RDH80Q77J': 'run_01M61SR0CCCAQS13DD4FPWCNC8',
+          'run_01M6268V2F85C6C9KTA4CSG1K9': 'run_01M61SR0PXEE665RDGSV1JCXYR'}
 # Runs that ended with no score and that Qiuyang judged the candidate's own failure: they score 0 and fail, as a timeout does.
 # Kimi K3's vLLM run: the agent exited without a final submission, and it is not retried (Qiuyang, 2026-10-19). Kimi K3's
 # LRR run: it ended FAILED with no score and no adjudication cause (Qiuyang, 2026-10-20: "就是0").
@@ -154,11 +165,16 @@ ORIGIN = {'run_01M5SC18YDXQDSN33H4N4CR39K': 'run_01M5RHJYJ7N3JMSRHSR3PBXW9C',
 # container OOM-killed within the task's 4 GiB limit (exit 137) before any submission; Diffusion Policy, the agent installed
 # PyTorch into the task's 4 GiB workspace and was evicted (exit 143) before any submission. Evidence per run:
 # ~/fcs2-ops/fable51/dispositions.json.
+# Gemini 4 Carbon (eval_01M5ZHWA8HFDS1QY8JGVN0RKMM; same rule): KV Cache Compaction, GPU k-NN and SQL Counterexample Search, the
+# model answered with plain text instead of a tool call, so agy ended the session with no final; Parallel DBSCAN and BABBLE,
+# the agent container OOM-killed within the task's 4 GiB limit (exit 137) before any submission.
 ZERO = {'run_01M5A2T1WJSCR64W2ZP34T8KHV', 'run_01M5C2J5QNEPEYAWMQY3HD7MF4',
         'run_01M5QR7T4M65RY0VAYMQDN6TP2', 'run_01M5QR7T4PJ4ZR9KSZN1X28WC7', 'run_01M5QR7T4N5K0QKQSCH6PXW660',
         'run_01M5QR7T4MKQYAT9R6AE36HH2B', 'run_01M5QR7T4P9BAF9GZ9NPSQAGM7', 'run_01M5QR7T4PE4CXY3CM4Y95WE31',
         'run_01M5RHJYJ60FQPMFRZZ4HGZC0Q',
-        'run_01M5VAJHMZ7XW1E850Z2M0SM3K', 'run_01M5VAJHMZXCEMGN8RREPEAVCB', 'run_01M5VAJHMZSTXYEGRP3ZVF9R9K'}
+        'run_01M5VAJHMZ7XW1E850Z2M0SM3K', 'run_01M5VAJHMZXCEMGN8RREPEAVCB', 'run_01M5VAJHMZSTXYEGRP3ZVF9R9K',
+        'run_01M5ZHWA8RFVEVDEYW4XA84M49', 'run_01M61SR075GP66G99XRAMKPP0J', 'run_01M61SR1CWQ0SATBFX1EFKRZDH',
+        'run_01M61SQZJ5A7HWMZMM975PG4V8', 'run_01M61SR17DTR7FS5GE4HM2EQDJ'}
 # Why a run in ZERO ended without a final, as the overview's kebab says it (from the evaluation monitor's disposition of
 # each run, ~/fcs2-ops/ds1017/dispositions.json).
 WHY = {'run_01M5QR7T4M65RY0VAYMQDN6TP2': 'Out of memory (exit 137)',            # within the task's 16 GiB limit
@@ -170,7 +186,12 @@ WHY = {'run_01M5QR7T4M65RY0VAYMQDN6TP2': 'Out of memory (exit 137)',            
        'run_01M5RHJYJ60FQPMFRZZ4HGZC0Q': 'Ended without a final (text-only turn)',
        'run_01M5VAJHMZ7XW1E850Z2M0SM3K': 'Out of memory (exit 137)',            # within the task's 4 GiB limit
        'run_01M5VAJHMZXCEMGN8RREPEAVCB': 'Out of memory (exit 137)',            # within the task's 4 GiB limit
-       'run_01M5VAJHMZSTXYEGRP3ZVF9R9K': 'Workspace over 4 GiB, evicted'}
+       'run_01M5VAJHMZSTXYEGRP3ZVF9R9K': 'Workspace over 4 GiB, evicted',
+       'run_01M5ZHWA8RFVEVDEYW4XA84M49': 'Ended without a final (text-only turn)',
+       'run_01M61SR075GP66G99XRAMKPP0J': 'Ended without a final (text-only turn)',
+       'run_01M61SR1CWQ0SATBFX1EFKRZDH': 'Ended without a final (text-only turn)',
+       'run_01M61SQZJ5A7HWMZMM975PG4V8': 'Out of memory (exit 137)',            # within the task's 4 GiB limit
+       'run_01M61SR17DTR7FS5GE4HM2EQDJ': 'Out of memory (exit 137)'}            # within the task's 4 GiB limit
 # Runs the platform marks FAILED whose selected final was rejudged and accepted: they completed, so the site shows no failure
 # for them. Claude Opus 5.5's KV Cache Compaction (61.55; Qiuyang, 2026-10-20: "kebab上的opus kv compaction信息是否不对").
 COMPLETED = {'run_01M5BMPCS19PVWJRAGZSF9ED8P'}
@@ -198,6 +219,8 @@ COMPLETED = {'run_01M5BMPCS19PVWJRAGZSF9ED8P'}
 # Claude Fable 5.1's KV Compaction (run_01M5ZE82Z39XH8G29CKJJDSMCS, 52.1786, reference 60.6278, eight development scores) and
 # Progent (run_01M5VAJHMZYCT2SKZ0BFTRMKPZ, 56.1778, reference 41.0058, four development scores), the same way (2026-10-28,
 # ~/fcs2-ops/site-fable/rescore.py); both fail, as the platform judged them (Progent above the reference but not on every metric).
+# Gemini 4 Carbon's Progent (run_01M5ZHWA8SSY4TD8QXDXNMBVQZ, 53.365, reference 40.268, three development scores), the same way
+# (2026-10-29); it passes, as the platform judged it. Its KV Compaction has no final (ZERO above).
 SCORE = {'run_01M5B6757V0VMSXB5QZGAWXB6C': 56.8798, 'run_01M5970STDD1FKW0ECD8Q2XD28': 55.7482,
          'run_01M59RP96FT226RGXVGBP05MGT': 55.3904, 'run_01M5AZ52W78HS5FPKF2HZ30ZMG': 50.4422,
          'run_01M5BPM6CGT9G16Z0KKXDV1192': 49.4521, 'run_01M5B71VP4ZTTXEDZTSJRWHCF2': 48.7175,
@@ -215,7 +238,8 @@ SCORE = {'run_01M5B6757V0VMSXB5QZGAWXB6C': 56.8798, 'run_01M5970STDD1FKW0ECD8Q2X
          'run_01M5RHJYJ8CC2Y5BMAWWEHNM5A': 56.2725,
          'run_01M5WSAM360SH8XJMCPBXXSNEM': 50.3647, 'run_01M5WSAM37K6GZP7FYGDJR0G47': 26.7725,
          'run_01M5WW43VKTD5EPYXPDB9W5VMD': 56.7017, 'run_01M5WW43VND5W5SATXS9PDAJ6W': 45.4725,
-         'run_01M5ZE82Z39XH8G29CKJJDSMCS': 52.1786, 'run_01M5VAJHMZYCT2SKZ0BFTRMKPZ': 56.1778}
+         'run_01M5ZE82Z39XH8G29CKJJDSMCS': 52.1786, 'run_01M5VAJHMZYCT2SKZ0BFTRMKPZ': 56.1778,
+         'run_01M5ZHWA8SSY4TD8QXDXNMBVQZ': 53.365}
 # The human reference's score on the same scales, measured in each run (KV Compaction's frozen captures give 60.63 in every
 # run, 87.5 x its mean accuracy; Progent's reference policy is measured live, 38.9 to 41.8); the site shows the median over the
 # task's runs, as for every task. The platform reports 0 for both, its relative scale.
@@ -235,7 +259,8 @@ REFERENCE = {'run_01M5B6757V0VMSXB5QZGAWXB6C': 40.635, 'run_01M5970STDD1FKW0ECD8
              'run_01M5RHJYJ8CC2Y5BMAWWEHNM5A': 40.033,
              'run_01M5WSAM360SH8XJMCPBXXSNEM': 60.6278, 'run_01M5WSAM37K6GZP7FYGDJR0G47': 37.6631,
              'run_01M5WW43VKTD5EPYXPDB9W5VMD': 60.6278, 'run_01M5WW43VND5W5SATXS9PDAJ6W': 39.8199,
-             'run_01M5ZE82Z39XH8G29CKJJDSMCS': 60.6278, 'run_01M5VAJHMZYCT2SKZ0BFTRMKPZ': 41.0058}
+             'run_01M5ZE82Z39XH8G29CKJJDSMCS': 60.6278, 'run_01M5VAJHMZYCT2SKZ0BFTRMKPZ': 41.0058,
+             'run_01M5ZHWA8SSY4TD8QXDXNMBVQZ': 40.268}
 # Development scores that replace the platform's, by verification: KV Compaction's and Progent's train submissions,
 # rescored with the same formulas as their finals above (the evaluation monitor, 2026-10-21:
 # reports/rescore-kv-progent-train-20261021.json; Qiuyang approved the formulas). Evaluations that failed at the time had no
@@ -307,9 +332,12 @@ TRAIN = {'verification_01M59D1KBE7X37J6RAZ70V52F8': 61.1975, 'verification_01M59
          'verification_01M61F1QR7XKHP1TQR3PMPBTDM': 50.1886, 'verification_01M61G4BN0P0JW4TC0AX0GDVPH': 51.2325,
          'verification_01M61GW14NAZTRMA938Z4TQHAA': 50.0068, 'verification_01M61HVZSRJKTHQ8KW3Z6ZGM52': 50.7556,
          'verification_01M5XHAVNA0M5S8XV1P2JDK8RB': 58.8, 'verification_01M5XK9CNPCC49DYJGPGDNB5AW': 61.015,
-         'verification_01M5XKZFDVJV1YDJ0V7F4FHC0V': 61.3825, 'verification_01M5XN1RZMX5GFDF1SZ3KPRJG4': 59.4275}
+         'verification_01M5XKZFDVJV1YDJ0V7F4FHC0V': 61.3825, 'verification_01M5XN1RZMX5GFDF1SZ3KPRJG4': 59.4275,
+         # Gemini 4 Carbon's (2026-10-29): Progent
+         'verification_01M60F554CK8Z9C3RQWQJJC7S5': 55.1475, 'verification_01M60GRQV6SCVHEGS0E2CDERHZ': 57.6775,
+         'verification_01M60JSW4QJNT0YS78SA2G85YP': 56.83}
 # The rescored runs the platform judged PASS: the rescore changes the score only, never the verdict.
-SCORE_PASS = {'run_01M5RHJYJ8CC2Y5BMAWWEHNM5A'}
+SCORE_PASS = {'run_01M5RHJYJ8CC2Y5BMAWWEHNM5A', 'run_01M5ZHWA8SSY4TD8QXDXNMBVQZ'}
 rids = [(c, RERUN.get((c, i['task_name']), i['run_id'])) for c, v in items.items() for i in v if i.get('run_id') and i['task_name'] not in OFF_SITE]
 with ThreadPoolExecutor(16) as ex:
     pulled = list(ex.map(lambda cr: (cr[0], get('runs/' + cr[1]), get(f'runs/{ORIGIN.get(cr[1], cr[1])}/events?limit=500')), rids))
