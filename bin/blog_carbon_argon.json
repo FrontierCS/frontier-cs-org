@@ -624,9 +624,9 @@
    true
   ],
   "knn_gpu_kernel_optimization|carbon": [
-   0.0,
-   "FAIL",
-   false
+   47.16,
+   "PASS",
+   true
   ],
   "ragen_multi_turn_rl|carbon": [
    11.645833333333334,
@@ -649,9 +649,9 @@
    true
   ],
   "polygon|carbon": [
-   0.0,
+   96.57,
    "FAIL",
-   false
+   true
   ],
   "clusterwise_spgemm|carbon": [
    64.5728543939146,
@@ -714,9 +714,9 @@
    true
   ],
   "fast_kv_compaction|carbon": [
-   0.0,
+   58.74,
    "FAIL",
-   false
+   true
   ],
   "lrr|carbon": [
    30.53,

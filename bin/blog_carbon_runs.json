@@ -1,5 +1,5 @@
 {
- "note": "Figure 2 of _posts/2026-10-29-gemini-4-carbon.md: per Gemini 4 Carbon run, [site short name, verdict, hours to the end of the session, hour of the final call or null, hours of the development submissions]. From the public release (FrontierCS2/FrontierCS-2-runs) and each run trace, read with run_timeline.py of the fcs2-trace-audit skill.",
+ "note": "Figure 2 of _posts/2026-10-29-gemini-4-carbon.md: per Gemini 4 Carbon run, [site short name, verdict, hours to the end of the session, hour of the final call or null, hours of the development submissions]. From the public release (FrontierCS2/FrontierCS-2-runs) and each run trace, read with run_timeline.py of the fcs2-trace-audit skill. The runs of KV Compaction, k-NN kernel and Polygon are the 2026-10-29 reruns with agy --print-timeout 6h (bin/fcs2_db_from_platform.py, RERUN); their times come from the ULIDs of the payloads and verifications in the released evidence.",
  "runs": {
   "approximate_mips_global_probing": [
    "FARGO paper-aligned query core",
@@ -244,9 +244,14 @@
   "fast_kv_compaction": [
    "KV Compaction",
    "FAIL",
-   0.9,
-   null,
-   []
+   5.3,
+   4.91,
+   [
+    1.38,
+    3.13,
+    4.38,
+    4.69
+   ]
   ],
   "flow_opd": [
    "OCR Distillation Trajectory Sampling",
@@ -363,10 +368,20 @@
   ],
   "knn_gpu_kernel_optimization": [
    "knn kernel",
-   "FAIL",
-   0.88,
-   null,
-   []
+   "PASS",
+   3.75,
+   3.64,
+   [
+    0.79,
+    1.79,
+    2.45,
+    2.84,
+    3.24,
+    3.33,
+    3.42,
+    3.52,
+    3.54
+   ]
   ],
   "lejepa_world_model": [
    "LeJEPA",
@@ -508,9 +523,14 @@
   "polygon": [
    "Polygon",
    "FAIL",
-   1.02,
+   5.05,
    null,
-   []
+   [
+    1.08,
+    2.2,
+    2.56,
+    3.74
+   ]
   ],
   "progent_privilege_control": [
    "Progent",
