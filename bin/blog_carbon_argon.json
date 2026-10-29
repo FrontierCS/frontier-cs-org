@@ -1,0 +1,727 @@
+{
+ "note": "Figures 3 and 4 of _posts/2026-10-29-gemini-4-carbon.md: per task and model, [final score (0 to 100), verdict, whether a final submission was scored]. From metadata/formal-results.json of the public release FrontierCS2/FrontierCS-2-runs.",
+ "tasks": [
+  {
+   "task": "batch_local_counting",
+   "display_name": "Batch Local Counting",
+   "site_task_name": "SCOPE"
+  },
+  {
+   "task": "bounded_evm_path_prediction",
+   "display_name": "Bounded EVM Path Prediction",
+   "site_task_name": "Seer"
+  },
+  {
+   "task": "evm_state_checkpoints",
+   "display_name": "EVM State Checkpoints",
+   "site_task_name": "Spectrum"
+  },
+  {
+   "task": "graph_mining_method_selection",
+   "display_name": "Graph Mining Method Selection",
+   "site_task_name": "ScaleGPM"
+  },
+  {
+   "task": "join_tree_rewriting",
+   "display_name": "Join-Tree Rewriting",
+   "site_task_name": "Yannakakis"
+  },
+  {
+   "task": "sparse_video_attention_policy",
+   "display_name": "Sparse Video Attention Policy",
+   "site_task_name": "SVG-EAR"
+  },
+  {
+   "task": "bbq_packet_scheduling",
+   "display_name": "BBQ bitmap traversal",
+   "site_task_name": "BBQ"
+  },
+  {
+   "task": "babble_anti_unification",
+   "display_name": "Reusable Library Candidates",
+   "site_task_name": "BABBLE"
+  },
+  {
+   "task": "shockwave_dynamic_gpu_allocation",
+   "display_name": "Dynamic GPU Allocation",
+   "site_task_name": "Shockwave"
+  },
+  {
+   "task": "mujoco_playground_cpu",
+   "display_name": "Go1 Joystick Policy Training",
+   "site_task_name": "MuJoCo Playground"
+  },
+  {
+   "task": "parallel_radix_sort",
+   "display_name": "In-place Integer Redistribution",
+   "site_task_name": "RegionsSort"
+  },
+  {
+   "task": "egraph_invariant_restoration",
+   "display_name": "E-Graph Invariant Restoration",
+   "site_task_name": "egg"
+  },
+  {
+   "task": "polar_express",
+   "display_name": "Polar-Factor Approximation",
+   "site_task_name": "Polar Express"
+  },
+  {
+   "task": "lwe_structured_recovery",
+   "display_name": "Structured-LWE Public Witness Recovery",
+   "site_task_name": "Structured LWE"
+  },
+  {
+   "task": "persistent_treap_update_engine",
+   "display_name": "Persistent Treap Update Engine",
+   "site_task_name": "Persistent Treap Update Engine"
+  },
+  {
+   "task": "parallel_dbscan",
+   "display_name": "Exact DBSCAN Connectivity",
+   "site_task_name": "Parallel DBSCAN"
+  },
+  {
+   "task": "parbutterfly",
+   "display_name": "ParButterfly Exact Counting",
+   "site_task_name": "ParButterfly"
+  },
+  {
+   "task": "hypergraph_core_numbers",
+   "display_name": "Hypergraph Core Numbers",
+   "site_task_name": "Hygra"
+  },
+  {
+   "task": "residual_state_advancement",
+   "display_name": "Residual State Advancement",
+   "site_task_name": "Residual State Advancement"
+  },
+  {
+   "task": "approximate_mips_query_stopping",
+   "display_name": "Approximate-MIPS Query Stopping",
+   "site_task_name": "Approximate-MIPS Query Stopping"
+  },
+  {
+   "task": "metaopt_combined_te_gap_search",
+   "display_name": "MetaOpt Combined-TE Gap Search",
+   "site_task_name": "MetaOpt"
+  },
+  {
+   "task": "dynamic_tanh",
+   "display_name": "Learned Transformer Layer Mapping",
+   "site_task_name": "DyT"
+  },
+  {
+   "task": "kmeans_gpu_kernel_optimization",
+   "display_name": "GPU K-Means Kernel Optimization",
+   "site_task_name": "kmeans kernel"
+  },
+  {
+   "task": "dbscan_gpu_kernel_optimization",
+   "display_name": "GPU DBSCAN Kernel Optimization",
+   "site_task_name": "dbscan kernel"
+  },
+  {
+   "task": "nano_world_model",
+   "display_name": "Future Video Sampling",
+   "site_task_name": "Nano World Model"
+  },
+  {
+   "task": "detok_latent_denoising",
+   "display_name": "Robust Image Tokenizer",
+   "site_task_name": "Robust Image Tokenizer"
+  },
+  {
+   "task": "ivf_pq_gpu_kernel_optimization",
+   "display_name": "GPU IVF-PQ Search Kernel Optimization",
+   "site_task_name": "ivf_pq kernel"
+  },
+  {
+   "task": "representation_frechet_loss",
+   "display_name": "Differentiable Population Statistics",
+   "site_task_name": "Differentiable Population Statistics"
+  },
+  {
+   "task": "knn_gpu_kernel_optimization",
+   "display_name": "GPU Brute-Force k-NN Kernel Optimization",
+   "site_task_name": "knn kernel"
+  },
+  {
+   "task": "ragen_multi_turn_rl",
+   "display_name": "Multi-turn Trajectory Batches",
+   "site_task_name": "RAGEN"
+  },
+  {
+   "task": "diffusion_policy_cpu",
+   "display_name": "Closed-loop action sampling",
+   "site_task_name": "Diffusion Policy"
+  },
+  {
+   "task": "approximate_mips_global_probing",
+   "display_name": "FARGO paper-aligned query core",
+   "site_task_name": "FARGO paper-aligned query core"
+  },
+  {
+   "task": "kami_fp64_block_gemm",
+   "display_name": "KAMI FP64 Block GEMM \u2014 trusted batched harness adaptation",
+   "site_task_name": "KAMI"
+  },
+  {
+   "task": "polygon",
+   "display_name": "SQL Counterexample Search",
+   "site_task_name": "Polygon"
+  },
+  {
+   "task": "clusterwise_spgemm",
+   "display_name": "Fixed-Length Clustered Sparse Multiplication",
+   "site_task_name": "Clusterwise SpGEMM"
+  },
+  {
+   "task": "flow_opd",
+   "display_name": "OCR Distillation Trajectory Sampling",
+   "site_task_name": "OCR Distillation Trajectory Sampling"
+  },
+  {
+   "task": "lejepa_world_model",
+   "display_name": "Latent Objective Recovery",
+   "site_task_name": "LeJEPA"
+  },
+  {
+   "task": "binary_fuse_filter",
+   "display_name": "Binary Fuse Filter Construction and Lookup",
+   "site_task_name": "Binary Fuse Filter Construction and Lookup"
+  },
+  {
+   "task": "glenside",
+   "display_name": "Access-Pattern Rewriting",
+   "site_task_name": "Glenside"
+  },
+  {
+   "task": "quarter_pir",
+   "display_name": "Private Set List Decoding",
+   "site_task_name": "QuarterPIR"
+  },
+  {
+   "task": "ckks_composable_noise",
+   "display_name": "CKKS Precision Propagation at 2,048 Slots",
+   "site_task_name": "CKKS noise"
+  },
+  {
+   "task": "edlib_exact_alignment",
+   "display_name": "Exact Sequence Alignment",
+   "site_task_name": "Exact Sequence Alignment"
+  },
+  {
+   "task": "runlts_predictor",
+   "display_name": "Register-aware Branch Prediction",
+   "site_task_name": "RUNLTS"
+  },
+  {
+   "task": "cute_crest",
+   "display_name": "Search Strategy for Concolic Testing",
+   "site_task_name": "CREST"
+  },
+  {
+   "task": "vllm_llm_serving_optimization",
+   "display_name": "GPU vLLM Serving Optimization",
+   "site_task_name": null
+  },
+  {
+   "task": "progent_privilege_control",
+   "display_name": "Progent Privilege Control",
+   "site_task_name": null
+  },
+  {
+   "task": "fast_kv_compaction",
+   "display_name": "Fast KV Compaction",
+   "site_task_name": null
+  },
+  {
+   "task": "lrr",
+   "display_name": "LRR",
+   "site_task_name": null
+  }
+ ],
+ "runs": {
+  "sparse_video_attention_policy|gemini-agy": [
+   40.606621454212096,
+   "FAIL",
+   true
+  ],
+  "dbscan_gpu_kernel_optimization|gemini-agy": [
+   68.84074949349228,
+   "FAIL",
+   true
+  ],
+  "knn_gpu_kernel_optimization|gemini-agy": [
+   45.41661130784086,
+   "PASS",
+   true
+  ],
+  "vllm_llm_serving_optimization|gemini-agy": [
+   17.743844660906397,
+   "FAIL",
+   true
+  ],
+  "representation_frechet_loss|gemini-agy": [
+   5.751003595975148,
+   "FAIL",
+   true
+  ],
+  "flow_opd|gemini-agy": [
+   49.886877828054295,
+   "FAIL",
+   true
+  ],
+  "ivf_pq_gpu_kernel_optimization|gemini-agy": [
+   78.472797464762,
+   "PASS",
+   true
+  ],
+  "diffusion_policy_cpu|gemini-agy": [
+   52.039369409257155,
+   "FAIL",
+   true
+  ],
+  "join_tree_rewriting|gemini-agy": [
+   12.106911513692946,
+   "FAIL",
+   true
+  ],
+  "approximate_mips_query_stopping|gemini-agy": [
+   81.42833586820102,
+   "PASS",
+   true
+  ],
+  "babble_anti_unification|gemini-agy": [
+   18.64444132319428,
+   "FAIL",
+   true
+  ],
+  "nano_world_model|gemini-agy": [
+   79.39257646600404,
+   "FAIL",
+   true
+  ],
+  "dynamic_tanh|gemini-agy": [
+   70.0,
+   "PASS",
+   true
+  ],
+  "lejepa_world_model|gemini-agy": [
+   99.5064,
+   "PASS",
+   true
+  ],
+  "kmeans_gpu_kernel_optimization|gemini-agy": [
+   51.93069820373417,
+   "PASS",
+   true
+  ],
+  "evm_state_checkpoints|gemini-agy": [
+   100.0,
+   "PASS",
+   true
+  ],
+  "residual_state_advancement|gemini-agy": [
+   33.35741965335753,
+   "PASS",
+   true
+  ],
+  "cute_crest|gemini-agy": [
+   13.1037839064819,
+   "FAIL",
+   true
+  ],
+  "binary_fuse_filter|gemini-agy": [
+   55.33129023145147,
+   "PASS",
+   true
+  ],
+  "progent_privilege_control|gemini-agy": [
+   56.2725,
+   "PASS",
+   true
+  ],
+  "lrr|gemini-agy": [
+   14.54,
+   "FAIL",
+   true
+  ],
+  "mujoco_playground_cpu|gemini-agy": [
+   49.62192905094747,
+   "FAIL",
+   true
+  ],
+  "detok_latent_denoising|gemini-agy": [
+   73.52176330582107,
+   "PASS",
+   true
+  ],
+  "egraph_invariant_restoration|gemini-agy": [
+   61.62438289285781,
+   "FAIL",
+   true
+  ],
+  "bbq_packet_scheduling|gemini-agy": [
+   37.2653934069011,
+   "PASS",
+   true
+  ],
+  "polar_express|gemini-agy": [
+   62.929186449533994,
+   "PASS",
+   true
+  ],
+  "glenside|gemini-agy": [
+   91.01987343783895,
+   "PASS",
+   true
+  ],
+  "shockwave_dynamic_gpu_allocation|gemini-agy": [
+   47.134258204741045,
+   "PASS",
+   true
+  ],
+  "metaopt_combined_te_gap_search|gemini-agy": [
+   51.14868500818264,
+   "FAIL",
+   true
+  ],
+  "ragen_multi_turn_rl|gemini-agy": [
+   12.020833333333332,
+   "FAIL",
+   true
+  ],
+  "fast_kv_compaction|gemini-agy": [
+   0.0,
+   "FAIL",
+   false
+  ],
+  "batch_local_counting|gemini-agy": [
+   15.310672252844668,
+   "FAIL",
+   true
+  ],
+  "parallel_radix_sort|gemini-agy": [
+   51.45850689981266,
+   "FAIL",
+   true
+  ],
+  "graph_mining_method_selection|gemini-agy": [
+   91.99094310262464,
+   "PASS",
+   true
+  ],
+  "bounded_evm_path_prediction|gemini-agy": [
+   81.44027469141948,
+   "PASS",
+   true
+  ],
+  "approximate_mips_global_probing|gemini-agy": [
+   52.11058966636611,
+   "PASS",
+   true
+  ],
+  "persistent_treap_update_engine|gemini-agy": [
+   21.84427397857361,
+   "PASS",
+   true
+  ],
+  "parbutterfly|gemini-agy": [
+   56.254849492913166,
+   "PASS",
+   true
+  ],
+  "lwe_structured_recovery|gemini-agy": [
+   14.0,
+   "FAIL",
+   true
+  ],
+  "clusterwise_spgemm|gemini-agy": [
+   65.20431121843026,
+   "PASS",
+   true
+  ],
+  "runlts_predictor|gemini-agy": [
+   31.01248675654361,
+   "FAIL",
+   true
+  ],
+  "kami_fp64_block_gemm|gemini-agy": [
+   22.313538458199503,
+   "PASS",
+   true
+  ],
+  "hypergraph_core_numbers|gemini-agy": [
+   59.517940492645224,
+   "PASS",
+   true
+  ],
+  "quarter_pir|gemini-agy": [
+   62.76438619424235,
+   "PASS",
+   true
+  ],
+  "parallel_dbscan|gemini-agy": [
+   77.4266832531289,
+   "FAIL",
+   true
+  ],
+  "ckks_composable_noise|gemini-agy": [
+   95.88501762360848,
+   "PASS",
+   true
+  ],
+  "edlib_exact_alignment|gemini-agy": [
+   66.92783490595173,
+   "PASS",
+   true
+  ],
+  "polygon|gemini-agy": [
+   80.2915139697341,
+   "FAIL",
+   true
+  ],
+  "batch_local_counting|carbon": [
+   73.64718558496625,
+   "PASS",
+   true
+  ],
+  "bounded_evm_path_prediction|carbon": [
+   81.33785680766712,
+   "PASS",
+   true
+  ],
+  "evm_state_checkpoints|carbon": [
+   100.0,
+   "PASS",
+   true
+  ],
+  "graph_mining_method_selection|carbon": [
+   91.76669120043316,
+   "PASS",
+   true
+  ],
+  "join_tree_rewriting|carbon": [
+   11.82342352160638,
+   "FAIL",
+   true
+  ],
+  "sparse_video_attention_policy|carbon": [
+   42.82032588195754,
+   "FAIL",
+   true
+  ],
+  "bbq_packet_scheduling|carbon": [
+   33.096151013879606,
+   "PASS",
+   true
+  ],
+  "babble_anti_unification|carbon": [
+   0.0,
+   "FAIL",
+   false
+  ],
+  "shockwave_dynamic_gpu_allocation|carbon": [
+   46.33694228946084,
+   "PASS",
+   true
+  ],
+  "mujoco_playground_cpu|carbon": [
+   49.95199579403437,
+   "FAIL",
+   true
+  ],
+  "parallel_radix_sort|carbon": [
+   51.49171197341605,
+   "PASS",
+   true
+  ],
+  "egraph_invariant_restoration|carbon": [
+   61.97250768778037,
+   "FAIL",
+   true
+  ],
+  "polar_express|carbon": [
+   71.70586230774585,
+   "PASS",
+   true
+  ],
+  "lwe_structured_recovery|carbon": [
+   79.5,
+   "FAIL",
+   true
+  ],
+  "persistent_treap_update_engine|carbon": [
+   40.586341612956225,
+   "PASS",
+   true
+  ],
+  "parallel_dbscan|carbon": [
+   0.0,
+   "FAIL",
+   false
+  ],
+  "parbutterfly|carbon": [
+   58.37241062902427,
+   "PASS",
+   true
+  ],
+  "hypergraph_core_numbers|carbon": [
+   58.9156188948852,
+   "PASS",
+   true
+  ],
+  "residual_state_advancement|carbon": [
+   33.142119166836935,
+   "PASS",
+   true
+  ],
+  "approximate_mips_query_stopping|carbon": [
+   81.49642007464597,
+   "FAIL",
+   true
+  ],
+  "metaopt_combined_te_gap_search|carbon": [
+   51.96946989102006,
+   "PASS",
+   true
+  ],
+  "dynamic_tanh|carbon": [
+   70.0,
+   "PASS",
+   true
+  ],
+  "kmeans_gpu_kernel_optimization|carbon": [
+   54.69511003170742,
+   "PASS",
+   true
+  ],
+  "dbscan_gpu_kernel_optimization|carbon": [
+   69.61725302306702,
+   "PASS",
+   true
+  ],
+  "nano_world_model|carbon": [
+   78.52526053786278,
+   "FAIL",
+   true
+  ],
+  "detok_latent_denoising|carbon": [
+   73.78696850026606,
+   "FAIL",
+   true
+  ],
+  "ivf_pq_gpu_kernel_optimization|carbon": [
+   79.16368549699666,
+   "PASS",
+   true
+  ],
+  "representation_frechet_loss|carbon": [
+   7.09368196451621,
+   "FAIL",
+   true
+  ],
+  "knn_gpu_kernel_optimization|carbon": [
+   0.0,
+   "FAIL",
+   false
+  ],
+  "ragen_multi_turn_rl|carbon": [
+   11.645833333333334,
+   "FAIL",
+   true
+  ],
+  "diffusion_policy_cpu|carbon": [
+   56.79033633393523,
+   "FAIL",
+   true
+  ],
+  "approximate_mips_global_probing|carbon": [
+   52.587682772819136,
+   "PASS",
+   true
+  ],
+  "kami_fp64_block_gemm|carbon": [
+   22.9692226620376,
+   "PASS",
+   true
+  ],
+  "polygon|carbon": [
+   0.0,
+   "FAIL",
+   false
+  ],
+  "clusterwise_spgemm|carbon": [
+   64.5728543939146,
+   "PASS",
+   true
+  ],
+  "flow_opd|carbon": [
+   68.86437908496733,
+   "FAIL",
+   true
+  ],
+  "lejepa_world_model|carbon": [
+   99.4685,
+   "FAIL",
+   true
+  ],
+  "binary_fuse_filter|carbon": [
+   54.49839810059181,
+   "FAIL",
+   true
+  ],
+  "glenside|carbon": [
+   91.021525634084,
+   "PASS",
+   true
+  ],
+  "quarter_pir|carbon": [
+   63.68929457304709,
+   "PASS",
+   true
+  ],
+  "ckks_composable_noise|carbon": [
+   95.9548982852888,
+   "PASS",
+   true
+  ],
+  "edlib_exact_alignment|carbon": [
+   66.87273819075146,
+   "FAIL",
+   true
+  ],
+  "runlts_predictor|carbon": [
+   31.231207132701453,
+   "FAIL",
+   true
+  ],
+  "cute_crest|carbon": [
+   13.387050818585228,
+   "FAIL",
+   true
+  ],
+  "vllm_llm_serving_optimization|carbon": [
+   16.627723130607464,
+   "FAIL",
+   true
+  ],
+  "progent_privilege_control|carbon": [
+   53.365,
+   "PASS",
+   true
+  ],
+  "fast_kv_compaction|carbon": [
+   0.0,
+   "FAIL",
+   false
+  ],
+  "lrr|carbon": [
+   30.53,
+   "FAIL",
+   true
+  ]
+ }
+}
