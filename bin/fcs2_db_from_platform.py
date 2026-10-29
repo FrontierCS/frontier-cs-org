@@ -167,11 +167,11 @@ ORIGIN = {'run_01M5SC18YDXQDSN33H4N4CR39K': 'run_01M5RHJYJ7N3JMSRHSR3PBXW9C',
 # Gemini 4 Argon on agy's KV Cache Compaction: the model answered with plain text instead of a tool call, so agy ended the
 # session after one turn with no final (eval_01M5RHJYJ0Z12JB8D3R4YCG9M2; same rule, 2026-10-25).
 # Claude Fable 5.1 (eval_01M5VAJHMRE1PZRN6NKP0G24RZ; owner, 2026-10-26: "按照规则给他标记"): BABBLE and Parallel DBSCAN, the agent
-# container OOM-killed within the task's 4 GiB limit (exit 137) before any submission; Diffusion Policy, the agent installed
+# container OOM-killed within the task's limit (8 GiB on BABBLE, 4 GiB on Parallel DBSCAN; exit 137) before any submission; Diffusion Policy, the agent installed
 # PyTorch into the task's 4 GiB workspace and was evicted (exit 143) before any submission. Evidence per run:
 # ~/fcs2-ops/fable51/dispositions.json.
 # Gemini 4 Carbon (eval_01M5ZHWA8HFDS1QY8JGVN0RKMM; same rule): Parallel DBSCAN and BABBLE, the agent container OOM-killed
-# within the task's 4 GiB limit (exit 137) before any submission.
+# within the task's limit (4 GiB on Parallel DBSCAN, 8 GiB on BABBLE; exit 137) before any submission.
 ZERO = {'run_01M5A2T1WJSCR64W2ZP34T8KHV', 'run_01M5C2J5QNEPEYAWMQY3HD7MF4',
         'run_01M5QR7T4M65RY0VAYMQDN6TP2', 'run_01M5QR7T4PJ4ZR9KSZN1X28WC7', 'run_01M5QR7T4N5K0QKQSCH6PXW660',
         'run_01M5QR7T4MKQYAT9R6AE36HH2B', 'run_01M5QR7T4P9BAF9GZ9NPSQAGM7', 'run_01M5QR7T4PE4CXY3CM4Y95WE31',
@@ -187,11 +187,11 @@ WHY = {'run_01M5QR7T4M65RY0VAYMQDN6TP2': 'Out of memory (exit 137)',            
        'run_01M5QR7T4P9BAF9GZ9NPSQAGM7': 'Workspace over 8 GiB, evicted',
        'run_01M5QR7T4PE4CXY3CM4Y95WE31': 'Killed its own harness, no final',    # its code sent SIGTERM to matching processes
        'run_01M5RHJYJ60FQPMFRZZ4HGZC0Q': 'Ended without a final (text-only turn)',
-       'run_01M5VAJHMZ7XW1E850Z2M0SM3K': 'Out of memory (exit 137)',            # within the task's 4 GiB limit
+       'run_01M5VAJHMZ7XW1E850Z2M0SM3K': 'Out of memory (exit 137)',            # within the task's 8 GiB limit (BABBLE)
        'run_01M5VAJHMZXCEMGN8RREPEAVCB': 'Out of memory (exit 137)',            # within the task's 4 GiB limit
        'run_01M5VAJHMZSTXYEGRP3ZVF9R9K': 'Workspace over 4 GiB, evicted',
        'run_01M61SQZJ5A7HWMZMM975PG4V8': 'Out of memory (exit 137)',            # within the task's 4 GiB limit
-       'run_01M61SR17DTR7FS5GE4HM2EQDJ': 'Out of memory (exit 137)'}            # within the task's 4 GiB limit
+       'run_01M61SR17DTR7FS5GE4HM2EQDJ': 'Out of memory (exit 137)'}            # within the task's 8 GiB limit (BABBLE)
 # Runs the platform marks FAILED whose selected final was rejudged and accepted: they completed, so the site shows no failure
 # for them. Claude Opus 5.5's KV Cache Compaction (61.55; Qiuyang, 2026-10-20: "kebab上的opus kv compaction信息是否不对").
 COMPLETED = {'run_01M5BMPCS19PVWJRAGZSF9ED8P'}
