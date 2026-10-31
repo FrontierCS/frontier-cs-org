@@ -2,7 +2,7 @@ import json
 # verifier/evidence.tar!/phase/operator-result.json: result.reference_verdict.groups[<group>] for the four
 # groups (swe/public, swe/hidden, bfcl/public, bfcl/hidden); one row per group:
 #   p90/p95/p99      = candidate_tails[p] vs reference_tails[p]   (request latency tails, seconds)
-#   correctness      = candidate_correct / observed_instances vs reference_correct / observed_instances
+#   correctness      = candidate_correct / observed_instances vs required_correct_count / observed_instances (the bar)
 #   paired_timing    = paired_speedup_over_reference vs 1.0 (reference against itself)
 #   beat             = comparisons[metric]
 # Site value = plain mean over the 4 groups. (The run's final evidence has no metrics.json; the operator
@@ -26,7 +26,7 @@ def parse(ev):
         for p in TAILS:
             add(p, ct.get(p), rt.get(p), 'seconds')
         n = v.get('observed_instances') or v.get('expected_instances')
-        cc, rc = v.get('candidate_correct'), v.get('reference_correct')
+        cc, rc = v.get('candidate_correct'), v.get('required_correct_count')
         add('correctness', None if cc is None or not n else cc / n, None if rc is None or not n else rc / n)
         sp = v.get('paired_speedup_over_reference')
         add('paired_timing', sp, 1.0 if sp is not None else None)

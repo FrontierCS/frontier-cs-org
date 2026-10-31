@@ -17,8 +17,9 @@ tasks/frontier-cs-2.0-demo/problems) gives each metric's direction from <categor
 Every verifier writes its own metrics.json (or measurement.json), so each task has its own reader in
 bin/fcs2_metric_parsers/<slug>.py: parse(members) -> rows {metric, workload, value, reference_value[, beat, margin,
 unit]}, one per hidden final workload, or one row with workload "*" where the site's number is not a mean over
-workloads. A run's value is the arithmetic mean of its workload rows (nulls left out); a metric some run of the task has
-and this run lacks (no final, a failed verification) gets null. The readers were rebuilt on 2026-10-25 from the
+workloads. A run's value is the arithmetic mean of its workload rows; where some of them have a value and others none
+(an invalid workload), the run's value is null and its row is marked "invalid", never a mean over the valid ones. A
+metric some run of the task has and this run lacks (no final, a failed verification) gets null. The readers were rebuilt on 2026-10-25 from the
 evidence of the 12 models then on the site, against the live assets/js/fcs2-metrics.js (the 2026-10-22 export chain,
 exports/metric-values-1022/extract_1022.py on the old host, is lost); each reader's docstring says where its numbers
 live and what it does not reproduce.
@@ -127,15 +128,18 @@ def main():
             for metric in metrics:
                 mine = [x for x in rows if x['metric'] == metric]
                 star = [x for x in mine if x['workload'] == '*']
+                invalid = False
                 if star: v, rv = star[0]['value'], star[0].get('reference_value')
                 else:
                     vs = [x['value'] for x in mine if x['value'] is not None]
                     rs = [x['reference_value'] for x in mine if x.get('reference_value') is not None]
                     v, rv = (sum(vs) / len(vs) if vs else None), (sum(rs) / len(rs) if rs else None)
+                    if vs and len(vs) < len(mine): v, invalid = None, True   # an invalid workload: no mean over the rest
                 if v is None and rv is None and (r['run_id'], metric) in CARRY: v, rv = CARRY[r['run_id'], metric]
                 b = next((x['better'] for x in mine if x.get('better')), None) or better.get(metric)
                 fa.write(json.dumps({**base, 'metric': metric, 'better': b, 'unit': unit.get(metric), 'value': v,
-                                     'reference_value': rv, 'workloads': len([x for x in mine if x['workload'] != '*']), 'source': src}) + '\n')
+                                     'reference_value': rv, 'workloads': len([x for x in mine if x['workload'] != '*']), 'source': src}
+                                    | ({'invalid': True} if invalid else {})) + '\n')
                 for x in mine:
                     if x['workload'] == '*': continue
                     fv.write(json.dumps({**base, 'metric': metric, 'workload': x['workload'], 'value': x['value'],
