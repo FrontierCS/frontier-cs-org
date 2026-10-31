@@ -183,7 +183,7 @@ function drawResults() {
   const sc = (v, m) => v * F[m].k;   // F, each column's scale, follows split below
   const cell = (r, m, i) => { const v = (by[r[0]] || {})[m], [mean, rref] = (st[m] && st[m].by[r[0]]) || [];
     if (!v) return `<td class="${mcls(i)} e">—</td>`;
-    const tip = `Beat the human reference on ${v[0]} of ${v[1]} hidden workloads` + (rref != null ? `; human reference in this run: ${num(sc(rref, m), F[m].p)}` : '');
+    const tip = `Beat the human reference on ${v[0]} of ${v[1]} hidden workloads` + (rref != null ? `; ${st[m].bar || 'human reference'} in this run: ${num(sc(rref, m), F[m].p)}` : '');
     const all = v[0] === v[1], bar = `<span class="mbar"><i class="${all ? 'y' : 'n'}" style="width:${(100 * v[0] / v[1]).toFixed(0)}%"></i></span>`;   // none won: the empty track (Qiuyang)
     const inv = (st[m] && st[m].invalid || []).includes(r[0]);   // a workload without a value: no mean over the rest
     return `<td class="${mcls(i)} ${all ? 'cy' : 'cn'}" title="${tip}">` + (inv ? '<b>invalid</b>' : mean != null ? `<b>${num(sc(mean, m), F[m].p)}</b>` : `<b>${v[0]}/${v[1]}</b>`) + bar + '</td>'; };
@@ -209,7 +209,7 @@ function drawResults() {
       + '<th class="rs">Final score</th><th class="rc">Cost</th></tr></thead>'
     : '<thead><tr><th>Model</th>' + ms.map((m, i) => `<th class="${mcls(i)}" title="${esc(m)}">${headText(metricHead(m, st[m], F[m].e, F[m].u), dir(m))}</th>`).join('') + '<th class="rs">Final score</th><th class="rc">Cost</th></tr></thead>';
   const refRow = split ? ms.map(m => wl.map(w => wref(m, w)).join('')).join('')
-    : ms.map((m, i) => st[m] && st[m].ref != null ? `<td class="${mcls(i)}"${st[m].profiled ? ' title="From a separate measurement of the human reference"' : ''}><b>${num(sc(st[m].ref, m), F[m].p)}</b>${st[m].fixed ? `<span class="mg">${esc(st[m].fixed)}</span>` : ''}</td>` : `<td class="${mcls(i)} e">—</td>`).join('');   // a "fixed" value is a pass bar, named under it
+    : ms.map((m, i) => st[m] && st[m].ref != null ? `<td class="${mcls(i)}"${st[m].profiled ? ' title="From a separate measurement of the human reference"' : ''}><b>${num(sc(st[m].ref, m), F[m].p)}</b>${st[m].bar ? `<span class="mg">${esc(st[m].bar)}</span>` : ''}</td>` : `<td class="${mcls(i)} e">—</td>`).join('');   // a value that is the decision's bar says so
   $('#rtbl').innerHTML = head + '<tbody>'
     + (ref != null || ms.some(m => st[m] && st[m].ref != null)
       ? '<tr class="rref"><td><span class="sq"></span>Human reference</td>' + refRow
