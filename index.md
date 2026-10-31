@@ -34,12 +34,18 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
 
 <section class="sec" id="leaderboard">
   <h2>Leaderboard</h2>
-  <!-- First in the leaderboard (owner, 2026-10-16): one bar per model, Artificial Analysis style, the pass rate as a whole
-       number in the bar, the exact value in the tooltip; no FCI switch (owner, 2026-10-16) -->
+  <!-- First in the leaderboard (owner, 2026-10-16): one bar per model, Artificial Analysis style, the value as a whole
+       number in the bar, the exact value in the tooltip. Since 2026-10-31 (owner) the bars come twice, stacked with no switch:
+       pass rate, then FCI as a whole number with no interval -->
   <figure class="chart" style="margin:0">
     <div class="chead"><span>Pass rate (beat reference)</span></div>
     <div class="plot" id="fcibplot"><svg id="fcibsvg" role="img" aria-label="Pass rate (beat reference) by model"></svg><div class="tip" id="fcibtip" hidden></div></div>
     <div class="cfoot">{% include chart_logo.html %}</div>   <!-- the bars keep their FrontierCS row (owner, 2026-10-16, on #89) -->
+  </figure>
+  <figure class="chart" style="margin:56px 0 0">
+    <div class="chead"><span>FCI</span></div>
+    <div class="plot" id="fcbplot"><svg id="fcbsvg" role="img" aria-label="FCI by model"></svg><div class="tip" id="fcbtip" hidden></div></div>
+    <div class="cfoot">{% include chart_logo.html %}</div>
   </figure>
   <!-- a short folded note in small type under the bars (owner, 2026-10-26), from the trace audits: in 10 Gemini 4 Argon runs
        in Pi the provider refused a request (finish_reason content_filter) and Pi, which does not retry, ended the run; in
@@ -61,6 +67,12 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
     <div class="plot" id="pcplot"><svg id="pcsvg" role="img" aria-label="Pass rate (beat reference) against cost per run"></svg><div class="tip" id="pctip" hidden></div></div>
     <div class="cfoot">{% include chart_logo.html %}</div>
   </figure>
+  <!-- FCI against cost, under the pass rate one (owner, 2026-10-31: the two stacked, no switch, pass rate first) -->
+  <figure class="chart" style="margin:56px 0 0">
+    <div class="chead"><span>FCI</span></div>
+    <div class="plot" id="fcplot"><svg id="fcsvg" role="img" aria-label="FCI against cost per run"></svg><div class="tip" id="fctip" hidden></div></div>
+    <div class="cfoot">{% include chart_logo.html %}</div>
+  </figure>
   <p class="pcontact">To add your model, email its score on every task to <strong>both</strong> <a class="mail" href="mailto:qmang@berkeley.edu,wenhao.chai@princeton.edu">qmang@berkeley.edu</a> and <a class="mail" href="mailto:qmang@berkeley.edu,wenhao.chai@princeton.edu">wenhao.chai@princeton.edu</a>.</p>
 
   <details class="tbl-wrap fold" id="domains">
@@ -69,8 +81,9 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
     <p class="cfoot" style="border-top:0; margin-top:10px; padding-top:0">Bold marks the best in a column.</p>
   </details>
 
-  <div class="tbl-wrap" id="eci">
-    <h3>FCI</h3>
+  <!-- folded (owner, 2026-10-31): the leaderboard charts above show FCI as their main metric -->
+  <details class="tbl-wrap fold" id="eci">
+    <summary><h3>FCI</h3></summary>
     <figure class="chart" style="margin:0">
       <div class="chead"><span>FrontierCS Capabilities Index (FCI)</span></div>
       <div class="plot" id="eciplot"><svg id="ecisvg" role="img" aria-label="FCI chart"></svg><div class="tip" id="ecitip" hidden></div></div>
@@ -117,7 +130,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
         </ul>
       </div>
     </details>
-  </div>
+  </details>
 
   <div class="tbl-wrap" id="tts">
     <h3>Test-time scaling</h3>
@@ -225,7 +238,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
       <details id="q-pick"><summary>What if the agent picks the wrong version?</summary><div class="ans"><p>We report it as it is. An agent may end on a version that fails although an earlier one would have passed. Choosing which version to submit is part of the work we measure, so we do not correct the choice: every run is scored by the submission the agent chose.</p></div></details>
       <details id="q-bar"><summary>What counts as a pass?</summary><div class="ans"><p>A run passes only when its final submission beats the human reference on every metric the task checks and on every hidden workload. A higher total score is not enough: a run that is faster on average but worse on one metric or one workload does not pass. The criteria are set from the reference’s own measurements. For SVG-EAR, its latency must be at most 0.96 of the reference’s, with PSNR, SSIM and LPIPS within fixed bands. Each task’s page lists the metrics its judge checks.</p></div></details>
       <details id="q-high"><summary>Why can a run score above the human reference and still fail?</summary><div class="ans"><p>The final score averages over every metric and every hidden workload, so a large gain in one place can hide a loss in another. A pass asks for more: the run must beat the human reference on each metric and each workload, by the margin the rule sets. We want agents to push the research frontier, with a result the paper’s authors would accept as better. A gain on one metric bought with another, or a fit to a few workloads, is not that. On KV Compaction, Claude Opus 5.5 has the top score and sits above the human reference. Its answers still fall short of the reference’s accuracy on 2 of the 24 articles, so the run fails.</p></div></details>
-      <details id="q-score"><summary>How are scores computed?</summary><div class="ans"><p>The leaderboard’s main number is pass rate, the share of runs that pass by the criteria above. Each task’s evaluator also scores the final submission on the hidden suite, from 0 to 100, and a run that ends without a final submission scores 0. The mean score chart averages each run’s score minus the human reference’s score on the same task, so 0 means level with the human reference. FCI, the FrontierCS Capabilities Index, applies the idea of Epoch AI’s ECI to what decides a pass. One fit, over each run’s beat or miss on every metric the task checks and how far its final score is above or below the human reference’s (a run that does not pass but scores above the human reference counts only as at least level with it), gives every model an FCI and every task an FDI. Kimi K2.7 is the <span data-fill="zero"></span> point; its runs take part in the fit, but it is not on the leaderboard. The human reference has no FCI, since its code cannot pass against itself. FCI’s whiskers are 90% intervals from a bootstrap that resamples the tasks. Costs are estimates. The results cover <span data-fill="summary"></span>.</p></div></details>
+      <details id="q-score"><summary>How are scores computed?</summary><div class="ans"><p>The leaderboard’s main number is FCI, described below; its switch also shows pass rate, the share of runs that pass by the criteria above. Each task’s evaluator also scores the final submission on the hidden suite, from 0 to 100, and a run that ends without a final submission scores 0. The mean score chart averages each run’s score minus the human reference’s score on the same task, so 0 means level with the human reference. FCI, the FrontierCS Capabilities Index, applies the idea of Epoch AI’s ECI to what decides a pass. One fit, over each run’s beat or miss on every metric the task checks and how far its final score is above or below the human reference’s (a run that does not pass but scores above the human reference counts only as at least level with it), gives every model an FCI and every task an FDI. Kimi K2.7 is the <span data-fill="zero"></span> point; its runs take part in the fit, but it is not on the leaderboard. The human reference has no FCI, since its code cannot pass against itself. FCI’s whiskers are 90% intervals from a bootstrap that resamples the tasks. Costs are estimates. The results cover <span data-fill="summary"></span>.</p></div></details>
       <details id="q-scaling"><summary>How is test-time scaling computed?</summary><div class="ans"><p>Each curve is the FCI a model would have if every run were stopped at a cost budget. A run that has ended within the budget counts what it beat; a run still going at the budget counts as a run that ended there without a final submission: it beats nothing and scores 0. So no curve falls as the budget grows. The chart shows each lab’s model with the highest FCI. Every task’s difficulty stays as in the leaderboard fit, so once the budget covers all of a model’s runs, its curve ends at its leaderboard value. The budget is the estimated cost.</p></div></details>
       <details id="q-run"><summary>Can I run it?</summary><div class="ans"><p>Yes. The 48 tasks, their evaluators and the judge are public as one evaluation environment at <a href="https://github.com/FrontierCS/FrontierCS-2">github.com/FrontierCS/FrontierCS-2</a>. It installs into your own AWS account. GPU tasks also need Modal, and the agent’s model needs an API key from any OpenAI-compatible provider. Its README walks through setup and a first run.</p></div></details>
       <details id="q-cost"><summary>What does a full evaluation cost?</summary><div class="ans"><p>For Claude Opus 5.5, one full evaluation of the 48 tasks costs about US$1,000 in API fees, US$300 in GPU time and US$100 in CPU time.</p><p>Gemini 4 Carbon has no public price; its cost is estimated at Gemini 4 Argon’s prices.</p></div></details>

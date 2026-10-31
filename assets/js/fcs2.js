@@ -54,21 +54,26 @@ $('#lblegend').innerHTML = RANKED.map(m => `<span><i style="background:${MCOL[m.
 /* Main chart: pass rate against mean cost per run in US$, one dot per model (PASS, COST); the dots on the Pareto frontier are emphasised. Each label takes the first
    spot right, left, above or below its dot that clears every dot, every placed label and the edges; a dot with no free
    spot keeps no label (the tooltip still names it). No legend: the labels name the dots. */
-const passPct = m => PASS[m.id][0];   // pass rate in %; both leaderboard charts show it alone (owner, 2026-10-16: no FCI switch)
-function drawPassCost() {
-  const svg = $('#pcsvg'), W = Math.max(300, $('#pcplot').clientWidth), narrow = W < 560;
+const passPct = m => PASS[m.id][0];   // pass rate in %
+// The leaderboard's two metrics (owner, 2026-10-31): the bars and the cost chart are each drawn twice, stacked with no
+// switch, pass rate first, then FCI as a whole number with no interval.
+const METRIC = {fci:{val:m => ECI[m.id][0], tip:v => `FCI <b>${Math.round(v)}</b>`, tick:v => String(v)},
+                pass:{val:passPct, tip:v => `Pass rate <b>${f1(v)}%</b>`, tick:v => v + '%'}};
+$('#eci').addEventListener('toggle', () => drawECI());   // folded: its width is known once it opens
+function drawPassCost(k = 'pass', id = 'pc') {
+  const svg = $(`#${id}svg`), W = Math.max(300, $(`#${id}plot`).clientWidth), narrow = W < 560;
   const L = 44, R = narrow ? 12 : 24, T = 14, B = 46, H = CHART_H.pc || (narrow ? 320 : 400);
   const ms = MODELS.filter(m => COST[m.id]), tx = ms.map(m => COST[m.id][0]);
   // the axis runs 0.15 decade past the outermost dots and no further (owner, 2026-10-10: half-decade rounding left
   // the range loose); an edge dot whose label has no room on its outer side takes another spot
   // (on phones the right side keeps more, so the labels of the dots near the right edge fit on their right)
   const x0 = Math.log10(Math.min(...tx)) - .15, x1 = Math.log10(Math.max(...tx)) + (narrow ? .74 : .15);
-  const val = passPct, ystep = 20, ymax = Math.min(100, Math.ceil((Math.max(...ms.map(val)) + 5) / 20) * 20);
+  const M = METRIC[k], val = M.val, ystep = 20, ymax = Math.min(k === 'pass' ? 100 : Infinity, Math.ceil((Math.max(...ms.map(val)) + 5) / 20) * 20);
   const X = v => L + (Math.log10(v) - x0) / (x1 - x0) * (W - L - R), Y = v => T + (1 - v / ymax) * (H - T - B);
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
   for (let v = 0; v <= ymax + ystep / 2; v += ystep) {
     svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1}));
-    svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, v + '%'));
+    svg.append(sv('text', {x:L - 8, y:Y(v) + 4, 'text-anchor':'end'}, M.tick(v)));
   }
   // ticks at 1, 2 and 5 times each power of ten; a range under one decade still gets several
   for (let k = Math.floor(x0); k <= Math.ceil(x1); k++) [1, 2, 5].forEach(f => { const v = f * 10 ** k, lv = Math.log10(v);
@@ -76,10 +81,10 @@ function drawPassCost() {
     svg.append(sv('line', {x1:X(v), x2:X(v), y1:T, y2:H - B, stroke:'var(--grid)', 'stroke-width':1}));
     svg.append(sv('text', {x:X(v), y:H - B + 20, 'text-anchor':'middle'}, usdfmt(v))); });
   svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'Cost per run in US$, mean, log scale'));
-  const pts = [], order = [...ms].sort((a, b) => val(b) - val(a));
+  const pts = [], order = [...ms].sort((a, b) => val(b) - val(a) || ECI[b.id][0] - ECI[a.id][0]);
   const at = m => [X(COST[m.id][0]), Y(Math.max(0, val(m)))];
   const boxes = order.map(m => { const [cx, cy] = at(m); return {x:cx - 9, y:cy - 9, w:18, h:18}; });
-  // the Pareto frontier: the models no cheaper model matches or beats on pass rate
+  // the Pareto frontier: the models no cheaper model matches or beats on the metric
   const front = [...ms].sort((p, q) => COST[p.id][0] - COST[q.id][0] || val(q) - val(p)).filter((m, i, a) => a.slice(0, i).every(o => val(o) < val(m)));
   order.forEach(m => {
     const [cx, cy] = at(m), name = narrow ? m.short : m.name;
@@ -88,9 +93,9 @@ function drawPassCost() {
     const lead = front.includes(m);
     svg.append(sv('circle', {cx, cy, r:6.5, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':2, 'data-m':m.id}));   // one dot size for every model (owner, 2026-10-16); the frontier keeps its bold names
     labelDot(svg, boxes, cx, cy, name, {l:L, r:W, t:T, b:H - B}, MTXT(m.id), lead);   // fcs2-data.js
-    pts.push({x:cx, y:cy, mean:true, html:`<b>${esc(m.name)}</b><br>Pass rate <b>${f1(val(m))}%</b><br>${usdfmt(COST[m.id][0])} per run, mean`});
+    pts.push({x:cx, y:cy, mean:true, html:`<b>${esc(m.name)}</b><br>${M.tip(val(m))}<br>${usdfmt(COST[m.id][0])} per run, mean`});
   });
-  attachTip(svg, W, H, pts, $('#pctip'));
+  attachTip(svg, W, H, pts, $(`#${id}tip`));
 }
 
 /* On phones the model column is as wide as the longest model name, so every name shows in full (owner: "DeepSeek V4.1 Flash", not cut). */
@@ -105,9 +110,9 @@ const LOGO_DIR = (document.querySelector('script[src*="fcs2.js"]') || {src:''}).
 const lightCol = id => { const h = getComputedStyle(document.documentElement).getPropertyValue(`--m-${id}`).trim().replace('#', '');
   if (h.length !== 6) return false; const [r, g, b] = [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16) / 255);
   return .2126 * r + .7152 * g + .0722 * b > .6; };   // white as Artificial Analysis has it, dark ink only on the lightest (Sol's grey, GLM Flash's pink)
-function drawPassBars() {
-  const val = passPct, order = [...MODELS].sort((a, b) => val(b) - val(a));
-  const svg = $('#fcibsvg'), W = Math.max(300, $('#fcibplot').clientWidth), an = animates(svg);
+function drawPassBars(k = 'pass', id = 'fcib') {
+  const M = METRIC[k], val = M.val, order = [...MODELS].sort((a, b) => val(b) - val(a) || ECI[b.id][0] - ECI[a.id][0]);   // equal pass rates go by FCI (owner, 2026-10-31)
+  const svg = $(`#${id}svg`), W = Math.max(300, $(`#${id}plot`).clientWidth), an = animates(svg);
   svg.setAttribute('viewBox', `0 0 ${W} 10`); svg.replaceChildren();
   const measure = (txt, size, cls = 'lab') => { const t = sv('text', {class:cls, x:-999, y:-999, 'font-size':size}, txt); svg.append(t); const w = t.getComputedTextLength(); t.remove(); return w; };
   // second style (owner, 2026-10-16): the value large in the middle of its bar, the logo on a light tile, and under it the
@@ -152,9 +157,9 @@ function drawPassBars() {
       svg.append(sv('text', {class:'lab', x:cx + fs * .35, y:ny, 'font-size':fs, 'text-anchor':'end', transform:`rotate(${-ang} ${cx + fs * .35} ${ny})`}, m.short));
     }
     if (an) { mark(bar, 'a-rise', i * .05); mark(vtx, 'a-fade', .5 + i * .05); }
-    pts.push({x:cx, y, box:[cx - band / 2, cx + band / 2, T, H], html:`<b>${esc(m.base)}</b>${m.h ? ` · ${esc(m.h)}` : ''}<br>Pass rate <b>${f1(e)}%</b>`});   // the whole column, bar, logo and name, shows the tooltip
+    pts.push({x:cx, y, box:[cx - band / 2, cx + band / 2, T, H], html:`<b>${esc(m.base)}</b>${m.h ? ` · ${esc(m.h)}` : ''}<br>${M.tip(e)}`});   // the whole column, bar, logo and name, shows the tooltip
   });
-  attachTip(svg, W, H, pts, $('#fcibtip'));
+  attachTip(svg, W, H, pts, $(`#${id}tip`));
 }
 
 /* FCI: one row per model ranked by ECI, a bar from 0 (Kimi K2.7) to its FCI and its 90% interval as a whisker. */
@@ -861,8 +866,8 @@ drawPapers();
   const lock = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.2" fill="#3c4043"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="#3c4043" stroke-width="2.2" stroke-linecap="round"/></svg>';
   $('#locked').innerHTML = Array.from({length:6}, (_, i) => all[Math.floor((i + .5) * all.length / 6)]).map(([t, k]) =>
     `<div class="lk-tile" style="background:${ART_FIELD[k]}"><div class="lk-art">${taskArt(t.s, k).replace('<svg class="art"', '<svg width="100%" height="100%" preserveAspectRatio="xMidYMid slice"')}</div><span class="lk-lock">${lock}</span></div>`).join(''); })();
-drawPassCost(); drawTable(); drawLB(); drawPassBars(); drawECI(); drawTTS(); drawMap(); drawRows();
+drawPassCost(); drawPassCost('fci', 'fc'); drawTable(); drawLB(); drawPassBars(); drawPassBars('fci', 'fcb'); drawECI(); drawTTS(); drawMap(); drawRows();
 if (location.hash === '#kebab') { tView('kebab'); $('#tasks').scrollIntoView(); }
 // labels are placed by measured text width, so draw again once the web font has loaded and the widths are final
-if (document.fonts) document.fonts.ready.then(() => { drawPassCost(); drawLB(); drawPassBars(); drawECI(); drawTTS(); drawMap(); });
-let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { drawPassCost(); drawLB(); drawPassBars(); drawECI(); drawTTS(); drawMap(); drawPapers(); redraws.forEach(f => f()); }, 120); });
+if (document.fonts) document.fonts.ready.then(() => { drawPassCost(); drawPassCost('fci', 'fc'); drawLB(); drawPassBars(); drawPassBars('fci', 'fcb'); drawECI(); drawTTS(); drawMap(); });
+let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { drawPassCost(); drawPassCost('fci', 'fc'); drawLB(); drawPassBars(); drawPassBars('fci', 'fcb'); drawECI(); drawTTS(); drawMap(); drawPapers(); redraws.forEach(f => f()); }, 120); });

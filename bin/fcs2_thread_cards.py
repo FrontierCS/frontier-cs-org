@@ -146,7 +146,7 @@ OVERVIEW = {
     # pass rate by model: the leaderboard's first chart, one bar per model with its lab's logo and harness (owner, 2026-10-20:
     # the bar chart added on 2026-10-16 had no card); the line under the headline names the model with the highest pass rate
     '02-pass-rate': """() => {
-      const top = [...MODELS].sort((a, b) => passPct(b) - passPct(a))[0];
+      const top = [...MODELS].sort((a, b) => passPct(b) - passPct(a) || ECI[b.id][0] - ECI[a.id][0])[0];
       const v = card('stack', 'Pass rate', `${top.name} passes ${Math.round(passPct(top))}% of its runs.`,
         'A pass beats the human reference on every metric of every hidden workload.');
       CHART_H.fcibFlat = true; CHART_H.fcib = Math.floor(v.clientHeight - 150); v.append(document.getElementById('fcibplot')); drawPassBars();   // upright names and harnesses, as on a desktop page
