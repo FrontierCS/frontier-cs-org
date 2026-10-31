@@ -25,11 +25,11 @@ from datetime import datetime, timezone
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 lit = {}
-for f, names in (('fcs2_db_from_platform.py', ('SCORE', 'REFERENCE', 'ZERO', 'COMPLETED')), ('fcs2_runs_from_db.py', ('TASK', 'MODEL'))):
+for f, names in (('fcs2_db_from_platform.py', ('SCORE', 'REFERENCE', 'ZERO', 'COMPLETED', 'WHY')), ('fcs2_runs_from_db.py', ('TASK', 'MODEL'))):
     for n in ast.parse((ROOT / 'bin' / f).read_text()).body:   # the first, literal assignment of each
         for t in getattr(n, 'targets', []):
             if isinstance(t, ast.Name) and t.id in names and t.id not in lit: lit[t.id] = ast.literal_eval(n.value)
-SCORE, REFERENCE, ZERO, COMPLETED, TASK, MODEL = (lit[k] for k in ('SCORE', 'REFERENCE', 'ZERO', 'COMPLETED', 'TASK', 'MODEL'))
+SCORE, REFERENCE, ZERO, COMPLETED, WHY, TASK, MODEL = (lit[k] for k in ('SCORE', 'REFERENCE', 'ZERO', 'COMPLETED', 'WHY', 'TASK', 'MODEL'))
 short = lambda t: TASK[t][1] or t.split(' — ')[0]
 BY_SHORT = {}
 for t in TASK: BY_SHORT.setdefault(short(t), []).append(t)
@@ -51,9 +51,13 @@ def task_name(t):
     return names[0]
 
 
+# release model ids that differ from the converter's site ids (models added to the release after 2026-10-25)
+RELEASE_ID = {'fable51': 'fable', 'carbon-g': 'carbon'}
+
+
 def candidate(r):
     if r['candidate_name'] in MODEL: return r['candidate_name']
-    names = [c for c, v in MODEL.items() if v[0] == r['model_id']]
+    names = [c for c, v in MODEL.items() if v[0] == RELEASE_ID.get(r['model_id'], r['model_id'])]
     assert len(names) == 1, f'{r["model_id"]}: more than one database name {names}'
     return names[0]
 
@@ -87,8 +91,11 @@ for r in sorted(rel['runs'], key=lambda r: (cands.index(candidate(r)), tasks[r['
     score = SCORE.get(rid, 0.0 if zero else r['score'])
     fb = {'reference_score': REFERENCE.get(rid, OWN_REFERENCE.get(rid, r['reference_score'])), 'checks': [{'label': k['label']} for k in r.get('checks') or []]}
     if 'provider refused' in r['result_source']: fb['refusal'] = True   # the platform's cause provider_refusal_no_final
+    if rid in WHY: fb['why'] = WHY[rid]
     verdict = 'FAIL' if zero and rid in ZERO else r['verdict']
-    db.execute('insert into runs values (?,?,?,?,?,?)', (rid, score, 'COMPLETED' if rid in COMPLETED else r['platform_state'], verdict, ts(r['finished_at']) - ts(r['started_at']) if r['started_at'] and r['finished_at'] else None, json.dumps(fb)))
+    # a stored final scored by a final-only recovery run completed, as bin/fcs2_db_from_platform.py records it (ORIGIN)
+    done = rid in COMPLETED or 'recovered and evaluated' in r['result_source']
+    db.execute('insert into runs values (?,?,?,?,?,?)', (rid, score, 'COMPLETED' if done else r['platform_state'], verdict, ts(r['finished_at']) - ts(r['started_at']) if r['started_at'] and r['finished_at'] else None, json.dumps(fb)))
     db.execute('insert into cells values (?,?,?)', (rid, c, tid))
     t = traj.get((MODEL[c][0], short(tname)))
     if t is None: continue   # a hidden model's run: the site keeps no spend for it
