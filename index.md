@@ -35,12 +35,17 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
 <section class="sec" id="leaderboard">
   <h2>Leaderboard</h2>
   <!-- First in the leaderboard (owner, 2026-10-16): one bar per model, Artificial Analysis style, the value as a whole
-       number in the bar, the exact value in the tooltip. Since 2026-10-31 (owner) FCI is the main metric, a whole number with
-       no interval; its switch shows pass rate instead -->
+       number in the bar, the exact value in the tooltip. Since 2026-10-31 (owner) the bars come twice, stacked with no switch:
+       pass rate, then FCI as a whole number with no interval -->
   <figure class="chart" style="margin:0">
-    <div class="chead"><span id="fcibhead">FCI</span><div class="chips" id="lbmetric"><button class="chip" type="button" data-k="fci" aria-pressed="true">FCI</button><button class="chip" type="button" data-k="pass" aria-pressed="false">Pass rate</button></div></div>
-    <div class="plot" id="fcibplot"><svg id="fcibsvg" role="img" aria-label="FCI by model"></svg><div class="tip" id="fcibtip" hidden></div></div>
+    <div class="chead"><span>Pass rate (beat reference)</span></div>
+    <div class="plot" id="fcibplot"><svg id="fcibsvg" role="img" aria-label="Pass rate (beat reference) by model"></svg><div class="tip" id="fcibtip" hidden></div></div>
     <div class="cfoot">{% include chart_logo.html %}</div>   <!-- the bars keep their FrontierCS row (owner, 2026-10-16, on #89) -->
+  </figure>
+  <figure class="chart" style="margin:56px 0 0">
+    <div class="chead"><span>FCI</span></div>
+    <div class="plot" id="fcbplot"><svg id="fcbsvg" role="img" aria-label="FCI by model"></svg><div class="tip" id="fcbtip" hidden></div></div>
+    <div class="cfoot">{% include chart_logo.html %}</div>
   </figure>
   <!-- a short folded note in small type under the bars (owner, 2026-10-26), from the trace audits: in 10 Gemini 4 Argon runs
        in Pi the provider refused a request (finish_reason content_filter) and Pi, which does not retry, ended the run; in
