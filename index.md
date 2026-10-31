@@ -247,7 +247,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
 </section>
 </div>
 </div>
-<script defer src="{{ '/assets/js/fcs2-data.js' | relative_url }}"></script>
-<script defer src="{{ '/assets/js/fcs2-checks.js' | relative_url }}"></script>
-<script defer src="{{ '/assets/js/fcs2-art.js' | relative_url }}"></script>
-<script defer src="{{ '/assets/js/fcs2.js' | relative_url }}"></script>
+<script defer src="{{ '/assets/js/fcs2-data.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
+<script defer src="{{ '/assets/js/fcs2-checks.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
+<script defer src="{{ '/assets/js/fcs2-art.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
+<script defer src="{{ '/assets/js/fcs2.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>

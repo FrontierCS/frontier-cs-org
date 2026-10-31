@@ -25,9 +25,9 @@ page_css: [fcs2, fcs2-patch]
 </div>
 </div>
 <script>window.PATCH_DIR = "{{ '/assets/patches/' | relative_url }}"; window.FIG_DIR = "{{ '/assets/img/fcs2-tasks/' | relative_url }}";</script>
-<script defer src="{{ '/assets/js/fcs2-data.js' | relative_url }}"></script>
-<script defer src="{{ '/assets/js/fcs2-checks.js' | relative_url }}"></script>
-<script defer src="{{ '/assets/js/fcs2-metrics.js' | relative_url }}"></script>
-<script defer src="{{ '/assets/js/fcs2-solutions.js' | relative_url }}"></script>
-<script defer src="{{ '/assets/js/fcs2-patch.js' | relative_url }}"></script>
-<script defer src="{{ '/assets/js/fcs2-task.js' | relative_url }}"></script>
+<script defer src="{{ '/assets/js/fcs2-data.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
+<script defer src="{{ '/assets/js/fcs2-checks.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
+<script defer src="{{ '/assets/js/fcs2-metrics.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
+<script defer src="{{ '/assets/js/fcs2-solutions.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
+<script defer src="{{ '/assets/js/fcs2-patch.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
+<script defer src="{{ '/assets/js/fcs2-task.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
