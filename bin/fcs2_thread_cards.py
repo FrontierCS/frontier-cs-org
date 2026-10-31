@@ -149,7 +149,7 @@ OVERVIEW = {
       const top = [...MODELS].sort((a, b) => passPct(b) - passPct(a))[0];
       const v = card('stack', 'Pass rate', `${top.name} passes ${Math.round(passPct(top))}% of its runs.`,
         'A pass beats the human reference on every metric of every hidden workload.');
-      CHART_H.fcibFlat = true; CHART_H.fcib = Math.floor(v.clientHeight - 150); v.append(document.getElementById('fcibplot')); drawPassBars();   // upright names and harnesses, as on a desktop page
+      CHART_H.fcibFlat = true; CHART_H.fcib = Math.floor(v.clientHeight - 150); v.append(document.getElementById('fcibplot')); lbMetric = 'pass'; drawPassBars();   // upright names and harnesses, as on a desktop page
     }""",
     # pass rate against cost: the overview's chart
     '03-pass-cost': """() => {
