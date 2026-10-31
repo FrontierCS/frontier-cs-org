@@ -133,6 +133,12 @@ OFF_SITE = {'Argument-aware runtime privilege control',
 # ~/fcs2-ops/fable51/dispositions.json).
 # Gemini 4 Carbon's Learned Transformer Layer Mapping (DyT), Robust Image Tokenizer and Future Video Sampling: the same, after
 # verifier_gpu_error on the final evaluation (70.00 PASS, 73.79 FAIL, 78.53 FAIL).
+# Gemini 4 Carbon's Robust Image Tokenizer was rerun on 2026-10-30 (run_01M66YKCB8AH368BS290AP3WJ0): the first run's GPU
+# verifier and runner returned HTTP 502 on both train calls and the final, so it had no development feedback. The rerun's
+# final also hit verifier_gpu_error; a FINAL-only recovery (run_01M67HBD3STYJYNXEXTBR332DR) judged its stored final, 78.36
+# PASS. The site's entry for it was written from the public release with bin/fcs2_db_from_release.py, its spend estimated
+# at US$45.0757 (the gateway's token counts in its evidence at prices fitted to the other Carbon runs' costs); replace it
+# from ~/fcs2-ops/cost/carbon-tokens.json when that file has the run.
 RERUN = {('pi · Gemini 4', 'Sparse Video Attention Policy'): 'run_01M56053RVYXEC4EZTF9RWM8RK',
          ('Claude Code · Opus 5.5 (Subscription, max effort)', 'KV Cache Compaction'): 'run_01M5BMPCS19PVWJRAGZSF9ED8P',
          ('Antigravity CLI agy (gemini-4-argon)', 'Robust Image Tokenizer'): 'run_01M5SC18YDXQDSN33H4N4CR39K',
