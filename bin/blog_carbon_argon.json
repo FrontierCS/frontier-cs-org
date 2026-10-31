@@ -609,8 +609,8 @@
    true
   ],
   "detok_latent_denoising|carbon": [
-   73.78696850026606,
-   "FAIL",
+   78.36203560215822,
+   "PASS",
    true
   ],
   "ivf_pq_gpu_kernel_optimization|carbon": [

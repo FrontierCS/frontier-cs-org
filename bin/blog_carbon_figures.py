@@ -37,7 +37,8 @@ def pass_rate(narrow):
     models = {i: (n, h) for i, n, h in re.findall(r"\{id:'([a-z0-9-]+)', name:'([^']+)', short:'[^']*', h:'([^']+)'", src)}
     assert set(rate) == set(models) and len(models) == 18, (sorted(rate), sorted(models))
     name = lambda i: models[i][0] + (f' ({models[i][1]})' if models[i][0] == 'Gemini 4 Argon' else '')   # two harnesses
-    rows = sorted(rate, key=lambda i: (-rate[i][0], name(i)))
+    eci = json.JSONDecoder().raw_decode(src, re.search(r'^const ECI = ', src, re.M).end())[0]
+    rows = sorted(rate, key=lambda i: (-rate[i][0], -eci[i][0], name(i)))   # equal pass rates go by FCI, as on the site (owner, 2026-10-31)
     W, L, R, RH, BH, FS = (360, 168, 34, 22, 13, 12) if narrow else (760, 230, 44, 26, 15, 13)
     T, xmax = 2, 60
     H = T + RH * len(rows) + 2

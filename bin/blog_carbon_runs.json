@@ -1,5 +1,5 @@
 {
- "note": "Figure 2 of _posts/2026-10-29-gemini-4-carbon.md: per Gemini 4 Carbon run, [site short name, verdict, hours to the end of the session, hour of the final call or null, hours of the development submissions]. From the public release (FrontierCS2/FrontierCS-2-runs) and each run trace, read with run_timeline.py of the fcs2-trace-audit skill. The runs of KV Compaction, k-NN kernel and Polygon are the 2026-10-29 reruns with agy --print-timeout 6h (bin/fcs2_db_from_platform.py, RERUN); their times come from the ULIDs of the payloads and verifications in the released evidence.",
+ "note": "Figure 2 of _posts/2026-10-29-gemini-4-carbon.md: per Gemini 4 Carbon run, [site short name, verdict, hours to the end of the session, hour of the final call or null, hours of the development submissions]. From the public release (FrontierCS2/FrontierCS-2-runs) and each run trace, read with run_timeline.py of the fcs2-trace-audit skill. The runs of KV Compaction, k-NN kernel and Polygon are the 2026-10-29 reruns with agy --print-timeout 6h (bin/fcs2_db_from_platform.py, RERUN); their times come from the ULIDs of the payloads and verifications in the released evidence. Robust Image Tokenizer is the 2026-10-30 rerun (run_01M66YKCB8AH368BS290AP3WJ0), timed the same way; its first run had no GPU verifier (HTTP 502).",
  "runs": {
   "approximate_mips_global_probing": [
    "FARGO paper-aligned query core",
@@ -141,12 +141,13 @@
   ],
   "detok_latent_denoising": [
    "Robust Image Tokenizer",
-   "FAIL",
-   2.86,
-   2.63,
+   "PASS",
+   4.25,
+   4.14,
    [
-    0.49,
-    1.7
+    0.74,
+    1.54,
+    3.11
    ]
   ],
   "diffusion_policy_cpu": [
