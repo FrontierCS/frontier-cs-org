@@ -46,6 +46,15 @@ TASK_NAME = {'progent_privilege_control': 'Privilege Control for Tool-Using LLM 
 # nothing, and only for the run it names.
 CARRY = {(c['run_id'], c['metric']): (c['value'], c['reference_value'])
          for c in map(json.loads, open(ROOT / 'bin' / 'fcs2_metric_carry.jsonl')) if c}
+# a run's per-workload numbers from a re-run of its stored final submission (bin/fcs2_metric_replays.jsonl: run id,
+# metric, workload, value, reference_value, the re-run's own decision "beat", the date "measured", and "kind":
+# "reproduced" where the re-run reproduced the record's score exactly, "remeasured" for a wall-clock re-measurement).
+# Used only for a metric whose released evidence has no values, and only for the run it names, which keeps its own
+# score, verdict and pass flags; the aggregate row says where its numbers come from, with the number of workloads on
+# which the re-run's own decision differs from the record's flag ("mismatch"). It takes precedence over CARRY.
+REPLAY = {}
+for c in map(json.loads, open(ROOT / 'bin' / 'fcs2_metric_replays.jsonl')):
+    REPLAY.setdefault((c['run_id'], c['metric']), []).append(c)
 NEST = ('.tar', '.tar.gz', '.tgz', '.tar.zst')
 MAX_MEMBER = 64 << 20    # a file inside the verifier evidence
 MAX_ARCHIVE = 1 << 30    # the verifier evidence tar itself (vLLM's is a few hundred MB)
@@ -128,7 +137,15 @@ def main():
             for metric in metrics:
                 mine = [x for x in rows if x['metric'] == metric]
                 star = [x for x in mine if x['workload'] == '*']
-                invalid = False
+                invalid, replay = False, None
+                rp = REPLAY.get((r['run_id'], metric))
+                if rp and not star and all(x['value'] is None for x in mine):   # the evidence has flags only: the re-run's numbers
+                    flag = {x['workload']: x['beat'] for x in mine if x.get('beat') is not None}
+                    replay = {'measured': rp[0]['measured'], 'kind': rp[0]['kind'],
+                              'mismatch': sum(y['workload'] in flag and flag[y['workload']] != y['beat'] for y in rp)}
+                    unit_ = next((x['unit'] for x in mine if x.get('unit')), None)
+                    mine = [dict(metric=metric, workload=y['workload'], value=y['value'], reference_value=y['reference_value'],
+                                 beat=flag.get(y['workload'], y['beat'])) | ({'unit': unit_} if unit_ else {}) for y in rp]
                 if star: v, rv = star[0]['value'], star[0].get('reference_value')
                 else:
                     vs = [x['value'] for x in mine if x['value'] is not None]
@@ -139,7 +156,7 @@ def main():
                 b = next((x['better'] for x in mine if x.get('better')), None) or better.get(metric)
                 fa.write(json.dumps({**base, 'metric': metric, 'better': b, 'unit': unit.get(metric), 'value': v,
                                      'reference_value': rv, 'workloads': len([x for x in mine if x['workload'] != '*']), 'source': src}
-                                    | ({'invalid': True} if invalid else {})) + '\n')
+                                    | ({'invalid': True} if invalid else {}) | ({'replay': replay} if replay else {})) + '\n')
                 for x in mine:
                     if x['workload'] == '*': continue
                     fv.write(json.dumps({**base, 'metric': metric, 'workload': x['workload'], 'value': x['value'],
