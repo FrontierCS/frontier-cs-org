@@ -81,7 +81,7 @@ function drawPassCost(k = 'pass', id = 'pc') {
     svg.append(sv('line', {x1:X(v), x2:X(v), y1:T, y2:H - B, stroke:'var(--grid)', 'stroke-width':1}));
     svg.append(sv('text', {x:X(v), y:H - B + 20, 'text-anchor':'middle'}, usdfmt(v))); });
   svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'Cost per run in US$, mean, log scale'));
-  const pts = [], order = [...ms].sort((a, b) => val(b) - val(a));
+  const pts = [], order = [...ms].sort((a, b) => val(b) - val(a) || ECI[b.id][0] - ECI[a.id][0]);
   const at = m => [X(COST[m.id][0]), Y(Math.max(0, val(m)))];
   const boxes = order.map(m => { const [cx, cy] = at(m); return {x:cx - 9, y:cy - 9, w:18, h:18}; });
   // the Pareto frontier: the models no cheaper model matches or beats on the metric
@@ -111,7 +111,7 @@ const lightCol = id => { const h = getComputedStyle(document.documentElement).ge
   if (h.length !== 6) return false; const [r, g, b] = [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16) / 255);
   return .2126 * r + .7152 * g + .0722 * b > .6; };   // white as Artificial Analysis has it, dark ink only on the lightest (Sol's grey, GLM Flash's pink)
 function drawPassBars(k = 'pass', id = 'fcib') {
-  const M = METRIC[k], val = M.val, order = [...MODELS].sort((a, b) => val(b) - val(a));
+  const M = METRIC[k], val = M.val, order = [...MODELS].sort((a, b) => val(b) - val(a) || ECI[b.id][0] - ECI[a.id][0]);   // equal pass rates go by FCI (owner, 2026-10-31)
   const svg = $(`#${id}svg`), W = Math.max(300, $(`#${id}plot`).clientWidth), an = animates(svg);
   svg.setAttribute('viewBox', `0 0 ${W} 10`); svg.replaceChildren();
   const measure = (txt, size, cls = 'lab') => { const t = sv('text', {class:cls, x:-999, y:-999, 'font-size':size}, txt); svg.append(t); const w = t.getComputedTextLength(); t.remove(); return w; };
