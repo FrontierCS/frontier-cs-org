@@ -53,9 +53,10 @@ UNIT_NAME = {'milliseconds': 'ms', 'microseconds': 'µs', 'seconds': 's'}   # th
 # (Polar Express keeps these two over the original six of its twelve cases; Qiuyang, 2026-10-15)
 SIX = {'square_0', 'square_1', 'tall_0', 'tall_1', 'wide_0', 'wide_1'}
 REF_SCOPE = {('Polar Express', 'relative_polar_factor_error'): SIX, ('Polar Express', 'worst_case_scalar_error'): SIX}
-# the human reference's value by decision where no human implementation exists (Qiuyang, 2026-10-15: Structured LWE
-# counts as solving every instance, as its final score is 100); "fixed" marks it
-REF_FIXED = {('Structured LWE', 'valid_witness'): 1}
+# a pass bar shown in the reference row where the reference's own value says nothing: Structured LWE's frozen reference
+# is an empty ledger that solves no instance (0 on every workload), and a run must solve every one; "fixed" marks the
+# value as that bar and gives its label
+REF_FIXED = {('Structured LWE', 'valid_witness'): (1, 'pass bar')}
 WORKLOADS = {'CREST'}   # tasks whose page shows each hidden workload apart (their names are in assets/js/fcs2-task.js)
 rows = [json.loads(line) for line in open(sys.argv[1]) if line.strip()]
 dbp = next((a[5:] for a in sys.argv[2:] if a.startswith('--db=')), None)
@@ -64,7 +65,7 @@ if dbp:
     live = {r for r, in sqlite3.connect(dbp).execute('select run_id from cells')}
     stale = sum(r['run_id'] not in live for r in rows)
     for r in rows:   # a rerun's row from the old run: keep its direction, drop its numbers
-        if r['run_id'] not in live: r['value'] = r['reference_value'] = None
+        if r['run_id'] not in live: r['value'] = r['reference_value'] = r['invalid'] = None
 arg = lambda k: next((a[len(k) + 3:] for a in sys.argv[2:] if a.startswith(f'--{k}=')), None)
 wrows = [json.loads(l) for l in open(arg('values'))] if arg('values') else []
 margin = {(m['run_id'], m['metric'], m['workload']): m['margin'] for m in map(json.loads, open(arg('margins')))} if arg('margins') else {}
@@ -77,12 +78,14 @@ for r in rows:
     if r.get('unit') in UNIT_NAME: s['unit'] = UNIT_NAME[r['unit']]
     if cand in HIDDEN or cand not in MODEL: skipped[cand] = skipped.get(cand, 0) + 1; continue
     s['by'][MODEL[cand][0]] = [r4(r['value']), r4(r['reference_value'])]
+    if r.get('invalid'): s.setdefault('invalid', []).append(MODEL[cand][0])   # a workload without a value: "invalid", no mean
     if r['reference_value'] is not None: s['refs'].append(r['reference_value'])
 for t, metrics in out.items():
     for metric, s in metrics.items():
         refs = s.pop('refs')
         s['ref'] = r4(statistics.median(refs)) if refs else None
         s['by'] = dict(sorted(s['by'].items()))
+        if 'invalid' in s: s['invalid'] = sorted(s['invalid'])
         if (t, metric) in EXACT: s['exact'] = True
         if (t, metric) in BETTER: s['better'] = BETTER[t, metric]
         if (t, metric) in NEGATE and s['better'] == 'higher':
@@ -100,9 +103,9 @@ for p in (json.loads(l) for f in refpaths for l in open(f) if l.strip()):
     if (t, p['metric']) in REF_SCOPE and set(p.get('scope') or ()) != REF_SCOPE[t, p['metric']]: continue
     if s is not None and (s['ref'] is None or s.get('profiled')):   # a later file's row replaces an earlier one's
         s['ref'], s['profiled'] = r4(p['reference_mean']), True; profiled += 1
-for (t, metric), v in REF_FIXED.items():
+for (t, metric), (v, label) in REF_FIXED.items():
     s = out.get(t, {}).get(metric)
-    if s is not None and s['ref'] is None: s['ref'], s['fixed'] = v, True
+    if s is not None and s['ref'] is None: s['ref'], s['fixed'] = v, label
 for r in wrows:   # each workload apart, for the tasks in WORKLOADS
     task, cand = r['task'], r['candidate']
     if task not in TASK or (TASK[task][1] or task) not in WORKLOADS or cand in HIDDEN or cand not in MODEL: continue
