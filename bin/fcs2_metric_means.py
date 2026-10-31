@@ -68,7 +68,7 @@ if dbp:
     live = {r for r, in sqlite3.connect(dbp).execute('select run_id from cells')}
     stale = sum(r['run_id'] not in live for r in rows)
     for r in rows:   # a rerun's row from the old run: keep its direction, drop its numbers
-        if r['run_id'] not in live: r['value'] = r['reference_value'] = r['invalid'] = None
+        if r['run_id'] not in live: r['value'] = r['reference_value'] = r['invalid'] = r['replay'] = None
 arg = lambda k: next((a[len(k) + 3:] for a in sys.argv[2:] if a.startswith(f'--{k}=')), None)
 wrows = [json.loads(l) for l in open(arg('values'))] if arg('values') else []
 margin = {(m['run_id'], m['metric'], m['workload']): m['margin'] for m in map(json.loads, open(arg('margins')))} if arg('margins') else {}
@@ -82,6 +82,8 @@ for r in rows:
     if cand in HIDDEN or cand not in MODEL: skipped[cand] = skipped.get(cand, 0) + 1; continue
     s['by'][MODEL[cand][0]] = [r4(r['value']), r4(r['reference_value'])]
     if r.get('invalid'): s.setdefault('invalid', []).append(MODEL[cand][0])   # a workload without a value: "invalid", no mean
+    if r.get('replay'):   # numbers from a re-run of the stored final: [kind, date, workloads whose re-run decision differs]
+        s.setdefault('replay', {})[MODEL[cand][0]] = [r['replay']['kind'], r['replay']['measured'], r['replay']['mismatch']]
     if r['reference_value'] is not None: s['refs'].append(r['reference_value'])
 for t, metrics in out.items():
     for metric, s in metrics.items():
@@ -89,6 +91,7 @@ for t, metrics in out.items():
         s['ref'] = r4(statistics.median(refs)) if refs else None
         s['by'] = dict(sorted(s['by'].items()))
         if 'invalid' in s: s['invalid'] = sorted(s['invalid'])
+        if 'replay' in s: s['replay'] = dict(sorted(s['replay'].items()))
         if (t, metric) in EXACT: s['exact'] = True
         if (t, metric) in BETTER: s['better'] = BETTER[t, metric]
         if (t, metric) in NEGATE and s['better'] == 'higher':

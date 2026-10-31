@@ -53,9 +53,11 @@ function drawPage() {
     .concat([`best final score <b>${f1(best[2])}</b>, by ${esc(MNAME[best[0]])}`], ref != null ? [`human reference <b>${f1(ref)}</b>`] : []);
   // the note names the human reference's median only where its row has one; a task whose evidence holds only pass/fail has none (owner)
   const mst = (typeof METRIC_STATS === 'undefined' ? {} : METRIC_STATS)[t.s] || {}, refMean = (CHECKS[t.s] ? CHECKS[t.s].metrics : []).some(m => mst[m] && mst[m].ref != null && !mst[m].profiled && !mst[m].fixed);   // a profiled or fixed value is no median (Qiuyang)
+  const remeasured = Object.values(mst).some(s => Object.values(s.replay || {}).some(x => x[0] === 'remeasured'));
   $('#tbody').innerHTML = lead
     + `<section class="tres"><h2 class="th2">Results</h2><p class="tsum">${sum.join(' · ')}</p>`
-      + (CHECKS[t.s] ? '<p class="tnote">A run passes only if its final submission beats the human reference on every metric, on every hidden workload. Each metric column gives the run’s mean over its hidden workloads, or, where the evidence has no values, the number of workloads won; the bar under it is the share of workloads on which the run beat the human reference, green when all of them. ' + (refMean ? 'The human reference is measured again in every run, so its row shows the median, and some rules' : 'Some rules') + ' ask for a margin (for example 5% faster).</p>' : '')
+      + (CHECKS[t.s] ? '<p class="tnote">A run passes only if its final submission beats the human reference on every metric, on every hidden workload. Each metric column gives the run’s mean over its hidden workloads, or, where the evidence has no values, the number of workloads won; the bar under it is the share of workloads on which the run beat the human reference, green when all of them. ' + (refMean ? 'The human reference is measured again in every run, so its row shows the median, and some rules' : 'Some rules') + ' ask for a margin (for example 5% faster).'
+        + (remeasured ? ' Values marked re-measured come from a later re-run of the stored final submission; the score, verdict and bar are the original run’s, and * marks a run whose re-run decided a workload otherwise.' : '') + '</p>' : '')
       + `<div class="res-scroll"><table class="res rtab${CHECKS[t.s] ? ' wm' : ''}" id="rtbl"></table></div></section>`   // results and pass criteria in one table (owner, 2026-10-15)
     + figure('sc', 'Final score against cost')
     + solutionHTML(t, runs);   // the solution last (owner, 2026-10-14)
@@ -186,7 +188,13 @@ function drawResults() {
     const tip = `Beat the human reference on ${v[0]} of ${v[1]} hidden workloads` + (rref != null ? `; ${st[m].bar || 'human reference'} in this run: ${num(sc(rref, m), F[m].p)}` : '');
     const all = v[0] === v[1], bar = `<span class="mbar"><i class="${all ? 'y' : 'n'}" style="width:${(100 * v[0] / v[1]).toFixed(0)}%"></i></span>`;   // none won: the empty track (Qiuyang)
     const inv = (st[m] && st[m].invalid || []).includes(r[0]);   // a workload without a value: no mean over the rest
-    return `<td class="${mcls(i)} ${all ? 'cy' : 'cn'}" title="${tip}">` + (inv ? '<b>invalid</b>' : mean != null ? `<b>${num(sc(mean, m), F[m].p)}</b>` : `<b>${v[0]}/${v[1]}</b>`) + bar + '</td>'; };
+    // numbers from a re-run of the stored final submission (owner, 2026-10-31): the score, verdict and bar stay the
+    // record's; a wall-clock re-measurement is marked with its date, and "*" where the re-run decided a workload otherwise
+    const rp = st[m] && (st[m].replay || {})[r[0]], re = rp && rp[0] === 'remeasured';
+    const rtip = !rp ? '' : re ? `; numbers re-measured from the stored final submission on ${rp[1]}` + (rp[2] ? `; on ${rp[2]} workload${rp[2] > 1 ? 's' : ''} the re-measurement decided otherwise than the record` : '')
+      : `; numbers from a re-run of the stored final submission on ${rp[1]}, which reproduced its score`;
+    const mark = re ? `<span class="mg">re-measured ${rp[1].slice(5)}${rp[2] ? '*' : ''}</span>` : '';
+    return `<td class="${mcls(i)} ${all ? 'cy' : 'cn'}" title="${tip}${rtip}">` + (inv ? '<b>invalid</b>' : mean != null ? `<b>${num(sc(mean, m), F[m].p)}</b>` : `<b>${v[0]}/${v[1]}</b>`) + mark + bar + '</td>'; };
   // a task in WORKLOAD_NAME with numbers for each workload: every metric splits into one column per workload; the human
   // reference's cell adds the margin a run had to beat it by (the median over runs; each run's own in its tooltip), and a
   // run's bar is full green when it cleared that workload's rule, an empty track when not (Qiuyang, 2026-10-15); each
