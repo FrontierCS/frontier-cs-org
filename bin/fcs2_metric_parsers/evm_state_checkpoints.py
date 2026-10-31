@@ -5,11 +5,8 @@
 # These are not the run-level metrics.committed_tps (a geometric mean over the Spectrum workloads) or
 # metrics.checkpoint_* / retained_bytes_per_checkpoint (the checkpoint-micro profile); the site's mean is the arithmetic
 # mean over the workloads, as for every task.
-# Evidence whose passes cover checkpoint-micro but which has no workload_values gives no numbers for these four
-# metrics: its run-level aggregates are not that mean.
-# Older evidence (the three Spectrum workloads only) keeps one aggregate per metric (metrics.committed_tps,
-# checkpoint_create_ns, checkpoint_restore_ns, retained_bytes_per_checkpoint) -> workload='*' rows, no reference (the
-# site's ref is profiled).
+# Evidence without workload_values keeps one aggregate per metric (metrics.committed_tps, checkpoint_create_ns,
+# checkpoint_restore_ns, retained_bytes_per_checkpoint) -> workload='*' rows, no reference (the site's ref is profiled).
 # Correctness is run-level only (metrics.correct) -> a workload='*' row in every case.
 # A failed run has only diagnostics/failure.json -> [].
 import json
@@ -31,7 +28,7 @@ def parse(ev):
                 row = dict(metric=metric, workload=w, value=c.get(f), reference_value=r.get(f))
                 if metric in passes.get(w, {}): row['beat'] = bool(passes[w][metric])
                 rows.append(row)
-    elif not any(w.startswith('checkpoint-micro') for w in passes):
+    else:
         rows = [dict(metric=metric, workload='*', value=m[k], reference_value=None)
                 for metric, k in MAP.items() if m.get(k) is not None]
     if m.get('correct') is not None:
