@@ -4,7 +4,7 @@ import json
 # valid_witness = 1 if the id is in metrics.solved_ids else 0 (falls back to the per-instance pass flag, which is
 # equivalent because the frozen empty reference scores 0 everywhere). Site value = mean = solved_count/instance_count.
 # The evidence states no per-instance reference value (only reference_score 0.0), so reference_value=None;
-# the site's ref (=1, "fixed") is applied downstream (REF_FIXED in fcs2_metric_means.py).
+# the site shows the pass bar (=1, "fixed": every instance solved) in the reference row (REF_FIXED in fcs2_metric_means.py).
 def parse(ev):
     s = ev.get('verifier/evidence.tar!/metrics.json')
     if not s: return []

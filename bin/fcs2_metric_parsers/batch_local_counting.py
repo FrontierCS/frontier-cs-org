@@ -3,10 +3,10 @@ import json
 # (exact_counts, batch_latency_seconds) for the 6 graph x pattern-size workloads.
 #  - exact_counts: per workload value = 1.0 if the exact-output flag is true else 0.0; reference = 1.0 (the
 #    reference output is the correctness target by definition; evaluator validates naive == reference).
-#  - batch_latency_seconds: the final evidence has NO per-workload (or reference) seconds; only candidate-only
-#    full-suite medians (median_seconds, naive_median_seconds) and score-derived speedups. The site's per-workload
-#    means cannot be re-derived exactly (median_seconds/6 is within ~5%), so value/reference are None and only
-#    the per-workload beat flags are emitted.
+#  - batch_latency_seconds: newer evidence holds each workload's .candidate / .reference seconds. Older final
+#    evidence has no per-workload (or reference) seconds, only candidate-only full-suite medians, so value/reference
+#    are None there and only the per-workload beat flags are emitted; the numbers then come from a re-run of the stored
+#    final (bin/fcs2_metric_replays.jsonl) or the carry file.
 def parse(ev):
     raw = ev.get('verifier/evidence.tar!/metrics.json')
     if not raw: return []
@@ -18,6 +18,9 @@ def parse(ev):
             rows.append(dict(metric='exact_counts', workload=w['workload'], value=1.0 if f['exact_counts'] else 0.0,
                              reference_value=1.0, beat=bool(f['exact_counts'])))
         if 'batch_latency_seconds' in f:
-            rows.append(dict(metric='batch_latency_seconds', workload=w['workload'], value=None, reference_value=None,
+            c, r = w.get('candidate'), w.get('reference')
+            rows.append(dict(metric='batch_latency_seconds', workload=w['workload'],
+                             value=(c or {}).get('batch_latency_seconds') if c is not None else None,
+                             reference_value=(r or {}).get('batch_latency_seconds') if r is not None else None,
                              beat=bool(f['batch_latency_seconds']), unit='seconds'))
     return rows
