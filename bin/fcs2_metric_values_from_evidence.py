@@ -10,8 +10,11 @@ per task and model) and traces/<slug>/<model>/evidence.tar.zst. Of each archive 
 read (member verifier/evidence.tar, the platform's GET /api/v1/runs/<id>/submission/evidence?submission_id=final);
 where the run's own final has no numbers (an infrastructure or evaluator failure) and
 traces/<slug>/<model>/selected-final-rejudge/evidence.tar.zst exists, the rejudge's verifier evidence stands in (KV
-Compaction Opus, Polygon Gemini); a run whose final scored keeps its own numbers though a rejudge exists (ParButterfly
-Muse, QuarterPIR GLM), as the live page had it on 2026-10-22. PROBLEMS_DIR (default: the FrontierCS-2 release's
+Compaction Opus, Polygon Gemini). A record whose result is the rejudge's (result_source: "independently re-evaluated
+(selected-final re-judgement)") reads the rejudge's evidence first and its own only where the rejudge's has no numbers, so
+its numbers come from the evaluation that scored it; so does a record scored by a final-only recovery of its stored final
+(result_source "recovered and evaluated", traces/<slug>/<model>/final-recovery/evidence.tar.zst); any other run whose final scored keeps its own numbers though a
+rejudge exists (ParButterfly Muse, re-timed), as the live page had it on 2026-10-22. PROBLEMS_DIR (default: the FrontierCS-2 release's
 tasks/frontier-cs-2.0-demo/problems) gives each metric's direction from <category>/<slug>/judge/beat_spec.json.
 
 Every verifier writes its own metrics.json (or measurement.json), so each task has its own reader in
@@ -35,6 +38,7 @@ MODEL = next(ast.literal_eval(n.value) for n in _src.body for t in getattr(n, 't
 CANDIDATE = {}   # model id -> candidate name in the database (first MODEL key with that id), as fcs2_metric_means.py maps names
 for c, v in MODEL.items(): CANDIDATE.setdefault(v[0], c)
 PARSERS = ROOT / 'bin' / 'fcs2_metric_parsers'
+RELEASE_ID = {'fable51': 'fable', 'carbon-g': 'carbon'}   # release model ids that differ from the converter's site ids
 # release slug -> task name in the database (TASK keys of bin/fcs2_runs_from_db.py), where formal-results.json's
 # display_name is not one
 TASK_NAME = {'progent_privilege_control': 'Privilege Control for Tool-Using LLM Agents', 'fast_kv_compaction': 'KV Cache Compaction',
@@ -120,7 +124,10 @@ def main():
         slug = r['task']; parse = parser(slug)
         d = rel / 'traces' / slug / r['model_id']
         rows, arch = [], None
-        for a in (d / 'evidence.tar.zst', d / 'selected-final-rejudge' / 'evidence.tar.zst'):
+        own, rej, rec = d / 'evidence.tar.zst', d / 'selected-final-rejudge' / 'evidence.tar.zst', d / 'final-recovery' / 'evidence.tar.zst'
+        src = r.get('result_source') or ''   # a record scored by a separate evaluation reads that evaluation's evidence first
+        order = (rej, own, rec) if 'selected-final re-judgement' in src else (rec, own, rej) if 'recovered and evaluated' in src else (own, rej, rec)
+        for a in order:
             if parse and a.exists() and not rows:
                 try: rows, arch = parse(members(a)) or [], a
                 except (KeyError, IndexError, TypeError, ValueError, ZeroDivisionError) as e:   # evidence of another shape: no numbers
@@ -133,7 +140,7 @@ def main():
         metrics = sorted({x['metric'] for _, rows, _ in items for x in rows})
         unit = {x['metric']: x['unit'] for _, rows, _ in items for x in rows if x.get('unit')}
         for r, rows, src in items:
-            base = {'run_id': r['run_id'], 'task': tname[slug], 'candidate': CANDIDATE.get(r['model_id'], r['candidate_name']), 'model_id': r['model_id']}
+            base = {'run_id': r['run_id'], 'task': tname[slug], 'candidate': CANDIDATE.get(RELEASE_ID.get(r['model_id'], r['model_id']), r['candidate_name']), 'model_id': r['model_id']}
             for metric in metrics:
                 mine = [x for x in rows if x['metric'] == metric]
                 star = [x for x in mine if x['workload'] == '*']
