@@ -13,7 +13,8 @@ records, and the other two have no entry where the release lists every workload 
 Where a task's changed records check metrics that a kept record passing the task was never measured on (a task version
 that added metrics: Robust Image Tokenizer's LPIPS metrics), the kept record gets each added metric as beaten on all its
 workloads, as its published PASS says it beat every metric; bin/fcs2_runs_from_db.py stops unless PASS is every metric
-beaten. The script prints these cells.
+beaten. The script prints these cells. Entries of models in HIDDEN are kept in the hidden file only (moved there when a
+model is hidden), as bin/fcs2_checks_from_platform.py splits them.
 """
 import ast, collections, json, pathlib, re, sys
 
@@ -50,6 +51,15 @@ for r in new['runs']:
         tgt.setdefault(k, {})[mid(r)] = {c['label']: [c['passed'], c['total']] for c in r['checks']}; n_set += 1
     elif mid(r) in tgt.get(k, {}):
         del tgt[k][mid(r)]; n_del += 1
+moved = 0   # entries of models now kept off the site (HIDDEN) go to the hidden file, and back when a model is shown again
+for k in set(PB) | set(HPB):
+    for m in list(PB.get(k, {})):
+        if m in hidden: HPB.setdefault(k, {})[m] = PB[k].pop(m); moved += 1
+    for m in list(HPB.get(k, {})):
+        if m not in hidden: PB.setdefault(k, {})[m] = HPB[k].pop(m); moved += 1
+for t in (PB, HPB):
+    for k in [k for k, v in t.items() if not v]: del t[k]
+HJ['models'] = {MODEL[c][0]: MODEL[c][1] for c in MODEL if c in HIDDEN}
 imputed = []
 for task in sorted({r['task'] for r in new['runs'] if r['record_id'] in changed}):
     k = key[task]
@@ -64,4 +74,4 @@ for task in sorted({r['task'] for r in new['runs'] if r['record_id'] in changed}
             table(r).setdefault(k, {})[mid(r)] = cur; imputed.append((r['record_id'], add))
 path.write_text(js[:js.index('const PASSBY = ')] + 'const PASSBY = ' + json.dumps(PB, separators=(',', ':')) + ';\n')
 (ROOT / '_data/fcs2_checks_hidden.json').write_text(json.dumps(HJ, ensure_ascii=False, indent=1) + '\n')   # as bin/fcs2_checks_from_platform.py writes it
-print(f'{len(changed)} changed records: PASSBY entries set {n_set}, removed {n_del}; added metrics counted as beaten for kept PASS records: {imputed}')
+print(f'{len(changed)} changed records: PASSBY entries set {n_set}, removed {n_del}; moved between shown and hidden {moved}; added metrics counted as beaten for kept PASS records: {imputed}')
