@@ -71,7 +71,9 @@ CACHE = {'GPT-6 Astra': 1.00, 'GPT-6.1 Sol': 0.10, 'Kimi K3 (Modal)': 0.30, 'Dee
          'Claude Code · Fable 5.1 (Subscription)': None,
          # Gemini 4 Carbon (carbon-g) on the Antigravity CLI (2026-10-27): its runs' costs come from --run-cost, its gateway
          # token counts at Gemini 4 Argon's prices (no public carbon-g price)
-         'Antigravity CLI agy (carbon-g)': None}
+         'Antigravity CLI agy (carbon-g)': None,
+         # MiniMax-M3.1-Flash on Claude Code through OpenRouter (2026-11-01): its runs' costs are the gateway's spend log
+         'Claude Code · MiniMax-M3.1-Flash': None}
 # A candidate whose formal run of the task set spans several evaluations, collected as one: Gemini 4 Argon on agy ran six
 # CPU tasks first in a batch of their own and the other 42 in its formal evaluation; together they are its 48 (Qiuyang,
 # 2026-10-25). The first evaluation listed is the formal one.
@@ -197,7 +199,15 @@ WHY = {'run_01M5QR7T4M65RY0VAYMQDN6TP2': 'Out of memory (exit 137)',            
        'run_01M5VAJHMZXCEMGN8RREPEAVCB': 'Out of memory (exit 137)',            # within the task's 4 GiB limit
        'run_01M5VAJHMZSTXYEGRP3ZVF9R9K': 'Workspace over 4 GiB, evicted',
        'run_01M61SQZJ5A7HWMZMM975PG4V8': 'Out of memory (exit 137)',            # within the task's 4 GiB limit
-       'run_01M61SR17DTR7FS5GE4HM2EQDJ': 'Out of memory (exit 137)'}            # within the task's 8 GiB limit (BABBLE)
+       'run_01M61SR17DTR7FS5GE4HM2EQDJ': 'Out of memory (exit 137)',            # within the task's 8 GiB limit (BABBLE)
+       # MiniMax-M3.1-Flash (eval_01M6CMMG3YG91H7GKTD3KXFCQ4; ~/fcs2-ops/minimax/formal/dispositions.md)
+       'run_01M6CMMG435CAF6ASQQQS9FHGY': 'Reply cut at the output limit, harness exited, no final',
+       'run_01M6CMMG47BN7MM9FJ4RBW80GZ': 'Reply cut at the output limit, harness exited, no final',
+       'run_01M6CMMG49ZSQNNVEXBVHMPWPP': 'Reply cut at the output limit, harness exited, no final',
+       'run_01M6CMMG44FKQ5QZ0F340PZXZ7': 'Harness exited (exit 1), no final',
+       'run_01M6CMMG44VT465WY19DKJ3K8T': 'Out of memory (exit 137)',
+       'run_01M6CMMG438VHFZBRJ7YWF3AVD': 'Workspace over 4 GiB, evicted',
+       'run_01M6CMMG4531H0YHHP8D6KDGW3': 'Stored checkpoint failed on the verifier GPU'}
 # Runs the platform marks FAILED whose selected final was rejudged and accepted: they completed, so the site shows no failure
 # for them. Claude Opus 5.5's KV Cache Compaction (61.55; Qiuyang, 2026-10-20: "kebab上的opus kv compaction信息是否不对").
 COMPLETED = {'run_01M5BMPCS19PVWJRAGZSF9ED8P'}
