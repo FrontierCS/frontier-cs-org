@@ -1,13 +1,24 @@
 {
  "note": "Per-metric counts of models kept off the site (HIDDEN in bin/fcs2_runs_from_db.py), in the shape of PASSBY in assets/js/fcs2-checks.js. For fits only; not shown on any page.",
  "models": {
-  "k27": "Kimi K2.7"
+  "k27": "Kimi K2.7",
+  "gemini": "Gemini 4 Argon"
  },
  "passby": {
   "SCOPE": {
    "k27": {
     "batch_latency_seconds": [
      0,
+     6
+    ],
+    "exact_counts": [
+     6,
+     6
+    ]
+   },
+   "gemini": {
+    "batch_latency_seconds": [
+     6,
      6
     ],
     "exact_counts": [
@@ -26,12 +37,32 @@
      0,
      2
     ]
+   },
+   "gemini": {
+    "accuracy_qualified": [
+     2,
+     2
+    ],
+    "selected_runtime_seconds": [
+     2,
+     2
+    ]
    }
   },
   "BABBLE": {
    "k27": {
     "compression_ratio": [
      5,
+     10
+    ],
+    "runtime_seconds": [
+     10,
+     10
+    ]
+   },
+   "gemini": {
+    "compression_ratio": [
+     9,
      10
     ],
     "runtime_seconds": [
@@ -58,10 +89,50 @@
      0,
      2
     ]
+   },
+   "gemini": {
+    "average_jct_seconds": [
+     2,
+     2
+    ],
+    "makespan_seconds": [
+     2,
+     2
+    ],
+    "unfair_job_fraction_percent": [
+     2,
+     2
+    ],
+    "worst_finish_time_fairness_rho": [
+     2,
+     2
+    ]
    }
   },
   "Spectrum": {
    "k27": {
+    "checkpoint_create_ns": [
+     3,
+     6
+    ],
+    "checkpoint_restore_ns": [
+     3,
+     6
+    ],
+    "committed_tps": [
+     1,
+     6
+    ],
+    "correctness": [
+     6,
+     6
+    ],
+    "retained_bytes_per_checkpoint": [
+     1,
+     6
+    ]
+   },
+   "gemini": {
     "checkpoint_create_ns": [
      0,
      3
@@ -71,7 +142,7 @@
      3
     ],
     "committed_tps": [
-     3,
+     0,
      3
     ],
     "correctness": [
@@ -92,6 +163,16 @@
     ],
     "wall_clock_seconds": [
      1,
+     6
+    ]
+   },
+   "gemini": {
+    "congruence_seconds": [
+     6,
+     6
+    ],
+    "wall_clock_seconds": [
+     4,
      6
     ]
    }
@@ -122,10 +203,38 @@
      0,
      21
     ]
+   },
+   "gemini": {
+    "refuted_pair": [
+     21,
+     21
+    ],
+    "wall_time_seconds": [
+     19,
+     21
+    ]
    }
   },
   "FARGO paper-aligned query core": {
    "k27": {
+    "candidates_verified": [
+     48,
+     48
+    ],
+    "overall_ratio": [
+     48,
+     48
+    ],
+    "query_time_ms": [
+     48,
+     48
+    ],
+    "recall": [
+     48,
+     48
+    ]
+   },
+   "gemini": {
     "candidates_verified": [
      48,
      48
@@ -150,12 +259,24 @@
      4,
      8
     ]
+   },
+   "gemini": {
+    "tflops": [
+     8,
+     8
+    ]
    }
   },
   "Parallel DBSCAN": {
    "k27": {
     "elapsed_seconds": [
      6,
+     12
+    ]
+   },
+   "gemini": {
+    "elapsed_seconds": [
+     9,
      12
     ]
    }
@@ -174,6 +295,20 @@
      1,
      12
     ]
+   },
+   "gemini": {
+    "auxiliary_bytes": [
+     12,
+     12
+    ],
+    "region_graph_ns": [
+     12,
+     12
+    ],
+    "sort_time_ns": [
+     8,
+     12
+    ]
    }
   },
   "Seer": {
@@ -188,6 +323,20 @@
     ],
     "transaction_path_accuracy": [
      4,
+     6
+    ]
+   },
+   "gemini": {
+    "branch_accuracy": [
+     6,
+     6
+    ],
+    "report_coverage": [
+     6,
+     6
+    ],
+    "transaction_path_accuracy": [
+     6,
      6
     ]
    }
@@ -206,20 +355,64 @@
      2,
      6
     ]
+   },
+   "gemini": {
+    "label_mismatch_fraction": [
+     6,
+     6
+    ],
+    "labeled_inertia": [
+     6,
+     6
+    ],
+    "lloyd_loop_latency_ms": [
+     6,
+     6
+    ]
    }
   },
   "Robust Image Tokenizer": {
    "k27": {
-    "ema_quantized_png_psnr_db": [
+    "ema_quantized_png_lpips": [
      0,
      3
     ],
+    "ema_quantized_png_psnr_db": [
+     2,
+     3
+    ],
     "method_process_wall_seconds": [
+     2,
+     3
+    ],
+    "ordinary_quantized_png_lpips": [
      1,
      3
     ],
     "ordinary_quantized_png_psnr_db": [
-     2,
+     3,
+     3
+    ]
+   },
+   "gemini": {
+    "ema_quantized_png_psnr_db": [
+     3,
+     3
+    ],
+    "method_process_wall_seconds": [
+     3,
+     3
+    ],
+    "ordinary_quantized_png_psnr_db": [
+     3,
+     3
+    ],
+    "ema_quantized_png_lpips": [
+     3,
+     3
+    ],
+    "ordinary_quantized_png_lpips": [
+     3,
      3
     ]
    }
@@ -250,12 +443,44 @@
      2,
      3
     ]
+   },
+   "gemini": {
+    "clip_fdr": [
+     2,
+     3
+    ],
+    "convnext_fdr": [
+     2,
+     3
+    ],
+    "dinov2_fdr": [
+     1,
+     3
+    ],
+    "inception_fdr": [
+     2,
+     3
+    ],
+    "mae_fdr": [
+     2,
+     3
+    ],
+    "siglip_fdr": [
+     2,
+     3
+    ]
    }
   },
   "OCR Distillation Trajectory Sampling": {
    "k27": {
     "ocr_reward": [
      0,
+     8
+    ]
+   },
+   "gemini": {
+    "ocr_reward": [
+     4,
      8
     ]
    }
@@ -310,20 +535,44 @@
      0,
      3
     ]
+   },
+   "gemini": {
+    "average_episodic_reward": [
+     1,
+     3
+    ],
+    "success_rate": [
+     0,
+     3
+    ]
    }
   },
   "Nano World Model": {
    "k27": {
     "lpips": [
+     6,
+     6
+    ],
+    "psnr": [
+     3,
+     6
+    ],
+    "ssim": [
+     6,
+     6
+    ]
+   },
+   "gemini": {
+    "lpips": [
      3,
      6
     ],
     "psnr": [
-     4,
+     6,
      6
     ],
     "ssim": [
-     3,
+     6,
      6
     ]
    }
@@ -340,6 +589,20 @@
     ],
     "search_latency_ms": [
      1,
+     8
+    ]
+   },
+   "gemini": {
+    "iso_recall": [
+     8,
+     8
+    ],
+    "nn_recall": [
+     8,
+     8
+    ],
+    "search_latency_ms": [
+     8,
      8
     ]
    }
@@ -362,6 +625,24 @@
      4,
      8
     ]
+   },
+   "gemini": {
+    "distance_consistency": [
+     8,
+     8
+    ],
+    "latency_ms": [
+     8,
+     8
+    ],
+    "worst_ball_recall": [
+     7,
+     8
+    ],
+    "worst_exact_recall": [
+     7,
+     8
+    ]
    }
   },
   "Binary Fuse Filter Construction and Lookup": {
@@ -380,6 +661,28 @@
     ],
     "resident_bytes": [
      144,
+     144
+    ],
+    "space_overhead_pct": [
+     144,
+     144
+    ]
+   },
+   "gemini": {
+    "build_ns": [
+     72,
+     144
+    ],
+    "effective_fpr": [
+     144,
+     144
+    ],
+    "lookup_ns": [
+     118,
+     144
+    ],
+    "resident_bytes": [
+     0,
      144
     ],
     "space_overhead_pct": [
@@ -702,6 +1005,320 @@
      1,
      1
     ]
+   },
+   "gemini": {
+    "dev/1/exact_result": [
+     1,
+     1
+    ],
+    "dev/1/median_latency": [
+     1,
+     1
+    ],
+    "dev/10/exact_result": [
+     1,
+     1
+    ],
+    "dev/10/median_latency": [
+     1,
+     1
+    ],
+    "dev/11/exact_result": [
+     1,
+     1
+    ],
+    "dev/11/median_latency": [
+     1,
+     1
+    ],
+    "dev/12/exact_result": [
+     1,
+     1
+    ],
+    "dev/12/median_latency": [
+     0,
+     1
+    ],
+    "dev/13/exact_result": [
+     1,
+     1
+    ],
+    "dev/13/median_latency": [
+     1,
+     1
+    ],
+    "dev/14/exact_result": [
+     1,
+     1
+    ],
+    "dev/14/median_latency": [
+     0,
+     1
+    ],
+    "dev/15/exact_result": [
+     1,
+     1
+    ],
+    "dev/15/median_latency": [
+     1,
+     1
+    ],
+    "dev/16/exact_result": [
+     1,
+     1
+    ],
+    "dev/16/median_latency": [
+     0,
+     1
+    ],
+    "dev/17/exact_result": [
+     1,
+     1
+    ],
+    "dev/17/median_latency": [
+     1,
+     1
+    ],
+    "dev/18/exact_result": [
+     1,
+     1
+    ],
+    "dev/18/median_latency": [
+     1,
+     1
+    ],
+    "dev/19/exact_result": [
+     1,
+     1
+    ],
+    "dev/19/median_latency": [
+     0,
+     1
+    ],
+    "dev/2/exact_result": [
+     1,
+     1
+    ],
+    "dev/2/median_latency": [
+     1,
+     1
+    ],
+    "dev/20/exact_result": [
+     1,
+     1
+    ],
+    "dev/20/median_latency": [
+     0,
+     1
+    ],
+    "dev/3/exact_result": [
+     1,
+     1
+    ],
+    "dev/3/median_latency": [
+     1,
+     1
+    ],
+    "dev/4/exact_result": [
+     1,
+     1
+    ],
+    "dev/4/median_latency": [
+     1,
+     1
+    ],
+    "dev/5/exact_result": [
+     1,
+     1
+    ],
+    "dev/5/median_latency": [
+     1,
+     1
+    ],
+    "dev/6/exact_result": [
+     1,
+     1
+    ],
+    "dev/6/median_latency": [
+     1,
+     1
+    ],
+    "dev/7/exact_result": [
+     1,
+     1
+    ],
+    "dev/7/median_latency": [
+     1,
+     1
+    ],
+    "dev/8/exact_result": [
+     1,
+     1
+    ],
+    "dev/8/median_latency": [
+     0,
+     1
+    ],
+    "dev/9/exact_result": [
+     1,
+     1
+    ],
+    "dev/9/median_latency": [
+     0,
+     1
+    ],
+    "final/1/exact_result": [
+     1,
+     1
+    ],
+    "final/1/median_latency": [
+     1,
+     1
+    ],
+    "final/10/exact_result": [
+     1,
+     1
+    ],
+    "final/10/median_latency": [
+     1,
+     1
+    ],
+    "final/11/exact_result": [
+     1,
+     1
+    ],
+    "final/11/median_latency": [
+     0,
+     1
+    ],
+    "final/12/exact_result": [
+     1,
+     1
+    ],
+    "final/12/median_latency": [
+     0,
+     1
+    ],
+    "final/13/exact_result": [
+     1,
+     1
+    ],
+    "final/13/median_latency": [
+     1,
+     1
+    ],
+    "final/14/exact_result": [
+     1,
+     1
+    ],
+    "final/14/median_latency": [
+     1,
+     1
+    ],
+    "final/15/exact_result": [
+     1,
+     1
+    ],
+    "final/15/median_latency": [
+     1,
+     1
+    ],
+    "final/16/exact_result": [
+     1,
+     1
+    ],
+    "final/16/median_latency": [
+     0,
+     1
+    ],
+    "final/17/exact_result": [
+     1,
+     1
+    ],
+    "final/17/median_latency": [
+     0,
+     1
+    ],
+    "final/18/exact_result": [
+     1,
+     1
+    ],
+    "final/18/median_latency": [
+     1,
+     1
+    ],
+    "final/19/exact_result": [
+     1,
+     1
+    ],
+    "final/19/median_latency": [
+     1,
+     1
+    ],
+    "final/2/exact_result": [
+     1,
+     1
+    ],
+    "final/2/median_latency": [
+     1,
+     1
+    ],
+    "final/3/exact_result": [
+     1,
+     1
+    ],
+    "final/3/median_latency": [
+     1,
+     1
+    ],
+    "final/4/exact_result": [
+     1,
+     1
+    ],
+    "final/4/median_latency": [
+     1,
+     1
+    ],
+    "final/5/exact_result": [
+     1,
+     1
+    ],
+    "final/5/median_latency": [
+     1,
+     1
+    ],
+    "final/6/exact_result": [
+     1,
+     1
+    ],
+    "final/6/median_latency": [
+     1,
+     1
+    ],
+    "final/7/exact_result": [
+     1,
+     1
+    ],
+    "final/7/median_latency": [
+     1,
+     1
+    ],
+    "final/8/exact_result": [
+     1,
+     1
+    ],
+    "final/8/median_latency": [
+     1,
+     1
+    ],
+    "final/9/exact_result": [
+     1,
+     1
+    ],
+    "final/9/median_latency": [
+     0,
+     1
+    ]
    }
   },
   "CKKS noise": {
@@ -712,6 +1329,20 @@
     ],
     "estimator_seconds": [
      21,
+     29
+    ],
+    "std_log2_prec_l2_abs_discrepancy_bits": [
+     29,
+     29
+    ]
+   },
+   "gemini": {
+    "avg_log2_prec_l2_abs_discrepancy_bits": [
+     29,
+     29
+    ],
+    "estimator_seconds": [
+     29,
      29
     ],
     "std_log2_prec_l2_abs_discrepancy_bits": [
@@ -730,10 +1361,42 @@
      0,
      60
     ]
+   },
+   "gemini": {
+    "core_peak_live_bytes": [
+     60,
+     60
+    ],
+    "cpu_time_seconds": [
+     11,
+     60
+    ]
    }
   },
   "QuarterPIR": {
    "k27": {
+    "client_storage_bytes": [
+     0,
+     2
+    ],
+    "end_to_end_online_time_ms": [
+     0,
+     2
+    ],
+    "online_communication_bytes": [
+     2,
+     2
+    ],
+    "preprocessing_client_time_minutes": [
+     2,
+     2
+    ],
+    "server_compute_time_ns": [
+     0,
+     2
+    ]
+   },
+   "gemini": {
     "client_storage_bytes": [
      4,
      4
@@ -743,7 +1406,7 @@
      4
     ],
     "online_communication_bytes": [
-     2000,
+     4000,
      4000
     ],
     "preprocessing_client_time_minutes": [
@@ -763,8 +1426,8 @@
      24
     ],
     "mean_query_time": [
-     7,
-     12
+     16,
+     24
     ],
     "recall_at_50": [
      6,
@@ -772,6 +1435,24 @@
     ],
     "verified_candidate_count": [
      11,
+     24
+    ]
+   },
+   "gemini": {
+    "last_result_inner_product_ratio": [
+     24,
+     24
+    ],
+    "mean_query_time": [
+     12,
+     12
+    ],
+    "recall_at_50": [
+     24,
+     24
+    ],
+    "verified_candidate_count": [
+     24,
      24
     ]
    }
@@ -802,6 +1483,32 @@
      3,
      3
     ]
+   },
+   "gemini": {
+    "delta": [
+     2,
+     3
+    ],
+    "epsilon": [
+     3,
+     3
+    ],
+    "orth_err_normalized": [
+     3,
+     3
+    ],
+    "procrustes_mse": [
+     3,
+     3
+    ],
+    "r2_hz": [
+     3,
+     3
+    ],
+    "r2_zh": [
+     3,
+     3
+    ]
    }
   },
   "Diffusion Policy": {
@@ -822,10 +1529,38 @@
      4,
      4
     ]
+   },
+   "gemini": {
+    "complete_workload_wall_seconds": [
+     4,
+     4
+    ],
+    "episode_success_rate": [
+     3,
+     4
+    ],
+    "mean_episode_max_reward": [
+     3,
+     4
+    ],
+    "mean_predict_action_seconds": [
+     4,
+     4
+    ]
    }
   },
   "Clusterwise SpGEMM": {
    "k27": {
+    "execution_time_ms": [
+     8,
+     8
+    ],
+    "throughput_mflops": [
+     8,
+     8
+    ]
+   },
+   "gemini": {
     "execution_time_ms": [
      8,
      8
@@ -858,6 +1593,28 @@
      0,
      4
     ]
+   },
+   "gemini": {
+    "correctness": [
+     4,
+     4
+    ],
+    "p90": [
+     3,
+     4
+    ],
+    "p95": [
+     2,
+     4
+    ],
+    "p99": [
+     2,
+     4
+    ],
+    "paired_timing": [
+     4,
+     4
+    ]
    }
   },
   "Progent": {
@@ -868,6 +1625,16 @@
     ],
     "utility_under_attack": [
      2,
+     4
+    ]
+   },
+   "gemini": {
+    "attack_success_rate": [
+     3,
+     4
+    ],
+    "utility_under_attack": [
+     3,
      4
     ]
    }
@@ -881,6 +1648,276 @@
     "counting_seconds": [
      8,
      8
+    ]
+   },
+   "gemini": {
+    "butterfly_count": [
+     8,
+     8
+    ],
+    "counting_seconds": [
+     8,
+     8
+    ]
+   }
+  },
+  "Polar Express": {
+   "k27": {
+    "polar_cosine_similarity": [
+     0,
+     12
+    ],
+    "relative_polar_factor_error": [
+     0,
+     12
+    ],
+    "spectral_polar_error": [
+     0,
+     12
+    ],
+    "top_subspace_polar_error": [
+     0,
+     12
+    ],
+    "worst_case_scalar_error": [
+     0,
+     12
+    ]
+   },
+   "gemini": {
+    "polar_cosine_similarity": [
+     12,
+     12
+    ],
+    "relative_polar_factor_error": [
+     12,
+     12
+    ],
+    "spectral_polar_error": [
+     12,
+     12
+    ],
+    "top_subspace_polar_error": [
+     12,
+     12
+    ],
+    "worst_case_scalar_error": [
+     12,
+     12
+    ]
+   }
+  },
+  "LRR": {
+   "k27": {
+    "jaccard": [
+     0,
+     4
+    ],
+    "nls": [
+     4,
+     4
+    ],
+    "precision": [
+     1,
+     4
+    ],
+    "recall": [
+     0,
+     4
+    ],
+    "repair_rate": [
+     3,
+     4
+    ],
+    "rli": [
+     4,
+     4
+    ],
+    "vulnerability_elimination_rate": [
+     3,
+     4
+    ],
+    "well_formed_rate": [
+     3,
+     4
+    ]
+   },
+   "gemini": {
+    "jaccard": [
+     0,
+     4
+    ],
+    "nls": [
+     3,
+     4
+    ],
+    "precision": [
+     0,
+     4
+    ],
+    "recall": [
+     1,
+     4
+    ],
+    "repair_rate": [
+     3,
+     4
+    ],
+    "rli": [
+     4,
+     4
+    ],
+    "vulnerability_elimination_rate": [
+     3,
+     4
+    ],
+    "well_formed_rate": [
+     2,
+     4
+    ]
+   }
+  },
+  "CREST": {
+   "gemini": {
+    "branches_covered": [
+     0,
+     2
+    ],
+    "search_overhead_seconds": [
+     1,
+     2
+    ]
+   }
+  },
+  "dbscan kernel": {
+   "gemini": {
+    "adjusted_rand_index": [
+     5,
+     6
+    ],
+    "dbscan_latency_ms": [
+     6,
+     6
+    ],
+    "noise_mismatch_fraction": [
+     5,
+     6
+    ]
+   }
+  },
+  "Glenside": {
+   "gemini": {
+    "egraph_node_growth": [
+     14,
+     14
+    ],
+    "im2col_discovery": [
+     14,
+     14
+    ],
+    "rewrite_time_seconds": [
+     14,
+     14
+    ]
+   }
+  },
+  "RUNLTS": {
+   "gemini": {
+    "br_mis_pki": [
+     45,
+     105
+    ],
+    "cyc_wp_pki": [
+     52,
+     105
+    ],
+    "logical_storage_bits": [
+     105,
+     105
+    ]
+   }
+  },
+  "SVG-EAR": {
+   "gemini": {
+    "e2e_latency_seconds": [
+     12,
+     12
+    ],
+    "lpips": [
+     4,
+     12
+    ],
+    "psnr_db": [
+     5,
+     12
+    ],
+    "ssim": [
+     5,
+     12
+    ]
+   }
+  },
+  "KV Compaction": {
+   "gemini": {
+    "compact_cache_bytes": [
+     24,
+     24
+    ],
+    "compaction_seconds": [
+     24,
+     24
+    ],
+    "qa_correct": [
+     17,
+     24
+    ]
+   }
+  },
+  "DyT": {
+   "gemini": {
+    "inference_latency_ms": [
+     3,
+     3
+    ],
+    "top1_accuracy_pct": [
+     3,
+     3
+    ],
+    "training_latency_ms": [
+     3,
+     3
+    ]
+   }
+  },
+  "BBQ": {
+   "gemini": {
+    "latency_seconds": [
+     9,
+     9
+    ],
+    "throughput_ops_per_second": [
+     9,
+     9
+    ]
+   }
+  },
+  "MetaOpt": {
+   "gemini": {
+    "gap": [
+     0,
+     30
+    ]
+   }
+  },
+  "Hygra": {
+   "gemini": {
+    "runtime_seconds": [
+     4,
+     4
+    ],
+    "sequential_runtime_seconds": [
+     4,
+     4
     ]
    }
   }
