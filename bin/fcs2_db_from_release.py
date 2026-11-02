@@ -19,7 +19,8 @@ byte and every value of its converter block (runs, pass rates, FCI, FDI, metric 
 except 43 of SCALE's 384 budgets, which move by at most US$0.00002 (TRAJ keeps a run's largest spend to 4 decimals).
 --spend=FILE gives the spend of runs that REV's TRAJ does not hold: a release whose records changed after REV (a rerun
 that replaced a record, or a record rescored in place). One JSON row per run: run_id, usd (its spend at the end), dev
-([[US$, development score], ...] in order) and source (how the spend was found). Such a run takes its spend and
+([[US$, development score], ...] in order, on the record's score scale: a record whose score was converted to a new
+scale has its development scores converted too, as dev_rescored says) and source (how the spend was found). Such a run takes its spend and
 development scores from the row, not from TRAJ; every other run must still equal TRAJ. The snapshot is then dated by the
 release's generated_at, not by REV.
 Development submissions get placeholder ids (train-<n>), as nothing reads them. Add the candidates of a newer platform
