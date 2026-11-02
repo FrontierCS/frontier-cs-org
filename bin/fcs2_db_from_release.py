@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Rebuild the snapshot database the live site was built from, without the platform that held its runs.
 
-usage: python3 bin/fcs2_db_from_release.py out.db formal-results.json REV
+usage: python3 bin/fcs2_db_from_release.py out.db formal-results.json REV [--spend=spend.jsonl]
        (REV: the commit whose site the snapshot built; 99df6b5 for the site before DeepSeek V4.1 Flash 1017)
 
 When the platform that ran the formal evaluations is gone (2026-10-24: the old host and its last snapshot, a scratch file,
@@ -17,6 +17,12 @@ writes, from what was published:
 Checked 2026-10-25 at 99df6b5: the converter on this database writes that commit's _data/fcs2_runs_hidden.json byte for
 byte and every value of its converter block (runs, pass rates, FCI, FDI, metric groups, costs, trajectories, references)
 except 43 of SCALE's 384 budgets, which move by at most US$0.00002 (TRAJ keeps a run's largest spend to 4 decimals).
+--spend=FILE gives the spend of runs that REV's TRAJ does not hold: a release whose records changed after REV (a rerun
+that replaced a record, or a record rescored in place). One JSON row per run: run_id, usd (its spend at the end), dev
+([[US$, development score], ...] in order, on the record's score scale: a record whose score was converted to a new
+scale has its development scores converted too, as dev_rescored says) and source (how the spend was found). Such a run takes its spend and
+development scores from the row, not from TRAJ; every other run must still equal TRAJ. The snapshot is then dated by the
+release's generated_at, not by REV.
 Development submissions get placeholder ids (train-<n>), as nothing reads them. Add the candidates of a newer platform
 with bin/fcs2_db_add_snapshot.py.
 """
@@ -36,6 +42,7 @@ for t in TASK: BY_SHORT.setdefault(short(t), []).append(t)
 
 rel = json.load(open(sys.argv[2]))
 REV = sys.argv[3]   # the commit whose published files the snapshot was built for
+SPEND = {x['run_id']: x for a in sys.argv[4:] if a.startswith('--spend=') for x in map(json.loads, open(a[8:])) if x}
 show = lambda path: subprocess.run(['git', '-C', str(ROOT), 'show', f'{REV}:{path}'], check=True, capture_output=True).stdout.decode('utf-8')
 TRAJ = json.loads(re.search(r'^const TRAJ = (.*);$', show('assets/js/fcs2-data.js'), re.M).group(1))
 generated = json.loads(show('_data/fcs2_runs_hidden.json'))['generated_at']
@@ -80,6 +87,7 @@ create table cells(run_id text, candidate_id text, task_id text);
 create table runs(id text primary key, display_score real, state text, display_verdict text, elapsed_seconds real, feedback_json text);
 create table submissions(run_id text, id text, kind text, patch_sha256 text, ordinal int);
 create table score_points(run_id text, submission_id text, score real, total_tokens real, output_tokens real);''')
+if SPEND: generated = rel['generated_at']   # records changed after REV: the snapshot is the release's
 db.execute('insert into release values (?)', (generated,))
 cands = [candidate(m | {'model_id': m['model_id']}) for m in rel['models']]   # the release lists the models in the evaluations' order
 for n, c in enumerate(cands): db.execute('insert into candidates values (?,?,?)', (c, c, n))
@@ -97,6 +105,16 @@ for r in sorted(rel['runs'], key=lambda r: (cands.index(candidate(r)), tasks[r['
     done = rid in COMPLETED or 'recovered and evaluated' in r['result_source']
     db.execute('insert into runs values (?,?,?,?,?,?)', (rid, score, 'COMPLETED' if done else r['platform_state'], verdict, ts(r['finished_at']) - ts(r['started_at']) if r['started_at'] and r['finished_at'] else None, json.dumps(fb)))
     db.execute('insert into cells values (?,?,?)', (rid, c, tid))
+    if rid in SPEND:   # a record changed after REV: its spend and development scores from --spend
+        if (MODEL[c][0], short(tname)) in traj: used.add((MODEL[c][0], short(tname)))
+        sp = SPEND.pop(rid)
+        for n, (usd, dev) in enumerate(sp['dev']):
+            db.execute('insert into submissions values (?,?,?,?,?)', (rid, f'train-{n}', 'train', None, n))
+            db.execute('insert into score_points values (?,?,?,?,null)', (rid, f'train-{n}', dev, usd * 1e6))
+        if sp['usd']:
+            db.execute('insert into submissions values (?,?,?,?,?)', (rid, 'final', 'final', 'final:' + rid, len(sp['dev'])))
+            db.execute('insert into score_points values (?,?,?,?,null)', (rid, 'final', score, sp['usd'] * 1e6))
+        continue
     t = traj.get((MODEL[c][0], short(tname)))
     if t is None: continue   # a hidden model's run: the site keeps no spend for it
     used.add((MODEL[c][0], short(tname)))
@@ -109,5 +127,6 @@ for r in sorted(rel['runs'], key=lambda r: (cands.index(candidate(r)), tasks[r['
         db.execute('insert into submissions values (?,?,?,?,?)', (rid, 'final', 'final', 'final:' + rid, len(t[6])))
         db.execute('insert into score_points values (?,?,?,?,null)', (rid, 'final', score, usd * 1e6))
 assert used == set(traj), f'TRAJ entries without a release run: {sorted(set(traj) - used)}'
+assert not SPEND, f'--spend rows without a release run: {sorted(SPEND)}'
 db.commit()
 print(f'{len(rel["runs"])} runs of {len(cands)} models on {len(set(tasks.values()))} tasks; generated {generated} -> {sys.argv[1]}')

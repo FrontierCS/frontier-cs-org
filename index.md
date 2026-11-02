@@ -57,7 +57,6 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
        scope session) to claude-opus-4-8, which sent 106 of the run's 117 model messages; no other Fable run logged a refusal -->
   <details class="fold note" id="refusals">
     <summary>Refusals and harness faults</summary>
-    <p>Gemini 4 Argon (Pi): in 10 of its 48 runs, the content filter of the model provider refused a request and Pi ended the run.</p>
     <p>Gemini 4 Argon (Antigravity): refused requests are retried. In Structured LWE the retries ran out and the run ended, and in CREST refused context summaries were kept cut short.</p>
     <p>Claude Opus 5.5 (Claude Code): in Progent, a refusal switched the rest of the run to Claude Opus 4.8.</p>
     <p>Claude Fable 5.1 (Claude Code): in MuJoCo Playground, a refusal switched the rest of the run to Claude Opus 4.8.</p>

@@ -202,7 +202,7 @@ MODEL = {
     'Step Code - Step 5 Preview': ('step', 'Step 5 Preview', 'Step 5 Preview', 'Step Code', 'StepFun'),   # on StepFun's Step Code agent (Qiuyang, 2026-10-17)
 }
 
-HIDDEN = {'Kimi K2.7 Code'}                    # owner's call, 2026-10-09: off the leaderboard, kept in the fits (it is the FCI's 0 point)
+HIDDEN = {'Kimi K2.7 Code', 'pi · Gemini 4'}   # off the site, kept in every fit: Kimi K2.7 (owner, 2026-10-09; the FCI's 0 point), Gemini 4 Argon on Pi (owner, 2026-11-02)
 for a in sys.argv[2:]:   # optional: --low='Model name=value' to try another 0 point
     if a.startswith('--low='): PASS_ZERO, PASS_ZERO_VALUE = a[6:].rsplit('=', 1)[0], float(a[6:].rsplit('=', 1)[1])
 
@@ -816,7 +816,7 @@ gap24 = max(abs(half24[t] - DIFF[t][0]) for t in GROUPS)
 assert gap24 <= 0.06, f'the pages\' 48-node pass curve misses FDI by {gap24:.3f} points'
 assert {m[0] for m in models} <= set(eci_js), f'models without an FCI: {sorted({m[0] for m in models} - set(eci_js))}'
 block = (f'// One entry per scored run in the preview results database of {when:%Y-%m-%d} (bin/fcs2_runs_from_db.py):\n'
-         f'// model, domain, task, final score (0-100, the task\'s own scale), passed (1 = verdict PASS). Timeouts score 0; {sum(dropped.values())} unscored runs are left out' + ''.join(f'; {MODEL[c][1]} is left out (only the FCI 0 point)' for c in sorted(HIDDEN)) + '.\n'
+         f'// model, domain, task, final score (0-100, the task\'s own scale), passed (1 = verdict PASS). Timeouts score 0; {sum(dropped.values())} unscored runs are left out' + ''.join(f'; {MODEL[c][1]}' + (' (the FCI 0 point)' if c == PASS_ZERO else f' ({MODEL[c][3]})') + ' is left out' for c in sorted(HIDDEN)) + '.\n'
          f'const RUNS = {json.dumps(runs, ensure_ascii=False)}.map(([m, d, t, s, p]) => ({{m, d, t, s, p}}));\n'
          'const MODELS = [\n' + ''.join(f"  {{id:'{i}', name:'{n}', short:'{s}', h:'{h}', lab:'{l}'}},\n" for i, n, s, h, l in models) + '];\n'
          f"const UPDATED = '{when:%B} {when.day}, {when.year}';\n"
