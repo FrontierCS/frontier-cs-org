@@ -212,8 +212,9 @@ function drawECI() {
    is no legend (owner, 2026-10-17). */
 let ttsHover = null, ttsRun = 0;
 const TTS_KEY = new Set(['opus', 'ds']), TTS_FADE = .3;   // the two curves in full colour (owner, 2026-10-17)
-// a model with no reported spend has no curve; of each lab only the model with the highest FCI (RANKED is in FCI order)
-const TTSM = RANKED.filter(m => SCALE[m.id]).filter((m, i, a) => a.findIndex(o => o.lab === m.lab) === i);
+// a model with no reported spend, or whose FCI never reaches 0 (the curve starts at FCI 0), has no curve; of each lab only
+// the model with the highest FCI (RANKED is in FCI order)
+const TTSM = RANKED.filter(m => SCALE[m.id] && SCALE[m.id].some(p => p[1] >= 0)).filter((m, i, a) => a.findIndex(o => o.lab === m.lab) === i);
 const ttsOn = new Set(TTSM.map(m => m.id));
 const ttsBands = () => document.querySelectorAll('#ttssvg .tband').forEach(b => b.setAttribute('opacity', b.dataset.m === ttsHover ? .12 : 0));
 const ttsCurve = id => SCALE[id].filter(p => p[1] >= 0);   // [US$, FCI, 90% low, 90% high, share still going], from FCI 0 up
