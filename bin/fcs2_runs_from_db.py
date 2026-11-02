@@ -199,6 +199,9 @@ MODEL = {
     # carbon-g (thinking level high) on agy; formal evaluation eval_01M5ZHWA8HFDS1QY8JGVN0RKMM (2026-10-27). Shown as Gemini 4
     # Carbon on Antigravity (owner, 2026-10-29); its cost is estimated at Gemini 4 Argon's prices.
     'Antigravity CLI agy (carbon-g)': ('carbon', 'Gemini 4 Carbon', 'Gemini 4 Carbon', 'Antigravity', 'Google'),
+    # minimax-m3.1-flash through OpenRouter on Claude Code; formal evaluation eval_01M6CMMG3YG91H7GKTD3KXFCQ4 (2026-11-01). Its
+    # runs' US$ is the gateway's spend log for the model's requests.
+    'Claude Code · MiniMax-M3.1-Flash': ('minimax', 'MiniMax-M3.1-Flash', 'MiniMax-M3.1-Flash', 'Claude Code', 'MiniMax'),
     'Step Code - Step 5 Preview': ('step', 'Step 5 Preview', 'Step 5 Preview', 'Step Code', 'StepFun'),   # on StepFun's Step Code agent (Qiuyang, 2026-10-17)
 }
 
