@@ -95,8 +95,8 @@ from datetime import datetime
 
 # The FCI scale (Qiuyang, 2026-10-14): FCI = PASS_ZERO_VALUE + PASS_UNIT * (theta - theta of PASS_ZERO), theta in logits.
 # FCI, SCALE, DIFF, GROUPS and DIFF_FIT all follow from these three.
-PASS_ZERO = 'Kimi K2.7 Code'   # the 0 point; it is hidden (HIDDEN below) but stays in every fit
-PASS_ZERO_VALUE = 0
+PASS_ZERO = 'Kimi K2.7 Code'   # the scale's fixed point; it is hidden (HIDDEN below) but stays in every fit
+PASS_ZERO_VALUE = 5   # so every shown model's FCI is above 0 (owner, 2026-11-02; was 0)
 PASS_UNIT = 10                 # FCI points per logit (Qiuyang, 2026-10-14; was 1)
 DEC = max(0, int(np.ceil(2 - np.log10(PASS_UNIT) - 1e-9)))   # decimals of FCI points: a hundredth of a logit or finer, 1 at 10 per logit
 TIE_EPS = 0                    # a final score within TIE_EPS of the human reference is half a win; 0: only an exact tie
@@ -205,8 +205,8 @@ MODEL = {
     'Step Code - Step 5 Preview': ('step', 'Step 5 Preview', 'Step 5 Preview', 'Step Code', 'StepFun'),   # on StepFun's Step Code agent (Qiuyang, 2026-10-17)
 }
 
-HIDDEN = {'Kimi K2.7 Code', 'pi · Gemini 4'}   # off the site, kept in every fit: Kimi K2.7 (owner, 2026-10-09; the FCI's 0 point), Gemini 4 Argon on Pi (owner, 2026-11-02)
-for a in sys.argv[2:]:   # optional: --low='Model name=value' to try another 0 point
+HIDDEN = {'Kimi K2.7 Code', 'pi · Gemini 4'}   # off the site, kept in every fit: Kimi K2.7 (owner, 2026-10-09; the FCI's fixed point), Gemini 4 Argon on Pi (owner, 2026-11-02)
+for a in sys.argv[2:]:   # optional: --low='Model name=value' to try another fixed point
     if a.startswith('--low='): PASS_ZERO, PASS_ZERO_VALUE = a[6:].rsplit('=', 1)[0], float(a[6:].rsplit('=', 1)[1])
 
 
@@ -677,7 +677,7 @@ for cand, task, score, state, verdict in rows:
     folder, paper = TASK[task]
     runs.append([MODEL[cand][0], SHOWN.get(folder, folder), paper or task.split(' — ')[0], round(score, 2), int(verdict == 'PASS')])
 dropped = Counter(r[3] for r in rows if r[2] is None and r[0] not in HIDDEN)
-# the hidden models' runs in RUNS's columns, for fits made outside this script: Kimi K2.7 is the FCI 0 point but not on the
+# the hidden models' runs in RUNS's columns, for fits made outside this script: Kimi K2.7 is the FCI scale's fixed point but not on the
 # site (Qiuyang, 2026-10-14). _data/ is never published as a file, and no page reads this one.
 hidden = [[MODEL[c][0], SHOWN.get(TASK[t][0], TASK[t][0]), TASK[t][1] or t.split(' — ')[0], round(s, 2), int(v == 'PASS')]
           for c, t, s, st, v in rows if s is not None and c in HIDDEN]
@@ -819,7 +819,7 @@ gap24 = max(abs(half24[t] - DIFF[t][0]) for t in GROUPS)
 assert gap24 <= 0.06, f'the pages\' 48-node pass curve misses FDI by {gap24:.3f} points'
 assert {m[0] for m in models} <= set(eci_js), f'models without an FCI: {sorted({m[0] for m in models} - set(eci_js))}'
 block = (f'// One entry per scored run in the preview results database of {when:%Y-%m-%d} (bin/fcs2_runs_from_db.py):\n'
-         f'// model, domain, task, final score (0-100, the task\'s own scale), passed (1 = verdict PASS). Timeouts score 0; {sum(dropped.values())} unscored runs are left out' + ''.join(f'; {MODEL[c][1]}' + (' (the FCI 0 point)' if c == PASS_ZERO else f' ({MODEL[c][3]})') + ' is left out' for c in sorted(HIDDEN)) + '.\n'
+         f'// model, domain, task, final score (0-100, the task\'s own scale), passed (1 = verdict PASS). Timeouts score 0; {sum(dropped.values())} unscored runs are left out' + ''.join(f'; {MODEL[c][1]}' + (" (the FCI scale's fixed point)" if c == PASS_ZERO else f' ({MODEL[c][3]})') + ' is left out' for c in sorted(HIDDEN)) + '.\n'
          f'const RUNS = {json.dumps(runs, ensure_ascii=False)}.map(([m, d, t, s, p]) => ({{m, d, t, s, p}}));\n'
          'const MODELS = [\n' + ''.join(f"  {{id:'{i}', name:'{n}', short:'{s}', h:'{h}', lab:'{l}'}},\n" for i, n, s, h, l in models) + '];\n'
          f"const UPDATED = '{when:%B} {when.day}, {when.year}';\n"

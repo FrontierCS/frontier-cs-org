@@ -162,18 +162,18 @@ function drawPassBars(k = 'pass', id = 'fcib') {
   attachTip(svg, W, H, pts, $(`#${id}tip`));
 }
 
-/* FCI: one row per model ranked by ECI, a bar from 0 (Kimi K2.7) to its FCI and its 90% interval as a whisker. */
+/* FCI: one row per model ranked by ECI, a bar from 0 to its FCI and its 90% interval as a whisker. */
 function drawECI() {
   const order = [...MODELS].sort((a, b) => ECI[b.id][0] - ECI[a.id][0]);
   const svg = $('#ecisvg'), W = Math.max(300, $('#eciplot').clientWidth), narrow = W < 560;
   const L = narrow ? nameCol(svg) : 190, R = 34, T = 14, B = 46, lane = CHART_H.eciLane || (narrow ? 56 : 64);
   // the axis holds 0 and every whisker, on a grid of about six steps (four on phones) whatever the scale's unit
-  const bot = 0, top = Math.max(...MODELS.map(m => ECI[m.id][2])), step = eciStep(top - bot, narrow ? 4 : 6);   // the axis starts at 0, Kimi K2.7 (owner, 2026-10-17)
+  const bot = 0, top = Math.max(...MODELS.map(m => ECI[m.id][2])), step = eciStep(top - bot, narrow ? 4 : 6);   // the axis starts at 0 (owner, 2026-10-17)
   const xmin = Math.floor(bot / step) * step, xmax = Math.ceil(top / step) * step;
   const H = T + order.length * lane + B, an = animates(svg), bh = Math.min(narrow ? 24 : 28, Math.floor(lane * .62));   // bars near half the lane (owner, 2026-10-14: 18 px read too thin)
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
   const X = v => L + (v - xmin) / (xmax - xmin) * (W - L - R);
-  for (let i = 0, v = xmin; v <= xmax + step / 2; v = xmin + ++i * step) {   // the 0 line, Kimi K2.7, is darker when the axis runs below it
+  for (let i = 0, v = xmin; v <= xmax + step / 2; v = xmin + ++i * step) {   // the 0 line is darker when the axis runs below it
     const zero = xmin < 0 && Math.abs(v) < step / 2;
     svg.append(sv('line', {x1:X(v), x2:X(v), y1:T, y2:H - B + 6, stroke:zero ? 'var(--ink-2)' : 'var(--grid)', 'stroke-width':zero ? 1.2 : 1}));
     svg.append(sv('text', {x:X(v), y:H - B + 22, 'text-anchor':'middle'}, tick(v)));
@@ -186,7 +186,7 @@ function drawECI() {
     svg.append(sv('text', {class:'lab', x:0, y:yc + (m.h ? -3 : 4)}, narrow ? m.baseShort : m.base));
     if (m.h) svg.append(sv('text', {x:0, y:yc + 14, 'font-size':12}, m.h));
     const bar = sv('rect', {class:'ebar', x:Math.min(X(0), X(e)), y:yc - bh / 2, width:Math.abs(X(e) - X(0)), height:bh, fill:MCOL[m.id], 'data-m':m.id});
-    if (e < 0) bar.style.transformOrigin = 'right center';   // a bar below Kimi K2.7 grows leftwards from 0
+    if (e < 0) bar.style.transformOrigin = 'right center';   // a bar below 0 grows leftwards from 0
     // an interval below 0 is cut at the axis's 0 with no cap there (owner, 2026-10-17: the axis starts at 0); the tooltip keeps the full interval
     const lo0 = Math.max(lo, 0), wk = sv('path', {class:'ewhisk', d:`M${X(lo0)},${yc}H${X(hi)}${lo >= 0 ? `M${X(lo)},${yc - 7}v14` : ''}M${X(hi)},${yc - 7}v14`, fill:'none', stroke:'var(--ink)', 'stroke-width':1.5});
     const val = sv('text', {class:'val', x:X(e), y:yc - bh / 2 - 6, fill:MTXT(m.id), 'text-anchor':'middle'}, fe(e));   // as many decimals as keep the models apart
@@ -528,7 +528,7 @@ const redraws = [fitKebab];
 
 /* ---------- How FCI works: a fold under the FCI chart (owner, 2026-10-11) ----------
    Three tasks' pass curves, the joint model's own (passChance, fcs2-data.js): an easy, a middle and a hard one, the tasks a sixth, a half and five sixths of the way up the FDI order, so the picture
-   follows the data (Qiuyang, 2026-10-14). A dashed line marks the scale's fixed point, Kimi K2.7 = 0. */
+   follows the data (Qiuyang, 2026-10-14). A dashed line marks the scale's fixed point, Kimi K2.7. */
 function drawHow() {
   const box = $('#fci-how'); if (!box || !box.open) return;
   const INKS = ['#8ab4f8', '#1a73e8', '#174ea6'];   // easy to hard: Google blue 300, 600, 900
