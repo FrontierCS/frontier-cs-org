@@ -37,7 +37,7 @@ def fci(narrow):
     name = lambda i: models[i][0] + (f' ({models[i][1]})' if models[i][0] in twice else '')   # one model on two harnesses
     col = lab_colour()
     rows = sorted(eci, key=lambda i: (-eci[i][0], name(i)))
-    W, L, R, RH, BH, FS = (360, 150, 30, 22, 12, 11.5) if narrow else (760, 236, 40, 25, 14, 13)
+    W, L, R, RH, BH, FS = (360, 150, 14, 24, 12, 11.5) if narrow else (760, 236, 20, 27, 15, 13)
     lo = min(0, min(eci[i][1] for i in rows)); hi = max(eci[i][2] for i in rows)
     xmin, xmax = (lo // 10) * 10, (hi // 10 + 1) * 10
     T, B = 6, 30
@@ -53,10 +53,16 @@ def fci(narrow):
         c = col.get(i, BAR) if on else BAR
         g += text(0, y + FS * .36, name(i), FS, INK, 600 if on else 400)
         g += f'<rect x="{min(X(0), X(v)):.1f}" y="{y - BH / 2:.1f}" width="{abs(X(v) - X(0)):.1f}" height="{BH}" rx="2" fill="{c}"/>'
-        g += (f'<line x1="{X(a):.1f}" x2="{X(b):.1f}" y1="{y:.1f}" y2="{y:.1f}" stroke="{INK if on else FAINT}" stroke-width="1"/>'
-              f'<line x1="{X(a):.1f}" x2="{X(a):.1f}" y1="{y - 4:.1f}" y2="{y + 4:.1f}" stroke="{INK if on else FAINT}" stroke-width="1"/>'
-              f'<line x1="{X(b):.1f}" x2="{X(b):.1f}" y1="{y - 4:.1f}" y2="{y + 4:.1f}" stroke="{INK if on else FAINT}" stroke-width="1"/>')
-        g += text(X(b) + 5, y + FS * .36, f'{v:.1f}', FS, INK if on else MUTED, 600 if on else 400)
+        wy = y + BH / 2 + 3                                     # the 90% interval: a thin line just under the bar
+        wc = INK if on else FAINT
+        g += (f'<line x1="{X(a):.1f}" x2="{X(b):.1f}" y1="{wy:.1f}" y2="{wy:.1f}" stroke="{wc}" stroke-width="1"/>'
+              f'<line x1="{X(a):.1f}" x2="{X(a):.1f}" y1="{wy - 2.5:.1f}" y2="{wy + 2.5:.1f}" stroke="{wc}" stroke-width="1"/>'
+              f'<line x1="{X(b):.1f}" x2="{X(b):.1f}" y1="{wy - 2.5:.1f}" y2="{wy + 2.5:.1f}" stroke="{wc}" stroke-width="1"/>')
+        lab, tw = f'{v:.1f}', FS * .62 * len(f'{v:.1f}')          # approximate text width
+        if X(v) - X(0) >= tw + 10:                              # inside the bar, at its end
+            g += text(X(v) - 5, y + FS * .36, lab, FS, '#fff' if on else INK, 600 if on else 500, 'end')
+        else:                                                   # too short: right after the bar
+            g += text(max(X(v), X(0)) + 5, y + FS * .36, lab, FS, INK if on else MUTED, 600 if on else 400)
     g += f'<line x1="{X(0):.1f}" x2="{X(0):.1f}" y1="{T}" y2="{T + RH * len(rows)}" stroke="{FAINT}" stroke-width="1"/>'
     label = 'FCI with 90% interval, by model: ' + ', '.join(f'{name(i)} {eci[i][0]:.1f}' for i in rows) + '.'
     return svg(narrow, W, H, label, g)
