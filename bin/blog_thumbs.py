@@ -119,8 +119,7 @@ def update():    # the November update: the new models' passed tasks, a shield o
              + path('M720 500 L780 560 L885 430', sw=12, colour=BLUE))
     cards = ''.join(box(1120 + i * 46, 250 + i * 70, 280, 360, WHITE if i < 2 else SKY, off=0) + lines(1160 + i * 46, 310 + i * 70, 200, 4, 40)
                     for i in range(3))
-    return (axes(140, 200, 640 - 60, 820) + bars + line(600, 200, 600, 820, dotted=True) + guard
-            + line(1040, 200, 1040, 820, dotted=True) + cards)
+    return axes(140, 200, 640 - 60, 820) + bars + guard + cards
 
 POSTS = {'humans-still-beat-ai': humans, 'frontiercs-2-roadmap': roadmap, 'frontiersmith': smith, 'harbor': harbor, 'calico': calico,
          'alma': alma, 'agent-evaluation': evolving, 'negative-optimization': negative, 'evaluation': pipeline, 'feb-release': release,
