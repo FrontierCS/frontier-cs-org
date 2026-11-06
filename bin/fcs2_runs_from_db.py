@@ -202,6 +202,13 @@ MODEL = {
     # minimax-m3.1-flash through OpenRouter on Claude Code; formal evaluation eval_01M6CMMG3YG91H7GKTD3KXFCQ4 (2026-11-01). Its
     # runs' US$ is the gateway's spend log for the model's requests.
     'Claude Code · MiniMax-M3.1-Flash': ('minimax', 'MiniMax-M3.1-Flash', 'MiniMax-M3.1-Flash', 'Claude Code', 'MiniMax'),
+    # claude-sonnet-5-5, effort max, on Claude Code 2.1.311 with a Claude subscription; formal evaluations eval_01M6PDR8ZBE6SQXWN53VMR9B1E
+    # (32 CPU tasks) and eval_01M6QTTV86KZ32PWTWVWJ3DEBE (16 GPU tasks), round-6 task versions (2026-11-05/06). Its runs' US$ is what
+    # Claude Code reports for itself, as Claude Opus 5.5's.
+    'Claude Code · Sonnet 5.5 (Subscription, max effort)': ('sonnet55', 'Claude Sonnet 5.5', 'Sonnet 5.5', 'Claude Code', 'Anthropic'),
+    # thinkingmachines/Inkling-2-Small through Tinker (reasoning effort xhigh, temperature 1.0) on the Pi agent harness; formal evaluation
+    # eval_01M6QX7NYM8EBN1NW9JSTH94RR, round-6 task versions (2026-11-06). Its runs' US$ is the gateway's token counts at Tinker's prices.
+    'pi · Inkling 2 Small': ('inkling', 'Inkling 2 Small', 'Inkling 2 Small', 'Pi', 'Thinking Machines'),
     'Step Code - Step 5 Preview': ('step', 'Step 5 Preview', 'Step 5 Preview', 'Step Code', 'StepFun'),   # on StepFun's Step Code agent (Qiuyang, 2026-10-17)
 }
 
