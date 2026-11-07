@@ -92,9 +92,8 @@ def glenside(narrow):
         fill = col["glmf"] if on else ('#e3e5e8' if failed else BAR)
         g += f'<rect x="{X(0):.1f}" y="{y - BH / 2:.1f}" width="{max(X(v) - X(0), 1.5):.1f}" height="{BH}" rx="2" fill="{fill}"/>'
         pct = f'{v:.0f}%' if v >= 1 else '<1%'
-        if on:   # the copy: its share and its line count, inside the bar's end
-            n = round(r['added_long_lines'] * v / 100)
-            g += text(X(v) - 6, y + FS * .36, f'{pct}, {n:,} of {r["added_long_lines"]:,} lines' if not narrow else pct, FS, '#fff', 600, 'end')
+        if on:   # the copy: its share, inside the bar's end
+            g += text(X(v) - 6, y + FS * .36, pct, FS, '#fff', 600, 'end')
         else:
             g += text(X(v) + 5, y + FS * .36, pct + (' · did not pass' if failed and not narrow else ''), FS, MUTED, 400)
     label = 'Glenside, share of each run\'s added long lines identical to the human reference: ' + ', '.join(f'{names[i]} {r["identical_pct"]:.0f}%' for i, r in rows) + '.'
