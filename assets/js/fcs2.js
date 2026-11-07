@@ -142,7 +142,7 @@ function drawPassBars(k = 'pass', id = 'fcib') {
   order.forEach((m, i) => {
     const e = val(m), cx = L + band * (i + .5), x = cx - bw / 2, y = Y(e), h = base - y, r = Math.min(6, bw / 6, h);
     const bar = sv('path', {d:`M${x},${base}V${y + r}Q${x},${y} ${x + r},${y}H${x + bw - r}Q${x + bw},${y} ${x + bw},${y + r}V${base}Z`, fill:MCOL[m.id], 'data-m':m.id});
-    const inside = h > vs * 1.8, vtx = sv('text', {x:cx, y:inside ? y + h / 2 + vs * .36 : y - 8, 'text-anchor':'middle', 'font-size':inside ? vs : Math.round(vs * .75), 'font-weight':600,
+    const inside = h > vs * 1.8, vtx = sv('text', {x:cx, y:inside ? y + h / 2 + vs * .36 : y - 8, 'text-anchor':'middle', 'font-size':vs, 'font-weight':600,
       fill:inside ? (lightCol(m.id) ? 'var(--ink)' : '#fff') : 'var(--ink)'}, M.lab(e));
     svg.append(bar, vtx);
     { const tw = vtx.getComputedTextLength();   // too wide for a narrow bar: stand the value up inside it, or leave it to the tooltip
