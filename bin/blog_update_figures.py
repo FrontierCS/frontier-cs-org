@@ -38,7 +38,7 @@ def fci(narrow):
     col = lab_colour()
     rows = sorted(eci, key=lambda i: (-eci[i][0], name(i)))
     W, L, R, RH, BH, FS = (360, 150, 14, 24, 12, 11.5) if narrow else (760, 236, 20, 27, 15, 13)
-    lo = min(0, min(eci[i][1] for i in rows)); hi = max(eci[i][2] for i in rows)
+    lo = min(0, min(eci[i][0] for i in rows)); hi = max(eci[i][0] for i in rows)
     xmin, xmax = (lo // 10) * 10, (hi // 10 + 1) * 10
     T, B = 6, 30
     H = T + RH * len(rows) + B
@@ -53,18 +53,13 @@ def fci(narrow):
         c = col.get(i, BAR) if on else BAR
         g += text(0, y + FS * .36, name(i), FS, INK, 600 if on else 400)
         g += f'<rect x="{min(X(0), X(v)):.1f}" y="{y - BH / 2:.1f}" width="{abs(X(v) - X(0)):.1f}" height="{BH}" rx="2" fill="{c}"/>'
-        wy = y + BH / 2 + 3                                     # the 90% interval: a thin line just under the bar
-        wc = INK if on else FAINT
-        g += (f'<line x1="{X(a):.1f}" x2="{X(b):.1f}" y1="{wy:.1f}" y2="{wy:.1f}" stroke="{wc}" stroke-width="1"/>'
-              f'<line x1="{X(a):.1f}" x2="{X(a):.1f}" y1="{wy - 2.5:.1f}" y2="{wy + 2.5:.1f}" stroke="{wc}" stroke-width="1"/>'
-              f'<line x1="{X(b):.1f}" x2="{X(b):.1f}" y1="{wy - 2.5:.1f}" y2="{wy + 2.5:.1f}" stroke="{wc}" stroke-width="1"/>')
         lab, tw = f'{v:.1f}', FS * .62 * len(f'{v:.1f}')          # approximate text width
         if X(v) - X(0) >= tw + 10:                              # inside the bar, at its end
             g += text(X(v) - 5, y + FS * .36, lab, FS, '#fff' if on else INK, 600 if on else 500, 'end')
         else:                                                   # too short: right after the bar
             g += text(max(X(v), X(0)) + 5, y + FS * .36, lab, FS, INK if on else MUTED, 600 if on else 400)
     g += f'<line x1="{X(0):.1f}" x2="{X(0):.1f}" y1="{T}" y2="{T + RH * len(rows)}" stroke="{FAINT}" stroke-width="1"/>'
-    label = 'FCI with 90% interval, by model: ' + ', '.join(f'{name(i)} {eci[i][0]:.1f}' for i in rows) + '.'
+    label = 'FCI by model: ' + ', '.join(f'{name(i)} {eci[i][0]:.1f}' for i in rows) + '.'
     return svg(narrow, W, H, label, g)
 
 # ---------- Glenside: how much of each run's code is the human reference, line for line ----------
@@ -92,54 +87,78 @@ def glenside(narrow):
         g += text(X(v), H - B + 18, f'{v}%', FS, MUTED, 400, 'middle')
     for k, (i, r) in enumerate(rows):
         y, v, on = T + RH * k + RH / 2, r['identical_pct'], i == 'glmf'
-        g += text(0, y + FS * .36, names[i], FS, INK, 600 if on else 400)
-        g += f'<rect x="{X(0):.1f}" y="{y - BH / 2:.1f}" width="{max(X(v) - X(0), 1.5):.1f}" height="{BH}" rx="2" fill="{col["glmf"] if on else BAR}"/>'
-        g += text(X(v) + 5, y + FS * .36, f'{v:.0f}%' if v >= 1 else '<1%', FS, INK if on else MUTED, 600 if on else 400)
+        failed = r['verdict'] != 'PASS'
+        g += text(0, y + FS * .36, names[i], FS, INK if not failed or on else MUTED, 600 if on else 400)
+        fill = col["glmf"] if on else ('#e3e5e8' if failed else BAR)
+        g += f'<rect x="{X(0):.1f}" y="{y - BH / 2:.1f}" width="{max(X(v) - X(0), 1.5):.1f}" height="{BH}" rx="2" fill="{fill}"/>'
+        pct = f'{v:.0f}%' if v >= 1 else '<1%'
+        if on:   # the copy: its share and its line count, inside the bar's end
+            n = round(r['added_long_lines'] * v / 100)
+            g += text(X(v) - 6, y + FS * .36, f'{pct}, {n:,} of {r["added_long_lines"]:,} lines' if not narrow else pct, FS, '#fff', 600, 'end')
+        else:
+            g += text(X(v) + 5, y + FS * .36, pct + (' · did not pass' if failed and not narrow else ''), FS, MUTED, 400)
     label = 'Glenside, share of each run\'s added long lines identical to the human reference: ' + ', '.join(f'{names[i]} {r["identical_pct"]:.0f}%' for i, r in rows) + '.'
     return svg(narrow, W, H, label, g)
 
 # ---------- RAGEN: where the patch takes the model out of its own training loop ----------
 def ragen(narrow):
-    """Four boxes left to right (top to bottom on phones): the model's answer, the patched parser, the game, the training batch;
-    the search the patch adds feeds the parser, and the model's moves stop there."""
-    ACC, SOFT, RED = '#0b57d0', '#d3e3fd', '#b3261e'
-    steps = [('The model answers', 'its moves for this turn'), ('The patched file', 'parses the answer'),
-             ('Sokoban', 'plays the moves'), ('PPO', 'trains on the history')]
+    """The data path of one RAGEN turn: the model answers, the patched parser drops its moves for a search's, Sokoban plays
+    them and PPO trains on them; under it, the check the judge now makes, a replay of every episode from its seed."""
+    ACC, SOFT, RED, GREEN = '#0b57d0', '#d3e3fd', '#b3261e', '#146c2e'
+    MONO = "'Google Sans Code', ui-monospace, monospace"
+    def chip(x, y, s, col, strike=False, size=12):
+        w = 9 + len(s) * size * .62
+        out = (f'<rect x="{x:.1f}" y="{y:.1f}" width="{w:.1f}" height="{size + 9}" rx="4" fill="#fff" stroke="{col}" stroke-width="1.2"/>'
+               f'<text x="{x + 5:.1f}" y="{y + size + 2:.1f}" font-size="{size}" font-family="{html.escape(MONO)}" fill="{col}">{html.escape(s)}</text>')
+        if strike:
+            out += f'<line x1="{x + 3:.1f}" x2="{x + w - 3:.1f}" y1="{y + (size + 9) / 2:.1f}" y2="{y + (size + 9) / 2:.1f}" stroke="{RED}" stroke-width="1.6"/>'
+        return out
+    def board(x, y, c):   # a 4 x 4 Sokoban board: walls, a box, its goal and the player
+        cells = ['####', '#@.#', '#$ #', '####']
+        out = ''
+        for r, row in enumerate(cells):
+            for k, ch in enumerate(row):
+                cx, cy = x + k * c, y + r * c
+                if ch == '#': out += f'<rect x="{cx}" y="{cy}" width="{c - 1}" height="{c - 1}" rx="1.5" fill="#bdc1c6"/>'
+                elif ch == '$': out += f'<rect x="{cx + 2}" y="{cy + 2}" width="{c - 5}" height="{c - 5}" rx="2" fill="#a8743a"/>'
+                elif ch == '.': out += f'<circle cx="{cx + c / 2 - .5}" cy="{cy + c / 2 - .5}" r="{c / 5}" fill="{GREEN}"/>'
+                elif ch == '@': out += f'<circle cx="{cx + c / 2 - .5}" cy="{cy + c / 2 - .5}" r="{c / 3}" fill="{INK}"/>'
+        return out
+    arrow = lambda x1, y1, x2, y2, col: (f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="{col}" stroke-width="1.5"/>'
+                                          + (f'<path d="M{x2 - 6} {y2 - 4} L{x2} {y2} L{x2 - 6} {y2 + 4} Z" fill="{col}"/>' if y1 == y2 else
+                                             f'<path d="M{x2 - 4} {y2 + (6 if y2 < y1 else -6)} L{x2} {y2} L{x2 + 4} {y2 + (6 if y2 < y1 else -6)} Z" fill="{col}"/>'))
+    box = lambda x, y, w, h, hot=False: f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="8" fill="{SOFT if hot else "#fff"}" stroke="{ACC if hot else BAR}" stroke-width="{1.8 if hot else 1.2}"/>'
+    label = "RAGEN: the patched parser drops the model's moves and passes on a search's; Sokoban plays them and PPO trains on them. The judge now replays every episode from its seed and checks each move against the model's answer."
     if narrow:
-        W, BW, BHh, GAP, x0 = 360, 200, 54, 26, 10
-        H = 4 * BHh + 3 * GAP + 20
-        g = ''
-        for k, (a, b) in enumerate(steps):
-            y = 10 + k * (BHh + GAP); hot = k == 1
-            g += f'<rect x="{x0}" y="{y}" width="{BW}" height="{BHh}" rx="6" fill="{SOFT if hot else "#fff"}" stroke="{ACC if hot else BAR}" stroke-width="{2 if hot else 1.2}"/>'
-            g += text(x0 + 12, y + 22, a, 12.5, INK, 600) + text(x0 + 12, y + 40, b, 11.5, MUTED)
-            if k < 3:
-                g += f'<line x1="{x0 + BW / 2}" x2="{x0 + BW / 2}" y1="{y + BHh}" y2="{y + BHh + GAP - 4}" stroke="{INK}" stroke-width="1.4"/>'
-        y1 = 10 + (BHh + GAP)
-        g += f'<rect x="{x0 + BW + 22}" y="{y1}" width="{W - x0 - BW - 32}" height="{BHh}" rx="6" fill="#fff" stroke="{RED}" stroke-width="1.6"/>'
-        g += text(x0 + BW + 32, y1 + 22, 'A search', 12.5, RED, 600) + text(x0 + BW + 32, y1 + 40, 'solves the board', 11.5, MUTED)
-        g += f'<line x1="{x0 + BW + 22}" x2="{x0 + BW + 4}" y1="{y1 + BHh / 2}" y2="{y1 + BHh / 2}" stroke="{RED}" stroke-width="1.6"/>'
-        g += text(x0 + BW / 2 + 8, y1 - 8, 'moves dropped', 11.5, RED, 600)
-        return svg(True, W, H, 'RAGEN: the patched file replaces the model\'s moves with a search\'s, so PPO trains on moves the model never chose.', g)
-    W, H, BW, BHh = 760, 210, 150, 64
-    xs = [10, 207, 404, 601]; y = 26
-    g = ''
-    for k, ((a, b), x) in enumerate(zip(steps, xs)):
-        hot = k == 1
-        g += f'<rect x="{x}" y="{y}" width="{BW}" height="{BHh}" rx="6" fill="{SOFT if hot else "#fff"}" stroke="{ACC if hot else BAR}" stroke-width="{2 if hot else 1.2}"/>'
-        g += text(x + 12, y + 26, a, 13, INK, 600) + text(x + 12, y + 46, b, 12, MUTED)
-        if k < 3:
-            g += (f'<line x1="{x + BW}" x2="{xs[k + 1] - 6}" y1="{y + BHh / 2}" y2="{y + BHh / 2}" stroke="{INK}" stroke-width="1.4"/>'
-                  f'<path d="M{xs[k + 1] - 6} {y + BHh / 2 - 4} L{xs[k + 1]} {y + BHh / 2} L{xs[k + 1] - 6} {y + BHh / 2 + 4} Z" fill="{INK}"/>')
-    sx = xs[1]; sy = 140
-    g += f'<rect x="{sx}" y="{sy}" width="{BW}" height="{BHh - 8}" rx="6" fill="#fff" stroke="{RED}" stroke-width="1.6"/>'
-    g += text(sx + 12, sy + 24, 'A search the patch adds', 12.5, RED, 600) + text(sx + 12, sy + 42, 'solves each board', 12, MUTED)
-    g += (f'<line x1="{sx + BW / 2}" x2="{sx + BW / 2}" y1="{sy}" y2="{y + BHh + 6}" stroke="{RED}" stroke-width="1.6"/>'
-          f'<path d="M{sx + BW / 2 - 4} {y + BHh + 6} L{sx + BW / 2} {y + BHh} L{sx + BW / 2 + 4} {y + BHh + 6} Z" fill="{RED}"/>')
-    g += f'<line x1="{xs[0] + BW + 14}" x2="{xs[1] - 18}" y1="{y + BHh / 2 - 9}" y2="{y + BHh / 2 + 9}" stroke="{RED}" stroke-width="2"/>'
-    g += text(xs[0] + BW + 8, y + BHh + 22, 'moves dropped', 12, RED, 600)
-    g += text(xs[2], sy + 24, 'The game is solved and PPO runs,', 12.5, INK, 500) + text(xs[2], sy + 42, 'but on moves the model never chose.', 12.5, INK, 500)
-    return svg(False, W, H, 'RAGEN: the patched file replaces the model\'s moves with a search\'s, so PPO trains on moves the model never chose.', g)
+        W, H = 360, 432
+        g = box(10, 10, 340, 62) + text(22, 32, 'The model', 13, INK, 600) + chip(22, 40, 'Up Left', INK)
+        g += arrow(180, 72, 180, 84, INK)
+        g += box(10, 84, 340, 92, True) + text(22, 106, 'The patched parser', 13, INK, 600)
+        g += chip(22, 116, 'Up Left', MUTED, True) + chip(110, 116, 'Right Down Down', RED)
+        g += text(22, 160, 'from a search the patch adds', 12, RED, 600)
+        g += arrow(180, 176, 180, 198, RED)
+        g += box(10, 198, 160, 84) + text(22, 220, 'Sokoban', 13, INK, 600) + board(22, 230, 11)
+        g += box(190, 198, 160, 84) + text(202, 220, 'PPO trains on', 13, INK, 600) + chip(202, 232, 'Right Down Down', RED, size=11)
+        g += f'<rect x="10" y="300" width="340" height="122" rx="8" fill="#e6f4ea" stroke="{GREEN}" stroke-width="1.2"/>'
+        g += text(22, 324, 'Now: the judge replays', 13, GREEN, 700)
+        for k, t in enumerate(['each episode from its seed,', 'checks every move against', "the model's own answer and", 'recomputes success and reward.']):
+            g += text(22, 348 + 22 * k, t, 12.5, INK, 500)
+        return svg(True, W, H, label, g)
+    W, H = 760, 262
+    g = box(10, 20, 124, 92) + text(22, 44, 'The model', 13.5, INK, 600) + chip(22, 60, 'Up Left', INK)
+    g += arrow(134, 66, 166, 66, INK)
+    g += box(166, 20, 238, 92, True) + text(178, 44, 'The patched parser', 13.5, INK, 600)
+    g += chip(178, 60, 'Up Left', MUTED, True) + chip(248, 60, 'Right Down Down', RED)
+    g += box(166, 132, 238, 40) + text(178, 157, 'A search the patch adds', 13, RED, 600)
+    g += arrow(285, 132, 285, 112, RED)
+    g += arrow(404, 66, 432, 66, RED)
+    g += box(432, 20, 130, 92) + text(444, 44, 'Sokoban', 13.5, INK, 600) + board(444, 54, 12)
+    g += arrow(562, 66, 598, 66, RED)
+    g += box(598, 20, 152, 92) + text(610, 44, 'PPO trains on', 13.5, INK, 600) + chip(610, 60, 'Right Down Down', RED, size=11)
+    g += f'<rect x="10" y="196" width="740" height="56" rx="8" fill="#e6f4ea" stroke="{GREEN}" stroke-width="1.2"/>'
+    g += text(24, 220, 'Now', 13.5, GREEN, 700) + text(66, 220, "The judge replays each episode from its seed and checks every move against the model's own answer.", 13, INK, 500)
+    g += text(66, 240, 'It recomputes the success rate and the reward itself.', 13, INK, 500)
+    return svg(False, W, H, label, g)
 
 # ---------- SCOPE: the cache spreads through ten agents ----------
 def spread(narrow):
@@ -238,40 +257,59 @@ def rebase(narrow):
 
 # ---------- Isolation: the judge runs the candidate's code in a sandbox of its own ----------
 def isolate(narrow):
-    ACC, RED = '#0b57d0', '#c5221f'
-    box = lambda x, y, w, h, fill, stroke, dash='': f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="10" fill="{fill}" stroke="{stroke}" stroke-width="1.5"{dash}/>'
-    rules = ["reads only its own tree and inputs", "writes only its result folder", "no network, no extra processes",
-             "a fresh instance for every run: nothing", "survives from one timing round to the next"]
-    lab = "The judge runs the candidate's code inside a sandbox of its own, which cannot read the judge's files or keep anything between runs."
-    cross = lambda x, y: f'<path d="M{x - 11} {y - 11} L{x + 11} {y + 11} M{x + 11} {y - 11} L{x - 11} {y + 11}" stroke="{RED}" stroke-width="3"/>'
+    """The judge diagram of the FrontierCS 2 README (docs/assets/judge.png) with the new inside layer: in the Judge, the
+    agent's code runs in a sandbox of its own (isolate)."""
+    BF, BT, PF, PT, GF = '#d3e3fd', '#0b57d0', '#f9dedc', '#b3261e', '#f1f3f4'
+    def node(x, y, w, h, fill, label, col, size=13.5, weight=600, r=10):
+        return (f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="{r}" fill="{fill}"/>'
+                + text(x + w / 2, y + h / 2 + size * .36, label, size, col, weight, 'middle'))
+    def arr(x1, y1, x2, y2):
+        if y1 == y2:
+            d = 1 if x2 > x1 else -1
+            head = f'<path d="M{x2 - 7 * d} {y2 - 4} L{x2} {y2} L{x2 - 7 * d} {y2 + 4} Z" fill="{MUTED}"/>'
+        else:
+            d = 1 if y2 > y1 else -1
+            head = f'<path d="M{x2 - 4} {y2 - 7 * d} L{x2} {y2} L{x2 + 4} {y2 - 7 * d} Z" fill="{MUTED}"/>'
+        return f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="{MUTED}" stroke-width="1.4"/>' + head
+    def inner(x, y, w, h, fs, lines):
+        out = (f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="8" fill="{BF}" stroke="{BT}" stroke-width="1.4" stroke-dasharray="5 4"/>'
+               + text(x + 12, y + fs + 9, "The agent's code, in isolate", fs, BT, 700))
+        for k, t in enumerate(lines):
+            out += text(x + 12, y + fs + 9 + (fs + 7) * (k + 1), t, fs - 1, INK, 400)
+        return out
+    rules = ['its own files and inputs only', 'no network', 'a fresh copy for every run']
+    label = ("The FrontierCS 2 judge: the Agent sends patches to the Driver; the Driver forwards them to the Judge, which holds the "
+             "held-out suite and the reference. Inside the Judge, the agent's code now runs in a sandbox of its own, isolate.")
     if narrow:
-        W, H, FS = 360, 430, 11.5
-        g = box(1, 1, 358, 428, '#f8f9fa', '#dadce0')
-        g += text(14, 24, 'The judge (trusted)', FS + 1, INK, 700)
-        g += box(14, 38, 332, 54, '#ffffff', '#dadce0')
-        g += text(28, 60, 'judge files: hidden workloads,', FS, INK, 500) + text(28, 78, 'the human reference, the scoring code', FS, INK, 500)
-        g += f'<line x1="180" x2="180" y1="176" y2="100" stroke="{RED}" stroke-width="2"/><path d="M173 110 L180 98 L187 110" fill="none" stroke="{RED}" stroke-width="2"/>'
-        g += cross(180, 138) + text(200, 143, 'blocked', FS, RED, 600)
-        g += box(14, 182, 332, 170, '#e8f0fe', ACC, ' stroke-dasharray="5 4"')
-        g += text(28, 206, "isolate: the candidate's code", FS + 1, ACC, 700)
-        for k, r in enumerate(rules):
-            g += text(28, 232 + 22 * k, r, FS, INK, 500)
-        g += text(14, 380, 'Attack submissions that read the judge, hide', FS, INK, 500) + text(14, 398, 'from its checks or keep state between rounds', FS, INK, 500) + text(14, 416, 'all score 0.', FS, INK, 500)
-        return svg(True, W, H, lab, g)
-    W, H, FS = 760, 262, 13
-    g = box(1, 1, 758, 260, '#f8f9fa', '#dadce0')
-    g += text(20, 30, 'The judge (trusted)', FS + 2, INK, 700)
-    g += box(20, 66, 250, 96, '#ffffff', '#dadce0')
-    g += text(36, 96, 'judge files', FS, INK, 700) + text(36, 120, 'hidden workloads, the human', FS, MUTED, 400) + text(36, 140, 'reference, the scoring code', FS, MUTED, 400)
-    g += box(400, 20, 340, 176, '#e8f0fe', ACC, ' stroke-dasharray="5 4"')
-    g += text(418, 48, "isolate: the candidate's code", FS + 2, ACC, 700)
-    for k, r in enumerate(rules):
-        g += text(418, 80 + 24 * k, r, FS, INK, 500)
-    g += f'<line x1="394" x2="280" y1="114" y2="114" stroke="{RED}" stroke-width="2"/><path d="M292 107 L278 114 L292 121" fill="none" stroke="{RED}" stroke-width="2"/>'
-    g += cross(337, 114) + text(337, 148, 'blocked', FS, RED, 600, 'middle')
-    g += f'<line x1="20" x2="740" y1="216" y2="216" stroke="#dadce0" stroke-width="1"/>'
-    g += text(20, 242, 'Attack submissions that read the judge, hide from its checks or keep state between rounds all score 0.', FS, INK, 500)
-    return svg(False, W, H, lab, g)
+        W, H = 360, 410
+        g = node(10, 10, 100, 40, BF, 'Agent', BT) + text(10, 68, 'No network but the Driver', 11, MUTED, 400)
+        g += node(130, 10, 100, 40, GF, 'Driver', INK) + node(250, 10, 100, 40, GF, 'Model API', INK, 12.5)
+        g += arr(110, 24, 128, 24) + arr(128, 38, 112, 38) + arr(230, 30, 248, 30)
+        g += f'<rect x="10" y="90" width="340" height="310" rx="14" fill="{GF}"/>' + text(24, 114, 'Evaluator', 12.5, MUTED, 600)
+        g += arr(180, 50, 180, 126)
+        g += f'<rect x="24" y="128" width="312" height="174" rx="10" fill="{PF}"/>' + text(38, 152, 'Judge', 14, PT, 700)
+        g += text(38, 172, 'Held-out suite, reference score', 11.5, PT, 400)
+        g += inner(38, 186, 284, 102, 12.5, rules)
+        g += node(24, 318, 148, 40, PF, 'Judge GPU', PT, 12.5) + node(188, 318, 148, 40, PF, 'Test sandboxes', PT, 12.5)
+        g += text(98, 378, 'GPU tasks only', 11.5, MUTED, 400, 'middle') + text(262, 378, 'Some tasks only', 11.5, MUTED, 400, 'middle')
+        return svg(True, W, H, label, g)
+    W, H = 760, 330
+    g = node(296, 8, 112, 38, GF, 'Model API', INK, 13)
+    g += node(10, 112, 116, 42, BF, 'Agent', BT) + text(68, 176, 'No network but the Driver', 12, MUTED, 400, 'middle')
+    g += node(296, 112, 112, 42, GF, 'Driver', INK)
+    g += arr(126, 124, 294, 124) + arr(294, 142, 128, 142)
+    g += text(210, 116, 'Patch to the allowed files', 12, INK, 500, 'middle') + text(210, 160, 'Development score, sanitized', 12, INK, 500, 'middle')
+    g += arr(352, 112, 352, 48)
+    g += node(296, 210, 112, 40, BF, 'Agent GPU', BT, 13) + text(352, 270, 'GPU tasks only', 12, MUTED, 400, 'middle')
+    g += arr(352, 154, 352, 208)
+    g += f'<rect x="426" y="20" width="324" height="300" rx="16" fill="{GF}"/>' + text(442, 44, 'Evaluator', 12.5, MUTED, 600)
+    g += f'<rect x="442" y="56" width="292" height="166" rx="12" fill="{PF}"/>' + text(456, 80, 'Judge', 14.5, PT, 700)
+    g += text(720, 80, 'Held-out suite, reference', 12, PT, 400, 'end')
+    g += inner(456, 94, 264, 104, 12.5, rules)
+    g += arr(408, 124, 440, 124) + arr(440, 142, 410, 142)
+    g += node(442, 240, 136, 40, PF, 'Judge GPU', PT, 13) + node(598, 240, 136, 40, PF, 'Test sandboxes', PT, 13)
+    g += text(510, 300, 'GPU tasks only', 12, MUTED, 400, 'middle') + text(666, 300, 'Some tasks only', 12, MUTED, 400, 'middle')
+    return svg(False, W, H, label, g)
 
 CHARTS = {'update-pass': ('pass', passrate), 'update-fci': ('fci', fci), 'update-rebase': ('rebase', rebase), 'update-isolate': ('isolate', isolate), 'update-glenside': ('glenside', glenside), 'update-ragen': ('ragen', ragen), 'update-spread': ('spread', spread)}
 
