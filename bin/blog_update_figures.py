@@ -321,7 +321,51 @@ def isolate(narrow):
     g += text(510, 300, 'GPU tasks only', 12, MUTED, 400, 'middle') + text(666, 300, 'Some tasks only', 12, MUTED, 400, 'middle')
     return svg(False, W, H, label, g)
 
-CHARTS = {'update-pass': ('pass', passrate), 'update-fci': ('fci', fci), 'update-rebase': ('rebase', rebase), 'update-isolate': ('isolate', isolate), 'update-glenside': ('glenside', glenside), 'update-ragen': ('ragen', ragen), 'update-spread': ('spread', spread)}
+# ---------- SCOPE on Shoal: who talked to whom, the cached run against the rerun on the fixed judge ----------
+# Edges and broadcasts from the Shoal run records of batch_local_counting (Oct 23, ten DeepSeek V4.1 Flash agents).
+MAS = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'blog_update_scope_mas.json')))
+
+def mas(narrow):
+    import math
+    ACC, RED = '#0b57d0', '#b3261e'
+    agents = [f'a{i:02d}' for i in range(1, 11)]
+    def net(cx, cy, R, run, hot):
+        d = MAS[run]
+        w = {}
+        for a, b, n in d['msg']:
+            k = tuple(sorted((a, b))); w[k] = w.get(k, 0) + n
+        pos = {a: (cx + R * math.sin(2 * math.pi * k / 10), cy - R * math.cos(2 * math.pi * k / 10)) for k, a in enumerate(agents)}
+        g = ''
+        for (a, b), n in sorted(w.items(), key=lambda x: x[1]):
+            (x1, y1), (x2, y2) = pos[a], pos[b]
+            col = RED if hot in (a, b) else ACC
+            g += f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" stroke="{col}" stroke-opacity="{min(.25 + .07 * n, .85):.2f}" stroke-width="{1 + .9 * n:.1f}" stroke-linecap="round"/>'
+        for a in agents:
+            x, y = pos[a]; r = 11 + 2.4 * d['bcast'].get(a, 0) ** .5
+            on = a == hot
+            g += f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{r:.1f}" fill="{"#fce8e6" if on else "#e8f0fe"}" stroke="{RED if on else ACC}" stroke-width="{2 if on else 1.2}"/>'
+            g += text(x, y + 4, a, 10.5, RED if on else INK, 600, 'middle')
+        return g
+    if narrow:
+        W, H = 360, 640
+        g = text(10, 18, 'The cached run, stopped at minute 132', 12.5, INK, 700)
+        g += net(180, 150, 105, 'stopped', 'a10')
+        g += text(10, 292, '21 messages, 1 shared file. a10 cached its', 12, INK, 500) + text(10, 310, 'answers and told the others; best 83.5 (not counted)', 12, INK, 500)
+        g += text(10, 350, 'The rerun on the fixed judge, 5 hours', 12.5, INK, 700)
+        g += net(180, 482, 105, 'rerun', None)
+        g += text(10, 624, '117 messages, 39 patches shared. Team best 54.2', 12, INK, 500)
+        return svg(True, W, H, MAS_LABEL, g)
+    W, H = 760, 340
+    g = text(20, 22, 'The cached run, stopped at minute 132', 13.5, INK, 700) + text(400, 22, 'The rerun on the fixed judge, 5 hours', 13.5, INK, 700)
+    g += net(190, 165, 115, 'stopped', 'a10') + net(570, 165, 115, 'rerun', None)
+    g += text(20, 316, '21 messages, 1 shared file. a10 cached its answers', 12.5, INK, 500) + text(20, 334, 'and told the others; best 83.5, not counted.', 12.5, INK, 500)
+    g += text(400, 316, '117 messages, 39 patches shared and fetched 133 times.', 12.5, INK, 500) + text(400, 334, 'Team best 54.2, against about 18 for the human reference.', 12.5, INK, 500)
+    return svg(False, W, H, MAS_LABEL, g)
+
+MAS_LABEL = ("SCOPE, ten agents on Shoal. Left, the run where a10 cached its answers: 21 messages, mostly to and from a10, best 83.5, not counted. "
+             "Right, the rerun on the fixed judge: 117 messages across 31 pairs and 39 shared patches; team best 54.2, human reference about 18.")
+
+CHARTS = {'update-pass': ('pass', passrate), 'update-fci': ('fci', fci), 'update-rebase': ('rebase', rebase), 'update-isolate': ('isolate', isolate), 'update-glenside': ('glenside', glenside), 'update-ragen': ('ragen', ragen), 'update-spread': ('spread', spread), 'update-mas': ('mas', mas)}
 
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
