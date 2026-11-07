@@ -1,6 +1,6 @@
 ---
 layout: distill
-title: "FrontierCS 2 Update 11/06"
+title: "FrontierCS 2 Update 11/06/2026"
 description: "Claude Sonnet 5.5, Claude Fable 5.1, Inkling 2 Small and MiniMax-M3.1-Flash join the leaderboard. We show how far agents went to game the judge, how we closed each hole, and how we rebuilt all 48 tasks on one format. Handshake and Snorkel AI join our sponsors."
 thumbnail: assets/img/blog-thumbs/frontiercs-2-november-update.svg
 tags: [FrontierCS 2, Update]
