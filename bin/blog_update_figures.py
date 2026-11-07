@@ -130,34 +130,43 @@ def ragen(narrow):
     box = lambda x, y, w, h, hot=False: f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="8" fill="{SOFT if hot else "#fff"}" stroke="{ACC if hot else BAR}" stroke-width="{1.8 if hot else 1.2}"/>'
     label = "RAGEN: the patched parser drops the model's moves and passes on a search's; Sokoban plays them and PPO trains on them. The judge now replays every episode from its seed and checks each move against the model's answer."
     if narrow:
-        W, H = 360, 432
-        g = box(10, 10, 340, 62) + text(22, 32, 'The model', 13, INK, 600) + chip(22, 40, 'Up Left', INK)
+        W, H = 360, 506
+        g = box(10, 10, 340, 62) + text(22, 32, 'The model', 13, INK, 600) + chip(22, 40, '↑ ← ←', INK)
         g += arrow(180, 72, 180, 84, INK)
         g += box(10, 84, 340, 92, True) + text(22, 106, 'The patched parser', 13, INK, 600)
-        g += chip(22, 116, 'Up Left', MUTED, True) + chip(110, 116, 'Right Down Down', RED)
+        g += chip(22, 116, '↑ ← ←', MUTED, True) + chip(96, 116, '→ ↓ ↓ → ↑', RED)
         g += text(22, 160, 'from a search the patch adds', 12, RED, 600)
         g += arrow(180, 176, 180, 198, RED)
         g += box(10, 198, 160, 84) + text(22, 220, 'Sokoban', 13, INK, 600) + board(22, 230, 11)
-        g += box(190, 198, 160, 84) + text(202, 220, 'PPO trains on', 13, INK, 600) + chip(202, 232, 'Right Down Down', RED, size=11)
-        g += f'<rect x="10" y="300" width="340" height="122" rx="8" fill="#e6f4ea" stroke="{GREEN}" stroke-width="1.2"/>'
-        g += text(22, 324, 'Now: the judge replays', 13, GREEN, 700)
-        for k, t in enumerate(['each episode from its seed,', 'checks every move against', "the model's own answer and", 'recomputes success and reward.']):
-            g += text(22, 348 + 22 * k, t, 12.5, INK, 500)
+        g += box(190, 198, 160, 84) + text(202, 220, 'PPO trains on', 13, INK, 600) + chip(202, 232, '→ ↓ ↓ → ↑', RED)
+        g += f'<rect x="10" y="300" width="340" height="196" rx="8" fill="#e6f4ea" stroke="{GREEN}" stroke-width="1.2"/>'
+        g += text(22, 324, 'Now the judge replays every episode', 12.5, GREEN, 700)
+        g += box(22, 336, 150, 66) + text(32, 356, 'seed, fresh board', 12, INK, 600) + chip(32, 368, 'seed 7', INK, size=11) + board(120, 366, 8)
+        g += arrow(172, 369, 188, 369, GREEN)
+        g += box(188, 336, 150, 66) + text(198, 356, 'moves = answer?', 12, INK, 600) + chip(198, 368, '→↓↓→↑', RED, size=11) + chip(270, 368, '↑←←', INK, size=11)
+        g += f'<rect x="22" y="414" width="316" height="68" rx="8" fill="#fff" stroke="{RED}" stroke-width="1.6"/>' + text(34, 440, 'they differ: score 0', 13, RED, 700) + text(34, 462, 'the judge recomputes the reward itself', 12, INK, 500)
         return svg(True, W, H, label, g)
-    W, H = 760, 262
-    g = box(10, 20, 124, 92) + text(22, 44, 'The model', 13.5, INK, 600) + chip(22, 60, 'Up Left', INK)
+    W, H = 760, 318
+    g = box(10, 20, 124, 92) + text(22, 44, 'The model', 13.5, INK, 600) + chip(22, 60, '↑ ← ←', INK)
     g += arrow(134, 66, 166, 66, INK)
     g += box(166, 20, 238, 92, True) + text(178, 44, 'The patched parser', 13.5, INK, 600)
-    g += chip(178, 60, 'Up Left', MUTED, True) + chip(248, 60, 'Right Down Down', RED)
+    g += chip(178, 60, '↑ ← ←', MUTED, True) + chip(248, 60, '→ ↓ ↓ → ↑', RED)
     g += box(166, 132, 238, 40) + text(178, 157, 'A search the patch adds', 13, RED, 600)
     g += arrow(285, 132, 285, 112, RED)
     g += arrow(404, 66, 432, 66, RED)
     g += box(432, 20, 130, 92) + text(444, 44, 'Sokoban', 13.5, INK, 600) + board(444, 54, 12)
     g += arrow(562, 66, 598, 66, RED)
-    g += box(598, 20, 152, 92) + text(610, 44, 'PPO trains on', 13.5, INK, 600) + chip(610, 60, 'Right Down Down', RED, size=11)
-    g += f'<rect x="10" y="196" width="740" height="56" rx="8" fill="#e6f4ea" stroke="{GREEN}" stroke-width="1.2"/>'
-    g += text(24, 220, 'Now', 13.5, GREEN, 700) + text(66, 220, "The judge replays each episode from its seed and checks every move against the model's own answer.", 13, INK, 500)
-    g += text(66, 240, 'It recomputes the success rate and the reward itself.', 13, INK, 500)
+    g += box(598, 20, 152, 92) + text(610, 44, 'PPO trains on', 13.5, INK, 600) + chip(610, 60, '→ ↓ ↓ → ↑', RED)
+    GB = '#e6f4ea'
+    g += f'<rect x="10" y="196" width="740" height="112" rx="8" fill="{GB}" stroke="{GREEN}" stroke-width="1.2"/>'
+    g += text(24, 220, 'Now the judge replays every episode', 13.5, GREEN, 700)
+    g += box(24, 234, 112, 60) + text(36, 256, 'episode seed', 12.5, INK, 600) + chip(36, 264, 'seed 7', INK, size=11)
+    g += arrow(136, 264, 164, 264, GREEN)
+    g += box(164, 234, 112, 60) + text(176, 256, 'fresh board', 12.5, INK, 600) + board(176, 262, 7)
+    g += arrow(276, 264, 304, 264, GREEN)
+    g += box(304, 234, 206, 60) + text(316, 256, "moves = the model's answer?", 12.5, INK, 600) + chip(316, 264, '→ ↓ ↓ → ↑', RED) + chip(424, 264, '↑ ← ←', INK)
+    g += arrow(510, 264, 538, 264, GREEN)
+    g += f'<rect x="538" y="234" width="198" height="60" rx="8" fill="#fff" stroke="{RED}" stroke-width="1.6"/>' + text(550, 258, 'they differ: score 0', 13, RED, 700) + text(550, 280, 'reward recomputed by the judge', 12, INK, 500)
     return svg(False, W, H, label, g)
 
 # ---------- SCOPE: the cache spreads through ten agents ----------
