@@ -56,9 +56,9 @@ $('#lblegend').innerHTML = RANKED.map(m => `<span><i style="background:${MCOL[m.
    spot keeps no label (the tooltip still names it). No legend: the labels name the dots. */
 const passPct = m => PASS[m.id][0];   // pass rate in %
 // The leaderboard's two metrics (owner, 2026-10-31): the bars and the cost chart are each drawn twice, stacked with no
-// switch, pass rate first, then FCI as a whole number with no interval.
-const METRIC = {fci:{val:m => ECI[m.id][0], tip:v => `FCI <b>${Math.round(v)}</b>`, tick:v => String(v)},
-                pass:{val:passPct, tip:v => `Pass rate <b>${f1(v)}%</b>`, tick:v => v + '%'}};
+// switch, pass rate first, then FCI to one decimal (owner, 2026-11-06) with no interval.
+const METRIC = {fci:{val:m => ECI[m.id][0], tip:v => `FCI <b>${f1(v)}</b>`, tick:v => String(v), lab:f1},
+                pass:{val:passPct, tip:v => `Pass rate <b>${f1(v)}%</b>`, tick:v => v + '%', lab:v => String(Math.round(v))}};
 $('#eci').addEventListener('toggle', () => drawECI());   // folded: its width is known once it opens
 function drawPassCost(k = 'pass', id = 'pc') {
   const svg = $(`#${id}svg`), W = Math.max(300, $(`#${id}plot`).clientWidth), narrow = W < 560;
@@ -105,7 +105,7 @@ const nameCol = svg => { svg.replaceChildren(); const w = Math.max(...MODELS.map
    model, highest first, in the model's colour with rounded top corners; the pass rate as a whole number in the middle of
    the bar, the exact value in the tooltip; under each bar the lab's logo on a light tile, the name and the harness.
    Dashed grid lines, no axis numbers: the bars carry them. */
-const LOGO = {OpenAI:'openai', Anthropic:'anthropic', Google:'google', Meta:'meta', Kimi:'kimi', DeepSeek:'deepseek', 'Z.ai':'zai', Qwen:'qwen', StepFun:'stepfun', MiniMax:'minimax'};
+const LOGO = {OpenAI:'openai', Anthropic:'anthropic', Google:'google', Meta:'meta', Kimi:'kimi', DeepSeek:'deepseek', 'Z.ai':'zai', Qwen:'qwen', StepFun:'stepfun', MiniMax:'minimax', 'Thinking Machines':'thinkingmachines'};
 const LOGO_DIR = (document.querySelector('script[src*="fcs2.js"]') || {src:''}).src.replace(/js\/fcs2\.js.*$/, 'img/models/');
 const lightCol = id => { const h = getComputedStyle(document.documentElement).getPropertyValue(`--m-${id}`).trim().replace('#', '');
   if (h.length !== 6) return false; const [r, g, b] = [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16) / 255);
@@ -143,8 +143,10 @@ function drawPassBars(k = 'pass', id = 'fcib') {
     const e = val(m), cx = L + band * (i + .5), x = cx - bw / 2, y = Y(e), h = base - y, r = Math.min(6, bw / 6, h);
     const bar = sv('path', {d:`M${x},${base}V${y + r}Q${x},${y} ${x + r},${y}H${x + bw - r}Q${x + bw},${y} ${x + bw},${y + r}V${base}Z`, fill:MCOL[m.id], 'data-m':m.id});
     const inside = h > vs * 1.8, vtx = sv('text', {x:cx, y:inside ? y + h / 2 + vs * .36 : y - 8, 'text-anchor':'middle', 'font-size':inside ? vs : Math.round(vs * .75), 'font-weight':600,
-      fill:inside ? (lightCol(m.id) ? 'var(--ink)' : '#fff') : 'var(--ink)'}, String(Math.round(e)));
+      fill:inside ? (lightCol(m.id) ? 'var(--ink)' : '#fff') : 'var(--ink)'}, M.lab(e));
     svg.append(bar, vtx);
+    { const tw = vtx.getComputedTextLength();   // too wide for a narrow bar: stand the value up inside it, or leave it to the tooltip
+      if (tw > band - 2) { if (h > tw + 8) { const fs = Math.min(vs, bw * .9), yc = y + h / 2; vtx.setAttribute('font-size', fs); vtx.setAttribute('x', cx + fs * .36); vtx.setAttribute('y', yc); vtx.setAttribute('transform', `rotate(-90 ${cx + fs * .36} ${yc})`); vtx.setAttribute('fill', lightCol(m.id) ? 'var(--ink)' : '#fff'); } else vtx.remove(); } }
     const ty = base + (flat ? 14 : 10);
     svg.append(sv('rect', {x:cx - tile / 2, y:ty, width:tile, height:tile, rx:tile * .2, fill:'#f1f3f4'}));
     if (LOGO[m.lab]) { const lg = tile * .58; svg.append(sv('image', {href:LOGO_DIR + LOGO[m.lab] + '.svg', x:cx - lg / 2, y:ty + (tile - lg) / 2, width:lg, height:lg})); }

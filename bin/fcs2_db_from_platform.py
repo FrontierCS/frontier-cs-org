@@ -73,11 +73,17 @@ CACHE = {'GPT-6 Astra': 1.00, 'GPT-6.1 Sol': 0.10, 'Kimi K3 (Modal)': 0.30, 'Dee
          # token counts at Gemini 4 Argon's prices (no public carbon-g price)
          'Antigravity CLI agy (carbon-g)': None,
          # MiniMax-M3.1-Flash on Claude Code through OpenRouter (2026-11-01): its runs' costs are the gateway's spend log
-         'Claude Code · MiniMax-M3.1-Flash': None}
+         'Claude Code · MiniMax-M3.1-Flash': None,
+         # Claude Sonnet 5.5 on Claude Code with a Claude subscription (2026-11-05/06): the cost Claude Code reports, as Opus 5.5's
+         'Claude Code · Sonnet 5.5 (Subscription, max effort)': None,
+         # Inkling 2 Small on Pi through Tinker (2026-11-06): the gateway's token counts at Tinker's prices
+         'pi · Inkling 2 Small': None}
 # A candidate whose formal run of the task set spans several evaluations, collected as one: Gemini 4 Argon on agy ran six
 # CPU tasks first in a batch of their own and the other 42 in its formal evaluation; together they are its 48 (Qiuyang,
 # 2026-10-25). The first evaluation listed is the formal one.
-EVALUATIONS = {'Antigravity CLI agy (gemini-4-argon)': ('eval_01M5RHJYJ0Z12JB8D3R4YCG9M2', 'eval_01M5R40BHHJHRTSNBV7FB6P6JV')}
+EVALUATIONS = {'Antigravity CLI agy (gemini-4-argon)': ('eval_01M5RHJYJ0Z12JB8D3R4YCG9M2', 'eval_01M5R40BHHJHRTSNBV7FB6P6JV'),
+               # Claude Sonnet 5.5: the 32 CPU tasks, then the 16 GPU tasks in an evaluation of their own (2026-11-05/06)
+               'Claude Code · Sonnet 5.5 (Subscription, max effort)': ('eval_01M6PDR8ZBE6SQXWN53VMR9B1E', 'eval_01M6QTTV86KZ32PWTWVWJ3DEBE')}
 
 
 def get(path):
@@ -207,7 +213,16 @@ WHY = {'run_01M5QR7T4M65RY0VAYMQDN6TP2': 'Out of memory (exit 137)',            
        'run_01M6CMMG44FKQ5QZ0F340PZXZ7': 'Harness exited (exit 1), no final',
        'run_01M6CMMG44VT465WY19DKJ3K8T': 'Out of memory (exit 137)',
        'run_01M6CMMG438VHFZBRJ7YWF3AVD': 'Workspace over 4 GiB, evicted',
-       'run_01M6CMMG4531H0YHHP8D6KDGW3': 'Stored checkpoint failed on the verifier GPU'}
+       'run_01M6CMMG4531H0YHHP8D6KDGW3': 'Stored checkpoint failed on the verifier GPU',
+       # Claude Sonnet 5.5 (eval_01M6PDR8ZBE6SQXWN53VMR9B1E; /data/task-format/sonnet/dispositions.json)
+       'run_01M6PDR8ZKZRBSQTRCJY514KT7': 'Out of memory (exit 137)',
+       'run_01M6PDR8ZPC4P89QG406GMMWHD': 'Out of memory (exit 137)',
+       'run_01M6Q3MGHP204BFTRHY3BB6VPP': 'Out of memory (exit 137)',
+       # Inkling 2 Small (eval_01M6QX7NYM8EBN1NW9JSTH94RR; ~/fcs2-ops/inkling/dispositions.md)
+       'run_01M6QX7NYS8RZD5745V2J5Y57Y': 'Stored checkpoint crashed on an evaluation workload',
+       'run_01M6QX7NYR9W01TMH58KYHNRRT': 'Empty reply, harness exited, no submission',
+       'run_01M6R0B80TXS29YP0VBH2R8SEB': 'Empty reply, harness exited, no submission',
+       'run_01M6R0B80T472MYZVJRG23PJ2Z': 'Agent time limit reached, no submission'}
 # Runs the platform marks FAILED whose selected final was rejudged and accepted: they completed, so the site shows no failure
 # for them. Claude Opus 5.5's KV Cache Compaction (61.55; Qiuyang, 2026-10-20: "kebab上的opus kv compaction信息是否不对").
 COMPLETED = {'run_01M5BMPCS19PVWJRAGZSF9ED8P'}
