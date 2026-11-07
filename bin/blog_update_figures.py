@@ -170,7 +170,110 @@ def spread(narrow):
     g += text(L, H - 6, 'Agents caching, out of ten', FS, MUTED, 500)
     return svg(narrow, W, H, 'SCOPE, ten agents side by side: one caches its answers at minute 47 and tells the others at minute 78; by minute 98 nine of ten cache.', g)
 
-CHARTS = {'update-fci': ('fci', fci), 'update-glenside': ('glenside', glenside), 'update-ragen': ('ragen', ragen), 'update-spread': ('spread', spread)}
+
+# ---------- Pass rate: tasks where the model beats the human reference ----------
+def passrate(narrow):
+    """Share of the 48 tasks each model passes (PASS in fcs2-data.js), the four new models in their lab colours."""
+    src = open(DATA).read()
+    pas = json.JSONDecoder().raw_decode(src, re.search(r'^const PASS = ', src, re.M).end())[0]
+    eci = json.JSONDecoder().raw_decode(src, re.search(r'^const ECI = ', src, re.M).end())[0]
+    names, col = site_models(), lab_colour()
+    rows = sorted([i for i in eci if i in pas], key=lambda i: (-pas[i][0], -eci[i][0], names[i]))
+    W, L, R, RH, BH, FS = (360, 150, 44, 24, 12, 11.5) if narrow else (760, 236, 64, 27, 15, 13)
+    T, B = 6, 30
+    H = T + RH * len(rows) + B
+    X = lambda v: L + v / 60 * (W - L - R)
+    g = ''
+    for v in range(0, 61, 20):
+        g += f'<line x1="{X(v):.1f}" x2="{X(v):.1f}" y1="{T}" y2="{T + RH * len(rows)}" stroke="{GRID}" stroke-width="1"/>'
+        g += text(X(v), H - B + 18, f'{v}%', FS, MUTED, 400, 'middle')
+    for k, i in enumerate(rows):
+        y, (v, n, tot), on = T + RH * k + RH / 2, pas[i], i in NEW
+        g += text(0, y + FS * .36, names[i], FS, INK, 600 if on else 400)
+        g += f'<rect x="{X(0):.1f}" y="{y - BH / 2:.1f}" width="{max(X(v) - X(0), 1.5):.1f}" height="{BH}" rx="2" fill="{col.get(i, BAR) if on else BAR}"/>'
+        g += text(X(v) + 5, y + FS * .36, f'{n} of {tot}', FS, INK if on else MUTED, 600 if on else 400)
+    label = 'Tasks passed out of 48, by model: ' + ', '.join(f'{names[i]} {pas[i][1]}' for i in rows) + '.'
+    return svg(narrow, W, H, label, g)
+
+# ---------- One format: the shared code that every task used to carry its own copy of ----------
+# Counted in FrontierCS/FrontierCS-2 at 1e6dfa12 (before the task-format move) and 3d02f24d (after): every copy of
+# these files under the task folders, its distinct versions (git blobs) and its lines; after the move, the shared copy
+# plus any task that still keeps its own.
+REBASE = [  # file, copies before, versions before, lines before, copies after, lines after
+    ('fcs2_verifier.py', 44, 30, 26908, 1, 836),
+    ('submission_patch.py', 59, 14, 18991, 1, 193),
+    ('beat_spec_feedback.py', 49, 8, 16206, 1, 162),
+    ('fcs2_verifier_gpu.py', 15, 10, 12121, 1, 2018),
+    ('fcs2_submission.py', 18, 1, 1890, 1, 103),
+    ('make_submission.sh', 89, 47, 1618, 13, 198),
+    ('verify.py', 48, 45, 1618, 2, 364),
+    ('prepare_workspace.sh', 49, 10, 1113, 1, 26),
+]
+
+def rebase(narrow):
+    ACC = '#0b57d0'
+    W, L, R, RH, FS = (360, 128, 10, 40, 11) if narrow else (760, 190, 20, 34, 13)
+    T, B = 26, 30
+    H = T + RH * len(REBASE) + B
+    top = 34000 if narrow else 30000
+    X = lambda v: L + v / top * (W - L - R)
+    g = ''
+    for v in range(0, top + 1, 10000):
+        g += f'<line x1="{X(v):.1f}" x2="{X(v):.1f}" y1="{T - 8}" y2="{T + RH * len(REBASE)}" stroke="{GRID}" stroke-width="1"/>'
+        g += text(X(v), H - B + 18, f'{v // 1000}k' if v else '0', FS, MUTED, 400, 'middle')
+    g += f'<rect x="{L}" y="4" width="10" height="10" rx="2" fill="{BAR}"/>' + text(L + 15, 13, 'before', FS - 1, MUTED, 500)
+    g += f'<rect x="{L + (70 if narrow else 80)}" y="4" width="10" height="10" rx="2" fill="{ACC}"/>' + text(L + (85 if narrow else 95), 13, 'after', FS - 1, MUTED, 500)
+    for k, (f, c0, v0, l0, c1, l1) in enumerate(REBASE):
+        y = T + RH * k + 4
+        g += text(0, y + 9, f, FS, INK, 600)
+        g += text(0, y + 9 + FS + 3, f'{c0} copies, {v0} versions', FS - 1.5, MUTED, 400)
+        bh = 10 if narrow else 11
+        g += f'<rect x="{X(0):.1f}" y="{y:.1f}" width="{max(X(l0) - X(0), 1.5):.1f}" height="{bh}" rx="2" fill="{BAR}"/>'
+        g += f'<rect x="{X(0):.1f}" y="{y + bh + 2:.1f}" width="{max(X(l1) - X(0), 1.5):.1f}" height="{bh}" rx="2" fill="{ACC}"/>'
+        g += text(X(l0) + 5, y + bh - 1.5, f'{l0:,}', FS - 1.5, MUTED, 400)
+        g += text(X(l1) + 5, y + 2 * bh + .5, f'{l1:,}', FS - 1.5, INK, 600)
+    label = ('Lines of shared code carried by the tasks, before and after the move: ' +
+             ', '.join(f'{f} {c0} copies in {v0} versions, {l0} lines, now {l1}' for f, c0, v0, l0, c1, l1 in REBASE) + '.')
+    return svg(narrow, W, H, label, g)
+
+# ---------- Isolation: the judge runs the candidate's code in a sandbox of its own ----------
+def isolate(narrow):
+    ACC, RED = '#0b57d0', '#c5221f'
+    box = lambda x, y, w, h, fill, stroke, dash='': f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="10" fill="{fill}" stroke="{stroke}" stroke-width="1.5"{dash}/>'
+    rules = ["reads only its own tree and inputs", "writes only its result folder", "no network, no extra processes",
+             "a fresh instance for every run: nothing", "survives from one timing round to the next"]
+    lab = "The judge runs the candidate's code inside a sandbox of its own, which cannot read the judge's files or keep anything between runs."
+    cross = lambda x, y: f'<path d="M{x - 11} {y - 11} L{x + 11} {y + 11} M{x + 11} {y - 11} L{x - 11} {y + 11}" stroke="{RED}" stroke-width="3"/>'
+    if narrow:
+        W, H, FS = 360, 430, 11.5
+        g = box(1, 1, 358, 428, '#f8f9fa', '#dadce0')
+        g += text(14, 24, 'The judge (trusted)', FS + 1, INK, 700)
+        g += box(14, 38, 332, 54, '#ffffff', '#dadce0')
+        g += text(28, 60, 'judge files: hidden workloads,', FS, INK, 500) + text(28, 78, 'the human reference, the scoring code', FS, INK, 500)
+        g += f'<line x1="180" x2="180" y1="176" y2="100" stroke="{RED}" stroke-width="2"/><path d="M173 110 L180 98 L187 110" fill="none" stroke="{RED}" stroke-width="2"/>'
+        g += cross(180, 138) + text(200, 143, 'blocked', FS, RED, 600)
+        g += box(14, 182, 332, 170, '#e8f0fe', ACC, ' stroke-dasharray="5 4"')
+        g += text(28, 206, "isolate: the candidate's code", FS + 1, ACC, 700)
+        for k, r in enumerate(rules):
+            g += text(28, 232 + 22 * k, r, FS, INK, 500)
+        g += text(14, 380, 'Attack submissions that read the judge, hide', FS, INK, 500) + text(14, 398, 'from its checks or keep state between rounds', FS, INK, 500) + text(14, 416, 'all score 0.', FS, INK, 500)
+        return svg(True, W, H, lab, g)
+    W, H, FS = 760, 262, 13
+    g = box(1, 1, 758, 260, '#f8f9fa', '#dadce0')
+    g += text(20, 30, 'The judge (trusted)', FS + 2, INK, 700)
+    g += box(20, 66, 250, 96, '#ffffff', '#dadce0')
+    g += text(36, 96, 'judge files', FS, INK, 700) + text(36, 120, 'hidden workloads, the human', FS, MUTED, 400) + text(36, 140, 'reference, the scoring code', FS, MUTED, 400)
+    g += box(400, 20, 340, 176, '#e8f0fe', ACC, ' stroke-dasharray="5 4"')
+    g += text(418, 48, "isolate: the candidate's code", FS + 2, ACC, 700)
+    for k, r in enumerate(rules):
+        g += text(418, 80 + 24 * k, r, FS, INK, 500)
+    g += f'<line x1="394" x2="280" y1="114" y2="114" stroke="{RED}" stroke-width="2"/><path d="M292 107 L278 114 L292 121" fill="none" stroke="{RED}" stroke-width="2"/>'
+    g += cross(337, 114) + text(337, 148, 'blocked', FS, RED, 600, 'middle')
+    g += f'<line x1="20" x2="740" y1="216" y2="216" stroke="#dadce0" stroke-width="1"/>'
+    g += text(20, 242, 'Attack submissions that read the judge, hide from its checks or keep state between rounds all score 0.', FS, INK, 500)
+    return svg(False, W, H, lab, g)
+
+CHARTS = {'update-pass': ('pass', passrate), 'update-fci': ('fci', fci), 'update-rebase': ('rebase', rebase), 'update-isolate': ('isolate', isolate), 'update-glenside': ('glenside', glenside), 'update-ragen': ('ragen', ragen), 'update-spread': ('spread', spread)}
 
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
