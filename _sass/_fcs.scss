@@ -1838,3 +1838,12 @@ section.journal.team-sec.team-top { padding-top: clamp(56px, 6vw, 72px); }
 .rail:hover i, .rail.drag i{left:3px; width:8px; border-radius:4px; background:#3c4043}
 .rail[hidden]{display:none}
 .rows:focus-visible, .ccbox:focus-visible{box-shadow:0 0 0 2px var(--teal)}
+
+/* Article pages (owner, 2026-11-07): the text column, not the contents + text pair, sits in the middle of the page. An
+   empty third column as wide as the contents balances it; it gives way first when the window narrows. */
+@media (min-width: 1180px) {
+  .ar-page { grid-template-columns: 200px 760px minmax(0, 200px); }
+}
+@media (min-width: 861px) and (max-width: 1179px) {
+  .ar-page { grid-template-columns: 180px minmax(0, 720px) minmax(0, 180px); }
+}
