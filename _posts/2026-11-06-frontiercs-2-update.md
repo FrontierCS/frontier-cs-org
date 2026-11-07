@@ -117,7 +117,7 @@ The same trick spread on its own in a test with ten agents working side by side.
 
 Parallel DBSCAN had the same hole in memory: one process ran all five timing rounds, and a cache made rounds two to five a copy. Each timing round in both tasks now starts with nothing left over from the last.
 
-### What we check now before a task joins the leaderboard
+### What we check before a trajectory joins the leaderboard
 
 Each of these submissions was legal. It changed only the files the task allowed, and it passed every check the judge made. A sandbox cannot stop that kind of trick. A judge that knows what to check can.
 
