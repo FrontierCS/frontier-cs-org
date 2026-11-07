@@ -111,9 +111,19 @@ def bbq():       # a tree of bitmaps with the first set bit followed down, and t
     return (tree + box(980, 280, 460, 130, SKY) + lines(1030, 325, 360, 2, 40)
             + box(980, 610, 260, 130, BLUE) + line(1290, 600, 1290, 750, dotted=True) + line(1440, 600, 1440, 750, dotted=True))
 
+def update():    # the November update: the new models' passed tasks, a shield over the judge, and one card shape for every task
+    bars = ''.join(box(170 + i * 110, 790 - h, 76, h, BLUE if i == 0 else (SKY if i == 1 else MINT), rx=10, off=10)
+                   for i, h in enumerate((24 * 22, 17 * 22, 4 * 22, 4 * 22)))
+    shield = 'M800 230 L960 290 L960 520 Q960 690 800 770 Q640 690 640 520 L640 290 Z'
+    guard = (f'<path d="M812 242 L972 302 L972 532 Q972 702 812 782 Q652 702 652 532 L652 302 Z" fill="{MINT}"/>' + path(shield)
+             + path('M720 500 L780 560 L885 430', sw=12, colour=BLUE))
+    cards = ''.join(box(1120 + i * 46, 250 + i * 70, 280, 360, WHITE if i < 2 else SKY, off=0) + lines(1160 + i * 46, 310 + i * 70, 200, 4, 40)
+                    for i in range(3))
+    return axes(140, 200, 640 - 60, 820) + bars + guard + cards
+
 POSTS = {'humans-still-beat-ai': humans, 'frontiercs-2-roadmap': roadmap, 'frontiersmith': smith, 'harbor': harbor, 'calico': calico,
          'alma': alma, 'agent-evaluation': evolving, 'negative-optimization': negative, 'evaluation': pipeline, 'feb-release': release,
-         'quarterpir-two-checksums': pir, 'bbq-two-faster-clocks': bbq}
+         'quarterpir-two-checksums': pir, 'bbq-two-faster-clocks': bbq, 'frontiercs-2-november-update': update}
 
 # The overview's Case studies row shows a case study's thumbnail in its task's domain tones, while the blog list keeps the
 # site's blues (Qiuyang, 2026-10-17). Writes assets/img/case-thumbs/<slug>.svg; the post points at it with case.thumbnail.
