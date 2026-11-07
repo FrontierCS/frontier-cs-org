@@ -143,8 +143,9 @@ def ragen(narrow):
         g += text(22, 324, 'Now the judge replays every episode', 12.5, GREEN, 700)
         g += box(22, 336, 150, 66) + text(32, 356, 'seed, fresh board', 12, INK, 600) + chip(32, 368, 'seed 7', INK, size=11) + board(120, 366, 8)
         g += arrow(172, 369, 188, 369, GREEN)
-        g += box(188, 336, 150, 66) + text(198, 356, 'moves = answer?', 12, INK, 600) + chip(198, 368, '→↓↓→↑', RED, size=11) + chip(270, 368, '↑←←', INK, size=11)
-        g += f'<rect x="22" y="414" width="316" height="68" rx="8" fill="#fff" stroke="{RED}" stroke-width="1.6"/>' + text(34, 440, 'they differ: score 0', 13, RED, 700) + text(34, 462, 'the judge recomputes the reward itself', 12, INK, 500)
+        g += box(188, 336, 150, 66) + text(198, 356, 'played', 11.5, INK, 600) + chip(262, 343, '→↓↓→↑', RED, size=11)
+        g += text(198, 386, 'answered', 11.5, INK, 600) + chip(262, 373, '↑←←', INK, size=11)
+        g += f'<rect x="22" y="414" width="316" height="68" rx="8" fill="#fff" stroke="{RED}" stroke-width="1.6"/>' + text(34, 440, 'they differ, so it scores 0', 13, RED, 700) + text(34, 462, 'the judge recomputes the reward itself', 12, INK, 500)
         return svg(True, W, H, label, g)
     W, H = 760, 318
     g = box(10, 20, 124, 92) + text(22, 44, 'The model', 13.5, INK, 600) + chip(22, 60, '↑ ← ←', INK)
@@ -164,9 +165,10 @@ def ragen(narrow):
     g += arrow(136, 264, 164, 264, GREEN)
     g += box(164, 234, 112, 60) + text(176, 256, 'fresh board', 12.5, INK, 600) + board(176, 262, 7)
     g += arrow(276, 264, 304, 264, GREEN)
-    g += box(304, 234, 206, 60) + text(316, 256, "moves = the model's answer?", 12.5, INK, 600) + chip(316, 264, '→ ↓ ↓ → ↑', RED) + chip(424, 264, '↑ ← ←', INK)
+    g += box(304, 234, 206, 60) + text(316, 254, 'moves played', 12, INK, 600) + chip(412, 240, '→ ↓ ↓ → ↑', RED, size=11)
+    g += text(316, 282, 'model answered', 12, INK, 600) + chip(412, 268, '↑ ← ←', INK, size=11)
     g += arrow(510, 264, 538, 264, GREEN)
-    g += f'<rect x="538" y="234" width="198" height="60" rx="8" fill="#fff" stroke="{RED}" stroke-width="1.6"/>' + text(550, 258, 'they differ: score 0', 13, RED, 700) + text(550, 280, 'reward recomputed by the judge', 12, INK, 500)
+    g += f'<rect x="538" y="234" width="198" height="60" rx="8" fill="#fff" stroke="{RED}" stroke-width="1.6"/>' + text(550, 258, 'they differ, so it scores 0', 13, RED, 700) + text(550, 280, 'reward recomputed by the judge', 12, INK, 500)
     return svg(False, W, H, label, g)
 
 # ---------- SCOPE: the cache spreads through ten agents ----------
