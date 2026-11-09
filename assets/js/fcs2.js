@@ -36,6 +36,8 @@ const io = moving && new IntersectionObserver(es => es.forEach(e => {
 // whether this draw of the chart animates; call before drawing its children
 const animates = svg => { const on = moving && !shown.has(svg.id); svg.classList.toggle('anim', on); svg.classList.toggle('pre', on); if (on) io.observe(svg); return on; };
 // mark an element: kind a-bar | a-wipe | a-fade | a-pop | a-draw (a path with pathLength 1), delay in s, dx a start offset in px (unused for now)
+// Mark it before it is added: an element that is laid out unmarked (a measuring call lays the chart out) and marked after
+// plays its transition into the .pre state, so it sinks or fades out while the chart waits and is not at 0 when it plays.
 const mark = (el, kind, d = 0, dx = 0) => { el.classList.add(kind); el.style.setProperty('--d', d.toFixed(2) + 's'); if (dx) el.style.setProperty('--dx', dx.toFixed(1) + 'px'); return el; };
 
 /* ---------- leaderboard chart ---------- */
@@ -144,6 +146,7 @@ function drawPassBars(k = 'pass', id = 'fcib') {
     const bar = sv('path', {d:`M${x},${base}V${y + r}Q${x},${y} ${x + r},${y}H${x + bw - r}Q${x + bw},${y} ${x + bw},${y + r}V${base}Z`, fill:MCOL[m.id], 'data-m':m.id});
     const inside = h > vs * 1.8, vtx = sv('text', {x:cx, y:inside ? y + h / 2 + vs * .36 : y - 8, 'text-anchor':'middle', 'font-size':vs, 'font-weight':600,
       fill:inside ? (lightCol(m.id) ? 'var(--ink)' : '#fff') : 'var(--ink)'}, M.lab(e));
+    if (an) { mark(bar, 'a-rise', i * .05); mark(vtx, 'a-fade', .5 + i * .05); }
     svg.append(bar, vtx);
     { const tw = vtx.getComputedTextLength();   // too wide for a narrow bar: stand the value up inside it, or leave it to the tooltip
       if (tw > band - 2) { if (h > tw + 8) { const fs = Math.min(vs, bw * .9), yc = y + h / 2; vtx.setAttribute('font-size', fs); vtx.setAttribute('x', cx + fs * .36); vtx.setAttribute('y', yc); vtx.setAttribute('transform', `rotate(-90 ${cx + fs * .36} ${yc})`); vtx.setAttribute('fill', lightCol(m.id) ? 'var(--ink)' : '#fff'); } else vtx.remove(); } }
@@ -158,7 +161,6 @@ function drawPassBars(k = 'pass', id = 'fcib') {
       const ny = ty + tile + 12;
       svg.append(sv('text', {class:'lab', x:cx + fs * .35, y:ny, 'font-size':fs, 'text-anchor':'end', transform:`rotate(${-ang} ${cx + fs * .35} ${ny})`}, m.short));
     }
-    if (an) { mark(bar, 'a-rise', i * .05); mark(vtx, 'a-fade', .5 + i * .05); }
     pts.push({x:cx, y, box:[cx - band / 2, cx + band / 2, T, H], html:`<b>${esc(m.base)}</b>${m.h ? ` · ${esc(m.h)}` : ''}<br>${M.tip(e)}`});   // the whole column, bar, logo and name, shows the tooltip
   });
   attachTip(svg, W, H, pts, $(`#${id}tip`));
@@ -425,10 +427,10 @@ function drawLB() {
       // the mean sits above its own dot, clear of the run dots, with no white outline (owner, 2026-10-18); a value that
       // would cross the dark 0 line moves along to the line's side its mean is on
       const val = sv('text', {class:'val', x:X(mu), y:yc - 19, fill:MTXT(it.m), 'text-anchor':'middle'}, sgn(mu));
+      if (an) { mark(dot, 'a-pop', dm); mark(val, 'a-fade', dm + .15); }
       svg.append(dot, val);
       const vw = val.getComputedTextLength() / 2 + 3;
       if (Math.abs(X(mu) - X(0)) < vw) { val.setAttribute('x', mu >= 0 ? X(0) + 3 : X(0) - 3); val.setAttribute('text-anchor', mu >= 0 ? 'start' : 'end'); }
-      if (an) { mark(dot, 'a-pop', dm); mark(val, 'a-fade', dm + .15); }
     });
     y0 += h;
   });
