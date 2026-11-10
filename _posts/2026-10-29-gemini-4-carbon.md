@@ -1,6 +1,7 @@
 ---
 layout: distill
 title: "Details about our evaluation of Gemini 4 Carbon"
+description: "Gemini 4 Carbon passes 26 of 48 tasks, as many as Gemini 4 Argon and second only to Claude Opus 5.5, and has a higher mean score than Argon where both submitted (57.7 against 52.9). We show how it tests more before its first submission, the three passes that used loopholes, and three runs that stopped early because the Antigravity harness stopped waiting."
 tags: [FrontierCS 2, Evaluation]
 thumbnail: assets/img/blog-thumbs/gemini-4-carbon.jpg
 og_image: assets/img/blog/gemini-4-carbon/share-card.jpg
