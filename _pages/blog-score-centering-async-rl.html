@@ -1,0 +1,318 @@
+---
+layout: distill
+title: "Beyond Score Centering: What Else Can We Optimize In Async RL?"
+description: "Score centering (SC) has recently drawn wide attention in LLM RL. This post uses experiments to explain the core idea of SC and how it works. Beyond SC itself and the tricks widely discussed alongside it, we follow the same idea to revisit other key components of async RL and make training more stable and efficient. At the end we present two findings that, with SC and the KL penalty on, further improve training quality and stability markedly: (1) replacing the mask based on token-level probability ratios with a mask based on state-level KL divergence; (2) switching how the trainer draws trajectories from the buffer from greedy to random sampling."
+permalink: /blog/score-centering-async-rl/
+date: 2026-11-12
+date_display: "November 12, 2026"
+tags: [Async RL]
+sitemap: false
+toc:
+  - name: "Why Do Old Trajectories Dominate The Update In Async RL?"
+  - name: "What SC Solves, And What Is Left To Solve"
+  - name: "What Should We Do On Top Of SC?"
+  - name: "What Kind Of Mask Do We Actually Need?"
+  - name: "Combining With The KL Penalty"
+  - name: "Beyond The Algorithm: Design Space And Free Lunches In The System"
+_styles: >
+  d-article .l-zh { display: none; }
+  html[data-lang="zh"] d-article .l-zh, html[data-lang="zh"] .sc-dek-zh { display: revert; }
+  html[data-lang="zh"] d-article .l-en { display: none; }
+  .sc-dek-zh { display: none; }
+  html[data-lang="zh"] .ar-standfirst.sc-has-zh .sc-dek-en { display: none; }
+  d-article .l-zh, d-article .l-zh :is(p, li, b, strong, a, em, i, figcaption), .ar-toc a, .sc-dek-zh { font-family: 'Hanken Grotesk', 'PingFang SC', 'Noto Sans CJK SC', 'Microsoft YaHei', sans-serif; }
+  d-article .sc-lang { display: flex; justify-content: flex-end; margin: 0 0 8px; }
+  d-article .sc-lang button { font: 500 13.5px/1 'Hanken Grotesk', sans-serif; border: 1px solid var(--line); background: none; color: var(--ink); border-radius: 999px; padding: 7px 14px; cursor: pointer; }
+  d-article .sc-lang button:hover { border-color: #0b57d0; color: #0b57d0; }
+  d-article figure.sc-fig { margin-block: 36px 40px; }
+  d-article figure.sc-fig .img { overflow-x: auto; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding-block: 16px; }
+  d-article figure.sc-fig img { display: block; width: 100%; min-width: 600px; height: auto; }
+  d-article figure.sc-fig figcaption { margin-top: 12px; font-size: 15px; line-height: 1.55; color: var(--muted-2); }
+  d-article figure.sc-fig figcaption b { color: var(--ink); }
+  d-article .math { overflow-x: auto; overflow-y: hidden; margin: 4px 0 18px; }
+  d-article .key { display: block; background: #d3e3fd; border-left: 3px solid #0b57d0; padding: 12px 16px; border-radius: 0 8px 8px 0; font-weight: 500; }
+  d-article ul.points { padding-left: 20px; } d-article ul.points li { margin-bottom: 6px; }
+---
+
+<div class="sc-lang"><button id="sc-langbtn" type="button" aria-label="Switch language">中文</button></div>
+<span id="sc-dek-zh" class="sc-dek-zh" lang="zh" hidden>最近，Score Centering（SC）在 LLM RL 领域引发了广泛关注。本文旨在结合实验深入浅出地介绍 SC 的核心思想与工作原理。除了 SC 本身及其广泛讨论的配套优化技巧，我们还将探讨如何沿着 SC 的核心思路，重新审视并优化 async RL 中的其他关键组件，从而进一步提升训练的稳定性与效率。本文最后将介绍两个在开启 SC 和 KL Penalty 后，能进一步显著提升训练效果与稳定性的发现：（1）将基于 token-level probability ratio 的 mask 替换为基于 state-level KL divergence 的 mask；(2) 将 trainer 从 buffer 中获取 trajectories 的策略由 greedy 改为随机采样。</span>
+<div class="l-en" lang="en"><p>First, some notation. In async RL the sampler \(\mu\) and the trainer \(\pi\) are decoupled: the sampler generates trajectories with the weights it holds, and the trainer takes optimizer steps on that data while it keeps updating. If a trajectory reaches the trainer at step \(k\) and was sampled by \(\mu = \pi_{\theta_{k-\mathrm{a}}}\), we say its policy age is \(\mathrm{a}\), i.e. the trainer is now computing gradients on data from a policy \(\mathrm{a}\) steps old.</p></div><div class="l-zh" lang="zh"><p>先约定一下记号。在 async RL 里，sampler \(\mu\) 和 trainer \(\pi\) 是 decoupled 的：sampler 用自己手上的权重生成 trajectories，trainer 拿这些数据做 optimizer step，同时不停地更新。如果一条 trajectory 在第 \(k\) 步进入 trainer，而它是由 \(\mu = \pi_{\theta_{k-\mathrm{a}}}\) 采出来的，我们就说它的 policy age 是 \(\mathrm{a}\)，即此时 trainer 是在用 \(\mathrm{a}\) 步之前的旧策略的数据计算梯度。</p></div>
+<h2 id="why-do-old-trajectories-dominate-the-update-in-async-rl"><span class="l-en" lang="en">Why Do Old Trajectories Dominate The Update In Async RL?</span><span class="l-zh" lang="zh">为什么旧的trajectory能主导async RL的更新？</span></h2>
+<div class="l-en" lang="en"><p>Rather than starting with theory and notation, let us first look at what happens when trajectories of different ages reach the trainer. An interesting finding is that without SC, a trajectory's policy-gradient norm grows roughly linearly with its age, while with SC this trend is well suppressed.</p>
+<p>The former is clearly bad. In principle, a token's influence on the policy update should depend roughly only on its advantage and otherwise be treated equally; in some settings one may even want to weaken the influence of very old trajectories. Here instead, the older a trajectory, the more it dominates the gradient update. We discuss the bias that old trajectories introduce later, but even considering only the variance of training, this imbalance is enough to make training unstable.</p></div><div class="l-zh" lang="zh"><p>我们不急着讨论理论和数学符号，先来看看不同 age 的 trajectories 进入到 trainer 会发生什么？
+一个有意思的发现是，在没有SC的情况下，trajectories 对应的 policy gradient norm 大约随 age 线性增长，而有 SC 的情况下，这一趋势得到了很好的抑制。</p>
+<p>前者当然不是什么好事，因为理论上来说，不同的 token，它们对 policy 更新的影响应当大约仅取决于它们的 advantage ，除此之外应当一视同仁，或者更进一步在一些 setting 下可以考虑削弱过旧 trajectories 的影响。然而在这里，越旧的 trajectories 越主导了 gradient update。后面我们会讨论旧的 trajectories 产生的 bias，但即使仅仅是考虑训练的 variance，这样的不平衡也足以让训练变得不稳定。</p></div>
+<figure class="sc-fig">
+<div class="img"><img src="{{ '/assets/img/2026-11-12-score-centering-async-rl/fig3_profile.svg' | relative_url }}" loading="lazy" alt="Left: median gradient norm grows from 1.56 to 5.05 with age for PG, but only to 2.40 for SC. Middle: drift share of the PG gradient rises from 0.09 to 0.86. Right: per-token KL grows from 0.0005 to 0.104."></div>
+<figcaption><span class="l-en" lang="en"><b>Figure 1. Gradient profile by policy age.</b> Countdown, Qwen3-0.6B, trained at staleness 64. At steps 200, 400 and 600, checkpoints of age 0 to 64 each sample 8 completions for the same 64 prompts, and each trajectory's gradient is evaluated at the current weights. Left: median gradient norm. Middle: drift share of the PG gradient. Right: per-token sampler–trainer KL.</span><span class="l-zh" lang="zh"><b>图 1. 按 policy age 统计的梯度 profile。</b>Countdown，Qwen3-0.6B，staleness 64 训练。在第 200、400、600 步，用 age 0–64 的旧 checkpoint 对同一批 64 道题各采 8 条回答，在当前权重下计算每条 trajectory 的梯度。左：gradient norm 中位数；中：drift 占 PG 梯度的比例；右：per token 的 sampler–trainer KL。</span></figcaption>
+</figure>
+<div class="l-en" lang="en"><p>The figure above naturally raises two questions: why does the gradient grow linearly with age without SC, and how does SC flatten that line? To answer them, we go back to the policy gradient itself. On-policy, the gradient of the objective is
+\[
+\nabla J = \mathbb{E}_{a\sim\pi}\big[A\,\nabla\log\pi(a)\big].
+\]
+Under async, samples come from the sampler \(\mu\), and the trainer actually computes
+\[
+\mathbb{E}_{a\sim\mu}\big[A\,\nabla\log\pi(a)\big].
+\]
+To make this easy to see, we work in the logit space of a single token. Write \(e_a\) for the one-hot vector of \(a\) and \(p = \pi_{\theta_k}(\cdot\mid s)\). Under a softmax, \(\nabla_z\log\pi(a) = e_a - p\), so the PG gradient for one sampled token is
+\[
+g_{\mathrm{PG}} = -A\,(e_a - p).
+\]
+But \(a\) was drawn by the sampler, so we take the expectation over the sampler with \(A\) inside. Write \(q = \mu(\cdot\mid s)\) and note that \(\mathbb{E}_{a\sim\mu}[e_a] = q\). Then
+\[
+\mathbb{E}_{a\sim\mu}\big[A\,(e_a - p)\big]
+= \underbrace{\mathbb{E}_{a\sim\mu}\big[A\,(e_a - q)\big]}_{\text{signal}}
+\;+\; \underbrace{\mathbb{E}_{a\sim\mu}[A]\,(q - p)}_{\text{drift}} .
+\]
+The signal term does not depend on the gap between the two policies, while the norm of the drift term grows linearly with that gap. The gap itself grows roughly linearly with age: every trainer step moves the policy by about \(\delta\) in a similar direction, so at age \(\mathrm{a}\)
+\[
+\lVert q - p\rVert \approx \mathrm{a}\,\lVert\delta\rVert ,
+\]
+and the drift term grows linearly in \(\mathrm{a}\). Even if the trainer were doing a random walk, the gap would still grow as \(\sqrt{\mathrm{a}}\), which is more than enough to wreck training stability. This explains what we observe.</p>
+<p>It is worth adding that, as several earlier blogs point out, the drift term of the policy gradient, mapped back to the objective, adds a term to the on-policy objective being maximized:
+\[
+-A\,D_{\mathrm{KL}}(\mu\|\pi)
+\]
+So far we argued for removing the drift from the standpoint of training stability. Another reading is that it hands the trainer a KL loss whose strength we do not control, which is not a desirable objective; we come back to this later.</p>
+<p>This form also restores some good properties of the on-policy version, such as subtracting a constant baseline leaving the expected policy gradient unchanged; we do not dwell on them here.</p></div><div class="l-zh" lang="zh"><p>上面的图片自然引出了两个问题：为什么没有 SC 时，梯度会随 age 线性变大？SC 又是怎么把这条线压平的？要回答它们，我们回到 policy gradient 本身。on-policy 时，目标的梯度是
+\[
+\nabla J = \mathbb{E}_{a\sim\pi}\big[A\,\nabla\log\pi(a)\big],
+\]
+<br>
+async 下，样本来自 sampler \(\mu\)，trainer 实际算的是
+\[
+\mathbb{E}_{a\sim\mu}\big[A\,\nabla\log\pi(a)\big].
+\]
+为了方便观察，我们直接考虑单个 token 的 logit space。记 \(e_a\) 为 \(a\) 的 one-hot 向量，\(p = \pi_{\theta_k}(\cdot\mid s)\)。softmax 下 \(\nabla_z\log\pi(a) = e_a - p\)，PG 对一个采样 token 的梯度是
+\[
+g_{\mathrm{PG}} = -A\,(e_a - p).
+\]
+但 \(a\) 是 sampler 采出来的，所以要带着 \(A\) 对 sampler 求期望。记 \(q = \mu(\cdot\mid s)\)，注意 \(\mathbb{E}_{a\sim\mu}[e_a] = q\)，于是
+\[
+\mathbb{E}_{a\sim\mu}\big[A\,(e_a - p)\big]
+= \underbrace{\mathbb{E}_{a\sim\mu}\big[A\,(e_a - q)\big]}_{\text{signal}}
+\;+\; \underbrace{\mathbb{E}_{a\sim\mu}[A]\,(q - p)}_{\text{drift}} .
+\]
+注意到 signal 项关于两个策略的差异是常数，而后面那一 drift 项的 norm 大小随着两个策略的差异线性增长。而两个策略的差异本身又大约随 age 线性增长：trainer 每一步都让策略沿差不多的方向移动大约 \(\delta\)，所以 age 为 \(\mathrm{a}\) 时
+\[
+\lVert q - p\rVert \approx \mathrm{a}\,\lVert\delta\rVert ,
+\]
+drift 项也就随 \(\mathrm{a}\) 线性增长。当然，就算 trainer 每一步都在随机游走，差异也会按 \(\sqrt{\mathrm{a}}\) 增长，在这种情况下破坏训练稳定性也绰绰有余。这也解释了为什么我们可以观测到这样的现象。</p>
+<p>值得补充的是，正如不少之前的 blog 提到的，这里 policy gradient 的 drift 项如果对应回优化目标，会给原本 on-policy 想要 maximize 的目标多出一项
+\[
+-A\,D_{\mathrm{KL}}(\mu\|\pi)
+\]
+前面我们是从训练稳定性的角度探讨了去掉drift的必要性，这里的另外一个解释是这里会给 trainer 一个不受我们自己控制力度的 KL loss，不是一个理想的优化目标，关于这一点我们会在后文进一步做解释。</p>
+<p>另外，这个形式同时还原了 on-policy  版本具有的一些好性质，诸如减去常数 baseline 不会改变 policy gradient 期望的，在此就不过多赘述了。</p></div>
+<figure class="sc-fig">
+<div class="img"><img src="{{ '/assets/img/2026-11-12-score-centering-async-rl/fig4_grad_age.svg' | relative_url }}" loading="lazy" alt="Three rows of box plots of per-trajectory gradient norm against policy age, at steps 200, 400 and 600 and pooled: PG rises with age, SC stays flat, and the drift, PG minus SC, starts near zero at age 0 and rises steadily."></div>
+<figcaption><span class="l-en" lang="en"><b>Figure 2. Distribution of per-trajectory gradient norms.</b> Same data as Figure 1. Rows: PG, SC and the drift (PG − SC). Columns: steps 200, 400, 600 and pooled.</span><span class="l-zh" lang="zh"><b>图 2. per trajectory gradient norm 的分布。</b>数据同图 1。三行为 PG、SC 和 drift（PG − SC），四列为第 200、400、600 步和三者合并。</span></figcaption>
+</figure>
+<h2 id="what-sc-solves-and-what-is-left-to-solve"><span class="l-en" lang="en">What SC Solves, And What Is Left To Solve</span><span class="l-zh" lang="zh">SC 解决了什么问题，还有哪些要解决？</span></h2>
+<div class="l-en" lang="en"><p>With that motivation, SC simply removes the drift term: in policy-gradient space it subtracts
+\[
+\mathbb{E}_{a\sim\mu}[A]\,\mathbb{E}_{a\sim\mu}[\nabla\log\pi(a)] ,
+\]
+and it is natural that the gradient norm under SC shows no clear correlation with age.</p>
+<p>After SC, what on-policy actually wants and the gradient we actually compute are, respectively,
+\[
+g_{\mathrm{PG}} = \mathbb{E}_{a\sim\pi}\big[A\,(e_a - p)\big], \quad g_{\mathrm{SC}} = \mathbb{E}_{a\sim\mu}\big[A\,(e_a - q)\big].
+\]
+The Jacobian behind them is the same, so the difference between the two depends only on the gap between \(p\) and \(q\) (token level) and between \(\pi\) and \(\mu\) (policy level).</p>
+<p class="key">This suggests that any method that starts from the gap between \(\mu\) and \(\pi\) may be a good way to improve further on top of SC.</p></div><div class="l-zh" lang="zh"><p>在充分 motivated 以后，SC 其实就是很自然地把这里的 Drift 项去掉，即在 policy gradient 的space 减去一个
+\[
+\mathbb{E}_{a\sim\mu}[A]\,\mathbb{E}_{a\sim\mu}[\nabla\log\pi(a)]
+\]
+我们也很自然地理解为什么 SC 下的 gradient norm 基本和 age 没有什么显著相关性了。</p>
+<p>那么在 SC 之后，实际的 gradient 和 on-policy 真正想要的东西实际上分别是
+\[
+g_{\mathrm{PG}} = \mathbb{E}_{a\sim\pi}\big[A\,(e_a - p)\big]
+. \quad g_{\mathrm{SC}} =  \mathbb{E}_{a\sim\mu}\big[A\,(e_a - q)\big]
+.
+\]
+这背后的 Jacobian 是一致的，所以二者的差异仅取决于 \(p\) 和 \(q\) 之间 (token-level) 以及 \(\pi\) 和 \(\mu\) (policy-level) 的差异。</p>
+<p class="key">这其实启发我们，所有从 \(\mu\) 和 \(\pi\) 之间的差异出发的方法，都可能是 SC 下进一步改进的好方法。</p></div>
+<h2 id="what-should-we-do-on-top-of-sc"><span class="l-en" lang="en">What Should We Do On Top Of SC?</span><span class="l-zh" lang="zh">在SC之上我们该做什么？</span></h2>
+<div class="l-en" lang="en"><p>So what is not a good method? SC combined with importance sampling (IS), we suspect.</p>
+<p>Doing SC first and then IS is clearly off. Ignoring truncation, the gradient for one token is \(\tfrac{p(a)}{q(a)}\,A\,(e_a - q)\). Taking the expectation over the sampler, the IS ratio first moves the distribution back to \(\pi\):
+\[
+\mathbb{E}_{a\sim\mu}\Big[\tfrac{p(a)}{q(a)}\,A\,(e_a - q)\Big]
+= \underbrace{\mathbb{E}_{a\sim\pi}\big[A\,(e_a - p)\big]}_{\text{on-policy}}
+\;+\; \underbrace{\mathbb{E}_{a\sim\pi}[A]\,(p - q)}_{\text{new drift}} .
+\]
+This does nothing to shrink the gap between \(p\) and \(q\); it introduces a new drift instead.</p>
+<p>What if we do IS first and then SC, as the original paper describes: use IS to move the distribution on-policy, then apply SC? Without truncation and with exact IS, this is pointless. After IS the expectation is already under \(\pi\), where the score is centered at \(p\),
+\[
+\mathbb{E}_{a\sim\mu}\Big[\tfrac{p(a)}{q(a)}\,A\,(e_a - p)\Big] = \mathbb{E}_{a\sim\pi}\big[A\,(e_a - p)\big],
+\]
+so SC does nothing: what it subtracts already has zero expectation under \(\pi\).</p>
+<p>With truncation, write the post-IS weight as \(w(a) = f\big(p(a)/q(a)\big)\). SC is then effectively applied on a new distribution
+\[
+\nu(a) = \frac{w(a)\,q(a)}{Z},\qquad Z = \sum_{a} w(a)\,q(a),
+\]
+where \(f(\cdot)\) is the processing after IS, such as the truncation in the paper. The score is then centered at \(\nu\), and the expected gradient becomes
+\[
+\mathbb{E}_{a\sim\mu}\big[w(a)\,A\,(e_a - \nu)\big] = Z\,\mathrm{Cov}_\nu(A,\, e_a).
+\]
+Clearly, there is no guarantee whether this new distribution or the plain \(\mu\) is closer to the target \(\pi\). It is a rather ill-defined operation.</p></div><div class="l-zh" lang="zh"><p>那么什么不是好方法呢？SC 加上 Importance Sampling (IS) 恐怕就不是一个好方法。
+如果先做 SC 再做 IS，显然不太对劲，在不考虑截断的情况下，单个 token 的梯度是 \(\tfrac{p(a)}{q(a)}\,A\,(e_a - q)\)。对 sampler 求期望，IS 比值先把分布换回了 \(\pi\)：
+\[
+\mathbb{E}_{a\sim\mu}\Big[\tfrac{p(a)}{q(a)}\,A\,(e_a - q)\Big]
+= \underbrace{\mathbb{E}_{a\sim\pi}\big[A\,(e_a - p)\big]}_{\text{on-policy}}
+\;+\; \underbrace{\mathbb{E}_{a\sim\pi}[A]\,(p - q)}_{\text{新的 drift}} .
+\]
+这并没有帮助我们缩减所有 \(p\) 和 \(q\) 之间的差异，反而引入了新的 drift。</p>
+<p>如果我们先做 IS 再做 SC 呢？也就是像原论文里说的那样，我们先用 IS 把分布换到 on-policy，再去做 SC。如果没有截断且 IS 完全，这件事情并没有意义：IS 之后期望已经在 \(\pi\) 下，score 的中心就是 \(p\)，
+\[
+\mathbb{E}_{a\sim\mu}\Big[\tfrac{p(a)}{q(a)}\,A\,(e_a - p)\Big] = \mathbb{E}_{a\sim\pi}\big[A\,(e_a - p)\big],
+\]
+这里 SC 并不会有什么作用，因为在 \(\pi\) 的分布下减去的东西期望本身就是 0。</p>
+<p>而如果有截断，记 IS 之后的权重为 \(w(a) = f\big(p(a)/q(a)\big)\)，这里本质上是在一个新分布
+\[
+\nu(a) = \frac{w(a)\,q(a)}{Z},\qquad Z = \sum_{a} w(a)\,q(a)
+\]
+上做 SC，其中 \(f(\cdot)\) 代表了 IS 后的处理，比如说论文里面的截断。此时 score 的中心是 \(\nu\)，梯度的期望变成
+\[
+\mathbb{E}_{a\sim\mu}\big[w(a)\,A\,(e_a - \nu)\big] = Z\,\mathrm{Cov}_\nu(A,\, e_a),
+\]
+显然，这里你并不能保证新分布和最朴素的 \(\mu\) 与目标分布 \(\pi\) 之间谁的差异更小，其实是一个非常意义不明的行为。</p></div>
+<div class="l-en" lang="en"><p>So what is a good method? <a href="https://normaluhr.github.io/en/p/score-function-centering-kl/">Yihua's blog</a> has one that follows this design principle:
+\[
+\mathcal{L}_{\mathrm{SC}} \;-\; \beta_{\mathrm{a}}\,D_{\mathrm{KL}}(\mu\,\|\,\pi),\qquad \beta_{\mathrm{a}} = \frac{\beta_0}{\sqrt{\mathrm{a}}} ,
+\]
+where \(\mathcal{L}_{\mathrm{SC}}\) is the objective after SC. It first removes the whole drift term with SC, then explicitly adds back a KL penalty that pulls the trainer toward the sampler that generated each token. This shrinks the gap between the two distributions and, with it, the bias of the policy gradient after SC.</p>
+<p>Note that, unlike the implicit \(-A\,D_{\mathrm{KL}}(\mu\|\pi)\) in PG, the coefficient here is always positive and independent of the advantage. It is a controllable knob that helps us reduce the discrepancy caused by the difference between the two distributions.</p>
+<p>One more point: why give the new KL penalty a mysterious coefficient proportional to \(\frac{1}{\sqrt{\mathrm{a}}}\)? Recall that the gradient of the KL penalty is troublesome because it gives trajectories of different ages an unbalanced influence on the batch. If every update step were fully independent, the norm of the KL term would grow as \(\sqrt{\mathrm{a}}\). The knob can of course be pushed further, for example to \(\mathrm{a}\), which reaches the upper bound here and further reduces the influence of very old policies on the KL penalty.</p></div><div class="l-zh" lang="zh"><p>那么什么是好方法呢？<a href="https://normaluhr.github.io/en/p/score-function-centering-kl/">Yihua 的 blog</a> 里面就有一个符合这个设计原则的好方法：
+\[
+\mathcal{L}_{\mathrm{SC}} \;-\; \beta_{\mathrm{a}}\,D_{\mathrm{KL}}(\mu\,\|\,\pi),\qquad \beta_{\mathrm{a}} = \frac{\beta_0}{\sqrt{\mathrm{a}}} .
+\]
+其中\(\mathcal{L}_{\mathrm{SC}}\) 是 SC后的优化目标。它先用 SC 把 drift 项整个去掉，再显式地加回一个 KL penalty，把 trainer 拉向生成这个 token 的 sampler，从而减少两个分布之间的差异，进而减少SC后 policy gradient 的 bias。</p>
+<p>注意到这里和 PG 里那个隐式的 \(-A\,D_{\mathrm{KL}}(\mu\|\pi)\) 不同，这里的系数恒为正且和 advantage 无关，是一个可控的 knob 来帮助我们减少由两个分布 difference 产生的差异。</p>
+<p>多提一点，为什么这里要给新的 KL penalty一个神秘的系数，正比于 \(\frac{1}{\sqrt{\mathrm{a}}}\)？还记得我们前面提到 KL penalty对应的 gradient 会非常讨厌，因为会给不同 age 的 trajectories 对 batch 不平衡的影响吗？如果每一步更新是完全独立的，KL项的 norm 也就会正比于 \(\sqrt{\mathrm{a}}\)，当然这个 knob 也可以再往上调，比如说调到 \(\mathrm{a}\) 去让这里取到到上界，进一步过旧策略对这里的 KL penalty影响。</p></div>
+<h2 id="what-kind-of-mask-do-we-actually-need"><span class="l-en" lang="en">What Kind Of Mask Do We Actually Need?</span><span class="l-zh" lang="zh">我们究竟需要什么样的Mask?</span></h2>
+<div class="l-en" lang="en"><p>We saw above that combining SC with IS does not make much sense. So why do combinations such as SC + TIS and SC + MIS still help stabilize training in many experiments?</p>
+<p>The reason is simple: the masking or truncation these combinations carry on top of IS also happens to restrict updates at token positions where \(p\) and \(q\) differ a lot. They use \(\frac{\pi(a\mid s)}{\mu(a\mid s)}\) as a surrogate to decide whether to restrict an update.</p>
+<p>Since we already know that bad updates happen when \(p\) and \(q\) differ too much, why take the long way round through the IS ratio to make this mask decision? A metric that follows the idea of SC more directly is the KL between the two distributions at each state \(s\):
+\[
+d(s) = D_{\mathrm{KL}}\big(\mu(\cdot\mid s)\,\|\,\pi(\cdot\mid s)\big) = \sum_{a} q(a)\,\log\frac{q(a)}{p(a)},
+\]
+and we keep only the positions with \(d(s) \le \tau\):
+\[
+g = \mathbb{1}\big[d(s) \le \tau\big]\; A\,(e_a - q).
+\]
+Although this metric does not consider the outer, policy-level layer, it looks at the full next-token distribution at each state, which is more information than the ratio of a single token.</p>
+<p>It also preserves the good baseline property. For a ratio-based mask, the weight \(\lambda(a)\) changes with the sampled token, so for a constant baseline \(c\),
+\[
+\mathbb{E}_{a\sim\mu}\big[\lambda(a)\,c\,(e_a - q)\big] = c\,\Big(\mathbb{E}_{a\sim\mu}\big[\lambda(a)\,e_a\big] - \mathbb{E}_{a\sim\mu}\big[\lambda(a)\big]\,q\Big) \neq 0 ,
+\]
+whereas \(d(s)\) depends only on the state,
+\[
+\mathbb{E}_{a\sim\mu}\Big[\mathbb{1}\big[d(s)\le\tau\big]\,c\,(e_a - q)\Big] = \mathbb{1}\big[d(s)\le\tau\big]\,c\,(q - q) = 0 ,
+\]
+so the baseline property is fully preserved.</p></div><div class="l-zh" lang="zh"><p>在前文我们已经知道从SC 和 IS 的结合不太有道理，可是为什么在一系列实验中诸如 SC + TIS 以及 SC + MIS 的组合仍然能帮助稳定一些训练呢？</p>
+<p>原因很简单，这些组合在 IS 之外自带的 mask 或者截断也顺带限制了一些 \(p\) 和 \(q\) 差异特别大的token位置的更新，使用 \( \frac{\pi(a\mid s)}{\mu(a \mid s)}\) 这一个 surrogate 的指标去判断要不要限制更新。</p>
+<p>既然我们已经知道坏更新发生在 \(p\) 和 \(q\) 差异过大的时候，那么我们为什么要舍近求远从 IS 的ratio出发绕一大圈去做这一个 mask 的决策呢？一个更直接符合 SC 思想的指标其实就是每个状态 \(s\) 下两个分布之间的 KL：
+\[
+d(s) = D_{\mathrm{KL}}\big(\mu(\cdot\mid s)\,\|\,\pi(\cdot\mid s)\big) = \sum_{a} q(a)\,\log\frac{q(a)}{p(a)},
+\]
+并只保留 \(d(s) \le \tau\) 的位置：
+\[
+g = \mathbb{1}\big[d(s) \le \tau\big]\; A\,(e_a - q).
+\]
+虽然这个指标并没有考虑外面那一层 policy level，但它看的是每个 state 下完整的 next-token 分布，考虑的信息比单个 token 的 ratio 要多。</p>
+<p>同时，它还把 baseline 的好性质保留了下来。基于 ratio 的 mask，权重 \(\lambda(a)\) 随采到的 token 变化，对一个常数 baseline \(c\)，
+\[
+\mathbb{E}_{a\sim\mu}\big[\lambda(a)\,c\,(e_a - q)\big] = c\,\Big(\mathbb{E}_{a\sim\mu}\big[\lambda(a)\,e_a\big] - \mathbb{E}_{a\sim\mu}\big[\lambda(a)\big]\,q\Big) \neq 0 ,
+\]
+而 \(d(s)\) 只依赖状态，
+\[
+\mathbb{E}_{a\sim\mu}\Big[\mathbb{1}\big[d(s)\le\tau\big]\,c\,(e_a - q)\Big] = \mathbb{1}\big[d(s)\le\tau\big]\,c\,(q - q) = 0 ,
+\]
+baseline 的好性质被完整保留。</p></div>
+<div class="l-en" lang="en"><p>With \(d(s)\) in hand, we now put the KL mask side by side with TIS and MIS. First, what does the gradient profile look like with the KL mask? An interesting observation is that the KL mask does not know the age of each trajectory, yet the older a trajectory, the larger the gap between \(\mu\) and \(\pi\), the more easily \(d(s)\) exceeds the threshold, and so the more positions get masked. So without any help from IS, the KL mask flattens the profile: at \(\tau = 0.3\) it is even flatter than TIS + SC, and at \(\tau = 0.1\) the trend reverses and the influence of very old trajectories is weakened, which is exactly the effect we said one might want in some settings.</p></div><div class="l-zh" lang="zh"><p>有了 \(d(s)\) 这个指标，接下来我们就把 KL mask 和 TIS、MIS 放在一起比一比。先来看看加了 KL mask 之后梯度 profile 会变成什么样。一个有意思的现象是，KL mask 本身并不知道每条 trajectory 的 age 是多少，但越旧的 trajectory，\(\mu\) 和 \(\pi\) 之间的差异越大，\(d(s)\) 也就越容易超过阈值，被 mask 掉的位置自然也就越多。所以在完全不借助 IS 的情况下，KL mask 就把 profile 拉平了：\(\tau = 0.3\) 时甚至比 TIS + SC 还要平，而 \(\tau = 0.1\) 时趋势直接反了过来，过旧 trajectories 的影响反而被削弱了，这其实正是我们前面说的在一些 setting 下想要的效果。</p></div>
+<figure class="sc-fig">
+<div class="img"><img src="{{ '/assets/img/2026-11-12-score-centering-async-rl/fig5_mask_profile.svg' | relative_url }}" loading="lazy" alt="Left: median norm relative to age 0 for six methods. Right: age 64 to age 0 ratio, 3.24 for PG, 1.54 for SC, 1.34 for mask 1.0, 1.15 for TIS plus SC, 1.06 for mask 0.3, 0.74 for mask 0.1."></div>
+<figcaption><span class="l-en" lang="en"><b>Figure 3. Gradient profile with the KL mask.</b> Same data as Figure 1. Left: median gradient norm of each method relative to age 0. Right: the age-64 / age-0 ratio, with the fraction of tokens masked at age 64 in parentheses.</span><span class="l-zh" lang="zh"><b>图 3. 加 KL mask 后的梯度 profile。</b>数据同图 1。左：各方法梯度范数中位数相对 age 0 的比值；右：age 64 与 age 0 的比值，括号内为 age 64 时被 mask 的 token 比例。</span></figcaption>
+</figure>
+<div class="l-en" lang="en"><p>The profile is flat, but what about training? When staleness is not too large (staleness 64, or age about 31 under async), SC alone either collapses or oscillates, while adding any one of TIS, the KL mask or the KL penalty on top of SC stabilizes training, and the final results are close.</p></div><div class="l-zh" lang="zh"><p>那么 profile 拉平了，训练上又如何呢？在 staleness 不算大的 setting 下（staleness 64，或者 async 下 age 约 31），只开 SC 的训练要么崩掉要么来回振荡，而只要在 SC 上加上 TIS、KL mask 或者 KL penalty 中的任何一种，训练就都能稳定下来，最终的结果也相差无几。</p></div>
+<figure class="sc-fig">
+<div class="img"><img src="{{ '/assets/img/2026-11-12-score-centering-async-rl/fig6_results_grid.svg' | relative_url }}" loading="lazy" alt="Final training accuracy for seven methods in two settings. SC plus KL penalty reaches 0.710 and 0.720; SC plus KL mask 0.3 0.716 and 0.726; TIS plus SC 0.734 and 0.701; SC collapses at staleness 64 and reaches 0.486 at age 31; PG and TIS collapse in both."></div>
+<figcaption><span class="l-en" lang="en"><b>Figure 4. Final training accuracy at moderate lag.</b> Countdown, Qwen3-0.6B, SGD at learning rate \(10^{-2}\), 64 prompts × 8 completions per step, 1,200 steps, one seed per method. Left: staleness 64. Right: async with greedy sampling, batch age about 31. Bars: mean training accuracy over the last 50 steps.</span><span class="l-zh" lang="zh"><b>图 4. staleness 较小时的最终训练准确率。</b>Countdown，Qwen3-0.6B，SGD，学习率 \(10^{-2}\)，每步 64 道题 × 8 条回答，训练 1,200 步，每个方法 1 个 seed。左：staleness 64；右：async greedy，batch age 约 31。柱为最后 50 步训练准确率的均值。</span></figcaption>
+</figure>
+<div class="l-en" lang="en"><p>The differences only show up at larger staleness. We enlarge the buffer to 128 steps so that every batch has age 127, and now TIS + SC and MIS + SC start to look off: two TIS + SC seeds drop sharply early on, and one MIS + SC seed falls straight to 0 midway through training, while all three seeds of the KL mask climb steadily. In final level the three are about the same; the real advantage of the KL mask is stability.</p></div><div class="l-zh" lang="zh"><p>差别其实要在 staleness 更大的时候才会显现出来。我们把 buffer 加到 128 步，让每个 batch 的 age 都是 127，这时候 TIS + SC 和 MIS + SC 就开始不太对劲了：TIS + SC 有两个 seed 在前期大幅下跌，MIS + SC 更是有一个 seed 在训练中途直接掉到了 0，而 KL mask 的三个 seed 都稳稳地往上走。当然，从最终水平上看三者其实差不多，KL mask 真正的优势在于稳定。</p></div>
+<figure class="sc-fig">
+<div class="img"><img src="{{ '/assets/img/2026-11-12-score-centering-async-rl/fig_mask_vs_is.svg' | relative_url }}" loading="lazy" alt=""></div>
+<figcaption><span class="l-en" lang="en"><b>Figure 5. SC + KL mask against TIS + SC and MIS + SC.</b> Countdown, Qwen3-0.6B, SGD at learning rate \(10^{-2}\), 64 prompts × 8 completions per step, 128-step buffer with every batch at age 127, 2,400 steps, 3 seeds. Top: training accuracy, 50-step trailing mean. Bottom: validation accuracy every 50 steps.</span><span class="l-zh" lang="zh"><b>图 5. SC + KL mask 与 TIS + SC、MIS + SC 的对比。</b>Countdown，Qwen3-0.6B，SGD，学习率 \(10^{-2}\)，每步 64 道题 × 8 条回答，128 步 buffer，每个 batch 的 age 固定为 127，训练 2,400 步，3 个 seed。上：训练准确率，50 步滑动平均；下：validation 准确率，每 50 步一次。</span></figcaption>
+</figure>
+<h2 id="combining-with-the-kl-penalty"><span class="l-en" lang="en">Combining With The KL Penalty</span><span class="l-zh" lang="zh">和 KL penalty 的结合</span></h2>
+<div class="l-en" lang="en"><p>Since the KL mask alone already stabilizes training, can it be stacked with Yihua's KL penalty from earlier? Recall the design principle: both depend only on the state, not on the sampled token, so stacking them does not bring the drift back, which is why we combine them into a recipe. In full, the recipe maximizes, per token,
+\[
+\mathbb{1}\big[d(s)\le\tau\big]\,\Big(\mathcal{L}_{\mathrm{SC}} \;-\; \beta_{\mathrm{a}}\,D_{\mathrm{KL}}\big(\mu(\cdot\mid s)\,\|\,\pi(\cdot\mid s)\big)\Big),\qquad \beta_{\mathrm{a}} = \frac{\beta_0}{\sqrt{\mathrm{a}}} ,
+\]
+that is, at positions where \(d(s)\) exceeds the threshold, both the policy term and the KL term are dropped. We compare this recipe with the baselines in three settings with a 128-step buffer: greedy, and random sampling at two learning rates.</p></div><div class="l-zh" lang="zh"><p>既然 KL mask 单独用就已经能让训练稳下来，那么它能不能和前面 Yihua 的 KL penalty 叠在一起用呢？还记得前面说的设计原则吗？两者都只依赖 state，不依赖采到的 token，所以叠在一起也不会把 drift 带回来，这也是我们把它们组合成一个 recipe 的原因。完整的 recipe 在每个 token 上最大化
+\[
+\mathbb{1}\big[d(s)\le\tau\big]\,\Big(\mathcal{L}_{\mathrm{SC}} \;-\; \beta_{\mathrm{a}}\,D_{\mathrm{KL}}\big(\mu(\cdot\mid s)\,\|\,\pi(\cdot\mid s)\big)\Big),\qquad \beta_{\mathrm{a}} = \frac{\beta_0}{\sqrt{\mathrm{a}}} ,
+\]
+即在 \(d(s)\) 超过阈值的位置，policy 项和 KL 项一起去掉。我们在三个 128 步 buffer 的 setting 下把这个 recipe 和 baseline 做了比较：greedy，以及两种学习率下的 random sampling。</p></div>
+<ul class="points">
+<li><span class="l-en" lang="en"><b>With the KL penalty, training is stable.</b> At learning rate \(4\times10^{-2}\), TIS + SC starts to swing and MIS + SC and DPPO collapse outright, while with the KL penalty, with or without the mask, every seed trains.</span><span class="l-zh" lang="zh"><b>只要加了 KL penalty，训练就很稳。</b>把学习率调到 \(4\times10^{-2}\) 之后，TIS + SC 开始来回摆动，MIS + SC 和 DPPO 直接崩掉，而只要带着 KL penalty，无论有没有 mask，每个 seed 都能训起来。</span></li>
+<li><span class="l-en" lang="en"><b>The mask speeds up early learning.</b> Also at \(4\times10^{-2}\), with the penalty alone the accuracy first drops and then slowly climbs back, while with the mask it rises from the start.</span><span class="l-zh" lang="zh"><b>Mask 让前期学得更快。</b>同样在 \(4\times10^{-2}\) 下，只用 penalty 时准确率会先掉下去再慢慢爬上来，而加上 mask 之后一开始就往上走。</span></li>
+</ul>
+<figure class="sc-fig">
+<div class="img"><img src="{{ '/assets/img/2026-11-12-score-centering-async-rl/fig8_recipe.svg' | relative_url }}" loading="lazy" alt="Training and validation curves over 1,200 steps in three settings with a 128-step buffer. The recipe and SC plus KL penalty rise smoothly in all three; TIS plus SC and MIS plus SC dip sharply under greedy sampling and at the higher learning rate; DPPO collapses under greedy sampling and at the higher learning rate."></div>
+<figcaption><span class="l-en" lang="en"><b>Figure 6. The recipe against the baselines with a 128-step buffer.</b> Setup as in Figure 4, with a 128-step buffer. Columns: greedy at learning rate \(10^{-2}\), random at \(10^{-2}\), and random at \(4\times10^{-2}\) (3 seeds, band = range across seeds). Top: training accuracy, 50-step trailing mean. Bottom: validation accuracy every 50 steps. Recipe: SC + KL penalty + KL mask, \(\tau = 0.3\) in the first two columns and \(0.1\) in the third.</span><span class="l-zh" lang="zh"><b>图 6. 128 步 buffer 下 recipe 与 baseline 的训练曲线。</b>设置同图 4，buffer 为 128 步。三列：greedy（学习率 \(10^{-2}\)）、random（\(10^{-2}\)）、random（\(4\times10^{-2}\)，3 个 seed，阴影为 seed 间范围）。上：训练准确率，50 步滑动平均；下：validation 准确率，每 50 步一次。Recipe 为 SC + KL penalty + KL mask，前两列 \(\tau = 0.3\)，第三列 \(\tau = 0.1\)。</span></figcaption>
+</figure>
+<figure class="sc-fig">
+<div class="img"><img src="{{ '/assets/img/2026-11-12-score-centering-async-rl/fig9_recipe_bars.svg' | relative_url }}" loading="lazy" alt="Summary bars for the three 128-step settings. Top: final training accuracy; recipe 0.688, 0.703 and 0.707, 0.735; SC plus KL penalty 0.690, 0.716, 0.751; TIS plus SC 0.593, 0.691, unstable; MIS plus SC 0.666, 0.680, collapsed; DPPO collapsed, 0.700, collapsed. Bottom: steps to reach 0.6."></div>
+<figcaption><span class="l-en" lang="en"><b>Figure 7. Summary of the runs in Figure 6.</b> Top: mean training accuracy over the last 50 steps. Bottom: first step at which the 50-step trailing mean reaches 0.6. Third column: mean over seeds.</span><span class="l-zh" lang="zh"><b>图 7. 图 6 的 run 汇总。</b>上：最后 50 步训练准确率的均值；下：50 步滑动平均第一次达到 0.6 的步数。第三列为 seed 均值。</span></figcaption>
+</figure>
+<h2 id="beyond-the-algorithm-design-space-and-free-lunches-in-the-system"><span class="l-en" lang="en">Beyond The Algorithm: Design Space And Free Lunches In The System</span><span class="l-zh" lang="zh">跳出算法：系统侧的 design 空间与 free lunch</span></h2>
+<div class="l-en" lang="en"><p>Beyond the algorithm, async RL as a system leaves a lot of design space, and some free lunches. Let us first walk through it at the system level.</p>
+<p>In short, async RL is a set of decoupled samplers and a trainer that talk through a buffer. The sampler \(\mu\) generates trajectories with its current weights and puts them into the buffer; the trainer \(\pi\) picks a batch from the buffer by some rule and takes an optimizer step. Concretely, if a trajectory reaches the trainer at step \(k\) and was sampled by \(\mu = \pi_{\theta_{k-\mathrm{a}}}\), then \(\mathrm{a}\) is its <b>policy age</b>. The trainer is then computing gradients on data from an older policy.</p></div><div class="l-zh" lang="zh"><p>除了算法侧，如果从更大的系统角度考虑，async RL 还有很多 design 空间和 free lunch 可以吃。我们先从 system level 对 async RL 做一个整体梳理。
+简单来说，async RL可以理解为一组 decoupled 的 sampler 和 trainer 通过 buffer 来交互：sampler \(\mu\) 每次会用当前的 weight 生成 trajectories 并放在 buffer 里，trainer \(\pi\) 每次会从 buffer 里按照某种策略选取一个 batch 进行 optimizer step。具体来说，如果一条 trajectory 在第 \(k\) 步到达 trainer 时，假设它是由 \(\mu = \pi_{\theta_{k-\mathrm{a}}}\) 采样的，那么 \(\mathrm{a}\) 就是它的 policy age。此时在trainer上就是用旧策略的数据计算gradients。</p></div>
+<figure class="sc-fig">
+<div class="img"><img src="{{ '/assets/img/2026-11-12-score-centering-async-rl/fig1_async_pipeline.svg' | relative_url }}" loading="lazy" alt="The trainer-sampler loop: six samplers send finished groups to a rollout buffer, the trainer takes 64 groups per step, greedily or at random, groups older than K are dropped, and new weights are pushed to the samplers after every step."></div>
+<figcaption><span class="l-en" lang="en"><b>Figure 8. The trainer–sampler loop of async RL.</b> Six vLLM samplers generate continuously and put each finished group, tagged with the weight version \(v\) that produced it, into the buffer. Each step the trainer takes 64 groups, takes one step and pushes the new weights to the samplers; groups older than \(K\) are dropped. A group generated with \(\theta_v\) and trained at step \(k\) has age \(\mathrm{a} = k - v\).</span><span class="l-zh" lang="zh"><b>图 8. async RL 的 trainer–sampler 循环。</b>6 个 vLLM sampler 持续生成，把完成的 group 连同生成它的权重版本 \(v\) 放进 buffer；trainer 每步取 64 个 group 训练一步，并把新权重推回 sampler；age 超过 \(K\) 的 group 被丢弃。由 \(\theta_v\) 生成、在第 \(k\) 步训练的 group，age 为 \(\mathrm{a} = k - v\)。</span></figcaption>
+</figure>
+<div class="l-en" lang="en"><p>Note that even without touching the loss or the policy gradient, once the rollout buffer holds enough trajectories, simply changing how the trainer samples minibatches from it can change training outcomes. This point gets very little attention in the literature.</p>
+<p>For example, the setting used in the original SC paper (staleness 64) does not use a buffer at all. The trainer and the sampler instead synchronize every 64 steps, so the age of each minibatch update is not uniform but follows a sawtooth.</p></div><div class="l-zh" lang="zh"><p>值得注意的是，即使完全不涉及 loss function 或 policy gradient 的改动，当 rollout buffer 中积累了足够多的 trajectories 时，仅仅改变 trainer 从 buffer 中采样 minibatch 的策略，就可能对训练效果产生影响，而这往往是学术界关注非常少的一点。
+就比如说SC的原始论文中做实验的setting (i.e., Staleness 64)，就并没有利用到buffer，而是让trainer 和 sampler 每64步进行一次同步，所以会发现每一个 minibatch 的更新的 age 并不是均匀的而是会呈现一个锯齿状。</p></div>
+<div class="l-en" lang="en"><p>Back to buffer-based sampling. A common small mechanism is a threshold \(K\) on the buffer that dynamically evicts trajectories that are too old (\(\mathrm{a} > K\)), to avoid an overly large gradient mismatch. On top of that, the possible strategies come down to the following three. There is also room for extra knobs, which we skip here.</p>
+<p><b>FIFO</b>: take older trajectories first. It comes in a strict and a non-strict form, depending on whether it skips rollouts in the buffer that have not finished yet; we call the non-strict form greedy. As far as we know, many async RL systems use FIFO or a variant of it. Its advantage is that it wastes as little inference as possible. Its obvious drawback is that every update is built around older trajectories and actively ignores the newer ones in the buffer.</p>
+<p><b>LIFO</b>: take newer trajectories first, the opposite of FIFO. Its advantage is very low staleness, but its drawback is fatal: it is biased against long trajectories, which then rarely make it into a trainer update, so almost no async RL recipe uses it.</p>
+<p><b>Random sampling (RS)</b>: the plainest, uniform random sampling. Its advantage is that it picks up some newer trajectories without biasing against older ones as strongly as LIFO does. As far as we know, some people use variants of it, and for different workloads it is natural to add a knob here to balance staleness against long-trajectory bias. As we show later, without SC, RS also runs into trouble that hurts its stability.</p></div><div class="l-zh" lang="zh"><p>回到基于 buffer 的采样策略，有一个通用的小机制是 buffer 会设置一个 threshold \(K\)，来动态淘汰掉过旧的 (i.e., \(\mathrm{a} > K\)) 的 trajectories，以避免过大的 gradient mismatch。
+在这基础上，可行的策略基本上由以下三种概括，当然这里也存在一些加 knobs 微调的空间，我们在这里略过不纠结。</p>
+<p><b>FIFO</b>: 优先取 age 较旧的 trajectories，这里根据会不会跳过 buffer 里还没有完成的 rollouts 分为严格和非严格两种，后者在这里我们用 greedy 来指代。据我们所知，很多async RL 使用的都是 FIFO 或其变种。优点是可以尽可能减少 inference 端的浪费，而缺点很明显是每次更新都是围绕着较旧的 trajectories 展开，会主动忽视 buffer 里更新的 trajectories。</p>
+<p><b>LIFO</b>: 优先取 age 较新的trajectories，和 FIFO 相反，优点是 staleness 非常小，但是缺点也非常致命，会对long trajectories产生 bias，使得基本上它们很难进入到 trainer 的更新，所以也几乎没有 async RL recipe 会使用。</p>
+<p><b>Random sampling (RS)</b>: 最朴素的均匀随机采样策略，优点是能够选取到一些较新的 trajectories，同时也不会给较旧的策略施加类似于 LIFO 那么强的bias。据我们所知，也有一些人在使用这个策略的变种，并且对于不同的 workload，为了平衡 staleness 和 long-trajectory-bias，在这里加一个 knob 去调整也是非常自然的选择。本文在之后也会写到，如果不使用SC，RS这一策略也会遇到一些影响其稳定性的麻烦。</p></div>
+<figure class="sc-fig">
+<div class="img"><img src="{{ '/assets/img/2026-11-12-score-centering-async-rl/fig2_batch_age.svg' | relative_url }}" loading="lazy" alt="Four panels of batch policy age against training step: a 0 to 64 sawtooth for staleness 64; greedy with a 128-step buffer, climbing to 127 and staying there; LIFO, climbing to 46 and then holding at 3 from step 53; random with mean settling near 52 and max near 127."></div>
+<figcaption><span class="l-en" lang="en"><b>Figure 9. Policy age of the training batch under each strategy.</b> Staleness 64 follows from the sync schedule. The three \(K = 128\) panels are measured on the SC + KL penalty runs (setup as in Figure 4); for random sampling, the mean (10-step smoothing) and the maximum are shown.</span><span class="l-zh" lang="zh"><b>图 9. 不同取法下训练 batch 的 policy age。</b>Staleness 64 由同步周期直接给出；三个 \(K = 128\) 的面板在 SC + KL penalty 的 run 上实测（设置同图 4），random 画出均值（10 步平滑）和最大值。</span></figcaption>
+</figure>
+<div class="l-en" lang="en"><p>Of the three strategies above, LIFO has the lowest staleness, but its bias against long trajectories is fatal and almost no one uses it. So is it worth switching between the two most common ones, greedy and RS? We compare greedy and RS on the same 128-step buffer, with no prefill on either side. RS has an obvious cost: some groups exceed age \(K\) and are dropped before they are ever drawn, so we pay compute for generations that are never trained on. Fortunately, over 1,200 steps RS spends only 4% to 7% more FLOPs, because training itself dominates the compute. For a fair comparison, the figure below uses actual training time as the x-axis.</p></div><div class="l-zh" lang="zh"><p>上面的三种取法里，LIFO 虽然 staleness 最小，但对 long trajectories 的 bias 太致命，几乎没人用；那么在最常见的 greedy 和 RS 之间换一换，到底值不值得呢？我们用同一个 128 步的 buffer 比较 greedy 和 RS，两边都不做 prefill。RS 有一个显而易见的代价：一部分 group 还没被取到，age 就已经超过 \(K\) 被丢掉了，也就是说我们要为一些最终没被训练的生成付出算力。好在 1,200 步下来 RS 只多花了 4% 到 7% 的 FLOPs，因为训练本身才是算力的大头。为了公平起见，下图直接以实际训练时间为横轴。</p></div>
+<figure class="sc-fig">
+<div class="img"><img src="{{ '/assets/img/2026-11-12-score-centering-async-rl/fig10_greedy_random_steps.svg' | relative_url }}" loading="lazy" alt="Training and validation accuracy against wall-clock hours for four methods, greedy against random sampling from a 128-step buffer. Random is at or above greedy everywhere."></div>
+<figcaption><span class="l-en" lang="en"><b>Figure 10. Greedy (FIFO) against random sampling, against training time.</b> Setup as in Figure 4, 128-step buffer, no prefill. Top: training accuracy (faint: per step; bold: 50-step trailing mean). Bottom: validation accuracy.</span><span class="l-zh" lang="zh"><b>图 10. Greedy（FIFO）与 random 取法，以实际训练时间为横轴。</b>设置同图 4，buffer 为 128 步，不做 prefill。上：训练准确率（浅色为每步，粗线为 50 步滑动平均）；下：validation 准确率。</span></figcaption>
+</figure>
+<div class="l-en" lang="en"><p>The result: at the same training time, RS is better for every method. TIS + SC and MIS + SC drop sharply under greedy but not under RS, and DPPO collapses outright under greedy. Of course, this comparison mixes two effects, because RS also lowers the mean age from 127 to 52. It is also worth noting, as said earlier, that without SC RS cannot save training either: plain PG collapses under both strategies.</p>
+<p>The reason RS works so well is also simple: smaller staleness means a smaller gap between \(\pi\) and \(\mu\), which fits exactly the methodology we proposed for improving recipes on top of SC.</p>
+<p>One more point: if RS is this good, can we use it without SC? The answer is not so certain. Recall that without SC, old trajectories have a larger norm and more influence. Under greedy, the grad norms within an optimizer minibatch are all similar, so the gradient itself is fairly stable; under RS the effective batch size shrinks, which makes stability worse.</p>
+<p>Of course, a good buffer strategy for async RL is far from as simple as shown here, and RS is not a universal solution. But we hope this discussion of SC and async RL draws more attention to these open problems, such as the bias from long trajectories, the remaining effect of staleness under SC, and the extra rollout cost. Going further, how to strike a better trade-off among staleness, cost and bias remains a research direction worth exploring in depth.</p></div><div class="l-zh" lang="zh"><p>结果是，在相同的训练时间下，每个方法都是 RS 更好：TIS + SC 和 MIS + SC 在 greedy 下会大幅下跌，在 RS 下则不会，DPPO 在 greedy 下更是直接崩掉。当然，这个对比里其实混着两个因素，因为 RS 同时也把平均 age 从 127 降到了 52。另外值得一提的是，正如前面说的，不开 SC 时 RS 也救不了训练：纯 PG 在两种取法下都会崩。</p>
+<p>RS能效果这么好的原因，也非常简单。更小的staleness，更小的 \(\pi\) 和 \(\mu\) 之间的差距，完全符合我们之前提出的设计基于SC的recipe改进的方法论。</p>
+<p>多提一句，RS 这么好，我们能不能在没有 SC 的时候用呢？答案是没有那么肯定的，还记得在没有SC的时候旧的 trajectories 会有更大的 norm 和影响吗？如果是 greedy，那么一个 optimizer minibatch里面的 grad norm 都差不多，大家对 gradient 本身比较稳定，但在 RS 下就会削弱有效 batch size ，让稳定性更差了</p>
+<p>当然，async RL 下好的 buffer 策略远没有这里展示的那么简单，RS 也不是什么万能的 solution。但我们希望借着这次讨论 SC 和 Async RL 的机会，让学术界更加关注这些尚未解决的问题，例如长 trajectory 带来的 bias、SC 下仍然存在的 staleness 的影响，以及额外的 rollout 开销。更进一步，如何在 staleness、cost 和 bias 三者之间取得更好的 trade-off，仍然是一个值得深入探索的研究方向。</p></div>
+<script>
+(function(){
+  var root=document.documentElement, btn=document.getElementById('sc-langbtn');
+  var sf=document.querySelector('.ar-standfirst'), zh=document.getElementById('sc-dek-zh');
+  if(sf&&zh){ sf.innerHTML='<span class="sc-dek-en">'+sf.innerHTML+'</span>'; sf.appendChild(zh); sf.classList.add('sc-has-zh'); zh.hidden=false; }
+  var toc=[].slice.call(document.querySelectorAll('.ar-toc a'));
+  function set(l){ root.setAttribute('data-lang',l); btn.textContent = l==='zh' ? 'English' : '中文';
+    toc.forEach(function(a){ var h=document.getElementById(a.getAttribute('href').slice(1)); if(!h) return; var s=h.querySelector(l==='zh'?'.l-zh':'.l-en'); if(s) a.textContent=s.textContent; });
+    try{ localStorage.setItem('sc-blog-lang',l); }catch(e){} }
+  var saved='en'; try{ saved=localStorage.getItem('sc-blog-lang')||'en'; }catch(e){}
+  var q=(location.search.match(/[?&]lang=(zh|en)/)||[])[1]; if(q) saved=q;
+  set(saved);
+  btn.addEventListener('click',function(){ set(root.getAttribute('data-lang')==='zh'?'en':'zh'); });
+})();
+</script>
