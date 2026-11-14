@@ -199,6 +199,9 @@ MODEL = {
     # carbon-g (thinking level high) on agy; formal evaluation eval_01M5ZHWA8HFDS1QY8JGVN0RKMM (2026-10-27). Shown as Gemini 4
     # Carbon on Antigravity (owner, 2026-10-29); its cost is estimated at Gemini 4 Argon's prices.
     'Antigravity CLI agy (carbon-g)': ('carbon', 'Gemini 4 Carbon', 'Gemini 4 Carbon', 'Antigravity', 'Google'),
+    # gemini-4-hydrogen (thinking level high) on agy 1.4.7 through the Kaggle model proxy, with Gemini 4 Carbon's overlay and settings;
+    # formal evaluation eval_01M7BRXM8RGETBGS1C132PZ3RH (2026-11-14). Its runs' US$ is the gateway's token counts at Kaggle's billed rates for gemini-4-hydrogen.
+    'Antigravity CLI agy (gemini-4-hydrogen)': ('hydrogen', 'Gemini 4 Hydrogen', 'Gemini 4 Hydrogen', 'Antigravity', 'Google'),
     # minimax-m3.1-flash through OpenRouter on Claude Code; formal evaluation eval_01M6CMMG3YG91H7GKTD3KXFCQ4 (2026-11-01). Its
     # runs' US$ is the gateway's spend log for the model's requests.
     'Claude Code · MiniMax-M3.1-Flash': ('minimax', 'MiniMax-M3.1-Flash', 'MiniMax-M3.1-Flash', 'Claude Code', 'MiniMax'),

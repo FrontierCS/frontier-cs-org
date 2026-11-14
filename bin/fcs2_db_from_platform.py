@@ -77,7 +77,10 @@ CACHE = {'GPT-6 Astra': 1.00, 'GPT-6.1 Sol': 0.10, 'Kimi K3 (Modal)': 0.30, 'Dee
          # Claude Sonnet 5.5 on Claude Code with a Claude subscription (2026-11-05/06): the cost Claude Code reports, as Opus 5.5's
          'Claude Code · Sonnet 5.5 (Subscription, max effort)': None,
          # Inkling 2 Small on Pi through Tinker (2026-11-06): the gateway's token counts at Tinker's prices
-         'pi · Inkling 2 Small': None}
+         'pi · Inkling 2 Small': None,
+         # Gemini 4 Hydrogen on the Antigravity CLI through the Kaggle model proxy (2026-11-14): the gateway's token counts at
+         # Kaggle's billed rates for gemini-4-hydrogen (the gateway logs US$0)
+         'Antigravity CLI agy (gemini-4-hydrogen)': None}
 # A candidate whose formal run of the task set spans several evaluations, collected as one: Gemini 4 Argon on agy ran six
 # CPU tasks first in a batch of their own and the other 42 in its formal evaluation; together they are its 48 (Qiuyang,
 # 2026-10-25). The first evaluation listed is the formal one.
@@ -222,7 +225,9 @@ WHY = {'run_01M5QR7T4M65RY0VAYMQDN6TP2': 'Out of memory (exit 137)',            
        'run_01M6QX7NYS8RZD5745V2J5Y57Y': 'Stored checkpoint crashed on an evaluation workload',
        'run_01M6QX7NYR9W01TMH58KYHNRRT': 'Empty reply, harness exited, no submission',
        'run_01M6R0B80TXS29YP0VBH2R8SEB': 'Empty reply, harness exited, no submission',
-       'run_01M6R0B80T472MYZVJRG23PJ2Z': 'Agent time limit reached, no submission'}
+       'run_01M6R0B80T472MYZVJRG23PJ2Z': 'Agent time limit reached, no submission',
+       # Gemini 4 Hydrogen (eval_01M7BRXM8RGETBGS1C132PZ3RH; ~/fcs2-ops/hydrogen/dispositions.json)
+       'run_01M7BRXM9Q1CKQ8V1XP953BBMW': 'Agent time limit reached, no submission'}
 # Runs the platform marks FAILED whose selected final was rejudged and accepted: they completed, so the site shows no failure
 # for them. Claude Opus 5.5's KV Cache Compaction (61.55; Qiuyang, 2026-10-20: "kebab上的opus kv compaction信息是否不对").
 COMPLETED = {'run_01M5BMPCS19PVWJRAGZSF9ED8P'}
