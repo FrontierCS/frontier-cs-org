@@ -34,6 +34,8 @@ FrontierCS 2 runs 25 agents, each a model inside a coding harness, on 48 researc
 
 MiniMax-M3.1-Flash used the largest share of its time, Kimi K2.7 the largest share of its submissions, and Qwen 3.8 Max the smallest share of both. Across the 25 agents the two shares are unrelated, with a rank correlation of -0.02. The number of submissions also barely changes with the budget. On the 25 tasks with a budget of 100 submissions, the median run used 6. On the 7 tasks with a budget of 3, it used all 3.
 
+We would not call this laziness. The agents have no budget awareness at all, of time or of other costs such as submissions.
+
 The median run started its final evaluation 1.84 hours into its 5 hours. Many runs stopped while the dev checks still showed that the work was not done. In 780 runs the final patch had not passed every dev check, because a check failed, the patch was never sent to the dev set, or there was no final patch. Of these runs, 81% stopped with at least an hour left, at a median of 2.01 hours.
 
 The dev checks predict the hidden result. Of the 420 runs whose final patch passed every dev check, 64.5% passed the hidden test. Of the other 780 runs, 5.4% did. Unused time and submissions are unused chances to check the work.
