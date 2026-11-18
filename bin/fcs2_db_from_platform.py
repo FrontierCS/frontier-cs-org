@@ -80,7 +80,9 @@ CACHE = {'GPT-6 Astra': 1.00, 'GPT-6.1 Sol': 0.10, 'Kimi K3 (Modal)': 0.30, 'Dee
          'pi · Inkling 2 Small': None,
          # Gemini 4 Hydrogen on the Antigravity CLI through the Kaggle model proxy (2026-11-14): the gateway's token counts at
          # Kaggle's billed rates for gemini-4-hydrogen (the gateway logs US$0)
-         'Antigravity CLI agy (gemini-4-hydrogen)': None}
+         'Antigravity CLI agy (gemini-4-hydrogen)': None,
+         # Qwen 4 Max on Claude Code (2026-11-18): total tokens at Qwen 3.8 Max's cache-read price
+         'Claude Code · Qwen 4 Max (xhigh effort)': 0.25}
 # A candidate whose formal run of the task set spans several evaluations, collected as one: Gemini 4 Argon on agy ran six
 # CPU tasks first in a batch of their own and the other 42 in its formal evaluation; together they are its 48 (Qiuyang,
 # 2026-10-25). The first evaluation listed is the formal one.
