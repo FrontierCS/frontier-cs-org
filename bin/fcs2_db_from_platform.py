@@ -82,7 +82,9 @@ CACHE = {'GPT-6 Astra': 1.00, 'GPT-6.1 Sol': 0.10, 'Kimi K3 (Modal)': 0.30, 'Dee
          # Kaggle's billed rates for gemini-4-hydrogen (the gateway logs US$0)
          'Antigravity CLI agy (gemini-4-hydrogen)': None,
          # Qwen 4 Max on Claude Code (2026-11-18): total tokens at Qwen 3.8 Max's cache-read price
-         'Claude Code · Qwen 4 Max (xhigh effort)': 0.25}
+         'Claude Code · Qwen 4 Max (xhigh effort)': 0.25,
+         # Gemini 4 Neon on Pi (2026-11-19/20): the US$ its Pumpkin record reports for each run
+         'pi · Gemini 4 Neon': None}
 # A candidate whose formal run of the task set spans several evaluations, collected as one: Gemini 4 Argon on agy ran six
 # CPU tasks first in a batch of their own and the other 42 in its formal evaluation; together they are its 48 (Qiuyang,
 # 2026-10-25). The first evaluation listed is the formal one.
@@ -229,7 +231,10 @@ WHY = {'run_01M5QR7T4M65RY0VAYMQDN6TP2': 'Out of memory (exit 137)',            
        'run_01M6R0B80TXS29YP0VBH2R8SEB': 'Empty reply, harness exited, no submission',
        'run_01M6R0B80T472MYZVJRG23PJ2Z': 'Agent time limit reached, no submission',
        # Gemini 4 Hydrogen (eval_01M7BRXM8RGETBGS1C132PZ3RH; ~/fcs2-ops/hydrogen/dispositions.json)
-       'run_01M7BRXM9Q1CKQ8V1XP953BBMW': 'Agent time limit reached, no submission'}
+       'run_01M7BRXM9Q1CKQ8V1XP953BBMW': 'Agent time limit reached, no submission',
+       # Gemini 4 Neon (Pumpkin records; the release's failure_reason)
+       '20261119-080446-5e2680f2': 'Agent time limit reached, no submission',
+       '20261119-081600-c865926d': 'Agent time limit reached, no final'}
 # Runs the platform marks FAILED whose selected final was rejudged and accepted: they completed, so the site shows no failure
 # for them. Claude Opus 5.5's KV Cache Compaction (61.55; Qiuyang, 2026-10-20: "kebab上的opus kv compaction信息是否不对").
 COMPLETED = {'run_01M5BMPCS19PVWJRAGZSF9ED8P'}

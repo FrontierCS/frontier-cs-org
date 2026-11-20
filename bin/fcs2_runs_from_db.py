@@ -202,6 +202,9 @@ MODEL = {
     # gemini-4-hydrogen (thinking level high) on agy 1.4.7 through the Kaggle model proxy, with Gemini 4 Carbon's overlay and settings;
     # formal evaluation eval_01M7BRXM8RGETBGS1C132PZ3RH (2026-11-14). Its runs' US$ is the gateway's token counts at Kaggle's billed rates for gemini-4-hydrogen.
     'Antigravity CLI agy (gemini-4-hydrogen)': ('hydrogen', 'Gemini 4 Hydrogen', 'Gemini 4 Hydrogen', 'Antigravity', 'Google'),
+    # gemini-4-neon on the Pi agent harness, run on Pumpkin (2026-11-19/20). Its runs' US$ is the Pumpkin record's own (usage.usd);
+    # its development points' US$ is that prorated by the time each job returned.
+    'pi · Gemini 4 Neon': ('neon', 'Gemini 4 Neon', 'Gemini 4 Neon', 'Pi', 'Google'),
     # qwen4-max (xhigh effort) on Claude Code through DashScope's Anthropic-compatible API, run on Pumpkin (2026-11-17/18). Its runs'
     # US$ is the agent's total tokens at Qwen 3.8 Max's cache-read price, as Qwen 3.8 Max's.
     'Claude Code · Qwen 4 Max (xhigh effort)': ('qwen4-max', 'Qwen4-max', 'Qwen4-max', 'Claude Code', 'Qwen'),
