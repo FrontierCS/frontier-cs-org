@@ -28,7 +28,7 @@ varies from run to run; the page shows the median over a task's runs, and each r
 Names go through the TASK and MODEL maps of bin/fcs2_runs_from_db.py, as bin/fcs2_checks_from_platform.py does; runs of
 models in HIDDEN (Kimi K2.7) and of candidates the maps do not know are left out. Numbers keep 4 significant digits.
 """
-import ast, json, pathlib, statistics, sys
+import ast, json, pathlib, re, statistics, sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 src = ast.parse((ROOT / 'bin' / 'fcs2_runs_from_db.py').read_text())
@@ -112,24 +112,32 @@ for (t, metric), v in REF_FIXED.items():
 for (t, metric), label in BAR.items():
     s = out.get(t, {}).get(metric)
     if s is not None and s['ref'] is not None: s['bar'] = label
-for r in wrows:   # each workload apart, for the tasks in WORKLOADS
+# each workload apart: every task's go to assets/workloads/<slug>.json, which a task page fetches when a run's row is
+# opened (owner, 2026-11-21: a run's mean over its workloads hid which workloads it lost); the tasks in WORKLOADS also
+# keep theirs in fcs2-metrics.js, where their table shows a column per workload
+wout = {}
+for r in wrows:
     task, cand = r['task'], r['candidate']
-    if task not in TASK or (TASK[task][1] or task) not in WORKLOADS or cand in HIDDEN or cand not in MODEL: continue
+    if task not in TASK or cand in HIDDEN or cand not in MODEL: continue
     if dbp and r['run_id'] not in live: continue
-    s = out.get(TASK[task][1] or task, {}).get(r['metric'])
+    t = TASK[task][1] or task.split(' — ')[0]
+    s = out.get(t, {}).get(r['metric'])
     if s is None: continue
-    w = s.setdefault('w', {}).setdefault(r['workload'], {'by': {}, 'refs': [], 'margins': []})
+    w = wout.setdefault(t, {}).setdefault(r['metric'], {}).setdefault(r['workload'], {'by': {}, 'refs': [], 'margins': []})
     mg = margin.get((r['run_id'], r['metric'], r['workload']))
-    w['by'][MODEL[cand][0]] = [r4(r['value']), r4(r['reference_value']), r['beat'], r4(mg)]
-    if r['reference_value'] is not None: w['refs'].append(r['reference_value'])
+    v, rv = r['value'], r['reference_value']
+    if (t, r['metric']) in NEGATE and v is not None: v = -v
+    if (t, r['metric']) in NEGATE and rv is not None: rv = -rv
+    w['by'][MODEL[cand][0]] = [r4(v), r4(rv), r['beat'], r4(mg)]
+    if rv is not None: w['refs'].append(rv)
     if mg is not None: w['margins'].append(mg)
-for metrics in out.values():
-    for s in metrics.values():
-        for w in s.get('w', {}).values():
+for t, metrics in wout.items():
+    for m, ws in metrics.items():
+        for w in ws.values():
             refs, mgs = w.pop('refs'), w.pop('margins')
             w['ref'], w['margin'] = (r4(statistics.median(refs)) if refs else None), (r4(statistics.median(mgs)) if mgs else None)
             w['by'] = dict(sorted(w['by'].items()))
-        if 'w' in s: s['w'] = dict(sorted(s['w'].items()))
+        if t in WORKLOADS: out[t][m]['w'] = dict(sorted(ws.items()))
 out = {t: dict(sorted(m.items())) for t, m in sorted(out.items())}
 
 path = ROOT / 'assets' / 'js' / 'fcs2-metrics.js'
@@ -137,6 +145,12 @@ path.write_text('// Written by bin/fcs2_metric_means.py from an export of the pl
                 '// higher or lower is better, the human reference\'s mean (the median over the task\'s runs, as it is measured again in\n'
                 '// every run), and per model [the run\'s mean over its hidden final workloads, the human reference\'s mean in that run].\n'
                 'const METRIC_STATS = ' + json.dumps(out, separators=(',', ':'), ensure_ascii=False) + ';\n')
+slug = lambda s: re.sub(r'^-+|-+$', '', re.sub(r'[^a-z0-9]+', '-', s.lower()))   # as fcs2-data.js's slug
+wdir = ROOT / 'assets' / 'workloads'
+if wrows:
+    wdir.mkdir(exist_ok=True)
+    for t, metrics in sorted(wout.items()):   # workloads keep the export's order, which is the verifier's
+        (wdir / f'{slug(t)}.json').write_text(json.dumps({'task': t, 'metrics': metrics}, separators=(',', ':'), ensure_ascii=False) + '\n')
 print(f'{len(rows)} rows, {sum(len(m) for m in out.values())} metrics on {len(out)} tasks -> {path}; left out: {skipped}'
       + (f'; numbers of {stale} rows dropped, their runs not in {dbp}' if dbp else '')
       + (f'; {profiled} reference means from {", ".join(refpaths)}' if refpaths else ''))
