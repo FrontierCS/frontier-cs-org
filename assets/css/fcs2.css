@@ -508,6 +508,20 @@ a.pbtn:hover{border-color:var(--teal); color:var(--teal-d)}
 .legend i.dash{width:22px; height:0; border-top:1.5px dashed var(--ink-2)}   /* a reference line, as a task's Human reference */
 .th2{margin:72px 0 14px}
 #rtbl td:first-child{white-space:nowrap}
+/* a run's row opens to its hidden workloads (owner, 2026-11-21) */
+.rtab.wxt tr.wx{cursor:pointer} .rtab.wxt tr.wx:hover td{background:var(--soft)}
+.rtab .wxb{display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; margin:0 4px 0 -4px; padding:0; border:0; border-radius:50%; background:none; color:var(--muted); cursor:pointer; vertical-align:-4px}
+.rtab .wxb svg{width:14px; height:14px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; transition:transform .15s}
+.rtab .wxb[aria-expanded="true"] svg{transform:rotate(90deg)}
+.rtab tr.wrow td{background:var(--soft); border-top:0; padding-top:6px; padding-bottom:6px; font-size:13px}
+.rtab tr.wrow td:first-child{padding-left:44px}
+.rtab tr.wrow .wn{font:12.5px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; color:var(--ink-2)}
+.rtab tr.wrow td.mc .wr{display:block; font-size:12px; color:var(--muted)}
+.rtab tr.whd td{color:var(--muted); font-size:12px; padding-top:10px}
+.rtab tr.wrow .wmore{border:1px solid var(--grid); border-radius:999px; padding:3px 12px; background:var(--bg); color:var(--ink-2); font:inherit; font-size:13px; cursor:pointer}
+.rtab tr.wrow td.wnone{color:var(--muted)}
+.rtab tr.whd td.mc{white-space:normal}
+@media (max-width:640px){ .rtab.wm tr.wrow td:first-child{background:var(--soft)} .rtab tr.wrow td:first-child{padding-left:28px} }
 
 /* scroll-in animation of the mean-score, FCI and test-time scaling charts (fcs2.js: animates, mark); .pre is the state before the chart comes into view */
 .anim .a-bar{transform-box:fill-box; transform-origin:left center; transition:transform .8s cubic-bezier(.2,.7,.2,1) var(--d,0s)}

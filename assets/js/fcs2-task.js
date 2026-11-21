@@ -214,11 +214,43 @@ function drawResults() {
     + (ref != null || ms.some(m => st[m] && st[m].ref != null)
       ? '<tr class="rref"><td><span class="sq"></span>Human reference</td>' + refRow
         + `<td class="rs">${ref != null ? bar(ref, '') : ''}</td><td class="rc"></td></tr>` : '')
-    + [...runs].sort((p, q) => q[2] - p[2]).map(r => `<tr><td>${r[3] ? TICK : CROSS}<span class="full">${esc(MNAME[r[0]])}</span><span class="short">${esc(short[r[0]])}</span></td>`
+    + [...runs].sort((p, q) => q[2] - p[2]).map(r => `<tr${!split && by[r[0]] ? ` class="wx" data-m="${r[0]}"` : ''}><td>${!split && by[r[0]] ? WXB : ''}${r[3] ? TICK : CROSS}<span class="full">${esc(MNAME[r[0]])}</span><span class="short">${esc(short[r[0]])}</span></td>`
       + (split ? ms.map(m => wl.map(w => wcell(r, m, w)).join('')).join('') : ms.map((m, i) => cell(r, m, i)).join(''))
       + `<td class="rs">${bar(r[2], `background:${MCOL[r[0]]}`)}</td>${r[4] > 0 ? `<td class="rc">$${r[4].toFixed(2)}</td>` : '<td class="rc e" title="The platform recorded no cost for this run">—</td>'}</tr>`).join('')
     + '</tbody>';
+  $('#rtbl').classList.toggle('wxt', !split);
+  // a run's row opens to one row per hidden workload (owner, 2026-11-21: a mean over the workloads hid which ones a run
+  // lost): per metric, the run's value over the human reference's in the same evaluation, and a full green or red bar
+  // for whether it beat it there; assets/workloads/<slug>.json (bin/fcs2_metric_means.py) is fetched at the first open
+  const wtr = (mid, w, W) => `<tr class="wrow" data-of="${mid}"><td><span class="wn">${esc(w)}</span></td>` + ms.map((m, i) => {
+      const x = ((W[m] || {})[w] || {}).by, [v, rref, beat] = (x && x[mid]) || [];
+      if (v == null) return `<td class="${mcls(i)} e">—</td>`;
+      return `<td class="${mcls(i)} ${beat ? 'cy' : 'cn'}"><b>${num(sc(v, m), F[m].p)}</b>${rref != null ? `<span class="wr">${num(sc(rref, m), F[m].p)}</span>` : ''}`
+        + `<span class="mbar"><i class="${beat ? 'y' : 'n'}" style="width:100%"></i></span></td>`; }).join('')
+    + '<td class="rs"></td><td class="rc"></td></tr>';
+  const CAP = 24;
+  const open = (tr, W) => { const mid = tr.dataset.m, wls = [...new Set(ms.flatMap(m => Object.keys(W[m] || {})))].filter(w => ms.some(m => ((W[m] || {})[w] || {}).by && W[m][w].by[mid]));
+    const n = ms.length + 3, head = `<tr class="wrow whd" data-of="${mid}"><td>Workload</td>${ms.map((m, i) => `<td class="${mcls(i)}">This run<span class="wr">Human reference</span></td>`).join('')}<td class="rs"></td><td class="rc"></td></tr>`;
+    const more = wls.length > CAP ? `<tr class="wrow" data-of="${mid}"><td colspan="${n}"><button type="button" class="wmore">Show all ${wls.length} workloads</button></td></tr>` : '';
+    tr.insertAdjacentHTML('afterend', wls.length ? head + wls.slice(0, CAP).map(w => wtr(mid, w, W)).join('') + more
+      : `<tr class="wrow" data-of="${mid}"><td colspan="${n}" class="wnone">No numbers for each workload</td></tr>`);
+    const b = tr.nextElementSibling && [...$('#rtbl').querySelectorAll(`tr.wrow[data-of="${mid}"] .wmore`)][0];
+    if (b) b.onclick = () => { b.closest('tr').outerHTML = wls.slice(CAP).map(w => wtr(mid, w, W)).join(''); };
+    typeset($('#rtbl')); };
+  $('#rtbl').onclick = e => { const tr = e.target.closest('tr.wx'); if (!tr || e.target.closest('.wmore')) return;
+    const on = tr.getAttribute('aria-expanded') === 'true', mid = tr.dataset.m;
+    tr.setAttribute('aria-expanded', String(!on)); tr.querySelector('.wxb').setAttribute('aria-expanded', String(!on));
+    if (on) return $('#rtbl').querySelectorAll(`tr.wrow[data-of="${mid}"]`).forEach(x => x.remove());
+    loadWorkloads(t, W => { if (tr.isConnected && tr.getAttribute('aria-expanded') === 'true') open(tr, W.metrics || {}); }); };
   typeset($('#rtbl'));
+}
+const WXB = '<button type="button" class="wxb" aria-expanded="false" aria-label="Each workload"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5"/></svg></button>';
+const WORKLOADS = {};
+function loadWorkloads(t, done) {
+  const s = slug(t.s);
+  if (WORKLOADS[s]) return done(WORKLOADS[s]);
+  fetch(`${window.WORKLOAD_DIR || '/assets/workloads/'}${s}.json`).then(r => r.ok ? r.json() : {metrics:{}}).catch(() => ({metrics:{}}))
+    .then(d => { WORKLOADS[s] = d; done(d); });
 }
 
 function drawCharts() {
