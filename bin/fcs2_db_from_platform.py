@@ -84,7 +84,9 @@ CACHE = {'GPT-6 Astra': 1.00, 'GPT-6.1 Sol': 0.10, 'Kimi K3 (Modal)': 0.30, 'Dee
          # Qwen 4 Max on Claude Code (2026-11-18): total tokens at Qwen 3.8 Max's cache-read price
          'Claude Code · Qwen 4 Max (xhigh effort)': 0.25,
          # Gemini 4 Neon on Pi (2026-11-19/20): the US$ its Pumpkin record reports for each run
-         'pi · Gemini 4 Neon': None}
+         'pi · Gemini 4 Neon': None,
+         # GPT-6.2 Sol / Astra on the Codex CLI (2026-11-20): total tokens at GPT-6.1 Sol's / GPT-6 Astra's cache-read price
+         'GPT-6.2 Sol': 0.10, 'GPT-6.2 Astra': 1.00}
 # A candidate whose formal run of the task set spans several evaluations, collected as one: Gemini 4 Argon on agy ran six
 # CPU tasks first in a batch of their own and the other 42 in its formal evaluation; together they are its 48 (Qiuyang,
 # 2026-10-25). The first evaluation listed is the formal one.
