@@ -83,6 +83,14 @@ as B grows, and the likelihood is monotone in it, so a curve never falls. FCI(mo
 leaderboard FCI at full budget; it is mapped with the leaderboard's theta of PASS_ZERO. Its 90% interval resamples the
 model's tasks (SCALE_BOOT draws, task parameters held).
 
+A second harness of a model on the site (ALT; owner, 2026-11-22) is in no fit and on no page but the leaderboard bars' switch:
+its runs are taken out of the database before anything else reads it, so no other number depends on them. Its FCI is the
+strength that maximises its runs' likelihood under the strengths' prior with every task's parameters, metric groups,
+reference and score unit held at the fit (theta_at, as test-time scaling at full budget; for a model in the fit this is its
+FCI). Its 90% interval comes from the same BOOT draws as the others': in each draw the strength against that draw's
+resampled tasks and refitted parameters, mapped with that draw's theta of PASS_ZERO. Its per-metric counts are in
+_data/fcs2_checks_hidden.json.
+
 Pass rate is the share of scored runs whose verdict is PASS: the final submission meets the task's
 beat-the-reference criteria on every workload. It is a plain count, so it has no interval.
 """
@@ -244,6 +252,11 @@ for a in sys.argv[2:]:   # optional: --low='Model name=value' to try another fix
     if a.startswith('--low='): PASS_ZERO, PASS_ZERO_VALUE = a[6:].rsplit('=', 1)[0], float(a[6:].rsplit('=', 1)[1])
 
 
+# database candidate name -> (id of its per-metric counts, id of the model on the site it is another harness of, harness)
+# gemini-4-neon on Google's Antigravity CLI (agy), run on Pumpkin (2026-11-20/22); the leaderboard bars of Gemini 4 Neon
+# can be switched to it (owner, 2026-11-22). Held out of every fit and scored against it (see the docstring).
+ALT = {'Antigravity · Gemini 4 Neon': ('neon-agy', 'neon', 'Antigravity')}
+
 LAM = 0.35                       # the strengths' prior is N(0, 1/LAM), the penalty of the site's in-browser TDIFF
 BOOT = 500
 PRIOR_SD = 6                     # logits: prior sd of a task's beat-the-human level, or of its metric difficulties without a reference
@@ -391,6 +404,27 @@ def metric_tasks(obs, ref, PB):
     return out, unit0
 
 
+def held_rows(alt, tasks, PB):
+    """Per ALT candidate and task (database name): the outcome row of its run, as metric_tasks builds a fitted run's, with
+    the task's metrics, groups, reference and unit as the fit has them. alt: (candidate, task, passed, score) per scored run."""
+    out = defaultdict(dict)
+    for c, t, passed, score in alt:
+        T, agg = tasks[t], defaultdict(lambda: [0, 0])
+        for key, (b, tot) in PB.get(short(t), {}).get(ALT[c][0], {}).items():
+            if key.startswith('dev/'): continue
+            agg[key.rsplit('/', 1)[-1]][0] += b; agg[key.rsplit('/', 1)[-1]][1] += tot
+        assert set(agg) <= set(T['stems']), f'{t}: {c} has metrics the fit does not know: {sorted(set(agg) - set(T["stems"]))}'
+        z = {j: float(agg[j][0] == agg[j][1] > 0) if j in agg else 0.0 for j in T['stems']}
+        assert passed == all(z.values()), f'{t}: PASS is not "every metric beaten" for {c}; refresh _data/fcs2_checks_hidden.json'
+        o = [min(z[m] for m in g) for g in T['groups']]
+        if T['ref'] is not None:
+            y, ok = (score - T['ref']) / T['unit'], bool(passed)
+            below, above = score < T['ref'] - TIE_EPS, score > T['ref'] + TIE_EPS
+            o += [y if ok or below else 0.0, 0.0 if ok or below else 1.0 if above else 2.0]
+        out[c][t] = np.array(o)
+    return out
+
+
 def task_prior(x, k, has_ref, hyp):
     """Log prior of a task's parameter rows x (N x items), with its gradient and Hessian at the first row:
     h ~ N(0, PRIOR_SD^2) and beta_j ~ N(h + d, tau^2); without a reference beta_j ~ N(0, PRIOR_SD^2)."""
@@ -513,12 +547,13 @@ def joint_cold(TL, hyp, th):
     return th, ll
 
 
-def joint_fit(obs, ref, PB):
+def joint_fit(obs, ref, PB, alt=()):
     """FCI and FDI from one model (see the docstring). Returns per model (FCI, 90% low, 90% high, tasks), the strengths
     in logits and PASS_ZERO's; per task (database name) metric_tasks()'s fields and its fit, in logits: 'x' (the mode),
     'D', 'lo', 'hi', 'ess', 'slope' (dP(pass)/dtheta at D), 'ci' (per parameter, its 90% interval); the hyperparameters
     (s_u, a, d, tau, s_e), the profile log marginal likelihood, each start's result, the margin unit c (points) and the
-    number of bootstrap draws that did not converge (left out)."""
+    number of bootstrap draws that did not converge (left out); and per ALT candidate of alt (held_rows), which is in no
+    fit, (FCI, 90% low, 90% high, tasks) against this fit (see the docstring)."""
     tasks, unit0 = metric_tasks(obs, ref, PB)
     M = list(dict.fromkeys(o[0] for o in obs)); nM = len(M)
     assert PASS_ZERO in M, f'{PASS_ZERO} has no scored runs'
@@ -555,26 +590,36 @@ def joint_fit(obs, ref, PB):
                     ci=[tuple(wpct(X[:, j], w, [.05, .95])) for j in range(n)], lo=lo, hi=hi)
     for T, r in zip(TL, in_order(interval, len(TL))): T.update(r)
     # the FCI interval: resample tasks, refit the strengths and every task's parameters, hyperparameters held
-    draws, skipped = fci_draws(TL, hb, th, z)
+    held, names = held_rows(alt, tasks, PB), list(tasks)
+    # a held-out candidate against tasks Ts (their parameters as they are), their names ns: its strength in logits
+    against = lambda H, Ts, ns: float(theta_at([(T['x'], H[n], T['k']) for T, n in zip(Ts, ns) if n in H], np.ones((1, sum(n in H for n in ns))), hb)[0])
+    if held:   # a model of the fit scored this way is at its fitted strength
+        gap = max(abs(against({t: T['O'][T['models'].index(m)] for t, T in tasks.items() if m in T['models']}, TL, names) - th[i]) for i, m in enumerate(M))
+        assert gap < 1e-6, f'scoring a fitted model against the fit misses its strength by {gap:.2e} logits'
+    draws, hdraws, skipped = fci_draws(TL, hb, th, z, lambda Tb, pick, d: [float(on_scale(against(H, Tb, [names[j] for j in pick]), d[z])) for H in held.values()])
     point, (lo, hi) = on_scale(th, th[z]), np.percentile(draws, [5, 95], axis=0)
+    hout = {c: (round(float(on_scale(against(H, TL, names), th[z])), DEC), *(round(float(v), DEC) for v in np.percentile([h[i] for h in hdraws], [5, 95])), len(H))
+            for i, (c, H) in enumerate(held.items())}
     out = {m: (round(float(point[i]), DEC), round(float(lo[i]), DEC), round(float(hi[i]), DEC), len({o[1] for o in obs if o[0] == m}))
            for i, m in enumerate(M)}
-    return out, dict(zip(M, th)), th[z], tasks, hb, ll, [(hyp(r.x), -r.fun) for r in fits], unit0, skipped
+    return out, dict(zip(M, th)), th[z], tasks, hb, ll, [(hyp(r.x), -r.fun) for r in fits], unit0, skipped, hout
 
 
-def fci_draws(TL, hb, th, z):
+def fci_draws(TL, hb, th, z, also=None):
     """The FCI bootstrap from the full fit (tasks TL at their mode, hyperparameters hb, strengths th, PASS_ZERO at index z):
     draw seed resamples the tasks with default_rng(seed) and refits from the full fit, so the draws are independent.
-    Returns the draws on the FCI scale, in seed order, and the number left out because their mode was not found."""
+    Returns the draws on the FCI scale, in seed order; per draw kept, also(the draw's refitted tasks, their indices in TL,
+    its strengths), if given; and the number of draws left out because their mode was not found."""
     full = [T['x'].copy() for T in TL]
 
     def draw(seed):
         pick = np.random.default_rng(seed).integers(0, len(TL), len(TL))
-        try: d, _ = joint_mode([dict(TL[j], x=full[j].copy()) for j in pick], hb, th.copy())
+        Tb = [dict(TL[j], x=full[j].copy()) for j in pick]
+        try: d, _ = joint_mode(Tb, hb, th.copy())
         except (ArithmeticError, np.linalg.LinAlgError): return None   # left out and counted (should be none)
-        return on_scale(d, d[z])
-    draws = [d for d in in_order(draw, BOOT) if d is not None]
-    return draws, BOOT - len(draws)
+        return on_scale(d, d[z]), also(Tb, pick, d) if also else None
+    kept = [r for r in in_order(draw, BOOT) if r is not None]
+    return [r[0] for r in kept], [r[1] for r in kept], BOOT - len(kept)
 
 
 def p_pass(D, B, s_u, gh=None):
@@ -758,7 +803,14 @@ def hidden_json(generated, hidden):   # one run per line, so a refresh diffs by 
     return json.dumps(head, ensure_ascii=False, indent=1)[:-2] + ',\n "runs": [\n' + ',\n'.join('  ' + json.dumps(r, ensure_ascii=False) for r in hidden) + '\n ]\n}\n'
 
 
-db = sqlite3.connect(sys.argv[1])
+db = sqlite3.connect(':memory:')   # a copy: the runs of ALT are read, then taken out, so nothing below sees them
+with sqlite3.connect(sys.argv[1]) as src: src.backup(db)
+alt_obs = [(c, t, int(v == 'PASS'), s) for c, t, s, v in db.execute(f'''select c.name, t.name, r.display_score, r.display_verdict from cells ce
+  join runs r on r.id = ce.run_id join candidates c on c.id = ce.candidate_id join tasks t on t.id = ce.task_id
+  where c.name in ({','.join('?' * len(ALT))}) order by t.ordinal''', list(ALT)) if s is not None]
+db.execute(f'create temp table alt_runs as select ce.run_id from cells ce join candidates c on c.id = ce.candidate_id where c.name in ({",".join("?" * len(ALT))})', list(ALT))
+for tb, col in (('score_points', 'run_id'), ('submissions', 'run_id'), ('runs', 'id'), ('cells', 'run_id')): db.execute(f'delete from {tb} where {col} in (select run_id from alt_runs)')
+db.execute(f'delete from candidates where name in ({",".join("?" * len(ALT))})', list(ALT))
 generated = db.execute('select generated_at from release').fetchone()[0]
 rows = db.execute('''select c.name, t.name, r.display_score, r.state, r.display_verdict from cells ce
   join runs r on r.id = ce.run_id join candidates c on c.id = ce.candidate_id join tasks t on t.id = ce.task_id
@@ -891,7 +943,9 @@ fit_rows = db.execute('''select c.name, t.name, r.display_score, r.display_verdi
 # (Qiuyang, 2026-10-20); LEAVE_OUT_REFUSALS restores the 2026-10-16 rule that left it out
 fit_rows = [x for x in fit_rows if not (LEAVE_OUT_REFUSALS and refused(x[4])) and TASK[x[1]][0] not in OFF_FIT_DOMAINS]
 obs, task_ref = fit_data(fit_rows)
-E, THETA, theta0, MT, dfit, dll, dstarts, UNIT0, nskip = joint_fit(obs, task_ref, passby())
+E, THETA, theta0, MT, dfit, dll, dstarts, UNIT0, nskip, HELD = joint_fit(obs, task_ref, passby(), alt_obs)
+ALT_JS = {ALT[c][1]: {'h': ALT[c][2], 'pass': [round(100 * sum(o[2] for o in alt_obs if o[0] == c) / len([o for o in alt_obs if o[0] == c]), 1), sum(o[2] for o in alt_obs if o[0] == c), len([o for o in alt_obs if o[0] == c])], 'eci': list(HELD[c])} for c in HELD}
+assert set(ALT_JS) <= {MODEL[c][0] for c in MODEL if c not in HIDDEN}, 'ALT names a model that is not on the site'
 TFIT, DIFF, METRIC, MGROUPS, DIFF_FIT = task_fits(MT, dfit, theta0, UNIT0)
 # each task's metric-group difficulties at the mode, on the FCI scale: the task chart draws the exact pass curve from them (Qiuyang);
 # one decimal more than FDI, so the curve from these rounded values crosses 1/2 within 0.06 points of the rounded FDI
@@ -923,6 +977,7 @@ block = (f'// One entry per scored run in the preview results database of {when:
          f"// Pass rate per model: [percent, runs that pass, runs].\nconst PASS = {json.dumps(pass_rate(runs))};\n"
          f"// FCI per model: [point, 90% low, 90% high, tasks], from the model that also gives FDI: every run's metric groups and how far its final score is from the human reference (a run that does not pass counts at most as level), in units of the task's score spread (at least the median spread over tasks), with a run effect shared by both and a strength prior N(0, 1/{LAM:g}), every model a respondent ({zero} too); FCI = {PASS_ZERO_VALUE:g} + {PASS_UNIT:g} x (strength - {zero}'s strength), strengths in logits (ECI_LOW, ECI_LOW_VALUE, ECI_UNIT); the interval resamples tasks and refits ({BOOT} bootstrap draws).\n"
          f"const ECI = {json.dumps(eci_js)};\nconst ECI_LOW = '{MODEL[PASS_ZERO][0]}', ECI_LOW_NAME = '{zero}', ECI_LOW_VALUE = {PASS_ZERO_VALUE:g}, ECI_UNIT = {PASS_UNIT:g};\n"
+         f"// Another harness of a model, for the switch on the leaderboard's bars: per model id, h the harness, pass and eci as PASS and ECI above. Its runs are in no fit: its FCI is the strength that fits them best with every task held at the fit, its interval from the same bootstrap draws.\nconst ALT = {json.dumps(ALT_JS)};\n"
          f"// Test-time scaling per model: [US$ budget per run, FCI, 90% low, 90% high, share of runs still going]; at a budget a run that has ended counts its metric groups and its margin (at most level if it did not pass); a run still going counts as timed out at the budget (no group, final score 0), so a curve never falls; task parameters held at the FCI fit (see the converter's docstring).\nconst SCALE = {json.dumps(SC, separators=(',', ':'))};\n"
          f"// Cost per model: [mean US$ per scored run, runs]; output tokens x output price + every token x cache-read price (PRICE above).\nconst COST = {json.dumps(CO)};\nconst PRICE = {json.dumps(PRICE)};\n"
          f"// Every scored run: [model, task, final score, passed, US$ at end, hours, [[US$, dev score] per development submission]].\nconst TRAJ = {json.dumps(trajectories(db), separators=(',', ':'), ensure_ascii=False)};\n"
@@ -943,6 +998,7 @@ hid_path = '_data/fcs2_runs_hidden.json'
 open(hid_path, 'w', encoding='utf-8').write(hidden_json(generated, hidden))
 print('PASS', pass_rate(runs))
 print('FCI', eci_js)
+print('ALT', ALT_JS)
 print('DIFF_FIT', DIFF_FIT, '(logits: sigma_u {:.4f}, a {:.4f}, delta {:.4f}, tau {:.4f}, s_e {:.4f}; profile log marginal likelihood {:.3f})'.format(*dfit, dll))
 print(f'FCI bootstrap: {BOOT - nskip} draws, {nskip} skipped (no convergence)')
 print(f'pass curves from GROUPS reach 1/2 within {gap:.3f} points of FDI ({gap24:.3f} with the pages\' 48 nodes)')
@@ -956,7 +1012,7 @@ for a in sys.argv[2:]:
         S, nboot, nbad, pinned, curves = eci_score(fit_rows)   # the raw-score fit, kept for the paper only
         out = {'source': sys.argv[1], 'generated_at': generated, 'runs_columns': ['model', 'domain', 'task', 'score', 'passed'], 'runs': runs,
                'models': [dict(zip(['id', 'name', 'short', 'harness', 'lab'], m)) for m in models], 'dropped': dict(dropped),
-               'pass': pass_rate(runs), 'cost_usd': CO, 'price_per_mtok': PRICE, 'eci': eci_js, 'eci_unit': PASS_UNIT,
+               'pass': pass_rate(runs), 'alt': ALT_JS, 'cost_usd': CO, 'price_per_mtok': PRICE, 'eci': eci_js, 'eci_unit': PASS_UNIT,
                'eci_low': [PASS_ZERO, PASS_ZERO_VALUE], 'eci_penalty': LAM, 'eci_boot': BOOT, 'eci_boot_skipped': nskip,
                'scaling_columns': ['usd', 'eci', 'lo90', 'hi90', 'share_running'], 'scaling': SC,
                'task_reference': REF, 'task_fit_columns': ['difficulty', 'slope'], 'task_fit': TFIT,

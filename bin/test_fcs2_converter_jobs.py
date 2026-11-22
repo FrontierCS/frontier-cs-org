@@ -75,8 +75,11 @@ class ConverterJobsTests(unittest.TestCase):
         c.JOBS = 1
         th, _ = c.joint_cold(TL, hyp, np.zeros(nM))
         c.BOOT = 16
-        (d1, s1), (d3, s3) = (self.run_with(j, lambda: c.fci_draws(TL, hyp, th, 0)) for j in (1, 3))
+        also = lambda Tb, pick, d: (list(map(int, pick)), float(d.sum()), Tb[0]['x'].tobytes())
+        (d1, e1, s1), (d3, e3, s3) = (self.run_with(j, lambda: c.fci_draws(TL, hyp, th, 0, also)) for j in (1, 3))
         self.assertEqual(s1, s3)
+        self.assertEqual(e1, e3)
+        self.assertEqual(len(e1), len(d1))
         self.assertEqual(len(d1) + s1, 16)
         self.assertGreater(len(d1), 0)
         self.assertEqual(len(d1), len(d3))

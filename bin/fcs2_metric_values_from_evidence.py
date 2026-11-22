@@ -8,7 +8,7 @@ usage: python3 -I bin/fcs2_metric_values_from_evidence.py RELEASE_DIR OUT_DIR [-
 RELEASE_DIR has the layout of the public dataset FrontierCS2/FrontierCS-2-runs: metadata/formal-results.json (one run
 per task and model) and traces/<slug>/<model>/evidence.tar.zst. Of each archive only the final verifier evidence is
 read (member verifier/evidence.tar, the platform's GET /api/v1/runs/<id>/submission/evidence?submission_id=final; in a
-Pumpkin record, the evidence of the job its log starts as the final call, jobs/<n>/out/evidence/evidence.tar.zst);
+Pumpkin record, the evidence of the job its log starts as the final call, jobs/<n>/out/evidence/evidence.tar.zst; in a Pumpkin final-only recovery, its evidence/evidence.tar.zst);
 where the run's own final has no numbers (an infrastructure or evaluator failure) and
 traces/<slug>/<model>/selected-final-rejudge/evidence.tar.zst exists, the rejudge's verifier evidence stands in (KV
 Compaction Opus, Polygon Gemini). A record whose result is the rejudge's (result_source: "independently re-evaluated
@@ -108,6 +108,10 @@ def members(path):
     with tf:
         for m in tf:
             if not m.isfile() or m.size > MAX_ARCHIVE: continue
+            if m.name == 'evidence/evidence.tar.zst':   # a Pumpkin final-only recovery: its one verification's evidence
+                data = subprocess.run(['zstd', '-dcq'], input=tf.extractfile(m).read(), capture_output=True).stdout
+                with tarfile.open(fileobj=io.BytesIO(data)) as t2: walk(t2, 'verifier/evidence.tar!/', 1)
+                continue
             if m.name.startswith('jobs/') and m.name.endswith('/out/evidence/evidence.tar.zst'):
                 pumpkin = pumpkin or {}; pumpkin[m.name] = None
                 continue
