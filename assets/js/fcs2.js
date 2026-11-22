@@ -65,9 +65,9 @@ $('#eci').addEventListener('toggle', () => drawECI());   // folded: its width is
 function drawPassCost(k = 'pass', id = 'pc') {
   const svg = $(`#${id}svg`), W = Math.max(300, $(`#${id}plot`).clientWidth), narrow = W < 560;
   const L = 44, R = narrow ? 12 : 24, T = 14, B = 46, H = CHART_H.pc || (narrow ? 320 : 400);
-  // COST is the model's own; an Antigravity model's safety review (REVIEW_COST) runs on to an open ring (reviewMark)
+  // COST is the model's own; an Antigravity model's safety review (REVIEW_COST) is not drawn, only named in the tooltip (owner, 2026-11-22)
   const RV = m => (typeof REVIEW_COST !== 'undefined' && REVIEW_COST[m.id]) ? REVIEW_COST[m.id][0] : 0;
-  const ms = MODELS.filter(m => COST[m.id]), tx = ms.flatMap(m => [COST[m.id][0], COST[m.id][0] + RV(m)]);
+  const ms = MODELS.filter(m => COST[m.id]), tx = ms.map(m => COST[m.id][0]);
   // the axis runs 0.15 decade past the outermost dots and no further (owner, 2026-10-10: half-decade rounding left
   // the range loose); an edge dot whose label has no room on its outer side takes another spot
   // (on phones the right side keeps more, so the labels of the dots near the right edge fit on their right)
@@ -88,8 +88,6 @@ function drawPassCost(k = 'pass', id = 'pc') {
   const pts = [], order = [...ms].sort((a, b) => val(b) - val(a) || ECI[b.id][0] - ECI[a.id][0]);
   const at = m => [X(COST[m.id][0]), Y(Math.max(0, val(m)))];
   const boxes = order.map(m => { const [cx, cy] = at(m); return {x:cx - 9, y:cy - 9, w:18, h:18}; });
-  ms.forEach(m => { if (RV(m)) { const [cx, cy] = at(m); reviewMark(svg, boxes, cx, X(COST[m.id][0] + RV(m)), cy, MCOL[m.id]); } });
-  const key = $(`#${id}key`); if (key) key.innerHTML = ms.some(RV) ? REVIEW_KEY : '';
   // the Pareto frontier: the models no cheaper model matches or beats on the metric
   const front = [...ms].sort((p, q) => COST[p.id][0] - COST[q.id][0] || val(q) - val(p)).filter((m, i, a) => a.slice(0, i).every(o => val(o) < val(m)));
   order.forEach(m => {
@@ -99,9 +97,7 @@ function drawPassCost(k = 'pass', id = 'pc') {
     const lead = front.includes(m);
     svg.append(sv('circle', {cx, cy, r:6.5, fill:MCOL[m.id], stroke:'#fff', 'stroke-width':2, 'data-m':m.id}));   // one dot size for every model (owner, 2026-10-16); the frontier keeps its bold names
     labelDot(svg, boxes, cx, cy, name, {l:L, r:W, t:T, b:H - B}, MTXT(m.id), lead);   // fcs2-data.js
-    const html = `<b>${esc(m.name)}</b><br>${M.tip(val(m))}<br>${usdfmt(COST[m.id][0])} per run, mean` + (RV(m) ? `<br>+ ${usdfmt(RV(m))} ${REVIEW_TIP}` : '');
-    pts.push({x:cx, y:cy, mean:true, html});
-    if (RV(m)) pts.push({x:X(COST[m.id][0] + RV(m)), y:cy, html});
+    pts.push({x:cx, y:cy, mean:true, html:`<b>${esc(m.name)}</b><br>${M.tip(val(m))}<br>${usdfmt(COST[m.id][0])} per run, mean` + (RV(m) ? `<br>+ ${usdfmt(RV(m))} ${REVIEW_TIP}` : '')});
   });
   attachTip(svg, W, H, pts, $(`#${id}tip`));
 }

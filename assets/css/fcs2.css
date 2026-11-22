@@ -69,9 +69,6 @@ h2{font-weight:600; font-size:clamp(25px,2.4vw,30px); line-height:1.2; margin:0}
 .chart{min-width:0}
 .chead{display:flex; flex-wrap:wrap; justify-content:space-between; align-items:baseline; font-size:18px; font-weight:600; color:var(--ink); margin-bottom:6px; gap:12px}
 .chead .r{color:var(--faint); font-weight:400}
-/* the key of an Antigravity model's safety review on the cost charts (reviewMark, fcs2-data.js) */
-.rvkey{display:inline-flex; align-items:center; gap:6px; font-size:14px; font-weight:400; color:var(--muted-2)}
-.rvkey circle{fill:var(--muted-2)} .rvkey circle.o{fill:var(--paper); stroke:var(--muted-2); stroke-width:1.5} .rvkey line{stroke:var(--muted-2); stroke-width:1.5; stroke-opacity:.6}
 .plot{position:relative}
 .plot svg{display:block; width:100%; overflow:visible}
 .plot text{font-family:var(--sans); font-size:12px; fill:var(--muted)}

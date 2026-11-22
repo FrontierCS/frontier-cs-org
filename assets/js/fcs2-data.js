@@ -261,15 +261,10 @@ function attachTip(svg, W, H, pts, tip = $('#lbtip')) {
 const money = v => v === 0 ? '$0' : v < 0.1 ? `$${+v.toFixed(3)}` : v < 10 ? `$${+v.toFixed(2)}` : `$${Math.round(v)}`;
 const usdfmt = v => v >= 1 ? `$${+v.toPrecision(2)}` : `$${+v.toPrecision(1)}`;
 // Antigravity's safety review (owner, 2026-11-22: its cost apart from the model's). A run's own cost is TRAJ's US$ less the
-// review in its last column (bin/fcs2_runs_from_db.py); on a cost chart a thin line runs from the dot on to an open ring
-// at the cost with the review, drawn under the dots, and its boxes keep labels off it.
+// review in its last column (bin/fcs2_runs_from_db.py). The charts draw only the own cost; the tooltips name the review
+// (owner, 2026-11-22: 「不用同时画有safety的 只画没有的」).
 const reviewUsd = r => r.length > 7 ? r[7] : 0, ownUsd = r => r[4] - reviewUsd(r);
-const reviewMark = (svg, boxes, x1, x2, y, col) => {
-  svg.append(sv('line', {x1, x2, y1:y, y2:y, stroke:col, 'stroke-width':1.5, 'stroke-opacity':.6}));
-  svg.append(sv('circle', {cx:x2, cy:y, r:4.5, fill:'var(--paper)', stroke:col, 'stroke-width':1.5}));
-  boxes.push({x:x1, y:y - 3, w:x2 - x1, h:6}, {x:x2 - 6, y:y - 6, w:12, h:12}); };
 const REVIEW_TIP = 'for Antigravity’s safety review';
-const REVIEW_KEY = `<span class="rvkey"><svg viewBox="0 0 30 12" width="30" height="12" aria-hidden="true"><circle cx="5" cy="6" r="4"/><line x1="9" x2="21" y1="6" y2="6"/><circle class="o" cx="25" cy="6" r="3.5"/></svg>with Antigravity’s safety review</span>`;
 // text in a model's colour, 22% darker: GPT-6.1 Sol, Qwen 3.8 Max and GLM 5.3 Flash are under 3:1 on white at full colour
 const MTXT = id => `color-mix(in srgb, ${MCOL[id]} 78%, #000)`;
 /* A label beside its dot, for the charts that name their dots instead of a legend (the overview's pass rate, a task's final

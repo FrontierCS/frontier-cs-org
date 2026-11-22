@@ -270,7 +270,7 @@ function drawScore() {
   const L = 34, R = narrow ? 12 : 24, T = 14, B = 46, H = narrow ? 320 : 400;
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
   if (!rs.length) { $('#scnote').textContent = 'No run on this task has a cost.'; return; }
-  const tx = rs.flatMap(r => [ownUsd(r), r[4]]);   // the run's own cost, and with an Antigravity run's safety review (reviewMark)
+  const tx = rs.map(ownUsd);   // the run's own cost: an Antigravity run's safety review is not drawn, only named in the tooltip (owner, 2026-11-22)
   // as the overview: 0.15 decade past the outermost dots, more on the right on phones so the labels there fit
   const x0 = Math.log10(Math.min(...tx)) - .15, x1 = Math.log10(Math.max(...tx)) + (narrow ? .74 : .15);
   // the y axis spans the dots and the human reference, a tenth of their spread past each but at least 10 points in all,
@@ -293,13 +293,12 @@ function drawScore() {
   svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'Cost of the run in US$, log scale'));
   const at = r => [X(ownUsd(r)), Y(r[2])], order = [...rs].sort((a, b) => b[2] - a[2]);
   const boxes = order.map(r => { const [cx, cy] = at(r); return {x:cx - 9, y:cy - 9, w:18, h:18}; });
-  rs.forEach(r => { if (reviewUsd(r)) { const [cx, cy] = at(r); reviewMark(svg, boxes, cx, X(r[4]), cy, MCOL[r[0]]); } });
   // the Human reference: a dashed line, named in the legend; no run's name is written across it
   if (ref != null) {
     svg.append(sv('line', {x1:L, x2:W - R, y1:Y(ref), y2:Y(ref), stroke:'var(--ink-2)', 'stroke-width':1.2, 'stroke-dasharray':'4 4'}));
     boxes.push({x:L, y:Y(ref) - 2, w:W - R - L, h:4});
   }
-  $('#sclegend').innerHTML = (ref != null ? '<span><i class="dash"></i>Human reference</span>' : '') + (rs.some(reviewUsd) ? REVIEW_KEY : '');
+  $('#sclegend').innerHTML = ref != null ? '<span><i class="dash"></i>Human reference</span>' : '';
   // the frontier: the runs no cheaper run matches or beats on final score
   const front = [...rs].sort((p, q) => ownUsd(p) - ownUsd(q) || q[2] - p[2]).filter((r, i, a) => a.slice(0, i).every(o => o[2] < r[2]));
   const pts = [];
@@ -310,9 +309,7 @@ function drawScore() {
     // dropped (a crowded chart dropped Gemini 4 Argon · Antigravity on Yannakakis, CKKS and Differentiable Population
     // Statistics); phones keep dropping such names, as leaders would crowd their narrow plot
     labelDot(svg, boxes, cx, cy, narrow ? m.short : m.name, {l:L, r:W, t:T, b:H - B}, MTXT(r[0]), lead, false, !narrow);
-    const html = `<b>${esc(m.name)}</b><br>Final score <b>${f1(r[2])}</b>, ${r[3] ? 'passes' : 'does not pass'}<br>${money(ownUsd(r))}` + (reviewUsd(r) ? `<br>+ ${money(reviewUsd(r))} ${REVIEW_TIP}` : '');
-    pts.push({x:cx, y:cy, mean:true, html});
-    if (reviewUsd(r)) pts.push({x:X(r[4]), y:cy, html});
+    pts.push({x:cx, y:cy, mean:true, html:`<b>${esc(m.name)}</b><br>Final score <b>${f1(r[2])}</b>, ${r[3] ? 'passes' : 'does not pass'}<br>${money(ownUsd(r))}` + (reviewUsd(r) ? `<br>+ ${money(reviewUsd(r))} ${REVIEW_TIP}` : '')});
   });
   attachTip(svg, W, H, pts, $('#sctip'));
 }

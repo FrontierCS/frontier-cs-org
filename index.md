@@ -62,13 +62,13 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
     <p>Claude Fable 5.1 (Claude Code): in MuJoCo Playground, a refusal switched the rest of the run to Claude Opus 4.8.</p>
   </details>
   <figure class="chart" style="margin:56px 0 0">   <!-- the gap of the blocks around it, so it does not run into the bars' footer (owner, 2026-10-16) -->
-    <div class="chead"><span>Pass rate (beat reference)</span><span class="r" id="pckey"></span></div>
+    <div class="chead"><span>Pass rate (beat reference)</span></div>
     <div class="plot" id="pcplot"><svg id="pcsvg" role="img" aria-label="Pass rate (beat reference) against cost per run"></svg><div class="tip" id="pctip" hidden></div></div>
     <div class="cfoot">{% include chart_logo.html %}</div>
   </figure>
   <!-- FCI against cost, under the pass rate one (owner, 2026-10-31: the two stacked, no switch, pass rate first) -->
   <figure class="chart" style="margin:56px 0 0">
-    <div class="chead"><span>FCI</span><span class="r" id="fckey"></span></div>
+    <div class="chead"><span>FCI</span></div>
     <div class="plot" id="fcplot"><svg id="fcsvg" role="img" aria-label="FCI against cost per run"></svg><div class="tip" id="fctip" hidden></div></div>
     <div class="cfoot">{% include chart_logo.html %}</div>
   </figure>
