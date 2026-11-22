@@ -38,7 +38,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
        number in the bar, the exact value in the tooltip. Since 2026-10-31 (owner) the bars come twice, stacked with no switch:
        pass rate, then FCI as a whole number with no interval -->
   <figure class="chart" style="margin:0">
-    <div class="chead"><span>Pass rate (beat reference)</span></div>
+    <div class="chead"><span>Pass rate (beat reference)</span><span class="hsw" id="hsw" hidden></span></div>   <!-- a model's other harness, for these bars and the FCI bars below only (owner, 2026-11-22) -->
     <div class="plot" id="fcibplot"><svg id="fcibsvg" role="img" aria-label="Pass rate (beat reference) by model"></svg><div class="tip" id="fcibtip" hidden></div></div>
     <div class="cfoot">{% include chart_logo.html %}</div>   <!-- the bars keep their FrontierCS row (owner, 2026-10-16, on #89) -->
   </figure>
