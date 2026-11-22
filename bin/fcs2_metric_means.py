@@ -27,6 +27,8 @@ varies from run to run; the page shows the median over a task's runs, and each r
 
 Names go through the TASK and MODEL maps of bin/fcs2_runs_from_db.py, as bin/fcs2_checks_from_platform.py does; runs of
 models in HIDDEN (Kimi K2.7) and of candidates the maps do not know are left out. Numbers keep 4 significant digits.
+A cell in FALLBACK (bin/fcs2_runs_from_db.py) takes the rows of the run it shows (another candidate's) under its own
+candidate; its replaced run's rows go.
 """
 import ast, json, pathlib, re, statistics, sys
 
@@ -35,8 +37,21 @@ src = ast.parse((ROOT / 'bin' / 'fcs2_runs_from_db.py').read_text())
 lit = {}
 for n in src.body:   # the first, literal assignment of each (MODEL is narrowed later in that script)
     for t in getattr(n, 'targets', []):
-        if isinstance(t, ast.Name) and t.id in ('TASK', 'MODEL', 'HIDDEN') and t.id not in lit: lit[t.id] = ast.literal_eval(n.value)
-TASK, MODEL, HIDDEN = lit['TASK'], lit['MODEL'], lit['HIDDEN']
+        if isinstance(t, ast.Name) and t.id in ('TASK', 'MODEL', 'HIDDEN', 'FALLBACK') and t.id not in lit: lit[t.id] = ast.literal_eval(n.value)
+TASK, MODEL, HIDDEN, FALLBACK = lit['TASK'], lit['MODEL'], lit['HIDDEN'], lit['FALLBACK']
+
+
+def fallback(rows):
+    """FALLBACK (bin/fcs2_runs_from_db.py): a cell that shows another candidate's run takes that run's rows under its own
+    candidate, and its replaced run's rows go."""
+    src = {(s, k): c for (c, k), s in FALLBACK.items()}
+    out = []
+    for r in rows:
+        k = (TASK[r['task']][1] or r['task'].split(' — ')[0]) if r['task'] in TASK else None
+        if (r['candidate'], k) in FALLBACK: continue
+        out.append(r)
+        if (r['candidate'], k) in src: out.append(dict(r, candidate=src[(r['candidate'], k)]))
+    return out
 
 r4 = lambda v: None if v is None else float(f'{v:.4g}')
 # checks that must equal an exact answer: the page says so instead of a direction (Qiuyang, 2026-10-15; ParButterfly's
@@ -61,7 +76,7 @@ REF_FIXED = {('Structured LWE', 'valid_witness'): 1}
 # count less a tolerance)
 BAR = {('Structured LWE', 'valid_witness'): 'pass bar', ('Continuum', 'correctness'): 'pass bar'}
 WORKLOADS = {'CREST'}   # tasks whose page shows each hidden workload apart (their names are in assets/js/fcs2-task.js)
-rows = [json.loads(line) for line in open(sys.argv[1]) if line.strip()]
+rows = fallback([json.loads(line) for line in open(sys.argv[1]) if line.strip()])
 dbp = next((a[5:] for a in sys.argv[2:] if a.startswith('--db=')), None)
 if dbp:
     import sqlite3
@@ -70,7 +85,7 @@ if dbp:
     for r in rows:   # a rerun's row from the old run: keep its direction, drop its numbers
         if r['run_id'] not in live: r['value'] = r['reference_value'] = r['invalid'] = None
 arg = lambda k: next((a[len(k) + 3:] for a in sys.argv[2:] if a.startswith(f'--{k}=')), None)
-wrows = [json.loads(l) for l in open(arg('values'))] if arg('values') else []
+wrows = fallback([json.loads(l) for l in open(arg('values'))]) if arg('values') else []
 margin = {(m['run_id'], m['metric'], m['workload']): m['margin'] for m in map(json.loads, open(arg('margins')))} if arg('margins') else {}
 out, skipped = {}, {}
 for r in rows:

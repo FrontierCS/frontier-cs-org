@@ -14,7 +14,9 @@ Where a task's changed records check metrics that a kept record passing the task
 that added metrics: Robust Image Tokenizer's LPIPS metrics), the kept record gets each added metric as beaten on all its
 workloads, as its published PASS says it beat every metric; bin/fcs2_runs_from_db.py stops unless PASS is every metric
 beaten. The script prints these cells. Entries of models in HIDDEN are kept in the hidden file only (moved there when a
-model is hidden), as bin/fcs2_checks_from_platform.py splits them.
+model is hidden), as bin/fcs2_checks_from_platform.py splits them. A cell in FALLBACK (bin/fcs2_runs_from_db.py) shows
+another candidate's run, so it takes that run's entry, read from either file. Run it with BASE = the new release to apply
+FALLBACK alone.
 """
 import ast, collections, json, pathlib, re, sys
 
@@ -23,8 +25,8 @@ new, base = json.load(open(sys.argv[1])), {r['record_id']: r for r in json.load(
 lit = {}
 for n in ast.parse((ROOT / 'bin' / 'fcs2_runs_from_db.py').read_text()).body:   # the first, literal assignment of each
     for t in getattr(n, 'targets', []):
-        if isinstance(t, ast.Name) and t.id in ('TASK', 'MODEL', 'HIDDEN') and t.id not in lit: lit[t.id] = ast.literal_eval(n.value)
-TASK, MODEL, HIDDEN = lit['TASK'], lit['MODEL'], lit['HIDDEN']
+        if isinstance(t, ast.Name) and t.id in ('TASK', 'MODEL', 'HIDDEN', 'FALLBACK') and t.id not in lit: lit[t.id] = ast.literal_eval(n.value)
+TASK, MODEL, HIDDEN, FALLBACK = lit['TASK'], lit['MODEL'], lit['HIDDEN'], lit['FALLBACK']
 short = lambda t: TASK[t][1] or t.split(' — ')[0]
 BY_SHORT = collections.defaultdict(list)
 for t in TASK: BY_SHORT[short(t)].append(t)
@@ -57,6 +59,13 @@ for k in set(PB) | set(HPB):
         if m in hidden: HPB.setdefault(k, {})[m] = PB[k].pop(m); moved += 1
     for m in list(HPB.get(k, {})):
         if m not in hidden: PB.setdefault(k, {})[m] = HPB[k].pop(m); moved += 1
+fell = 0   # FALLBACK: such a cell shows the other candidate's run, so it takes that run's entry (none where it beat no metric)
+for (c, k), src in FALLBACK.items():
+    if c not in MODEL or c in HIDDEN: continue
+    e = HPB.get(k, {}).get(MODEL[src][0]) or PB.get(k, {}).get(MODEL[src][0])
+    if e: PB.setdefault(k, {})[MODEL[c][0]] = dict(e)
+    else: PB.get(k, {}).pop(MODEL[c][0], None)
+    fell += 1
 for t in (PB, HPB):
     for k in [k for k, v in t.items() if not v]: del t[k]
 HJ['models'] = {MODEL[c][0]: MODEL[c][1] for c in MODEL if c in HIDDEN}
@@ -66,6 +75,7 @@ for task in sorted({r['task'] for r in new['runs'] if r['record_id'] in changed}
     labels = set().union(*[set(v) for v in list(PB.get(k, {}).values()) + list(HPB.get(k, {}).values())])
     for r in new['runs']:
         if r['task'] != task or r['record_id'] in changed or r['verdict'] != 'PASS': continue
+        if (mid(r), k) in {(MODEL[c][0], kk) for c, kk in FALLBACK if c in MODEL}: continue   # the cell shows another run
         cur = table(r).get(k, {}).get(mid(r), {})
         add = sorted(labels - set(cur))
         if add:
@@ -74,4 +84,4 @@ for task in sorted({r['task'] for r in new['runs'] if r['record_id'] in changed}
             table(r).setdefault(k, {})[mid(r)] = cur; imputed.append((r['record_id'], add))
 path.write_text(js[:js.index('const PASSBY = ')] + 'const PASSBY = ' + json.dumps(PB, separators=(',', ':')) + ';\n')
 (ROOT / '_data/fcs2_checks_hidden.json').write_text(json.dumps(HJ, ensure_ascii=False, indent=1) + '\n')   # as bin/fcs2_checks_from_platform.py writes it
-print(f'{len(changed)} changed records: PASSBY entries set {n_set}, removed {n_del}; moved between shown and hidden {moved}; added metrics counted as beaten for kept PASS records: {imputed}')
+print(f'{len(changed)} changed records: PASSBY entries set {n_set}, removed {n_del}; moved between shown and hidden {moved}; FALLBACK cells given the other run\'s entry {fell}; added metrics counted as beaten for kept PASS records: {imputed}')

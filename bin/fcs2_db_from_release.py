@@ -23,6 +23,9 @@ that replaced a record, or a record rescored in place). One JSON row per run: ru
 scale has its development scores converted too, as dev_rescored says) and source (how the spend was found). Such a run takes its spend and
 development scores from the row, not from TRAJ; every other run must still equal TRAJ. The snapshot is then dated by the
 release's generated_at, not by REV.
+A cell in FALLBACK (bin/fcs2_runs_from_db.py) holds the other candidate's run on that task instead of its own; that run's
+spend comes from --spend too, as its candidate may be off the site (Gemini 4 Neon on Pi's runs shown for Gemini 4 Neon on
+Antigravity), and the replaced run's spend row is not read.
 Development submissions get placeholder ids (train-<n>), as nothing reads them. Add the candidates of a newer platform
 with bin/fcs2_db_add_snapshot.py.
 """
@@ -31,11 +34,11 @@ from datetime import datetime, timezone
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 lit = {}
-for f, names in (('fcs2_db_from_platform.py', ('SCORE', 'REFERENCE', 'ZERO', 'COMPLETED', 'WHY')), ('fcs2_runs_from_db.py', ('TASK', 'MODEL'))):
+for f, names in (('fcs2_db_from_platform.py', ('SCORE', 'REFERENCE', 'ZERO', 'COMPLETED', 'WHY')), ('fcs2_runs_from_db.py', ('TASK', 'MODEL', 'FALLBACK'))):
     for n in ast.parse((ROOT / 'bin' / f).read_text()).body:   # the first, literal assignment of each
         for t in getattr(n, 'targets', []):
             if isinstance(t, ast.Name) and t.id in names and t.id not in lit: lit[t.id] = ast.literal_eval(n.value)
-SCORE, REFERENCE, ZERO, COMPLETED, WHY, TASK, MODEL = (lit[k] for k in ('SCORE', 'REFERENCE', 'ZERO', 'COMPLETED', 'WHY', 'TASK', 'MODEL'))
+SCORE, REFERENCE, ZERO, COMPLETED, WHY, TASK, MODEL, FALLBACK = (lit[k] for k in ('SCORE', 'REFERENCE', 'ZERO', 'COMPLETED', 'WHY', 'TASK', 'MODEL', 'FALLBACK'))
 short = lambda t: TASK[t][1] or t.split(' — ')[0]
 BY_SHORT = {}
 for t in TASK: BY_SHORT.setdefault(short(t), []).append(t)
@@ -93,8 +96,16 @@ cands = [candidate(m | {'model_id': m['model_id']}) for m in rel['models']]   # 
 for n, c in enumerate(cands): db.execute('insert into candidates values (?,?,?)', (c, c, n))
 for n, (tid, name) in enumerate(sorted(set(tasks.values()), key=lambda kv: kv[1])): db.execute('insert into tasks values (?,?,?)', (tid, name, n))
 used = set()
+# FALLBACK (bin/fcs2_runs_from_db.py): such a cell holds the other candidate's run on the task, which its own record adds
+# (with its spend from --spend, as its candidate may be off the site); the replaced run enters nothing, and its spend row is not read
+fallback_run = {(c, k): next(x['run_id'] for x in rel['runs'] if candidate(x) == src and short(tasks[x['task']][1]) == k) for (c, k), src in FALLBACK.items() if c in cands}
 for r in sorted(rel['runs'], key=lambda r: (cands.index(candidate(r)), tasks[r['task']][1])):
     c, (tid, tname), rid = candidate(r), tasks[r['task']], r['run_id']
+    if (c, short(tname)) in fallback_run:
+        db.execute('insert into cells values (?,?,?)', (fallback_run[(c, short(tname))], c, tid))
+        SPEND.pop(rid, None)
+        if (MODEL[c][0], short(tname)) in traj: used.add((MODEL[c][0], short(tname)))
+        continue
     zero = r['score'] is None and (r['platform_state'] == 'TIMED_OUT' or rid in ZERO)
     score = SCORE.get(rid, 0.0 if zero else r['score'])
     fb = {'reference_score': REFERENCE.get(rid, OWN_REFERENCE.get(rid, r['reference_score'])), 'checks': [{'label': k['label']} for k in r.get('checks') or []]}
