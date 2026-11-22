@@ -327,7 +327,8 @@ function solutionHTML(t, runs) {
    The patch each model handed in, from assets/patches/<slug>.json (bin/fcs2_patches_from_platform.py), fetched when the
    task is opened, folded under the solution in words (Qiuyang, 2026-10-14: the patch stays on the page, folded). A
    task with no words gets a Solution section of its own, the model line and the folded patch. One chip per model when
-   the file holds more than one; for now it holds Claude Opus 5.5 alone. A task with no file (Security) shows neither. */
+   the file holds more than one, with its verdict and final score: Claude Opus 5.5's and GPT-6.2 Astra's (owner,
+   2026-11-22). A task with no file (Security) shows neither. */
 const PATCHES = {};
 function loadPatches(t) {
   const s = slug(t.s), show = d => { if (cur && cur.t === t) drawPatches(d); };
@@ -358,7 +359,7 @@ function drawPatches(d) {
   sec.querySelector('.pfold').addEventListener('toggle', () => patchEnd());
   if (!one) $('#pchips').innerHTML = ms.map(m => { const p = d.runs[m.id];
     return `<button type="button" class="pchip" data-m="${m.id}" aria-pressed="false"><i style="background:${MCOL[m.id]}"></i><span>${esc(m.name)}</span>`
-      + `<span class="pv ${passed(m) ? 'y' : 'n'}">${passed(m) ? 'Pass' : 'Fail'}</span>`
+      + `<span class="pv ${passed(m) ? 'y' : 'n'}">${passed(m) ? 'Pass' : 'Fail'}</span>` + (p.score != null ? `<span class="ps">${f1(p.score)}</span>` : '')
       + (has(m) ? `<span class="pd"><b class="a">+${p.add}</b> <b class="d">−${p.del}</b></span>` : '<span class="pd">no solution</span>') + '</button>'; }).join('');
   const pick = id => {
     const m = ms.find(x => x.id === id), p = d.runs[id];

@@ -16,6 +16,16 @@ def parse(ev):
     m = d.get('metrics') or {}
     passes = {p['workload']: p.get('metrics', {}) for p in m.get('beat_spec_workload_passes') or []}
     rows = []
+    if not d.get('paired_workload_metrics') and passes:
+        # a Pumpkin record keeps no paired block: the run's mean from metrics.<metric> (the same values, sorted) as a '*'
+        # row, no reference in the run (the targets are pinned), and each workload's beat flag without a value
+        for k in METRICS:
+            vs = [_f(v) for v in m.get(k) or [] if v is not None]
+            if len(vs) == len(passes):
+                rows.append(dict(metric=k, workload='*', value=sum(vs) / len(vs), reference_value=None) | ({'unit': UNITS[k]} if k in UNITS else {}))
+            for name, f in passes.items():
+                if k in f: rows.append(dict(metric=k, workload=name, value=None, reference_value=None, beat=bool(f[k])) | ({'unit': UNITS[k]} if k in UNITS else {}))
+        return rows
     for w in d.get('paired_workload_metrics') or []:
         name = w.get('workload'); c = w.get('candidate') or {}; r = w.get('reference') or {}
         for k in METRICS:

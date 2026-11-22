@@ -208,6 +208,10 @@ MODEL = {
     # qwen4-max (xhigh effort) on Claude Code through DashScope's Anthropic-compatible API, run on Pumpkin (2026-11-17/18). Its runs'
     # US$ is the agent's total tokens at Qwen 3.8 Max's cache-read price, as Qwen 3.8 Max's.
     'Claude Code · Qwen 4 Max (xhigh effort)': ('qwen4-max', 'Qwen4-max', 'Qwen4-max', 'Claude Code', 'Qwen'),
+    # gpt-6.2-sol / gpt-6.2-astra (xhigh effort) on the Codex CLI 0.170.0, run on Pumpkin (2026-11-20). Its runs' US$ is the
+    # agent's total tokens at GPT-6.1 Sol's / GPT-6 Astra's cache-read price, as theirs.
+    'GPT-6.2 Sol': ('sol62', 'GPT-6.2 Sol', 'GPT-6.2 Sol', 'Codex CLI', 'OpenAI'),
+    'GPT-6.2 Astra': ('astra62', 'GPT-6.2 Astra', 'GPT-6.2 Astra', 'Codex CLI', 'OpenAI'),
     # minimax-m3.1-flash through OpenRouter on Claude Code; formal evaluation eval_01M6CMMG3YG91H7GKTD3KXFCQ4 (2026-11-01). Its
     # runs' US$ is the gateway's spend log for the model's requests.
     'Claude Code · MiniMax-M3.1-Flash': ('minimax', 'MiniMax-M3.1-Flash', 'MiniMax-M3.1-Flash', 'Claude Code', 'MiniMax'),

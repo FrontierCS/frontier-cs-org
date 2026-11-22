@@ -7,7 +7,8 @@ usage: python3 -I bin/fcs2_metric_values_from_evidence.py RELEASE_DIR OUT_DIR [-
 
 RELEASE_DIR has the layout of the public dataset FrontierCS2/FrontierCS-2-runs: metadata/formal-results.json (one run
 per task and model) and traces/<slug>/<model>/evidence.tar.zst. Of each archive only the final verifier evidence is
-read (member verifier/evidence.tar, the platform's GET /api/v1/runs/<id>/submission/evidence?submission_id=final);
+read (member verifier/evidence.tar, the platform's GET /api/v1/runs/<id>/submission/evidence?submission_id=final; in a
+Pumpkin record, the evidence of the job its log starts as the final call, jobs/<n>/out/evidence/evidence.tar.zst);
 where the run's own final has no numbers (an infrastructure or evaluator failure) and
 traces/<slug>/<model>/selected-final-rejudge/evidence.tar.zst exists, the rejudge's verifier evidence stands in (KV
 Compaction Opus, Polygon Gemini). A record whose result is the rejudge's (result_source: "independently re-evaluated
@@ -64,8 +65,31 @@ MAX_MEMBER = 64 << 20    # a file inside the verifier evidence
 MAX_ARCHIVE = 1 << 30    # the verifier evidence tar itself (vLLM's is a few hundred MB)
 
 
+def _stream(path):
+    src = open(path, 'rb')   # through stdin: zstd skips a path that is a symlink
+    p = subprocess.Popen(['zstd', '-dcq'], stdin=src, stdout=subprocess.PIPE)
+    return src, p, tarfile.open(fileobj=p.stdout, mode='r|')
+
+
+def final_job(path):
+    """The job of a Pumpkin record (no verifier/ member; jobs/<n>/out/evidence/evidence.tar.zst per verification) that
+    ran its final verification: the job its log.jsonl starts with a start_final_call action; None if there is none."""
+    src, p, tf = _stream(path)
+    job = None
+    with tf:
+        for m in tf:
+            if m.name != 'log.jsonl' or not m.isfile(): continue
+            for line in tf.extractfile(m):
+                if b'start_final_call' not in line: continue
+                for a in json.loads(line).get('actions') or []:
+                    if a.get('kind') == 'start_final_call': job = a.get('job')
+    p.wait(); src.close()
+    return job
+
+
 def members(path):
-    """{member path: text} of the archive's final verifier evidence; nested tars as 'outer!/inner'."""
+    """{member path: text} of the archive's final verifier evidence; nested tars as 'outer!/inner'. A Pumpkin record's
+    final job's evidence (jobs/<n>/out/evidence/evidence.tar.zst) is read as the platform's verifier/evidence.tar."""
     out = {}
     def walk(tf, prefix, depth):
         for m in tf:
@@ -79,11 +103,15 @@ def members(path):
                 continue
             try: out[name] = data.decode()
             except UnicodeDecodeError: pass
-    src = open(path, 'rb')   # through stdin: zstd skips a path that is a symlink
-    p = subprocess.Popen(['zstd', '-dcq'], stdin=src, stdout=subprocess.PIPE)
-    with tarfile.open(fileobj=p.stdout, mode='r|') as tf:
+    src, p, tf = _stream(path)
+    pumpkin = None
+    with tf:
         for m in tf:
-            if not m.isfile() or not m.name.startswith('verifier/') or m.size > MAX_ARCHIVE: continue
+            if not m.isfile() or m.size > MAX_ARCHIVE: continue
+            if m.name.startswith('jobs/') and m.name.endswith('/out/evidence/evidence.tar.zst'):
+                pumpkin = pumpkin or {}; pumpkin[m.name] = None
+                continue
+            if not m.name.startswith('verifier/'): continue
             data = tf.extractfile(m).read()
             if m.name.endswith('.tar'):
                 with tarfile.open(fileobj=io.BytesIO(data)) as t2: walk(t2, m.name + '!/', 1)
@@ -91,6 +119,19 @@ def members(path):
                 try: out[m.name] = data.decode()
                 except UnicodeDecodeError: pass
     p.wait(); src.close()
+    if out or not pumpkin: return out
+    job = final_job(path)
+    if job is None: return out
+    want = f'jobs/{job}/out/evidence/evidence.tar.zst'
+    if want not in pumpkin: return out
+    src, p, tf = _stream(path)
+    with tf:
+        for m in tf:
+            if m.name == want and m.isfile():
+                data = subprocess.run(['zstd', '-dcq'], input=tf.extractfile(m).read(), capture_output=True).stdout
+                with tarfile.open(fileobj=io.BytesIO(data)) as t2: walk(t2, 'verifier/evidence.tar!/', 1)
+                break
+    p.stdout.close(); p.wait(); src.close()   # closed first: zstd may still be writing the rest
     return out
 
 

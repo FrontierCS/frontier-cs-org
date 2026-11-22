@@ -11,13 +11,15 @@ is the submission the platform judged (the run's default submission): its eviden
 (payloads/<id>/payload.tar), whose payload/solution.patch is kept. Security tasks are left out. A patch longer than CAP
 bytes is cut there and marked; its line counts are of the whole patch.
 Only Claude Opus 5.5 by default (owner, 2026-10-14): task versions still change and other models' runs on a task may be of
-earlier versions, so the site shows one model's patches until the runs settle; --models= takes model ids, or all.
+earlier versions, so the site shows one model's patches until the runs settle; --models= takes model ids, or all. The task
+pages show Claude Opus 5.5's and GPT-6.2 Astra's (owner, 2026-11-22); GPT-6.2 Astra's come from the release.
 --export=DIR reads one run's final submission that Codex exported from the platform instead (Qiuyang, 2026-10-17: patches
 go through Codex): DIR/solution.patch, DIR/run-before.json and DIR/default-submission.json. It writes FILE in the same
 format, one run, for a page outside the task pages (a case study).
 --release=DIR takes the patches from the public release (the Hugging Face dataset FrontierCS2/FrontierCS-2-runs) instead,
 for runs no platform holds any more (since 2026-10-24): DIR/metadata/formal-results.json and DIR/patches/<task>/<model>.patch;
-each patch is checked against the run table's patch_sha256. --tasks= limits it to some release task slugs. Added
+each patch is checked against the run table's patch_sha256. It replaces only the given models' runs in a task's file.
+--tasks= limits it to some release task slugs. Added
 2026-10-26 for the three tasks whose Opus patches were never exported (KV Compaction, LRR, Progent); it reproduces the
 existing CREST file's patch byte for byte.
 """
@@ -107,15 +109,21 @@ if RELEASE:
         key_of[t['task']] = t['site_task_name'] or alias[t['task']]
     stamp = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%MZ'); by = {}
     for r in res['runs']:
-        if r['model_id'] not in WANT.split(',') and WANT != 'all' or (only and r['task'] not in only) or not r.get('patch_path'): continue
+        if r['model_id'] not in WANT.split(',') and WANT != 'all' or (only and r['task'] not in only): continue
+        if not r.get('patch_path'):   # no final patch: the page says so
+            by.setdefault(key_of[r['task']], {})[r['model_id']] = {'run': r['run_id'], 'verdict': r.get('verdict'), 'score': r.get('score'),
+                                                                   'missing': r.get('patch_missing_reason') or 'no final submission'}
+            continue
         raw = (rel / r['patch_path']).read_bytes()
         assert 'sha256:' + hashlib.sha256(raw).hexdigest() == r['patch_sha256'], f"{r['patch_path']}: sha256 differs from the run table"
         rec = record({'run': r['run_id'], 'verdict': r.get('verdict'), 'score': r.get('score')}, 'Final submission', raw.decode('utf-8', 'replace'))
         by.setdefault(key_of[r['task']], {})[r['model_id']] = rec
     OUT.mkdir(parents=True, exist_ok=True)
-    for key, runs in by.items():
-        (OUT / f'{slug(key)}.json').write_text(json.dumps({'task': key, 'generated_at': stamp, 'runs': runs}, ensure_ascii=False, separators=(',', ':')))
-        print(f'{OUT / (slug(key) + ".json")}: {", ".join(runs)}')
+    for key, runs in by.items():   # the other models' runs a task's file holds stay as they are
+        f = OUT / f'{slug(key)}.json'
+        kept = {m: x for m, x in json.loads(f.read_text())['runs'].items() if m not in runs} if f.exists() else {}
+        f.write_text(json.dumps({'task': key, 'generated_at': stamp, 'runs': kept | runs}, ensure_ascii=False, separators=(',', ':')))
+        print(f'{f}: {", ".join(runs)}' + (f' (kept {", ".join(kept)})' if kept else ''))
     sys.exit()
 
 evs = {}
