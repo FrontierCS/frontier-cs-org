@@ -99,6 +99,11 @@ Cost is the model's own (owner, 2026-11-22). On the Antigravity CLI each command
 tool call and again with the whole trajectory, to the same model for a safety rating; the run pays for those requests too.
 That review's US$ (bin/fcs2_review_spend.jsonl) is taken out of every cost the site shows (COST, the test-time scaling
 budgets, the task pages) and shown apart (REVIEW_COST, TRAJ's last column). TRAJ's US$ stay the run's whole spend.
+
+A cell in FALLBACK shows another candidate's run of the same model (owner, 2026-11-22: Gemini 4 Neon on Antigravity takes
+Gemini 4 Neon on Pi's run on the 22 tasks where its harness cut the run short). The database already holds that run in the
+cell (bin/fcs2_db_from_release.py), so every number here (RUNS, PASS, the held-out FCI, COST, TRAJ, STATE) is that run's; it
+has no safety review. The pages mark the cell (FALLBACK in fcs2-data.js).
 """
 import json, re, sqlite3, sys
 from collections import Counter, defaultdict
@@ -265,6 +270,38 @@ for a in sys.argv[2:]:   # optional: --low='Model name=value' to try another fix
 # shown on the site, out of every fit and scored against it (see the docstring): Gemini 4 Neon on Antigravity (owner, 2026-11-22:
 # 「主页上只保留agy的neon」, 「pi的neon是参与拟合但不显示」)
 OUT_OF_FIT = {'Antigravity · Gemini 4 Neon'}
+
+# A run shown in place of a model's own on a task: (candidate, task short name) -> the candidate whose run on that task is
+# shown instead (owner, 2026-11-22: 「去把受影响的回退pi的结果不用重测」, then 「B」). Gemini 4 Neon on Antigravity takes Gemini 4
+# Neon on Pi's run on the 22 tasks where its harness cut the run short: on Hygra and Persistent Treap Update Engine the agent
+# waited on a hung background command until the time limit and handed in no final; on the other 20 the run reached the
+# 5-hour limit, about an hour of which went to the CLI's safety review. bin/fcs2_db_from_release.py puts the other run in
+# the cell, bin/fcs2_checks_from_release.py and bin/fcs2_metric_means.py give the cell that run's checks and metrics, and the
+# task pages mark it (FALLBACK in assets/js/fcs2-data.js); the replaced runs enter nothing. Literal: the other scripts read it.
+FALLBACK = {
+    ('Antigravity · Gemini 4 Neon', 'Hygra'): 'pi · Gemini 4 Neon',                                         # hung command, no final
+    ('Antigravity · Gemini 4 Neon', 'Persistent Treap Update Engine'): 'pi · Gemini 4 Neon',                # hung command, no final
+    ('Antigravity · Gemini 4 Neon', 'Approximate-MIPS Query Stopping'): 'pi · Gemini 4 Neon',               # the 5-hour limit, as the rest
+    ('Antigravity · Gemini 4 Neon', 'Binary Fuse Filter Construction and Lookup'): 'pi · Gemini 4 Neon',
+    ('Antigravity · Gemini 4 Neon', 'CREST'): 'pi · Gemini 4 Neon',
+    ('Antigravity · Gemini 4 Neon', 'Diffusion Policy'): 'pi · Gemini 4 Neon',
+    ('Antigravity · Gemini 4 Neon', 'Exact Sequence Alignment'): 'pi · Gemini 4 Neon',
+    ('Antigravity · Gemini 4 Neon', 'FARGO paper-aligned query core'): 'pi · Gemini 4 Neon',
+    ('Antigravity · Gemini 4 Neon', 'KV Compaction'): 'pi · Gemini 4 Neon',
+    ('Antigravity · Gemini 4 Neon', 'LRR'): 'pi · Gemini 4 Neon',
+    ('Antigravity · Gemini 4 Neon', 'LeJEPA'): 'pi · Gemini 4 Neon',
+    ('Antigravity · Gemini 4 Neon', 'ParButterfly'): 'pi · Gemini 4 Neon',
+    ('Antigravity · Gemini 4 Neon', 'Parallel DBSCAN'): 'pi · Gemini 4 Neon',
+    ('Antigravity · Gemini 4 Neon', 'QuarterPIR'): 'pi · Gemini 4 Neon',
+    ('Antigravity · Gemini 4 Neon', 'RUNLTS'): 'pi · Gemini 4 Neon',
+    ('Antigravity · Gemini 4 Neon', 'SCOPE'): 'pi · Gemini 4 Neon',
+    ('Antigravity · Gemini 4 Neon', 'SVG-EAR'): 'pi · Gemini 4 Neon',
+    ('Antigravity · Gemini 4 Neon', 'Spectrum'): 'pi · Gemini 4 Neon',
+    ('Antigravity · Gemini 4 Neon', 'Structured LWE'): 'pi · Gemini 4 Neon',
+    ('Antigravity · Gemini 4 Neon', 'Yannakakis'): 'pi · Gemini 4 Neon',
+    ('Antigravity · Gemini 4 Neon', 'egg'): 'pi · Gemini 4 Neon',
+    ('Antigravity · Gemini 4 Neon', 'knn kernel'): 'pi · Gemini 4 Neon',
+}
 
 LAM = 0.35                       # the strengths' prior is N(0, 1/LAM), the penalty of the site's in-browser TDIFF
 BOOT = 500
@@ -747,10 +784,11 @@ def cost(db):
     a safety review, [mean review US$ per scored run, runs]; a run's tokens are its last cumulative values."""
     end = {r: (t, o) for r, t, o in db.execute('select run_id, max(total_tokens), max(output_tokens) from score_points group by run_id')}
     by, rv, harness = defaultdict(list), defaultdict(list), {}
-    for r, c, s in db.execute('''select r.id, cd.name, r.display_score from cells ce join runs r on r.id = ce.run_id
-        join candidates cd on cd.id = ce.candidate_id'''):
+    for r, c, s, t in db.execute('''select r.id, cd.name, r.display_score, t.name from cells ce join runs r on r.id = ce.run_id
+        join candidates cd on cd.id = ce.candidate_id join tasks t on t.id = ce.task_id'''):
         if s is not None and c not in HIDDEN and end.get(r) and end[r][0]:
             u, m = usd(MODEL[c][0], *end[r]), MODEL[c][0]
+            if (c, short(t)) in FALLBACK: by[m].append(u); rv[m].append(0.0); continue   # another harness's run: no safety review
             assert r in REVIEW or MODEL[c][3] != 'Antigravity', f'{r} ({m}): an Antigravity run without its review in bin/fcs2_review_spend.jsonl'
             assert REVIEW.get(r, 0) <= u + 1e-4, f'{r} ({m}): review US${REVIEW[r]} above the run\'s US${u}'
             by[m].append(u - REVIEW.get(r, 0)); rv[m].append(REVIEW.get(r, 0)); harness[r] = MODEL[c][3]
@@ -876,8 +914,8 @@ assert len({short(t) for t in {r[1] for r in rows}}) == len({r[1] for r in rows}
 def task_reference(db):
     """Per task short name: the authors' reference score (median reference_score over its runs; where that is 0 or
     less, REF_DEFAULT's value, else left out)."""
-    ref = defaultdict(list)
-    for t, fj in db.execute('select t.name, r.feedback_json from cells ce join runs r on r.id = ce.run_id join tasks t on t.id = ce.task_id'):
+    ref = defaultdict(list)   # each run once: a FALLBACK cell shares its run with the other candidate's cell
+    for _, t, fj in db.execute('select distinct r.id, t.name, r.feedback_json from cells ce join runs r on r.id = ce.run_id join tasks t on t.id = ce.task_id'):
         f = json.loads(fj) if fj else {}
         if f.get('reference_score') is not None: ref[short(t)].append(f['reference_score'])
     out = {t: round(float(np.median(v)), 1) for t, v in ref.items() if np.median(v) > 0}
@@ -981,6 +1019,9 @@ TFIT, DIFF, METRIC, MGROUPS, DIFF_FIT = task_fits(MT, dfit, theta0, UNIT0, HROWS
 GROUPS = {short(t): sorted((round(float(v), DEC + 1) for v in on_scale(T['x'][:T['k']], theta0)), reverse=True) for t, T in sorted(MT.items(), key=lambda kv: short(kv[0]))}
 PROG = {short(t): [round(float(on_scale(g, theta0)), DEC), round(k / PASS_UNIT, 4), round(f, 3)] for t, (g, k, f) in sorted(progress(MT, THETA, dfit).items(), key=lambda kv: short(kv[0]))}
 SC, (CO, RV) = scaling(db, MT, dfit, theta0), cost(db)
+FB_JS = {}   # FALLBACK for the pages: task short name -> {model id: the harness whose run is shown}
+for (c, k), src in sorted(FALLBACK.items(), key=lambda kv: kv[0][1]):
+    if c in MODEL and c not in HIDDEN: FB_JS.setdefault(k, {})[MODEL[c][0]] = MODEL[src][3]
 REF = task_reference(db)
 CHECKS = task_checks(db)
 STATE, STATE_WHY = run_states(db)
@@ -1009,6 +1050,7 @@ block = (f'// One entry per scored run in the preview results database of {when:
          f"// Test-time scaling per model: [US$ budget per run, FCI, 90% low, 90% high, share of runs still going]; at a budget a run that has ended counts its metric groups and its margin (at most level if it did not pass); a run still going counts as timed out at the budget (no group, final score 0), so a curve never falls; task parameters held at the FCI fit (see the converter's docstring).\nconst SCALE = {json.dumps(SC, separators=(',', ':'))};\n"
          f"// Cost per model: [mean US$ per scored run, runs]; output tokens x output price + every token x cache-read price (PRICE above). The model's own: an Antigravity run's safety review is left out.\nconst COST = {json.dumps(CO)};\nconst PRICE = {json.dumps(PRICE)};\n"
          f"// Per Antigravity model: [mean US$ per scored run of the agy CLI's safety review, runs]; before each command or file edit it sends the pending call, and in a second request the whole trajectory, to the same model (bin/fcs2_review_spend.jsonl).\nconst REVIEW_COST = {json.dumps(RV)};\n"
+         f"// Per task and model: the harness whose run of the same model the cell shows instead of the model's own (FALLBACK in bin/fcs2_runs_from_db.py); the task pages mark it.\nconst FALLBACK = {json.dumps(FB_JS, ensure_ascii=False)};\n"
          f"// Every scored run: [model, task, final score, passed, US$ at end, hours, [[US$, dev score] per development submission]], and a run with a safety review its review US$ last; the US$ include it.\nconst TRAJ = {json.dumps(trajectories(db), separators=(',', ':'), ensure_ascii=False)};\n"
          f"// Per task: the authors' reference score, the median over the task's runs; where the database has none, the converter's REF_DEFAULT (" + ', '.join(f'{k}: {v:g}' for k, v in REF_DEFAULT.items()) + f"), else the task is left out.\nconst REF = {json.dumps(REF, ensure_ascii=False)};\n"
          f"// Per task: its metric groups' difficulties [beta_g, ...], highest first, on the FCI scale. A run passes when it beats every group, so the pass curve is P(pass | FCI) = integral of prod_g 1 / (1 + exp(-((FCI - beta_g) / ECI_UNIT + u))) N(u; 0, (sigma_u / ECI_UNIT)^2) du, sigma_u from DIFF_FIT (48-node Gauss-Hermite); it is 1/2 at the task's FDI.\nconst GROUPS = {json.dumps(GROUPS, ensure_ascii=False)};\n"
@@ -1041,7 +1083,7 @@ for a in sys.argv[2:]:
         S, nboot, nbad, pinned, curves = eci_score(fit_rows)   # the raw-score fit, kept for the paper only
         out = {'source': sys.argv[1], 'generated_at': generated, 'runs_columns': ['model', 'domain', 'task', 'score', 'passed'], 'runs': runs,
                'models': [dict(zip(['id', 'name', 'short', 'harness', 'lab'], m)) for m in models], 'dropped': dict(dropped),
-               'pass': pass_rate(runs), 'cost_usd': CO, 'review_cost_usd': RV, 'price_per_mtok': PRICE, 'eci': eci_js, 'eci_unit': PASS_UNIT,
+               'pass': pass_rate(runs), 'cost_usd': CO, 'review_cost_usd': RV, 'fallback': FB_JS, 'price_per_mtok': PRICE, 'eci': eci_js, 'eci_unit': PASS_UNIT,
                'eci_low': [PASS_ZERO, PASS_ZERO_VALUE], 'eci_penalty': LAM, 'eci_boot': BOOT, 'eci_boot_skipped': nskip,
                'scaling_columns': ['usd', 'eci', 'lo90', 'hi90', 'share_running'], 'scaling': SC,
                'task_reference': REF, 'task_fit_columns': ['difficulty', 'slope'], 'task_fit': TFIT,

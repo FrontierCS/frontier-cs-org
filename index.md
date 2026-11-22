@@ -60,6 +60,7 @@ og_image: assets/img/fcs2-card.png   # share card for X and other link previews,
     <p>Gemini 4 Argon (Antigravity): refused requests are retried. In Structured LWE the retries ran out and the run ended, and in CREST refused context summaries were kept cut short.</p>
     <p>Claude Opus 5.5 (Claude Code): in Progent, a refusal switched the rest of the run to Claude Opus 4.8.</p>
     <p>Claude Fable 5.1 (Claude Code): in MuJoCo Playground, a refusal switched the rest of the run to Claude Opus 4.8.</p>
+    <p>Gemini 4 Neon (Antigravity): on 22 tasks the harness cut the run short. On 2 the agent waited for a hung background command until the time limit; on 20 the run reached the 5-hour limit, about an hour of which went to the CLI’s safety review. On those tasks the site shows Gemini 4 Neon’s run on Pi.</p>
   </details>
   <figure class="chart" style="margin:56px 0 0">   <!-- the gap of the blocks around it, so it does not run into the bars' footer (owner, 2026-10-16) -->
     <div class="chead"><span>Pass rate (beat reference)</span></div>

@@ -111,8 +111,8 @@ def nnls3(X, y):
 lit = {}
 for node in ast.parse(open(os.path.join(ROOT, 'bin/fcs2_runs_from_db.py')).read()).body:   # the first, literal assignment of each
     for t in getattr(node, 'targets', []):
-        if isinstance(t, ast.Name) and t.id in ('TASK', 'MODEL') and t.id not in lit: lit[t.id] = ast.literal_eval(node.value)
-TASK, MODEL = lit['TASK'], lit['MODEL']
+        if isinstance(t, ast.Name) and t.id in ('TASK', 'MODEL', 'FALLBACK') and t.id not in lit: lit[t.id] = ast.literal_eval(node.value)
+TASK, MODEL, FALLBACK = lit['TASK'], lit['MODEL'], lit['FALLBACK']
 short = lambda t: TASK[t][1] or t.split(' — ')[0]
 BY_SHORT = collections.defaultdict(list)
 for t in TASK: BY_SHORT[short(t)].append(t)
@@ -121,14 +121,21 @@ rel = json.load(open(os.path.join(REL, 'metadata/formal-results.json')))
 key = {t['task']: short(t['display_name']) if t['display_name'] in TASK else short(BY_SHORT[t['site_task_name'] or alias[t['task']]][0]) for t in rel['tasks']}
 agy = {v[0] for v in MODEL.values() if v[3] == 'Antigravity'}
 TRAJ = {(r[0], r[1]): r for r in json.loads(re.search(r'^const TRAJ = (.*);$', open(os.path.join(ROOT, 'assets/js/fcs2-data.js')).read(), re.M).group(1))}
-todo = [r for r in rel['runs'] if RELEASE_ID.get(r['model_id'], r['model_id']) in agy and (RELEASE_ID.get(r['model_id'], r['model_id']), key[r['task']]) in TRAJ]
+# A cell in FALLBACK (bin/fcs2_runs_from_db.py) shows another harness's run, so it has no review and gets no row; its own
+# Antigravity run still counts toward the model's calibration and price fit, with its US$ from bin/fcs2_release_spend.jsonl
+fb = {(MODEL[c][0], k) for c, k in FALLBACK if c in MODEL}
+SPENT = {x['run_id']: round(x['usd'], 4) for x in map(json.loads, open(os.path.join(ROOT, 'bin/fcs2_release_spend.jsonl'))) if x}   # to TRAJ's 4 decimals
+sid = lambda r: RELEASE_ID.get(r['model_id'], r['model_id'])
+todo = [r for r in rel['runs'] if sid(r) in agy and (sid(r), key[r['task']]) in TRAJ]
 if CACHE: os.makedirs(CACHE, exist_ok=True)
 jobs = [(os.path.join(REL, 'traces', r['task'], r['model_id'], 'evidence.tar.zst'), CACHE and os.path.join(CACHE, f"{r['task']}.{r['model_id']}.json")) for r in todo]
 with ProcessPoolExecutor(JOBS) as ex: ROWS = list(ex.map(cached_rows, jobs))
 runs = collections.defaultdict(list)
 for r, rows in zip(todo, ROWS):
     target = collections.Counter(x[2] for x in rows if x[1] == 'agent').most_common(1)[0][0]
-    runs[r['model_id']].append(dict(run_id=r['run_id'], task=r['task'], U=TRAJ[(RELEASE_ID.get(r['model_id'], r['model_id']), key[r['task']])][4], rows=rows, target=target))
+    shown = (sid(r), key[r['task']]) not in fb
+    runs[r['model_id']].append(dict(run_id=r['run_id'], task=r['task'], U=TRAJ[(sid(r), key[r['task']])][4] if shown else SPENT.get(r['run_id'], 0),
+                                    rows=rows, target=target, shown=shown))
 
 cal = {}   # per model and kind, from the requests with usage: tokens per request byte, cached share, mean output
 for m, R in runs.items():
@@ -165,12 +172,13 @@ for m in sorted(runs):
     price = nnls3(X, y)
     r2 = 1 - ((X @ price - y) ** 2).sum() / ((y - y.mean()) ** 2).sum()
     for run in R:
+        if not run['shown']: continue
         T = float(run['A'] @ price) + run['other']
         share = float(run['Rv'] @ price) / T if T > 0 else 0.0
         out.append(dict(run_id=run['run_id'], record=f"{run['task']}/{m}", usd=round(run['U'], 4), review_usd=round(run['U'] * share, 4),
                         review_requests=sum(1 for x in run['rows'] if x[1].startswith('review')), requests=len(run['rows']), estimated_requests=run['est']))
     mine = [x for x in out if x['record'].endswith('/' + m)]
-    print(f"{m}: {len(R)} runs; US$ per million tokens: uncached {price[0]:.3f}, cached {price[1]:.3f}, output {price[2]:.3f} (R2 {r2:.4f}); "
+    print(f"{m}: {len(R)} runs fitted, {len(mine)} shown; US$ per million tokens: uncached {price[0]:.3f}, cached {price[1]:.3f}, output {price[2]:.3f} (R2 {r2:.4f}); "
           f"US$ per run: {np.mean([x['usd'] for x in mine]):.2f}, of which review {np.mean([x['review_usd'] for x in mine]):.2f} "
           f"({sum(x['review_usd'] for x in mine) / sum(x['usd'] for x in mine):.1%}); requests counted from their size: {sum(x['estimated_requests'] for x in mine)} of {sum(x['requests'] for x in mine)}")
 with open(os.path.join(ROOT, 'bin/fcs2_review_spend.jsonl'), 'w') as f:

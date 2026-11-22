@@ -482,7 +482,7 @@ function drawKebab(ts) {
       const run = RUNS.find(r => r.t === t && r.m === m.id), s = (st[t] || {})[m.id];
       if (!run && !s) return '<td></td>';
       const k = stems.filter(j => won(m.id, j)).length, n = stems.length;
-      let html = `<b>${esc(m.name)}</b><br>${esc(NAME(t))}<br>`;
+      let html = `<b>${esc(m.name)}</b><br>${esc(NAME(t))}<br>` + (fallbackOf(t, m.id) ? `${esc(fallbackTip(t, m.id))}<br>` : '');
       // a failed run shows the platform's final score, 0 for most but not all (Qiuyang, 2026-10-16)
       if (s) { const w = (why[t] || {})[m.id]; used.add(s);
         html += KSTATE[s][2] + (w ? `<br>${esc(w)}` : '') + (s === 'failed' && run ? `<br>Final score ${f1(run.s)}` : ''); }

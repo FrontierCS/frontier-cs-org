@@ -215,7 +215,7 @@ function drawResults() {
     + (ref != null || ms.some(m => st[m] && st[m].ref != null)
       ? '<tr class="rref"><td><span class="sq"></span>Human reference</td>' + refRow
         + `<td class="rs">${ref != null ? bar(ref, '') : ''}</td><td class="rc"></td></tr>` : '')
-    + [...runs].sort((p, q) => q[2] - p[2]).map(r => `<tr${!split && by[r[0]] ? ` class="wx" data-m="${r[0]}"` : ''}><td>${!split && by[r[0]] ? WXB : ''}${r[3] ? TICK : CROSS}<span class="full">${esc(MNAME[r[0]])}</span><span class="short">${esc(short[r[0]])}</span></td>`
+    + [...runs].sort((p, q) => q[2] - p[2]).map(r => `<tr${!split && by[r[0]] ? ` class="wx" data-m="${r[0]}"` : ''}><td>${!split && by[r[0]] ? WXB : ''}${r[3] ? TICK : CROSS}<span class="full">${esc(MNAME[r[0]])}</span><span class="short">${esc(short[r[0]])}</span>${fallbackOf(t.s, r[0]) ? `<span class="fbk" title="${esc(fallbackTip(t.s, r[0]))}">run on ${esc(fallbackOf(t.s, r[0]))}</span>` : ''}</td>`
       + (split ? ms.map(m => wl.map(w => wcell(r, m, w)).join('')).join('') : ms.map((m, i) => cell(r, m, i)).join(''))
       + `<td class="rs">${bar(r[2], `background:${MCOL[r[0]]}`)}</td>${r[4] > 0 ? `<td class="rc">$${ownUsd(r).toFixed(2)}${reviewUsd(r) ? `<span class="rv" title="Antigravity’s safety review: before each command or file edit the CLI sends the call to the same model for a safety rating">+$${reviewUsd(r).toFixed(2)} review</span>` : ''}</td>` : '<td class="rc e" title="The platform recorded no cost for this run">—</td>'}</tr>`).join('')
     + '</tbody>';
@@ -309,7 +309,8 @@ function drawScore() {
     // dropped (a crowded chart dropped Gemini 4 Argon · Antigravity on Yannakakis, CKKS and Differentiable Population
     // Statistics); phones keep dropping such names, as leaders would crowd their narrow plot
     labelDot(svg, boxes, cx, cy, narrow ? m.short : m.name, {l:L, r:W, t:T, b:H - B}, MTXT(r[0]), lead, false, !narrow);
-    pts.push({x:cx, y:cy, mean:true, html:`<b>${esc(m.name)}</b><br>Final score <b>${f1(r[2])}</b>, ${r[3] ? 'passes' : 'does not pass'}<br>${money(ownUsd(r))}` + (reviewUsd(r) ? `<br>+ ${money(reviewUsd(r))} ${REVIEW_TIP}` : '')});
+    pts.push({x:cx, y:cy, mean:true, html:`<b>${esc(m.name)}</b><br>Final score <b>${f1(r[2])}</b>, ${r[3] ? 'passes' : 'does not pass'}<br>${money(ownUsd(r))}` + (reviewUsd(r) ? `<br>+ ${money(reviewUsd(r))} ${REVIEW_TIP}` : '')
+      + (fallbackOf(t.s, r[0]) ? `<br>${esc(fallbackTip(t.s, r[0]))}` : '')});
   });
   attachTip(svg, W, H, pts, $('#sctip'));
 }
