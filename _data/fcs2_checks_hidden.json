@@ -2,7 +2,8 @@
  "note": "Per-metric counts of models kept off the site (HIDDEN in bin/fcs2_runs_from_db.py), in the shape of PASSBY in assets/js/fcs2-checks.js. For fits only; not shown on any page.",
  "models": {
   "k27": "Kimi K2.7",
-  "gemini": "Gemini 4 Argon"
+  "gemini": "Gemini 4 Argon",
+  "neon": "Gemini 4 Neon"
  },
  "passby": {
   "SCOPE": {
@@ -26,7 +27,7 @@
      6
     ]
    },
-   "neon-agy": {
+   "neon": {
     "batch_latency_seconds": [
      6,
      6
@@ -58,7 +59,7 @@
      2
     ]
    },
-   "neon-agy": {
+   "neon": {
     "accuracy_qualified": [
      2,
      2
@@ -90,9 +91,9 @@
      10
     ]
    },
-   "neon-agy": {
+   "neon": {
     "compression_ratio": [
-     8,
+     9,
      10
     ],
     "runtime_seconds": [
@@ -138,7 +139,7 @@
      2
     ]
    },
-   "neon-agy": {
+   "neon": {
     "average_jct_seconds": [
      2,
      2
@@ -202,7 +203,7 @@
      3
     ]
    },
-   "neon-agy": {
+   "neon": {
     "checkpoint_create_ns": [
      6,
      6
@@ -246,13 +247,13 @@
      6
     ]
    },
-   "neon-agy": {
+   "neon": {
     "congruence_seconds": [
      6,
      6
     ],
     "wall_clock_seconds": [
-     4,
+     5,
      6
     ]
    }
@@ -269,6 +270,20 @@
     ],
     "peak_memory_mib": [
      23,
+     24
+    ]
+   },
+   "neon": {
+    "case_throughput_ktps": [
+     24,
+     24
+    ],
+    "historical_query_us": [
+     24,
+     24
+    ],
+    "peak_memory_mib": [
+     24,
      24
     ]
    }
@@ -294,9 +309,9 @@
      21
     ]
    },
-   "neon-agy": {
+   "neon": {
     "refuted_pair": [
-     20,
+     21,
      21
     ],
     "wall_time_seconds": [
@@ -342,21 +357,21 @@
      48
     ]
    },
-   "neon-agy": {
+   "neon": {
     "candidates_verified": [
      48,
      48
     ],
     "overall_ratio": [
-     40,
+     42,
      48
     ],
     "query_time_ms": [
-     47,
+     48,
      48
     ],
     "recall": [
-     41,
+     43,
      48
     ]
    }
@@ -374,7 +389,7 @@
      8
     ]
    },
-   "neon-agy": {
+   "neon": {
     "tflops": [
      8,
      8
@@ -394,7 +409,7 @@
      12
     ]
    },
-   "neon-agy": {
+   "neon": {
     "elapsed_seconds": [
      12,
      12
@@ -430,7 +445,7 @@
      12
     ]
    },
-   "neon-agy": {
+   "neon": {
     "auxiliary_bytes": [
      12,
      12
@@ -440,7 +455,7 @@
      12
     ],
     "sort_time_ns": [
-     12,
+     10,
      12
     ]
    }
@@ -474,7 +489,7 @@
      6
     ]
    },
-   "neon-agy": {
+   "neon": {
     "branch_accuracy": [
      6,
      6
@@ -518,7 +533,7 @@
      6
     ]
    },
-   "neon-agy": {
+   "neon": {
     "label_mismatch_fraction": [
      6,
      6
@@ -578,7 +593,7 @@
      3
     ]
    },
-   "neon-agy": {
+   "neon": {
     "ema_quantized_png_lpips": [
      3,
      3
@@ -654,7 +669,7 @@
      3
     ]
    },
-   "neon-agy": {
+   "neon": {
     "clip_fdr": [
      3,
      3
@@ -664,11 +679,11 @@
      3
     ],
     "dinov2_fdr": [
-     3,
+     2,
      3
     ],
     "inception_fdr": [
-     2,
+     3,
      3
     ],
     "mae_fdr": [
@@ -694,7 +709,7 @@
      8
     ]
    },
-   "neon-agy": {
+   "neon": {
     "ocr_reward": [
      6,
      8
@@ -724,25 +739,25 @@
      15
     ]
    },
-   "neon-agy": {
+   "neon": {
     "action_rate": [
-     15,
+     12,
      15
     ],
     "energy": [
-     15,
+     9,
      15
     ],
     "episode_reward": [
-     15,
+     6,
      15
     ],
     "tracking_ang_vel": [
-     15,
+     6,
      15
     ],
     "tracking_lin_vel": [
-     15,
+     6,
      15
     ]
    }
@@ -762,7 +777,7 @@
      8
     ]
    },
-   "neon-agy": {
+   "neon": {
     "elapsed_seconds": [
      8,
      8
@@ -798,13 +813,13 @@
      3
     ]
    },
-   "neon-agy": {
+   "neon": {
     "average_episodic_reward": [
      2,
      3
     ],
     "success_rate": [
-     1,
+     0,
      3
     ]
    }
@@ -838,7 +853,7 @@
      6
     ]
    },
-   "neon-agy": {
+   "neon": {
     "lpips": [
      6,
      6
@@ -882,7 +897,7 @@
      8
     ]
    },
-   "neon-agy": {
+   "neon": {
     "iso_recall": [
      8,
      8
@@ -934,13 +949,13 @@
      8
     ]
    },
-   "neon-agy": {
+   "neon": {
     "distance_consistency": [
      8,
      8
     ],
     "latency_ms": [
-     7,
+     8,
      8
     ],
     "worst_ball_recall": [
@@ -998,9 +1013,9 @@
      144
     ]
    },
-   "neon-agy": {
+   "neon": {
     "build_ns": [
-     136,
+     144,
      144
     ],
     "effective_fpr": [
@@ -1650,13 +1665,13 @@
      1
     ]
    },
-   "neon-agy": {
+   "neon": {
     "exact_result": [
      39,
      39
     ],
     "median_latency": [
-     31,
+     27,
      39
     ]
    }
@@ -1690,7 +1705,7 @@
      29
     ]
    },
-   "neon-agy": {
+   "neon": {
     "avg_log2_prec_l2_abs_discrepancy_bits": [
      29,
      29
@@ -1726,13 +1741,13 @@
      60
     ]
    },
-   "neon-agy": {
+   "neon": {
     "core_peak_live_bytes": [
      60,
      60
     ],
     "cpu_time_seconds": [
-     56,
+     57,
      60
     ]
    }
@@ -1782,7 +1797,7 @@
      4000
     ]
    },
-   "neon-agy": {
+   "neon": {
     "client_storage_bytes": [
      2,
      2
@@ -1842,9 +1857,9 @@
      24
     ]
    },
-   "neon-agy": {
+   "neon": {
     "last_result_inner_product_ratio": [
-     15,
+     14,
      24
     ],
     "mean_query_time": [
@@ -1852,7 +1867,7 @@
      24
     ],
     "recall_at_50": [
-     19,
+     14,
      24
     ],
     "verified_candidate_count": [
@@ -1914,7 +1929,7 @@
      3
     ]
    },
-   "neon-agy": {
+   "neon": {
     "delta": [
      3,
      3
@@ -1978,7 +1993,7 @@
      4
     ]
    },
-   "neon-agy": {
+   "neon": {
     "complete_workload_wall_seconds": [
      4,
      4
@@ -1988,7 +2003,7 @@
      4
     ],
     "mean_episode_max_reward": [
-     2,
+     3,
      4
     ],
     "mean_predict_action_seconds": [
@@ -2018,7 +2033,7 @@
      8
     ]
    },
-   "neon-agy": {
+   "neon": {
     "execution_time_ms": [
      8,
      8
@@ -2074,21 +2089,21 @@
      4
     ]
    },
-   "neon-agy": {
+   "neon": {
     "correctness": [
      4,
      4
     ],
     "p90": [
-     3,
+     2,
      4
     ],
     "p95": [
-     3,
+     2,
      4
     ],
     "p99": [
-     4,
+     2,
      4
     ],
     "paired_timing": [
@@ -2118,13 +2133,13 @@
      4
     ]
    },
-   "neon-agy": {
+   "neon": {
     "attack_success_rate": [
      4,
      4
     ],
     "utility_under_attack": [
-     3,
+     4,
      4
     ]
    }
@@ -2150,7 +2165,7 @@
      8
     ]
    },
-   "neon-agy": {
+   "neon": {
     "butterfly_count": [
      8,
      8
@@ -2206,7 +2221,7 @@
      12
     ]
    },
-   "neon-agy": {
+   "neon": {
     "polar_cosine_similarity": [
      12,
      12
@@ -2298,7 +2313,7 @@
      4
     ]
    },
-   "neon-agy": {
+   "neon": {
     "jaccard": [
      2,
      4
@@ -2308,7 +2323,7 @@
      4
     ],
     "precision": [
-     0,
+     1,
      4
     ],
     "recall": [
@@ -2316,7 +2331,7 @@
      4
     ],
     "repair_rate": [
-     4,
+     3,
      4
     ],
     "rli": [
@@ -2344,13 +2359,13 @@
      2
     ]
    },
-   "neon-agy": {
+   "neon": {
     "branches_covered": [
-     1,
+     2,
      2
     ],
     "search_overhead_seconds": [
-     0,
+     1,
      2
     ]
    }
@@ -2370,9 +2385,9 @@
      6
     ]
    },
-   "neon-agy": {
+   "neon": {
     "adjusted_rand_index": [
-     5,
+     4,
      6
     ],
     "dbscan_latency_ms": [
@@ -2380,7 +2395,7 @@
      6
     ],
     "noise_mismatch_fraction": [
-     5,
+     4,
      6
     ]
    }
@@ -2400,7 +2415,7 @@
      14
     ]
    },
-   "neon-agy": {
+   "neon": {
     "egraph_node_growth": [
      14,
      14
@@ -2430,13 +2445,13 @@
      105
     ]
    },
-   "neon-agy": {
+   "neon": {
     "br_mis_pki": [
-     58,
+     57,
      105
     ],
     "cyc_wp_pki": [
-     51,
+     59,
      105
     ],
     "logical_storage_bits": [
@@ -2480,7 +2495,7 @@
      24
     ]
    },
-   "neon-agy": {
+   "neon": {
     "compact_cache_bytes": [
      24,
      24
@@ -2490,27 +2505,13 @@
      24
     ],
     "qa_correct": [
-     15,
+     13,
      24
     ]
    }
   },
   "DyT": {
    "gemini": {
-    "inference_latency_ms": [
-     3,
-     3
-    ],
-    "top1_accuracy_pct": [
-     3,
-     3
-    ],
-    "training_latency_ms": [
-     3,
-     3
-    ]
-   },
-   "neon-agy": {
     "inference_latency_ms": [
      3,
      3
@@ -2536,7 +2537,7 @@
      9
     ]
    },
-   "neon-agy": {
+   "neon": {
     "latency_seconds": [
      9,
      9
@@ -2554,7 +2555,7 @@
      30
     ]
    },
-   "neon-agy": {
+   "neon": {
     "gap": [
      30,
      30
@@ -2574,9 +2575,9 @@
    }
   },
   "Structured LWE": {
-   "neon-agy": {
+   "neon": {
     "valid_witness": [
-     174,
+     159,
      200
     ]
    }

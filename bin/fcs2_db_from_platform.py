@@ -86,7 +86,9 @@ CACHE = {'GPT-6 Astra': 1.00, 'GPT-6.1 Sol': 0.10, 'Kimi K3 (Modal)': 0.30, 'Dee
          # Gemini 4 Neon on Pi (2026-11-19/20): the US$ its Pumpkin record reports for each run
          'pi · Gemini 4 Neon': None,
          # GPT-6.2 Sol / Astra on the Codex CLI (2026-11-20): total tokens at GPT-6.1 Sol's / GPT-6 Astra's cache-read price
-         'GPT-6.2 Sol': 0.10, 'GPT-6.2 Astra': 1.00}
+         'GPT-6.2 Sol': 0.10, 'GPT-6.2 Astra': 1.00,
+         # Gemini 4 Neon on Antigravity (2026-11-20/22): the US$ its Pumpkin record reports for each run
+         'Antigravity · Gemini 4 Neon': None}
 # A candidate whose formal run of the task set spans several evaluations, collected as one: Gemini 4 Argon on agy ran six
 # CPU tasks first in a batch of their own and the other 42 in its formal evaluation; together they are its 48 (Qiuyang,
 # 2026-10-25). The first evaluation listed is the formal one.
@@ -236,7 +238,11 @@ WHY = {'run_01M5QR7T4M65RY0VAYMQDN6TP2': 'Out of memory (exit 137)',            
        'run_01M7BRXM9Q1CKQ8V1XP953BBMW': 'Agent time limit reached, no submission',
        # Gemini 4 Neon (Pumpkin records; the release's failure_reason)
        '20261119-080446-5e2680f2': 'Agent time limit reached, no submission',
-       '20261119-081600-c865926d': 'Agent time limit reached, no final'}
+       '20261119-081600-c865926d': 'Agent time limit reached, no final',
+       # Gemini 4 Neon on Antigravity (Pumpkin records; the release's failure_reason)
+       '20261120-194726-05b51bec': 'Agent time limit reached, no submission',
+       '20261121-181947-d27ba7b5': 'Agent time limit reached, no submission',
+       '20261121-182116-61437baf': 'Agent time limit reached, no final'}
 # Runs the platform marks FAILED whose selected final was rejudged and accepted: they completed, so the site shows no failure
 # for them. Claude Opus 5.5's KV Cache Compaction (61.55; Qiuyang, 2026-10-20: "kebab上的opus kv compaction信息是否不对").
 COMPLETED = {'run_01M5BMPCS19PVWJRAGZSF9ED8P'}

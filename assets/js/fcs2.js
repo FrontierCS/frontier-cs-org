@@ -61,15 +61,6 @@ const passPct = m => PASS[m.id][0];   // pass rate in %
 // switch, pass rate first, then FCI to one decimal (owner, 2026-11-06) with no interval.
 const METRIC = {fci:{val:m => ECI[m.id][0], tip:v => `FCI <b>${f1(v)}</b>`, tick:v => String(v), lab:f1},
                 pass:{val:passPct, tip:v => `Pass rate <b>${f1(v)}%</b>`, tick:v => v + '%', lab:v => String(Math.round(v))}};
-// A model's other harness (ALT in fcs2-data.js; owner, 2026-11-22): the chips in the head of the first bars switch that model's bar
-// in the two bar charts, pass rate and FCI, to it. Nothing else on the page follows, and the bars keep their order.
-const altOn = new Set(), altVal = (a, k) => k === 'fci' ? a.eci[0] : a.pass[0];
-const barOf = (m, k) => altOn.has(m.id) ? {v:altVal(ALT[m.id], k), h:ALT[m.id].h} : {v:METRIC[k].val(m), h:m.h};
-{ const box = $('#hsw'), ms = MODELS.filter(m => ALT[m.id]);
-  box.innerHTML = ms.map(m => `<span class="chips" role="group" aria-label="Harness of ${esc(m.base)}"><span>${esc(m.base)}</span>${[m.h, ALT[m.id].h].map((h, i) => `<button class="chip" type="button" data-m="${m.id}" data-alt="${i}" aria-pressed="${!i}">${esc(h)}</button>`).join('')}</span>`).join('');
-  box.hidden = !ms.length;
-  box.addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b) return; altOn[+b.dataset.alt ? 'add' : 'delete'](b.dataset.m);
-    [...b.parentNode.querySelectorAll('.chip')].forEach(c => c.setAttribute('aria-pressed', String(c === b))); drawPassBars(); drawPassBars('fci', 'fcb'); }); }
 $('#eci').addEventListener('toggle', () => drawECI());   // folded: its width is known once it opens
 function drawPassCost(k = 'pass', id = 'pc') {
   const svg = $(`#${id}svg`), W = Math.max(300, $(`#${id}plot`).clientWidth), narrow = W < 560;
@@ -134,7 +125,7 @@ function drawPassBars(k = 'pass', id = 'fcib') {
   const tile = flat ? 34 : 22, lead = fs * 1.3;
   let L = 4, B;
   if (flat) {
-    const lines = order.map(m => { const h = barOf(m, k).h; return [wrap(m.base, fs, band0 - 8), h ? wrap(`(${h})`, fs - 1, band0 - 8) : []]; });
+    const lines = order.map(m => [wrap(m.base, fs, band0 - 8), m.h ? wrap(`(${m.h})`, fs - 1, band0 - 8) : []]);
     order.forEach((m, k) => { m._nl = lines[k]; });
     B = 14 + tile + 12 + Math.max(...lines.map(([a, b]) => a.length + b.length)) * lead + 6;
   } else {
@@ -144,14 +135,14 @@ function drawPassBars(k = 'pass', id = 'fcib') {
     B = 10 + tile + 10 + Math.max(...lens) * Math.sin(ang * Math.PI / 180) + 8;
   }
   const PH = CHART_H.fcib || (flat ? 320 : 220), H = T + PH + B;
-  const top = Math.max(...order.map(val), ...Object.values(ALT).map(a => altVal(a, k))), step = eciStep(top, 4), ymax = top * 1.06;   // the tallest bar near the top: no axis numbers to round to
+  const top = Math.max(...order.map(val)), step = eciStep(top, 4), ymax = top * 1.06;   // the tallest bar near the top: no axis numbers to round to
   const band = (W - L - R) / order.length, bw = Math.min(96, band * .76), base = T + PH, Y = v => T + (1 - Math.max(0, v) / ymax) * PH;
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H);
   for (let v = step; v <= ymax; v += step) svg.append(sv('line', {x1:L, x2:W - R, y1:Y(v), y2:Y(v), stroke:'var(--grid)', 'stroke-width':1, 'stroke-dasharray':'4 4'}));
   svg.append(sv('line', {x1:L, x2:W - R, y1:base, y2:base, stroke:'var(--ink-2)', 'stroke-width':1}));
   const pts = [], vs = flat ? 22 : 12;   // the value's size, a size down from 26 and 13 (owner, 2026-10-17)
   order.forEach((m, i) => {
-    const {v:e, h:harness} = barOf(m, k), cx = L + band * (i + .5), x = cx - bw / 2, y = Y(e), h = base - y, r = Math.min(6, bw / 6, h);
+    const e = val(m), cx = L + band * (i + .5), x = cx - bw / 2, y = Y(e), h = base - y, r = Math.min(6, bw / 6, h);
     const bar = sv('path', {d:`M${x},${base}V${y + r}Q${x},${y} ${x + r},${y}H${x + bw - r}Q${x + bw},${y} ${x + bw},${y + r}V${base}Z`, fill:MCOL[m.id], 'data-m':m.id});
     const inside = h > vs * 1.8, vtx = sv('text', {x:cx, y:inside ? y + h / 2 + vs * .36 : y - 8, 'text-anchor':'middle', 'font-size':vs, 'font-weight':600,
       fill:inside ? (lightCol(m.id) ? 'var(--ink)' : '#fff') : 'var(--ink)'}, M.lab(e));
@@ -170,7 +161,7 @@ function drawPassBars(k = 'pass', id = 'fcib') {
       const ny = ty + tile + 12;
       svg.append(sv('text', {class:'lab', x:cx + fs * .35, y:ny, 'font-size':fs, 'text-anchor':'end', transform:`rotate(${-ang} ${cx + fs * .35} ${ny})`}, m.short));
     }
-    pts.push({x:cx, y, box:[cx - band / 2, cx + band / 2, T, H], html:`<b>${esc(m.base)}</b>${harness ? ` · ${esc(harness)}` : ''}<br>${M.tip(e)}`});   // the whole column, bar, logo and name, shows the tooltip
+    pts.push({x:cx, y, box:[cx - band / 2, cx + band / 2, T, H], html:`<b>${esc(m.base)}</b>${m.h ? ` · ${esc(m.h)}` : ''}<br>${M.tip(e)}`});   // the whole column, bar, logo and name, shows the tooltip
   });
   attachTip(svg, W, H, pts, $(`#${id}tip`));
 }
