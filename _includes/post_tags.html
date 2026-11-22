@@ -1,7 +1,0 @@
-{%- comment -%}
-A post's tags as pills that open the tag's page. The first tag names the project (FrontierCS, FrontierCS 2 ...) and takes the
-blue tone; the rest are neutral (owner, 2026-10-17). Pass the post's tags as `tags`.
-{%- endcomment -%}
-{%- if include.tags and include.tags.size > 0 -%}
-<span class="ptags">{% for t in include.tags %}<a class="ptag{% if forloop.first %} lead{% endif %}" href="{{ t | slugify | prepend: '/blog/tag/' | append: '/' | relative_url }}">{{ t }}</a>{% endfor %}</span>
-{%- endif -%}
