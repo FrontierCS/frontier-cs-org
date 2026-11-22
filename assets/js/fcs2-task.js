@@ -217,7 +217,7 @@ function drawResults() {
         + `<td class="rs">${ref != null ? bar(ref, '') : ''}</td><td class="rc"></td></tr>` : '')
     + [...runs].sort((p, q) => q[2] - p[2]).map(r => `<tr${!split && by[r[0]] ? ` class="wx" data-m="${r[0]}"` : ''}><td>${!split && by[r[0]] ? WXB : ''}${r[3] ? TICK : CROSS}<span class="full">${esc(MNAME[r[0]])}</span><span class="short">${esc(short[r[0]])}</span></td>`
       + (split ? ms.map(m => wl.map(w => wcell(r, m, w)).join('')).join('') : ms.map((m, i) => cell(r, m, i)).join(''))
-      + `<td class="rs">${bar(r[2], `background:${MCOL[r[0]]}`)}</td>${r[4] > 0 ? `<td class="rc">$${r[4].toFixed(2)}</td>` : '<td class="rc e" title="The platform recorded no cost for this run">—</td>'}</tr>`).join('')
+      + `<td class="rs">${bar(r[2], `background:${MCOL[r[0]]}`)}</td>${r[4] > 0 ? `<td class="rc">$${ownUsd(r).toFixed(2)}${reviewUsd(r) ? `<span class="rv" title="Antigravity’s safety review: before each command or file edit the CLI sends the call to the same model for a safety rating">+$${reviewUsd(r).toFixed(2)} review</span>` : ''}</td>` : '<td class="rc e" title="The platform recorded no cost for this run">—</td>'}</tr>`).join('')
     + '</tbody>';
   $('#rtbl').classList.toggle('wxt', !split);
   // a run's row opens to one row per hidden workload (owner, 2026-11-21: a mean over the workloads hid which ones a run
@@ -270,7 +270,7 @@ function drawScore() {
   const L = 34, R = narrow ? 12 : 24, T = 14, B = 46, H = narrow ? 320 : 400;
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('height', H); svg.replaceChildren();
   if (!rs.length) { $('#scnote').textContent = 'No run on this task has a cost.'; return; }
-  const tx = rs.map(r => r[4]);
+  const tx = rs.map(ownUsd);   // the run's own cost: an Antigravity run's safety review is not drawn, only named in the tooltip (owner, 2026-11-22)
   // as the overview: 0.15 decade past the outermost dots, more on the right on phones so the labels there fit
   const x0 = Math.log10(Math.min(...tx)) - .15, x1 = Math.log10(Math.max(...tx)) + (narrow ? .74 : .15);
   // the y axis spans the dots and the human reference, a tenth of their spread past each but at least 10 points in all,
@@ -291,7 +291,7 @@ function drawScore() {
     svg.append(sv('line', {x1:X(v), x2:X(v), y1:T, y2:H - B, stroke:'var(--grid)', 'stroke-width':1}));
     svg.append(sv('text', {x:X(v), y:H - B + 20, 'text-anchor':'middle'}, usdfmt(v))); });
   svg.append(sv('text', {class:'ax', x:L + (W - L - R) / 2, y:H - 6, 'text-anchor':'middle'}, 'Cost of the run in US$, log scale'));
-  const at = r => [X(r[4]), Y(r[2])], order = [...rs].sort((a, b) => b[2] - a[2]);
+  const at = r => [X(ownUsd(r)), Y(r[2])], order = [...rs].sort((a, b) => b[2] - a[2]);
   const boxes = order.map(r => { const [cx, cy] = at(r); return {x:cx - 9, y:cy - 9, w:18, h:18}; });
   // the Human reference: a dashed line, named in the legend; no run's name is written across it
   if (ref != null) {
@@ -300,7 +300,7 @@ function drawScore() {
   }
   $('#sclegend').innerHTML = ref != null ? '<span><i class="dash"></i>Human reference</span>' : '';
   // the frontier: the runs no cheaper run matches or beats on final score
-  const front = [...rs].sort((p, q) => p[4] - q[4] || q[2] - p[2]).filter((r, i, a) => a.slice(0, i).every(o => o[2] < r[2]));
+  const front = [...rs].sort((p, q) => ownUsd(p) - ownUsd(q) || q[2] - p[2]).filter((r, i, a) => a.slice(0, i).every(o => o[2] < r[2]));
   const pts = [];
   order.forEach(r => {
     const [cx, cy] = at(r), m = MODELS.find(x => x.id === r[0]), lead = front.includes(r);
@@ -309,7 +309,7 @@ function drawScore() {
     // dropped (a crowded chart dropped Gemini 4 Argon · Antigravity on Yannakakis, CKKS and Differentiable Population
     // Statistics); phones keep dropping such names, as leaders would crowd their narrow plot
     labelDot(svg, boxes, cx, cy, narrow ? m.short : m.name, {l:L, r:W, t:T, b:H - B}, MTXT(r[0]), lead, false, !narrow);
-    pts.push({x:cx, y:cy, mean:true, html:`<b>${esc(m.name)}</b><br>Final score <b>${f1(r[2])}</b>, ${r[3] ? 'passes' : 'does not pass'}<br>${money(r[4])}`});
+    pts.push({x:cx, y:cy, mean:true, html:`<b>${esc(m.name)}</b><br>Final score <b>${f1(r[2])}</b>, ${r[3] ? 'passes' : 'does not pass'}<br>${money(ownUsd(r))}` + (reviewUsd(r) ? `<br>+ ${money(reviewUsd(r))} ${REVIEW_TIP}` : '')});
   });
   attachTip(svg, W, H, pts, $('#sctip'));
 }

@@ -75,7 +75,7 @@ each respondent's task results are resampled with replacement and the fit is red
 draws); Epoch's code raises when a draw puts the anchors in the wrong order, and those draws are left out and counted.
 
 Test-time scaling (SCALE): the same model with every task's parameters held at the leaderboard fit (Qiuyang,
-2026-10-14). At a budget B of US$ (usd() below), a run that has ended within B (its spend at the end is at most B)
+2026-10-14). At a budget B of US$ (usd() below, less the run's safety review: REVIEW), a run that has ended within B (its spend at the end is at most B)
 contributes its metric groups and its margin; a run still going is scored as if it timed out at B, as a timeout scores 0:
 no group beaten, and with a reference a final score of 0, its margin counted as it is (Qiuyang, 2026-10-16; before, it
 counted no margin, so a run that ended below the reference could pull a curve down). A run's evidence then only improves
@@ -94,6 +94,11 @@ PASS_ZERO. Its test-time scaling is scored the same way, and its runs count in D
 
 Pass rate is the share of scored runs whose verdict is PASS: the final submission meets the task's
 beat-the-reference criteria on every workload. It is a plain count, so it has no interval.
+
+Cost is the model's own (owner, 2026-11-22). On the Antigravity CLI each command or file edit is first sent, as a pending
+tool call and again with the whole trajectory, to the same model for a safety rating; the run pays for those requests too.
+That review's US$ (bin/fcs2_review_spend.jsonl) is taken out of every cost the site shows (COST, the test-time scaling
+budgets, the task pages) and shown apart (REVIEW_COST, TRAJ's last column). TRAJ's US$ stay the run's whole spend.
 """
 import json, re, sqlite3, sys
 from collections import Counter, defaultdict
@@ -729,14 +734,29 @@ def usd(m, total, output):
     return (output * po + total * pc) / 1e6
 
 
+# Antigravity's safety review (owner, 2026-11-22: 「在网站上把评审费用和模型费用分开显示」): before each command or file edit, the
+# agy CLI sends the pending tool call to the same model for a safety rating, and a second request sends it the whole
+# trajectory so far; the run pays for both. bin/fcs2_review_spend.jsonl (bin/fcs2_review_spend.py) gives each Antigravity
+# run's US$ for them at its end (review_usd). A model's cost on the site is its own: the run's US$ less the review, in COST,
+# the test-time scaling budgets and the task pages; the review is shown apart (REVIEW_COST, TRAJ's last column).
+REVIEW = {x['run_id']: x['review_usd'] for x in map(json.loads, open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fcs2_review_spend.jsonl'))) if x}
+
+
 def cost(db):
-    """Per model: [mean US$ per scored run, runs with token counts]; a run's tokens are its last cumulative values."""
+    """Per model: [mean US$ per scored run less the safety review, runs with token counts], and per model whose runs had
+    a safety review, [mean review US$ per scored run, runs]; a run's tokens are its last cumulative values."""
     end = {r: (t, o) for r, t, o in db.execute('select run_id, max(total_tokens), max(output_tokens) from score_points group by run_id')}
-    by = defaultdict(list)
+    by, rv, harness = defaultdict(list), defaultdict(list), {}
     for r, c, s in db.execute('''select r.id, cd.name, r.display_score from cells ce join runs r on r.id = ce.run_id
         join candidates cd on cd.id = ce.candidate_id'''):
-        if s is not None and c not in HIDDEN and end.get(r) and end[r][0]: by[MODEL[c][0]].append(usd(MODEL[c][0], *end[r]))
-    return {m: [round(float(np.mean(v)), 4), len(v)] for m, v in sorted(by.items())}
+        if s is not None and c not in HIDDEN and end.get(r) and end[r][0]:
+            u, m = usd(MODEL[c][0], *end[r]), MODEL[c][0]
+            assert r in REVIEW or MODEL[c][3] != 'Antigravity', f'{r} ({m}): an Antigravity run without its review in bin/fcs2_review_spend.jsonl'
+            assert REVIEW.get(r, 0) <= u + 1e-4, f'{r} ({m}): review US${REVIEW[r]} above the run\'s US${u}'
+            by[m].append(u - REVIEW.get(r, 0)); rv[m].append(REVIEW.get(r, 0)); harness[r] = MODEL[c][3]
+    assert not [r for r in REVIEW if harness.get(r) != 'Antigravity'], f'reviews of runs not on Antigravity: {[r for r in REVIEW if harness.get(r) != "Antigravity"]}'
+    return ({m: [round(float(np.mean(v)), 4), len(v)] for m, v in sorted(by.items())},
+            {m: [round(float(np.mean(v)), 4), len(v)] for m, v in sorted(rv.items()) if any(v)})
 
 
 def theta_at(items, counts, hyp):
@@ -778,9 +798,9 @@ def scaling(db, tasks, hyp, theta0):
     info = {r: (c, t) for r, c, t, s, fj in db.execute('''select r.id, cd.name, t.name, r.display_score, r.feedback_json from cells ce
         join runs r on r.id = ce.run_id join candidates cd on cd.id = ce.candidate_id join tasks t on t.id = ce.task_id''') if s is not None and c not in HIDDEN and not (LEAVE_OUT_REFUSALS and refused(fj)) and TASK[t][0] not in OFF_FIT_DOMAINS}
     pts = {(r, sid): (tt, ot) for r, sid, tt, ot in db.execute('select run_id, submission_id, total_tokens, output_tokens from score_points')}
-    end = {}   # a run's spend at its end: usd() at its last submission with a score point, 0 if none
+    end = {}   # a run's spend at its end: usd() at its last submission with a score point, less its safety review (REVIEW), 0 if none
     for r, sid in db.execute('select run_id, id from submissions order by run_id, ordinal'):
-        if r in info and (r, sid) in pts: end[r] = usd(MODEL[info[r][0]][0], *pts[(r, sid)])
+        if r in info and (r, sid) in pts: end[r] = usd(MODEL[info[r][0]][0], *pts[(r, sid)]) - REVIEW.get(r, 0)
     def curve_of(c):   # one model's curve; its own generator, so the models are independent
         runs = {info[r][1]: r for r in info if info[r][0] == c}   # one run per model and task (metric_tasks asserts it)
         tl = sorted(runs); ends = [end.get(runs[t], 0) for t in tl]
@@ -833,8 +853,9 @@ hidden = [[MODEL[c][0], SHOWN.get(TASK[t][0], TASK[t][0]), TASK[t][1] or t.split
 
 def trajectories(db):
     """One entry per scored run, for the overview's run curve and the task pages:
-    [model id, task short name, final score, passed, US$ at the run's end, hours, [[US$ spent, dev score], ...]].
-    Each point is a development submission in order; its spend is usd() at that submission; failed ones score 0."""
+    [model id, task short name, final score, passed, US$ at the run's end, hours, [[US$ spent, dev score], ...]], and for a
+    run with a safety review (REVIEW) its review US$ last. Each point is a development submission in order; its spend is
+    usd() at that submission, the review included (the run's record: bin/fcs2_db_from_release.py reads it back); failed ones score 0."""
     pts = {(r, sid): (sc, tt, ot) for r, sid, sc, tt, ot in db.execute('select run_id, submission_id, score, total_tokens, output_tokens from score_points')}
     subs = defaultdict(list)
     for r, sid, kind in db.execute('select run_id, id, kind from submissions order by run_id, ordinal'): subs[r].append((sid, kind))
@@ -845,7 +866,7 @@ def trajectories(db):
         m = MODEL[c][0]
         seq = [[round(usd(m, pts[(r, sid)][1], pts[(r, sid)][2]), 4), round(pts[(r, sid)][0], 1)] for sid, kind in subs[r] if kind == 'train' and (r, sid) in pts]
         end = max((usd(m, p[1], p[2]) for (rr, _), p in pts.items() if rr == r), default=0)
-        out.append([m, TASK[t][1] or t.split(' — ')[0], round(s, 1), int(v == 'PASS'), round(end, 4), round((el or 0) / 3600, 2), seq])
+        out.append([m, TASK[t][1] or t.split(' — ')[0], round(s, 1), int(v == 'PASS'), round(end, 4), round((el or 0) / 3600, 2), seq] + ([round(REVIEW[r], 4)] if REVIEW.get(r) else []))
     return out
 
 
@@ -959,7 +980,7 @@ TFIT, DIFF, METRIC, MGROUPS, DIFF_FIT = task_fits(MT, dfit, theta0, UNIT0, HROWS
 # one decimal more than FDI, so the curve from these rounded values crosses 1/2 within 0.06 points of the rounded FDI
 GROUPS = {short(t): sorted((round(float(v), DEC + 1) for v in on_scale(T['x'][:T['k']], theta0)), reverse=True) for t, T in sorted(MT.items(), key=lambda kv: short(kv[0]))}
 PROG = {short(t): [round(float(on_scale(g, theta0)), DEC), round(k / PASS_UNIT, 4), round(f, 3)] for t, (g, k, f) in sorted(progress(MT, THETA, dfit).items(), key=lambda kv: short(kv[0]))}
-SC, CO = scaling(db, MT, dfit, theta0), cost(db)
+SC, (CO, RV) = scaling(db, MT, dfit, theta0), cost(db)
 REF = task_reference(db)
 CHECKS = task_checks(db)
 STATE, STATE_WHY = run_states(db)
@@ -986,8 +1007,9 @@ block = (f'// One entry per scored run in the preview results database of {when:
          f"// FCI per model: [point, 90% low, 90% high, tasks], from the model that also gives FDI: every run's metric groups and how far its final score is from the human reference (a run that does not pass counts at most as level), in units of the task's score spread (at least the median spread over tasks), with a run effect shared by both and a strength prior N(0, 1/{LAM:g}), every model a respondent ({zero} too); FCI = {PASS_ZERO_VALUE:g} + {PASS_UNIT:g} x (strength - {zero}'s strength), strengths in logits (ECI_LOW, ECI_LOW_VALUE, ECI_UNIT); the interval resamples tasks and refits ({BOOT} bootstrap draws).\n"
          f"const ECI = {json.dumps(eci_js)};\nconst ECI_LOW = '{MODEL[PASS_ZERO][0]}', ECI_LOW_NAME = '{zero}', ECI_LOW_VALUE = {PASS_ZERO_VALUE:g}, ECI_UNIT = {PASS_UNIT:g};\n"
          f"// Test-time scaling per model: [US$ budget per run, FCI, 90% low, 90% high, share of runs still going]; at a budget a run that has ended counts its metric groups and its margin (at most level if it did not pass); a run still going counts as timed out at the budget (no group, final score 0), so a curve never falls; task parameters held at the FCI fit (see the converter's docstring).\nconst SCALE = {json.dumps(SC, separators=(',', ':'))};\n"
-         f"// Cost per model: [mean US$ per scored run, runs]; output tokens x output price + every token x cache-read price (PRICE above).\nconst COST = {json.dumps(CO)};\nconst PRICE = {json.dumps(PRICE)};\n"
-         f"// Every scored run: [model, task, final score, passed, US$ at end, hours, [[US$, dev score] per development submission]].\nconst TRAJ = {json.dumps(trajectories(db), separators=(',', ':'), ensure_ascii=False)};\n"
+         f"// Cost per model: [mean US$ per scored run, runs]; output tokens x output price + every token x cache-read price (PRICE above). The model's own: an Antigravity run's safety review is left out.\nconst COST = {json.dumps(CO)};\nconst PRICE = {json.dumps(PRICE)};\n"
+         f"// Per Antigravity model: [mean US$ per scored run of the agy CLI's safety review, runs]; before each command or file edit it sends the pending call, and in a second request the whole trajectory, to the same model (bin/fcs2_review_spend.jsonl).\nconst REVIEW_COST = {json.dumps(RV)};\n"
+         f"// Every scored run: [model, task, final score, passed, US$ at end, hours, [[US$, dev score] per development submission]], and a run with a safety review its review US$ last; the US$ include it.\nconst TRAJ = {json.dumps(trajectories(db), separators=(',', ':'), ensure_ascii=False)};\n"
          f"// Per task: the authors' reference score, the median over the task's runs; where the database has none, the converter's REF_DEFAULT (" + ', '.join(f'{k}: {v:g}' for k, v in REF_DEFAULT.items()) + f"), else the task is left out.\nconst REF = {json.dumps(REF, ensure_ascii=False)};\n"
          f"// Per task: its metric groups' difficulties [beta_g, ...], highest first, on the FCI scale. A run passes when it beats every group, so the pass curve is P(pass | FCI) = integral of prod_g 1 / (1 + exp(-((FCI - beta_g) / ECI_UNIT + u))) N(u; 0, (sigma_u / ECI_UNIT)^2) du, sigma_u from DIFF_FIT (48-node Gauss-Hermite); it is 1/2 at the task's FDI.\nconst GROUPS = {json.dumps(GROUPS, ensure_ascii=False)};\n"
          f"// Per task: [D, 90% low, 90% high, passes, wins, runs] in RUNS. D, the difficulty, is the FCI at which a model passes half the time, a pass being every metric beaten at once. It comes from each metric's own difficulty (metrics that pass and fail together share one), fitted on which metrics each run beats and how far its final score is from the human reference (a run that does not pass counts at most as level), in units of the task's score spread (at least the median spread over tasks), with a run effect shared by both (DIFF_FIT). wins counts the runs whose final score beats the reference (a tie is half; null without a reference).\nconst DIFF = {json.dumps(DIFF, ensure_ascii=False)};\n"
@@ -1019,7 +1041,7 @@ for a in sys.argv[2:]:
         S, nboot, nbad, pinned, curves = eci_score(fit_rows)   # the raw-score fit, kept for the paper only
         out = {'source': sys.argv[1], 'generated_at': generated, 'runs_columns': ['model', 'domain', 'task', 'score', 'passed'], 'runs': runs,
                'models': [dict(zip(['id', 'name', 'short', 'harness', 'lab'], m)) for m in models], 'dropped': dict(dropped),
-               'pass': pass_rate(runs), 'cost_usd': CO, 'price_per_mtok': PRICE, 'eci': eci_js, 'eci_unit': PASS_UNIT,
+               'pass': pass_rate(runs), 'cost_usd': CO, 'review_cost_usd': RV, 'price_per_mtok': PRICE, 'eci': eci_js, 'eci_unit': PASS_UNIT,
                'eci_low': [PASS_ZERO, PASS_ZERO_VALUE], 'eci_penalty': LAM, 'eci_boot': BOOT, 'eci_boot_skipped': nskip,
                'scaling_columns': ['usd', 'eci', 'lo90', 'hi90', 'share_running'], 'scaling': SC,
                'task_reference': REF, 'task_fit_columns': ['difficulty', 'slope'], 'task_fit': TFIT,
