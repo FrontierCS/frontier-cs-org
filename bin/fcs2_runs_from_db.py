@@ -4,8 +4,11 @@
 The block sits between the BEGIN/END converter markers; the rest of the file (task list, helpers) is hand-written.
 Task descriptions come from bin/fcs2_descriptions.tsv, a copy of the paper repo's notes/descriptions_{a,b,c}.tsv.
 
-usage: python3 bin/fcs2_runs_from_db.py path/to/sqlite.db [--json=out.json]   (needs numpy, scipy, pandas, tqdm)
+usage: python3 bin/fcs2_runs_from_db.py path/to/sqlite.db [--json=out.json] [--jobs=N]   (needs numpy, scipy, pandas, tqdm)
 --json also writes every number the page shows, for the paper's figures, and the raw-score fit described below.
+--jobs (or FCS2_JOBS; default: the CPU count) is the number of worker processes for the independent loops: the FCI bootstrap,
+each task's importance sampling, each model's test-time scaling curve and the raw-score bootstrap. Every draw has its own seed
+and results are taken in seed, task and model order, so the output is the same for every N; --jobs=1 runs them in this process.
 
 The database lists one run per (model, task version) in `cells`. A run's score is `display_score`:
 the verifier's final score, with timeouts shown as 0. Runs without a score are left out.
@@ -83,11 +86,19 @@ beat-the-reference criteria on every workload. It is a plain count, so it has no
 """
 import json, re, sqlite3, sys
 from collections import Counter, defaultdict
+import multiprocessing, os
+from concurrent.futures import ProcessPoolExecutor
+JOBS = int(os.environ.get('FCS2_JOBS') or os.cpu_count() or 1)   # worker processes for the independent loops (in_order below)
+for i, a in enumerate(sys.argv):
+    if a.startswith('--jobs='): JOBS = int(a[7:])
+    elif a == '--jobs': JOBS = int(sys.argv[i + 1])
+# one BLAS thread per process, set before numpy loads: the matrices here are small, and JOBS workers each with a thread pool
+# would oversubscribe the cores. The same for every JOBS, so the arithmetic does not depend on it.
+for v in ('OMP_NUM_THREADS', 'OPENBLAS_NUM_THREADS', 'MKL_NUM_THREADS'): os.environ.setdefault(v, '1')
 import numpy as np
 from scipy.optimize import minimize
 from scipy.special import expit, log_expit, logsumexp, log_ndtr
 import pandas as pd
-import os
 os.environ.setdefault('TQDM_DISABLE', '1')   # Epoch's bootstrap bar, once per draw here
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from eci_fitting import fit_eci_model
@@ -239,6 +250,20 @@ IS_DRAWS = 2000                  # importance-weighted posterior draws per task 
 GH_U, GH_W = np.polynomial.hermite.hermgauss(64)   # E f(u), u ~ N(0, 1), is the sum over nodes of exp(GH_LW) f(GH_U); 24 nodes stall Newton near s_u = 3.7
 GH_U, GH_LW, LOG2PI = np.sqrt(2) * GH_U, np.log(GH_W / np.sqrt(np.pi)), np.log(2 * np.pi)
 HUMAN_VALUE = 25                # the raw-score fit only (--json): the authors' reference is HUMAN_VALUE (owner, 2026-10-13)
+
+
+def in_order(fn, n):
+    """[fn(0), ..., fn(n - 1)]. With JOBS > 1 the calls run in JOBS forked worker processes; a worker inherits fn and all it
+    refers to at the fork, so only i and fn's result cross processes, and the results come back in the order of i whatever the
+    scheduling. fn must not rely on side effects (a worker's are lost) and must seed its own random numbers from i."""
+    global _FN
+    if JOBS <= 1 or n <= 1: return [fn(i) for i in range(n)]
+    _FN = fn
+    with ProcessPoolExecutor(min(JOBS, n), mp_context=multiprocessing.get_context('fork')) as ex:
+        return list(ex.map(_call, range(n), chunksize=max(1, n // (4 * JOBS))))
+
+
+def _call(i): return _FN(i)
 
 
 def on_scale(theta, theta0):
@@ -476,7 +501,8 @@ def joint_fit(obs, ref, PB):
     hb = hyp(min(fits, key=lambda r: r.fun).x)
     th, ll = joint_mode(TL, hb, state['th'])
     s_u, z = hb[0], M.index(PASS_ZERO)
-    for i, T in enumerate(TL):
+    def interval(i):   # task i's difficulty and intervals; its own seed, so the tasks are independent
+        T = TL[i]
         x, k, n = T['x'], T['k'], len(T['x'])
         # the Laplace Gaussian, reweighted to the exact posterior: metric groups nobody beats have one-sided posteriors
         eps = np.random.default_rng(i).standard_normal((IS_DRAWS, n))
@@ -485,20 +511,31 @@ def joint_fit(obs, ref, PB):
         w = np.exp(lw - lw.max()); w /= w.sum()
         D = float(fdi(x[None, :k], s_u)[0])
         S = expit(D + s_u * GH_U[:, None] - x[:k])
-        T.update(D=D, ess=float(1 / (w @ w)), slope=float(np.exp(GH_LW) @ (S.prod(1) * (1 - S).sum(1))),
-                 ci=[tuple(wpct(X[:, j], w, [.05, .95])) for j in range(n)])
-        T['lo'], T['hi'] = wpct(fdi(X[:, :k], s_u), w, [.05, .95])
+        lo, hi = wpct(fdi(X[:, :k], s_u), w, [.05, .95])
+        return dict(D=D, ess=float(1 / (w @ w)), slope=float(np.exp(GH_LW) @ (S.prod(1) * (1 - S).sum(1))),
+                    ci=[tuple(wpct(X[:, j], w, [.05, .95])) for j in range(n)], lo=lo, hi=hi)
+    for T, r in zip(TL, in_order(interval, len(TL))): T.update(r)
     # the FCI interval: resample tasks, refit the strengths and every task's parameters, hyperparameters held
-    full, draws, skipped = [T['x'].copy() for T in TL], [], 0
-    for seed in range(BOOT):
-        pick = np.random.default_rng(seed).integers(0, len(TL), len(TL))
-        try: d, _ = joint_mode([dict(TL[j], x=full[j].copy()) for j in pick], hb, th.copy())
-        except (ArithmeticError, np.linalg.LinAlgError): skipped += 1; continue   # left out and counted (should be none)
-        draws.append(on_scale(d, d[z]))
+    draws, skipped = fci_draws(TL, hb, th, z)
     point, (lo, hi) = on_scale(th, th[z]), np.percentile(draws, [5, 95], axis=0)
     out = {m: (round(float(point[i]), DEC), round(float(lo[i]), DEC), round(float(hi[i]), DEC), len({o[1] for o in obs if o[0] == m}))
            for i, m in enumerate(M)}
     return out, dict(zip(M, th)), th[z], tasks, hb, ll, [(hyp(r.x), -r.fun) for r in fits], unit0, skipped
+
+
+def fci_draws(TL, hb, th, z):
+    """The FCI bootstrap from the full fit (tasks TL at their mode, hyperparameters hb, strengths th, PASS_ZERO at index z):
+    draw seed resamples the tasks with default_rng(seed) and refits from the full fit, so the draws are independent.
+    Returns the draws on the FCI scale, in seed order, and the number left out because their mode was not found."""
+    full = [T['x'].copy() for T in TL]
+
+    def draw(seed):
+        pick = np.random.default_rng(seed).integers(0, len(TL), len(TL))
+        try: d, _ = joint_mode([dict(TL[j], x=full[j].copy()) for j in pick], hb, th.copy())
+        except (ArithmeticError, np.linalg.LinAlgError): return None   # left out and counted (should be none)
+        return on_scale(d, d[z])
+    draws = [d for d in in_order(draw, BOOT) if d is not None]
+    return draws, BOOT - len(draws)
 
 
 def p_pass(D, B, s_u, gh=None):
@@ -560,13 +597,14 @@ def eci_score(rows):
               anchor_model_high='reference', anchor_eci_high=float(HUMAN_VALUE))
     central, curves, _ = fit_eci_model(df, bootstrap_samples=0, **kw)
     point = dict(zip(central['Model'], central['eci']))
-    draws, dropped = [], 0
-    for seed in range(BOOT):
+    def draw(seed):
         try:
             _, _, d = fit_eci_model(df, bootstrap_samples=1, bootstrap_seed=seed, **kw)
-            draws.append(dict(zip(d['model_names'], d['eci'][0])))
+            return dict(zip(d['model_names'], d['eci'][0]))
         except ValueError:
-            dropped += 1
+            return None
+    draws = [d for d in in_order(draw, BOOT) if d is not None]
+    dropped = BOOT - len(draws)
     ntask = Counter(df['Model'])
     out = {}
     for m in point:
@@ -653,11 +691,10 @@ def scaling(db, tasks, hyp, theta0):
     end = {}   # a run's spend at its end: usd() at its last submission with a score point, 0 if none
     for r, sid in db.execute('select run_id, id from submissions order by run_id, ordinal'):
         if r in info and (r, sid) in pts: end[r] = usd(MODEL[info[r][0]][0], *pts[(r, sid)])
-    out = {}
-    for c in sorted({v[0] for v in info.values()}, key=lambda c: MODEL[c][0]):
+    def curve_of(c):   # one model's curve; its own generator, so the models are independent
         runs = {info[r][1]: r for r in info if info[r][0] == c}   # one run per model and task (metric_tasks asserts it)
         tl = sorted(runs); ends = [end.get(runs[t], 0) for t in tl]
-        if not max(ends): continue   # no spend reported: no curve
+        if not max(ends): return None   # no spend reported: no curve
         O = {t: tasks[t]['O'][tasks[t]['models'].index(c)] for t in tl}
         rng, curve = np.random.default_rng(3), []
         # budgets are rounded up to the stored precision before use, so each point is exact at its stored budget
@@ -669,8 +706,9 @@ def scaling(db, tasks, hyp, theta0):
             curve.append([float(B), round(float(v[0]), DEC), round(float(lo), DEC), round(float(hi), DEC), round(float(np.mean([e > B for e in ends])), 2)])
         drop = max([a[1] - b[1] for a, b in zip(curve, curve[1:])] + [0])
         assert drop <= 10 ** -DEC, f'{MODEL[c][0]}: test-time FCI falls by {drop} between budgets'
-        out[MODEL[c][0]] = curve
-    return out
+        return curve
+    cands = sorted({v[0] for v in info.values()}, key=lambda c: MODEL[c][0])
+    return {MODEL[c][0]: curve for c, curve in zip(cands, in_order(lambda i: curve_of(cands[i]), len(cands))) if curve is not None}
 
 
 def hidden_json(generated, hidden):   # one run per line, so a refresh diffs by run
