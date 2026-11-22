@@ -5,9 +5,12 @@ import json
 # (elapsed_seconds_margin_by_workload is the achieved R-C, not a threshold, so it is not emitted).
 def parse(ev):
     raw = ev.get('verifier/evidence.tar!/measurement.json')
-    if raw is None:
+    if raw is not None:
+        m = (json.loads(raw).get('measurement') or {}).get('metrics') or {}
+    elif ev.get('verifier/evidence.tar!/metrics.json'):   # a Pumpkin record: the same metrics, in metrics.json's 'metrics'
+        m = json.loads(ev['verifier/evidence.tar!/metrics.json']).get('metrics') or {}
+    else:
         return []
-    m = (json.loads(raw).get('measurement') or {}).get('metrics') or {}
     ids = m.get('final_workload_identities') or []
     c = m.get('final_candidate_elapsed_seconds') or []
     r = m.get('final_reference_elapsed_seconds') or []

@@ -9,7 +9,7 @@ import json, statistics
 #                      for beat flags. Fallback when the aggregate fields are absent: median of the per-workload values.
 # beat from metrics.beat_spec_workload_passes[].metrics.<metric>.
 def parse(ev):
-    raw = ev.get('verifier/evidence.tar!/measurement.json')
+    raw = ev.get('verifier/evidence.tar!/measurement.json') or ev.get('verifier/evidence.tar!/metrics.json')   # metrics.json: a Pumpkin record, same fields
     if raw is None:
         return []
     m = json.loads(raw).get('metrics') or {}
