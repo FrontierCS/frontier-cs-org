@@ -9,6 +9,8 @@ usage: python3 bin/fcs2_runs_from_db.py path/to/sqlite.db [--json=out.json] [--j
 --jobs (or FCS2_JOBS; default: the CPU count) is the number of worker processes for the independent loops: the FCI bootstrap,
 each task's importance sampling, each model's test-time scaling curve and the raw-score bootstrap. Every draw has its own seed
 and results are taken in seed, task and model order, so the output is the same for every N; --jobs=1 runs them in this process.
+The hyperparameter search stays one chain of warm-started solves; the workers compute each solve's per-task terms, which the
+main process adds up in task order.
 
 The database lists one run per (model, task version) in `cells`. A run's score is `display_score`:
 the verifier's final score, with timeouts shown as 0. Runs without a score are left out.
@@ -88,6 +90,7 @@ import json, re, sqlite3, sys
 from collections import Counter, defaultdict
 import multiprocessing, os
 from concurrent.futures import ProcessPoolExecutor
+from contextlib import contextmanager
 JOBS = int(os.environ.get('FCS2_JOBS') or os.cpu_count() or 1)   # worker processes for the independent loops (in_order below)
 for i, a in enumerate(sys.argv):
     if a.startswith('--jobs='): JOBS = int(a[7:])
@@ -266,6 +269,41 @@ def in_order(fn, n):
 def _call(i): return _FN(i)
 
 
+_POOL = None   # inside task_workers(TL): (the executor, TL, each worker's share of TL's indices)
+
+
+@contextmanager
+def task_workers(TL):
+    """While this is open, joint_mode on this very list of tasks computes its per-task terms (per_task) in JOBS forked worker
+    processes, which stay up for the whole search: the hyperparameter search is one sequential chain of warm-started solves,
+    but within a solve the tasks' terms are independent. The workers hold the tasks' data from the fork ('O', 'k', 'mi', which
+    do not change); the strengths and the tasks' parameters travel with every call."""
+    global _POOL
+    n = min(JOBS, len(TL))
+    if n <= 1: yield; return
+    cut = [len(TL) * i // n for i in range(n + 1)]
+    with ProcessPoolExecutor(n, mp_context=multiprocessing.get_context('fork')) as ex:
+        _POOL = (ex, TL, [range(a, b) for a, b in zip(cut, cut[1:])])
+        try: yield
+        finally: _POOL = None
+
+
+def per_task(deriv, TL, th, xs, hyp):
+    """Per task of TL, in TL's order, at parameters xs and strengths th: task_derivs's tuple (deriv) or the log joint."""
+    if _POOL is None or _POOL[1] is not TL: return [_task_term(deriv, T, th, x, hyp) for T, x in zip(TL, xs)]
+    return [r for part in _POOL[0].map(_task_terms, [(deriv, c, th, [xs[j] for j in c], hyp) for c in _POOL[2]]) for r in part]
+
+
+def _task_term(deriv, T, th, x, hyp):
+    if deriv: return task_derivs(x, th[T['mi']], T['O'], T['k'], hyp)
+    return float(task_lj(x[None], th[T['mi']], T['O'], T['k'], hyp)[0])
+
+
+def _task_terms(a):   # in a worker: its share c of the tasks
+    deriv, c, th, xs, hyp = a
+    return [_task_term(deriv, _POOL[1][j], th, x, hyp) for j, x in zip(c, xs)]
+
+
 def on_scale(theta, theta0):
     """Logits to FCI points, theta0 being PASS_ZERO's strength in the same fit."""
     return PASS_ZERO_VALUE + PASS_UNIT * (np.asarray(theta) - theta0)
@@ -432,11 +470,11 @@ def joint_mode(TL, hyp, th):
     halving. Returns the strengths and the profile log marginal likelihood: per task the Laplace approximation over its
     parameters, summed, plus the strengths' log prior. Leaves minus each task's Hessian in its 'A'."""
     nM = len(th)
-    F = lambda th, xs: sum(float(task_lj(x[None], th[T['mi']], T['O'], T['k'], hyp)[0]) for T, x in zip(TL, xs)) - LAM / 2 * th @ th
+    F = lambda th, xs: sum(per_task(False, TL, th, xs, hyp)) - LAM / 2 * th @ th
     xs = [T['x'] for T in TL]
     f = F(th, xs)
     for _ in range(100):
-        D = [task_derivs(x, th[T['mi']], T['O'], T['k'], hyp) for T, x in zip(TL, xs)]
+        D = per_task(True, TL, th, xs, hyp)
         gth, Hd, S, r, Ys = -LAM * th, np.full(nM, -LAM), np.zeros((nM, nM)), np.zeros(nM), []
         for T, (_, gx, Hxx, gt, Htt, Htx) in zip(TL, D):
             np.add.at(gth, T['mi'], gt); np.add.at(Hd, T['mi'], Htt)
@@ -496,8 +534,9 @@ def joint_fit(obs, ref, PB):
     starts = [(1.85, 1.0, 1.4, 3.3, 1.0), (1.0, 0.5, 1.0, 2.0, 0.5)]   # (s_u, a, d, tau, s_e)
     bounds = [(np.log(1e-3), np.log(7)), (np.log(1e-2), np.log(20)), (-20, 30), (np.log(.05), np.log(20)), (np.log(.02), np.log(20))]
     state['th'], _ = joint_cold(TL, hyp([np.log(v) if i != 2 else v for i, v in enumerate(starts[0])]), state['th'])
-    fits = [minimize(lambda p: -total(p), [np.log(s[0]), np.log(s[1]), s[2], np.log(s[3]), np.log(s[4])], method='Nelder-Mead',
-                     bounds=bounds, options={'xatol': 1e-3, 'fatol': 1e-6, 'maxiter': 4000}) for s in starts]
+    with task_workers(TL):   # the starts stay in order (each solve warm-starts the next); the tasks within a solve are shared out
+        fits = [minimize(lambda p: -total(p), [np.log(s[0]), np.log(s[1]), s[2], np.log(s[3]), np.log(s[4])], method='Nelder-Mead',
+                         bounds=bounds, options={'xatol': 1e-3, 'fatol': 1e-6, 'maxiter': 4000}) for s in starts]
     hb = hyp(min(fits, key=lambda r: r.fun).x)
     th, ll = joint_mode(TL, hb, state['th'])
     s_u, z = hb[0], M.index(PASS_ZERO)

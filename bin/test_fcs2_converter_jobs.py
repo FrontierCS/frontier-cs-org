@@ -2,7 +2,7 @@
 
 bin/fcs2_runs_from_db.py converts a database as soon as it is loaded, so the test loads only its definitions (everything
 above the line that opens the database). Skipped where numpy, scipy or pandas is missing."""
-import sys, types, unittest
+import importlib.util, sys, types, unittest
 from pathlib import Path
 
 SRC = Path(__file__).resolve().parent / 'fcs2_runs_from_db.py'
@@ -22,8 +22,8 @@ def definitions():
 class ConverterJobsTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        try: import numpy, scipy, pandas, tqdm   # noqa: F401
-        except ImportError as e: raise unittest.SkipTest(f'the converter needs {e.name}')
+        missing = [m for m in ('numpy', 'scipy', 'pandas', 'tqdm') if importlib.util.find_spec(m) is None]
+        if missing: raise unittest.SkipTest(f'the converter needs {missing}')
         cls.c = definitions()
 
     def run_with(self, jobs, fn):
@@ -44,17 +44,35 @@ class ConverterJobsTests(unittest.TestCase):
         for jobs in (1, 3):
             with self.assertRaises(ArithmeticError): self.run_with(jobs, lambda: self.c.in_order(fn, 8))
 
-    def test_fci_bootstrap_draws_do_not_depend_on_jobs(self):
+    def tasks(self, nM=5):
+        """Six tasks, every model one run on each: two metric groups, then the margin and its code."""
         import numpy as np
-        c, rng = self.c, np.random.default_rng(0)
-        nM, hyp = 5, (1.5, 1.0, 1.4, 3.3, 1.0)
-        strength = np.linspace(-2, 2, nM)
-        TL = []
-        for t in range(6):   # six tasks, every model one run on each: two metric groups, then the margin and its code
+        rng, strength, TL = np.random.default_rng(0), np.linspace(-2, 2, nM), []
+        for t in range(6):
             G = (rng.random((nM, 2)) < 1 / (1 + np.exp(-(strength[:, None] - rng.normal(0, 1, 2))))).astype(float)
             ok, y = G.all(1), rng.normal(0, 1, nM)
             O = np.column_stack([G, np.where(ok | (y < 0), y, 0.0), np.where(ok | (y < 0), 0.0, 1.0)])
             TL.append({'O': O, 'k': 2, 'mi': np.arange(nM), 'x': np.zeros(3)})
+        return TL
+
+    def test_joint_mode_with_task_workers_is_the_sequential_one(self):
+        import numpy as np
+        c, hyp, got = self.c, (1.5, 1.0, 1.4, 3.3, 1.0), []
+        for jobs in (1, 3):
+            c.JOBS, TL, used = jobs, self.tasks(), []
+            with c.task_workers(TL):
+                used.append(c._POOL is not None)
+                th, ll = c.joint_cold(TL, hyp, np.zeros(5))
+                th, ll2 = c.joint_mode(TL, (1.4, 1.1, 1.3, 3.0, 0.9), th)
+            self.assertEqual(used, [jobs > 1])
+            self.assertIsNone(c._POOL)
+            got.append(th.tobytes() + np.array([ll, ll2]).tobytes() + b''.join(T['x'].tobytes() + T['A'].tobytes() for T in TL))
+        self.assertEqual(got[0], got[1])
+
+    def test_fci_bootstrap_draws_do_not_depend_on_jobs(self):
+        import numpy as np
+        c, nM, hyp, TL = self.c, 5, (1.5, 1.0, 1.4, 3.3, 1.0), self.tasks()
+        c.JOBS = 1
         th, _ = c.joint_cold(TL, hyp, np.zeros(nM))
         c.BOOT = 16
         (d1, s1), (d3, s3) = (self.run_with(j, lambda: c.fci_draws(TL, hyp, th, 0)) for j in (1, 3))
