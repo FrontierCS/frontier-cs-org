@@ -31,11 +31,11 @@ from datetime import datetime, timezone
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 lit = {}
-for f, names in (('fcs2_db_from_platform.py', ('SCORE', 'REFERENCE', 'ZERO', 'COMPLETED', 'WHY')), ('fcs2_runs_from_db.py', ('TASK', 'MODEL', 'ALT'))):
+for f, names in (('fcs2_db_from_platform.py', ('SCORE', 'REFERENCE', 'ZERO', 'COMPLETED', 'WHY')), ('fcs2_runs_from_db.py', ('TASK', 'MODEL'))):
     for n in ast.parse((ROOT / 'bin' / f).read_text()).body:   # the first, literal assignment of each
         for t in getattr(n, 'targets', []):
             if isinstance(t, ast.Name) and t.id in names and t.id not in lit: lit[t.id] = ast.literal_eval(n.value)
-SCORE, REFERENCE, ZERO, COMPLETED, WHY, TASK, MODEL, ALT = (lit[k] for k in ('SCORE', 'REFERENCE', 'ZERO', 'COMPLETED', 'WHY', 'TASK', 'MODEL', 'ALT'))
+SCORE, REFERENCE, ZERO, COMPLETED, WHY, TASK, MODEL = (lit[k] for k in ('SCORE', 'REFERENCE', 'ZERO', 'COMPLETED', 'WHY', 'TASK', 'MODEL'))
 short = lambda t: TASK[t][1] or t.split(' — ')[0]
 BY_SHORT = {}
 for t in TASK: BY_SHORT.setdefault(short(t), []).append(t)
@@ -63,7 +63,7 @@ RELEASE_ID = {'fable51': 'fable', 'carbon-g': 'carbon'}
 
 
 def candidate(r):
-    if r['candidate_name'] in MODEL or r['candidate_name'] in ALT: return r['candidate_name']
+    if r['candidate_name'] in MODEL: return r['candidate_name']
     names = [c for c, v in MODEL.items() if v[0] == RELEASE_ID.get(r['model_id'], r['model_id'])]
     assert len(names) == 1, f'{r["model_id"]}: more than one database name {names}'
     return names[0]
@@ -115,8 +115,8 @@ for r in sorted(rel['runs'], key=lambda r: (cands.index(candidate(r)), tasks[r['
             db.execute('insert into submissions values (?,?,?,?,?)', (rid, 'final', 'final', 'final:' + rid, len(sp['dev'])))
             db.execute('insert into score_points values (?,?,?,?,null)', (rid, 'final', score, sp['usd'] * 1e6))
         continue
-    t = None if c in ALT else traj.get((MODEL[c][0], short(tname)))
-    if t is None: continue   # a hidden model's run, or one of a second harness (ALT): the site keeps no spend for it
+    t = traj.get((MODEL[c][0], short(tname)))
+    if t is None: continue   # a hidden model's run: the site keeps no spend for it
     used.add((MODEL[c][0], short(tname)))
     assert round(score, 1) == t[2] and int(verdict == 'PASS') == t[3], f'{rid}: the release and TRAJ disagree'
     for n, (usd, dev) in enumerate(t[6]):
